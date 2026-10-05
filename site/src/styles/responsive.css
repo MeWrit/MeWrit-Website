@@ -33,12 +33,14 @@
   .dd span{font-size:.82rem;color:var(--muted)}
   .header-cta{display:inline-flex}
 
-  /* desktop: the ribbons cross the text column, so they drop to 10% strength behind it
-     (measured on screen: the paragraph fell to 1.19:1 contrast at the densest crossing without this) */
+  /* desktop: the ribbons flow through the copy column and fade out where the heartbeat panel
+     begins (--rib-h, set by src/scripts/ribbons.js). Right under the text the script veils them
+     to a tenth of their strength (without that, a paragraph measured 1.19:1 contrast at the
+     densest crossing). */
   .ribbons{
-    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 58%,transparent 84%),linear-gradient(90deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 40%,#000 60%);
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 86%,transparent 93%),linear-gradient(90deg,#000 0,#000 calc(var(--rib-h,55%) - 14%),transparent var(--rib-h,55%));
     -webkit-mask-composite:source-in;
-    mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 58%,transparent 84%),linear-gradient(90deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 40%,#000 60%);
+    mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 86%,transparent 93%),linear-gradient(90deg,#000 0,#000 calc(var(--rib-h,55%) - 14%),transparent var(--rib-h,55%));
     mask-composite:intersect}
   .hero-grid{grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"copy visual" "stats stats";align-items:center;column-gap:clamp(32px,5vw,80px);row-gap:18px;padding-block:22px 24px}
   .hero-copy{grid-area:copy}

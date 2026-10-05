@@ -6,5 +6,8 @@ The new website for MeWriT (mewrit.com), medical writing and training led by Dr 
 - `design/`: the design prototypes the site grew from (v1 first sample, v2 mobile first,
   v3 the current direction) with their preview images.
 
-Preview: https://mewrit.github.io/MeWrit-Website/ is rebuilt on every push to `main` by
-`.github/workflows/deploy.yml`. It is kept out of search results until launch.
+Preview, rebuilt on every push to `main` by `.github/workflows/deploy.yml` and kept out of
+search results until launch:
+
+- Version A (loading intro): https://mewrit.github.io/MeWrit-Website/
+- Version B (the logo draws itself in the header): https://mewrit.github.io/MeWrit-Website/version-b/

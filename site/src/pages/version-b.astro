@@ -1,0 +1,9 @@
+---
+// Home page, version B: no loading intro; the logo draws itself in the header on every load.
+import Base from '../layouts/Base.astro';
+import HomeSections from '../components/HomeSections.astro';
+import { site } from '../data/site';
+---
+<Base intro="header" title={`${site.title} (version B)`}>
+  <HomeSections />
+</Base>

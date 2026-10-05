@@ -1,11 +1,31 @@
 ---
 // Fixed header: logo, desktop navigation with dropdowns, call to action, phone menu button.
+// With `animatedLogo` (version B) the logo draws itself in place (src/scripts/header-logo.js,
+// src/styles/header-logo.css): its layers sit over the real logo image, which takes over
+// when the drawing is done.
 import { nav } from '../data/site';
 import { href } from '../lib/url';
+
+interface Props { animatedLogo?: boolean }
+const { animatedLogo = false } = Astro.props;
+const logoBase = href('/brand/logo-base.png');
 ---
 <header class="site-header" id="siteHeader">
   <div class="wrap">
-    <a class="logo" href={href('/')} aria-label="MeWriT home"><img id="headerLogo" src={href('/brand/logo-original.png')} alt="MeWriT, Writing Science Right" width="242" height="50"></a>
+    <a class="logo" href={href('/')} aria-label="MeWriT home">
+      <img id="headerLogo" src={href('/brand/logo-original.png')} alt="MeWriT, Writing Science Right" width="242" height="50">
+      {animatedLogo && (
+        <span class="la" id="logoAnim" aria-hidden="true">
+          <img class="la-part la-base" src={logoBase} alt="">
+          <img class="la-part la-label la-l1" src={logoBase} alt="">
+          <img class="la-part la-label la-l2" src={logoBase} alt="">
+          <img class="la-part la-label la-l3" src={logoBase} alt="">
+          <canvas class="la-part" id="laInk" width="1112" height="230"></canvas>
+          <span class="la-glow" id="laGlow"></span>
+          <img class="la-pen" id="laPen" src={href('/brand/pen-cutout.png')} alt="">
+        </span>
+      )}
+    </a>
     <nav class="nav-desktop" aria-label="Main">
       <ul>
         {nav.map(item => 'items' in item ? (

@@ -1,0 +1,19 @@
+/* ---------------- version B: the logo draws itself in the header ----------------
+   The layers (src/components/SiteHeader.astro) sit exactly over the real logo image, which
+   is hidden while they play and takes over when the drawing is done. With reduced motion,
+   ?static, or if the script never runs (the boot script's failsafe adds .logo-done), the
+   real logo simply shows. Clip boxes come from the logo's parts, in logo pixels of 1112 x 230. */
+.logo{position:relative}
+.la{display:none}
+.logo-anim:not(.logo-done) .la{display:block;position:absolute;left:0;top:0;bottom:0;margin:auto 0;height:40px;aspect-ratio:1112 / 230;pointer-events:none;will-change:opacity}
+.logo-anim:not(.logo-done) #headerLogo{opacity:0}
+.logo .la-part{position:absolute;left:0;top:0;width:100%;height:100%}
+.la-base{clip-path:inset(0 42.986% 0 0)}                      /* wordmark, registered mark, tagline: x 0 to 634 */
+.la-l1{clip-path:inset(16.957% 12.410% 70.435% 58.993%)}      /* MEDICAL WRITING: x 656 to 974, y 39 to 68 */
+.la-l2{clip-path:inset(42.174% 25.629% 44.783% 58.993%)}      /* TRAINING: x 656 to 827, y 97 to 127 */
+.la-l3{clip-path:inset(67.826% 0 19.565% 59.083%)}            /* HEALTHCARE CONSULTING: x 657 to 1112, y 156 to 185 */
+.la-label{opacity:0;will-change:transform,opacity}
+.logo .la-pen{position:absolute;left:0;top:0;width:5.036%;height:auto;opacity:0;will-change:transform,opacity}   /* 56 of 1112 */
+.la-glow{position:absolute;left:0;top:0;width:10%;aspect-ratio:1;margin:-5% 0 0 -5%;border-radius:50%;opacity:0;will-change:transform,opacity;
+  background:radial-gradient(closest-side,rgba(231,120,23,.32),rgba(231,120,23,0))}
+@media (min-width:900px){.logo-anim:not(.logo-done) .la{height:50px}}

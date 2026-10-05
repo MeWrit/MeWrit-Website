@@ -1,5 +1,7 @@
 ---
-// Page shell: head, logo intro, header, phone menu, footer, quick contact and the scripts.
+// Page shell: head, logo animation, header, phone menu, footer, quick contact and the scripts.
+// `intro` picks the page's logo animation: "overlay" (the loading intro, home page only),
+// "header" (version B: the logo draws itself in the header) or "none" (every other page).
 import '@fontsource-variable/inter';
 import '@fontsource-variable/fraunces/opsz.css';
 // the prototype's stylesheet in its original order (see the note in tokens.css)
@@ -8,6 +10,7 @@ import '../styles/base.css';
 import '../styles/header.css';
 import '../styles/hero.css';
 import '../styles/intro.css';
+import '../styles/header-logo.css';
 import '../styles/sections.css';
 import '../styles/responsive.css';
 import Intro from '../components/Intro.astro';
@@ -16,15 +19,15 @@ import MobileMenu from '../components/MobileMenu.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import QuickContact from '../components/QuickContact.astro';
 import { site } from '../data/site';
+import { href } from '../lib/url';
 
-interface Props { title?: string; description?: string }
-const { title = site.title, description = site.description } = Astro.props;
+interface Props { title?: string; description?: string; intro?: 'overlay' | 'header' | 'none' }
+const { title = site.title, description = site.description, intro = 'none' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
-import { href } from '../lib/url';
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-intro={intro}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -36,27 +39,25 @@ import { href } from '../lib/url';
 <link rel="icon" href={href('/favicon.png')} type="image/png">
 <link rel="apple-touch-icon" href={href('/apple-touch-icon.png')}>
 <script is:inline>
-/* boot: runs before first paint. Decides whether the logo intro plays (once per
-   session, never with reduced motion), and sets a failsafe so content can never
-   stay hidden if a later script fails. URL switches for review:
-   ?intro (replay intro) ?nointro ?static (no motion, for screenshots)
+/* boot: runs before first paint. Starts the page's logo animation (on every load, never
+   with reduced motion), and sets a failsafe so content can never stay hidden if a later
+   script fails. URL switches for review: ?nointro ?static (no motion, for screenshots)
    ?hero=ribbons | ?hero=ecg (show one hero element only) */
 (function () {
   var d = document.documentElement, q = location.search;
   d.classList.add('js');
   var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  var seen = false; try { seen = sessionStorage.getItem('mewrit-intro') === '1'; } catch (e) {}
-  var stat = /[?&]static\b/.test(q);
+  var stat = /[?&]static\b/.test(q), skip = /[?&]nointro\b/.test(q);
   if (stat) d.classList.add('static');
-  var force = /[?&]intro\b/.test(q), skip = /[?&]nointro\b/.test(q);
-  if (!reduce && !stat && !skip && (force || !seen)) {
-    d.classList.add('intro-on');
-    try { history.scrollRestoration = 'manual'; } catch (e) {}
+  var anim = d.getAttribute('data-intro');
+  if (!reduce && !stat && !skip) {
+    if (anim === 'overlay') { d.classList.add('intro-on'); try { history.scrollRestoration = 'manual'; } catch (e) {} }
+    if (anim === 'header') d.classList.add('logo-anim');
   }
   if (!reduce && !stat) d.classList.add('pre-enter');
   var hero = (q.match(/[?&]hero=(\w+)/) || [])[1];
   if (hero) d.setAttribute('data-hero', hero);
-  // failsafe: the page shows after 8.4 s whatever happens to the scripts. Once the intro is
+  // failsafe: the page shows after 8.4 s whatever happens to the scripts. Once an animation is
   // actually playing it moves this to just past its own end (window.mewritFailsafe).
   var timer = 0;
   function reveal() {
@@ -64,23 +65,26 @@ import { href } from '../lib/url';
       var o = document.getElementById('intro'); if (o) o.style.display = 'none';
       d.style.overflow = '';
     }
+    d.classList.add('logo-done');   // the header version: show the finished logo
     d.classList.remove('pre-enter'); d.classList.add('logo-landed');
     if (!d.classList.contains('intro-prepared')) { d.classList.add('intro-prepared'); document.dispatchEvent(new Event('mewrit:prepare')); }
     document.dispatchEvent(new Event('mewrit:introdone'));   // the heartbeat panel waits for this
   }
-  // (re)schedule the failsafe; 0 cancels it (the intro does that when it finishes normally)
+  // (re)schedule the failsafe; 0 cancels it (an animation does that when it finishes normally)
   window.mewritFailsafe = function (ms) { clearTimeout(timer); if (ms > 0) timer = setTimeout(reveal, ms); };
   window.mewritFailsafe(8400);
 })();
 </script>
+{intro !== 'none' && <>
 <link rel="preload" as="image" href={href('/brand/logo-base.png')}>
 <link rel="preload" as="image" href={href('/brand/pen-cutout.png')}>
 <link rel="preload" as="image" href={href('/brand/logo-original.png')}>
+</>}
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<Intro />
-<SiteHeader />
+{intro === 'overlay' && <Intro />}
+<SiteHeader animatedLogo={intro === 'header'} />
 <MobileMenu />
 <main id="main">
   <slot />

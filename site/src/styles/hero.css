@@ -3,10 +3,11 @@
 .hero::before{content:"";position:absolute;inset:0;z-index:-2;background:
   radial-gradient(70% 45% at 92% 6%, rgba(224,122,31,.07), transparent 70%),
   radial-gradient(60% 50% at 0% 100%, rgba(46,80,142,.06), transparent 70%)}
-/* ribbons fade out before the hero ends, so there is no edge where the page continues */
+/* one column: the ribbons flow through the copy and fade out above the heartbeat panel
+   (--rib-v is the panel's top, set by src/scripts/ribbons.js; the fallback suits a phone) */
 .ribbons{position:absolute;inset:0;width:100%;height:100%;z-index:-1;
-  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 70%,transparent 100%);
-  mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 70%,transparent 100%)}
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 calc(var(--rib-v,52%) - 12%),transparent var(--rib-v,52%));
+  mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 calc(var(--rib-v,52%) - 12%),transparent var(--rib-v,52%))}
 .hero-grid{flex:1;display:grid;grid-template-rows:auto minmax(0,1fr);gap:22px;padding-block:18px 20px;min-height:0}
 .hero h1{margin-bottom:14px}
 .hero h1 em{font-style:italic;color:var(--orange-ink)}
