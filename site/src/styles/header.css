@@ -1,0 +1,32 @@
+/* ---------------- header (floats over the hero) ----------------
+   Fixed, transparent at the top, solid once scrolled. backdrop-filter and the
+   hide transform make this a containing block for fixed descendants: it has none
+   (the menu is a <dialog> in the top layer; the intro overlay lives in <body>). */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:40;border-bottom:1px solid transparent;
+  transition:background .35s,border-color .35s,transform .35s ease}
+.site-header.is-solid{background:rgba(251,252,254,.9);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom-color:var(--line)}
+.site-header.is-hidden{transform:translateY(-100%)}
+.site-header .wrap{height:var(--header-h);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;min-height:48px}
+.logo img{height:40px;width:auto}
+.intro-on:not(.logo-landed) .site-header .logo img{opacity:0}
+.menu-btn{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;margin-right:-6px}
+.nav-desktop,.header-cta{display:none}
+
+/* ---------------- mobile menu (dialog) ---------------- */
+.menu-sheet{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;border:0;padding:0;background:var(--page);color:var(--body)}
+.menu-sheet::backdrop{background:rgba(20,33,61,.35)}
+.menu-sheet[open]{display:flex;flex-direction:column}
+@media (prefers-reduced-motion:no-preference){.menu-sheet[open]{animation:sheetIn .25s ease-out}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.menu-top{display:flex;align-items:center;justify-content:space-between;height:var(--header-h);padding-inline:var(--gutter);border-bottom:1px solid var(--line);flex:none}
+.menu-top img{height:40px;width:auto}
+.menu-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px var(--gutter) 24px}
+.menu-body > a,.menu-body summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;font-size:1.12rem;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line);list-style:none;cursor:pointer}
+.menu-body summary::-webkit-details-marker{display:none}
+.menu-body summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-right:6px;transition:transform .2s}
+.menu-body details[open] summary::after{transform:rotate(-135deg)}
+.menu-body details div{padding:4px 0 10px}
+.menu-body details a{display:flex;align-items:center;min-height:48px;padding-left:14px;color:var(--body)}
+.menu-foot{flex:none;display:grid;gap:10px;padding:16px var(--gutter) calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.menu-foot .btn{width:100%}

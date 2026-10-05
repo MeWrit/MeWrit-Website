@@ -1,0 +1,12 @@
+---
+import { areas } from '../data/home';
+---
+<section class="block areas" id="areas" aria-labelledby="areas-title">
+  <div class="wrap">
+    <div class="block-head reveal"><p class="eyebrow">{areas.eyebrow}</p><h2 id="areas-title">{areas.title}</h2></div>
+    <div class="chips reveal" id="areaChips" data-collapsed="true">
+      {areas.list.map(a => <span class="chip">{a}</span>)}
+    </div>
+    <button class="btn btn-outline areas-toggle" id="areasToggle" aria-expanded="false" aria-controls="areaChips">Show all {areas.list.length} areas</button>
+  </div>
+</section>

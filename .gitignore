@@ -1,0 +1,10 @@
+# This repository holds the website (site/) and its design prototypes (design/).
+# Everything else in this folder (the copy-editing Word document, the copies of the
+# current live pages) stays local.
+/*
+!/.github/
+!/design/
+!/site/
+!/.gitattributes
+!/.gitignore
+!/README.md

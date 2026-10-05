@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MeWriT | Medical Writing &amp; Training</title>
+<meta name="description" content="Founder-led medical writing and training consultancy in Ahmedabad, India.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1E3A6E; --navy-2:#2E508E; --ink:#14213D; --body:#45506A; --muted:#6B7590;
+  --orange:#E07A1F; --orange-soft:#FDF1E6; --bg:#FFFFFF; --bg-soft:#F5F7FB; --line:#E3E8F1;
+  --radius:14px; --shadow:0 10px 30px rgba(20,33,61,.08);
+  --serif:"Fraunces", Georgia, serif; --sans:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--body);background:var(--bg);line-height:1.65;font-size:16px}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+h1,h2,h3{font-family:var(--serif);color:var(--ink);line-height:1.15;font-weight:600}
+h2{font-size:clamp(1.8rem,3.2vw,2.6rem)}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--orange)}
+.lead{font-size:1.1rem;color:var(--body);max-width:60ch}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.4rem;border-radius:999px;font-weight:600;font-size:.95rem;transition:transform .15s,box-shadow .15s,background .15s}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:0 8px 20px rgba(224,122,31,.28)}
+.btn-primary:hover{transform:translateY(-1px);background:#cf6c12}
+.btn-ghost{border:1.5px solid var(--navy-2);color:var(--navy)}
+.btn-ghost:hover{background:var(--navy);color:#fff}
+section{padding:88px 0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:40px;flex-wrap:wrap}
+.sec-head p{max-width:46ch}
+
+/* utility bar + header */
+.topbar{background:var(--ink);color:#C9D2E6;font-size:.82rem}
+.topbar .wrap{display:flex;justify-content:space-between;gap:16px;padding:8px 0;flex-wrap:wrap}
+.topbar a:hover{color:#fff}
+.topbar .tb-left{display:flex;gap:22px;flex-wrap:wrap}
+header.site{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:78px;gap:20px}
+.logo img{height:52px;width:auto}
+nav.main{display:flex;align-items:center;gap:6px}
+nav.main > a, nav.main .dd > button{font:500 .95rem var(--sans);color:var(--ink);padding:10px 14px;border-radius:8px;background:none;border:0;cursor:pointer}
+nav.main > a:hover, nav.main .dd > button:hover{background:var(--bg-soft)}
+.dd{position:relative}
+.dd-menu{position:absolute;top:calc(100% + 8px);left:0;min-width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.18s}
+.dd:hover .dd-menu,.dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:none}
+.dd-menu a{display:block;padding:10px 12px;border-radius:8px}
+.dd-menu a strong{display:block;color:var(--ink);font-weight:600;font-size:.93rem}
+.dd-menu a span{font-size:.82rem;color:var(--muted)}
+.dd-menu a:hover{background:var(--bg-soft)}
+.menu-toggle{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#F5F7FB 0%,#fff 100%);padding:72px 0 80px}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.4rem,5vw,4rem);letter-spacing:-.01em;margin:18px 0 20px}
+.hero h1 em{font-style:italic;color:var(--orange)}
+.hero .actions{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 40px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;border-top:1px solid var(--line);padding-top:26px}
+.stats b{display:block;font-family:var(--serif);font-size:1.9rem;color:var(--navy)}
+.stats span{font-size:.82rem;color:var(--muted);line-height:1.35;display:block}
+.ecg{position:absolute;left:0;right:0;bottom:30px;width:100%;height:120px;opacity:.5;pointer-events:none}
+.portrait{position:relative}
+.portrait .frame{border-radius:28px 28px 28px 120px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:4/5;background:#dfe5f0}
+.portrait .frame img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;display:flex;gap:12px;align-items:center;font-size:.85rem}
+.badge b{color:var(--ink);display:block}
+.badge .dot{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none}
+.badge.b1{left:-34px;bottom:56px}
+.badge.b1 .dot{background:var(--orange-soft);color:var(--orange)}
+.badge.b2{right:-18px;top:34px}
+.badge.b2 .dot{background:#E8EEF8;color:var(--navy-2)}
+
+/* affiliations */
+.affil{padding:30px 0;border-block:1px solid var(--line);background:#fff}
+.affil .wrap{display:flex;align-items:center;gap:28px;flex-wrap:wrap;justify-content:center}
+.affil p{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.affil ul{display:flex;gap:12px;flex-wrap:wrap;list-style:none;justify-content:center}
+.affil li{border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-size:.88rem;color:var(--navy);font-weight:500;background:var(--bg-soft)}
+
+/* services */
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px;transition:transform .2s,box-shadow .2s,border-color .2s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:transparent}
+.card .ico{width:52px;height:52px;border-radius:12px;background:#E8EEF8;color:var(--navy-2);display:grid;place-items:center;margin-bottom:20px}
+.card h3{font-size:1.3rem;margin-bottom:10px}
+.card p{font-size:.95rem;flex:1}
+.card .more{margin-top:18px;font-weight:600;color:var(--orange);font-size:.92rem}
+.card.feature{background:var(--navy);color:#C9D2E6;border:0}
+.card.feature h3{color:#fff}
+.card.feature .ico{background:rgba(255,255,255,.1);color:#fff}
+
+/* why */
+.why{background:var(--bg-soft)}
+.why .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.why-item{background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--line)}
+.why-item b{font-family:var(--serif);font-size:1.15rem;color:var(--ink);display:block;margin-bottom:6px}
+.why-item p{font-size:.92rem}
+.num{font-family:var(--serif);color:var(--orange);font-size:.95rem;margin-bottom:8px;display:block}
+
+/* therapeutic areas */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:.92rem;color:var(--ink);transition:.15s}
+.chips span:hover{border-color:var(--orange);color:var(--orange)}
+
+/* trainings */
+.train{background:var(--ink);color:#C9D2E6;position:relative;overflow:hidden}
+.train h2,.train h3{color:#fff}
+.train .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px}
+.tcard{border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px;background:rgba(255,255,255,.04)}
+.tcard .tag{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:rgba(224,122,31,.18);color:#F6B57A;margin-bottom:16px}
+.tcard h3{font-size:1.6rem;margin-bottom:10px}
+.tcard ul{list-style:none;margin:20px 0 26px;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.tcard li{font-size:.9rem;padding-left:20px;position:relative}
+.tcard li::before{content:"";position:absolute;left:0;top:.6em;width:8px;height:8px;border-radius:2px;background:var(--orange);transform:rotate(45deg)}
+.meta{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;margin-bottom:24px}
+.meta span{display:flex;gap:6px;align-items:center}
+.train .btn-ghost{border-color:rgba(255,255,255,.4);color:#fff}
+.train .btn-ghost:hover{background:#fff;color:var(--ink)}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;counter-reset:s}
+.step{position:relative;padding-top:56px}
+.step::before{counter-increment:s;content:"0" counter(s);position:absolute;top:0;left:0;font-family:var(--serif);font-size:2.2rem;color:var(--orange)}
+.step::after{content:"";position:absolute;top:22px;left:70px;right:-11px;height:1px;background:var(--line)}
+.step:last-child::after{display:none}
+.step b{display:block;color:var(--ink);font-size:1.05rem;margin-bottom:6px}
+.step p{font-size:.92rem}
+
+/* testimonials */
+.testi{background:var(--bg-soft)}
+.slider{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 44px)/3);gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:thin}
+.quote{scroll-snap-align:start;background:#fff;border-radius:var(--radius);padding:30px;border:1px solid var(--line);display:flex;flex-direction:column}
+.quote svg{color:var(--orange);margin-bottom:14px}
+.quote p{font-family:var(--serif);font-size:1.08rem;color:var(--ink);line-height:1.5;flex:1}
+.quote small{display:block;margin-top:20px;color:var(--muted);font-size:.85rem}
+.slider-nav{display:flex;gap:10px}
+.slider-nav button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--navy)}
+.slider-nav button:hover{background:var(--navy);color:#fff}
+
+/* consult */
+.consult .box{background:linear-gradient(135deg,var(--navy) 0%,#2B4F8F 100%);border-radius:28px;padding:56px;display:grid;grid-template-columns:1fr 1fr;gap:48px;color:#D7DEEE;position:relative;overflow:hidden}
+.consult h2{color:#fff}
+.consult .contact-lines{margin-top:28px;display:grid;gap:12px;font-size:.95rem}
+.consult .contact-lines a{color:#fff;font-weight:500}
+form.enquiry{background:#fff;border-radius:20px;padding:28px;display:grid;gap:14px;position:relative;z-index:1}
+form.enquiry .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+form.enquiry label{font-size:.8rem;font-weight:600;color:var(--ink);display:grid;gap:6px}
+form.enquiry input,form.enquiry select,form.enquiry textarea{font:inherit;font-size:.95rem;border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);background:var(--bg-soft);width:100%}
+form.enquiry textarea{min-height:96px;resize:vertical}
+form.enquiry input:focus,form.enquiry select:focus,form.enquiry textarea:focus{outline:2px solid var(--orange);outline-offset:1px;background:#fff}
+form.enquiry .btn{justify-content:center;border:0;cursor:pointer}
+
+/* footer */
+footer{background:var(--ink);color:#AEB8CF;padding:64px 0 28px;font-size:.92rem}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px}
+footer h4{color:#fff;font:600 .95rem var(--sans);margin-bottom:14px}
+footer ul{list-style:none;display:grid;gap:9px}
+footer a:hover{color:#fff}
+footer .fl{background:#fff;border-radius:10px;padding:10px;display:inline-block;margin-bottom:16px}
+footer .fl img{height:44px}
+footer .bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:44px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.82rem}
+.wa{position:fixed;right:22px;bottom:22px;width:56px;height:56px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(37,211,102,.35);z-index:60}
+
+/* placeholder marker for new copy */
+.ph{outline:1px dashed rgba(224,122,31,.55);outline-offset:3px;border-radius:2px}
+
+/* responsive */
+@media (max-width:980px){
+  nav.main,.header-cta{display:none}
+  .menu-toggle{display:block}
+  nav.main.open{display:flex;position:absolute;top:78px;left:0;right:0;flex-direction:column;align-items:stretch;background:#fff;padding:12px 16px 20px;border-bottom:1px solid var(--line)}
+  nav.main.open .dd-menu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;padding:0 0 0 12px}
+  .hero .wrap,.why .wrap,.consult .box{grid-template-columns:1fr}
+  .portrait{max-width:420px;margin:0 auto}
+  .services-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .step::after{display:none}
+  .slider{grid-auto-columns:80%}
+  footer .cols{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  section{padding:64px 0}
+  .stats{grid-template-columns:1fr 1fr}
+  .services-grid,.why-grid,.train .grid,.steps,footer .cols,form.enquiry .row{grid-template-columns:1fr}
+  .tcard ul{grid-template-columns:1fr}
+  .consult .box{padding:28px}
+  .badge.b1{left:-6px}.badge.b2{right:-6px}
+  .topbar .tb-right{display:none}
+  .slider{grid-auto-columns:88%}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div class="tb-left"><a href="tel:+919727716506">+91 97277 16506</a><a href="mailto:hetal@mewrit.com">hetal@mewrit.com</a></div>
+  <div class="tb-right"><a href="https://www.linkedin.com/company/mewrit">LinkedIn</a> &nbsp;·&nbsp; <a href="https://academy.mewrit.com/">MeWriT Academy</a></div>
+</div></div>
+
+<header class="site"><div class="wrap">
+  <a class="logo" href="#"><img src="https://mewrit.com/images/final1.png" alt="MeWriT, Writing Science Right"></a>
+  <nav class="main" id="nav">
+    <div class="dd"><button>About</button>
+      <div class="dd-menu">
+        <a href="#"><strong>Our Leadership</strong><span>Dr Hetal Shah and team</span></a>
+        <a href="#areas"><strong>Therapeutic Areas</strong><span>17 areas of experience</span></a>
+        <a href="#"><strong>Publications</strong><span>Acknowledgements, papers, chapters</span></a>
+      </div></div>
+    <div class="dd"><button>Services</button>
+      <div class="dd-menu">
+        <a href="#services"><strong>Regulatory Documentation</strong><span>Protocols, CSRs, CTD modules</span></a>
+        <a href="#services"><strong>Scientific Publications</strong><span>Manuscripts, abstracts, posters</span></a>
+        <a href="#services"><strong>Medical Communications</strong><span>Slide decks, leaflets, grants</span></a>
+        <a href="#services"><strong>Research Support</strong><span>EC/IRB, experts, referrals</span></a>
+      </div></div>
+    <a href="#trainings">Trainings</a>
+    <a href="#">Gallery &amp; Events</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a class="btn btn-primary header-cta" href="#contact">Request a consultation</a>
+  <button class="menu-toggle" aria-label="Open menu" onclick="document.getElementById('nav').classList.toggle('open')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+</div></header>
+
+<section class="hero">
+  <svg class="ecg" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70 H520 L548 70 L566 28 L590 108 L612 12 L636 92 L652 70 H1440" fill="none" stroke="#E07A1F" stroke-width="1.5" stroke-opacity=".35"/></svg>
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Medical Writing &amp; Training, Ahmedabad</span>
+      <h1>We write your <em>science</em> right.</h1>
+      <p class="lead">A founder-led boutique medical writing consultancy delivering regulatory documents, scientific publications and expert training for pharma, CROs, device companies and academia.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#contact">Request a consultation</a>
+        <a class="btn btn-ghost" href="#trainings">Explore trainings</a>
+      </div>
+      <div class="stats">
+        <div><b>22+</b><span>years in clinical research &amp; writing</span></div>
+        <div><b>70+</b><span>publications &amp; presentations</span></div>
+        <div><b>3,000+</b><span>professionals trained since 2008</span></div>
+        <div><b>17</b><span>therapeutic areas</span></div>
+      </div>
+    </div>
+    <div class="portrait">
+      <div class="frame"><img src="https://mewrit.com/images/hetal11.png" alt="Dr Hetal Shah, Founder and Director, MeWriT"></div>
+      <div class="badge b2"><span class="dot"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15l-3 6 3-2 3 2-3-6zM12 3a6 6 0 100 12 6 6 0 000-12z"/></svg></span><div><b>ISCR Hall of Fame</b>Award recipient</div></div>
+      <div class="badge b1"><span class="dot"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/></svg></span><div><b>Dr Hetal Shah</b>PhD Pharmacologist, Founder</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="affil"><div class="wrap">
+  <p>Roles &amp; recognition</p>
+  <ul><li>ISCR Medical Writing Council</li><li>Section Editor, PICR</li><li>DIA Global Mentor</li><li>NITI Aayog WEP Mentor</li><li>NSRCEL, IIM Bangalore</li></ul>
+</div></div>
+
+<section id="services"><div class="wrap">
+  <div class="sec-head">
+    <div><span class="eyebrow">What we do</span><h2>Services across the drug development cycle</h2></div>
+    <p>From first protocol to final publication, every document is researched, written and quality-checked by experienced medical writers.</p>
+  </div>
+  <div class="services-grid">
+    <a class="card feature" href="#"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4M7 3h10l4 4v14H3V3h4"/></svg></span><h3>Regulatory Documentation</h3><p>Protocols, investigator's brochures, ICH-E3 clinical study reports, CTD modules, safety narratives and responses to authorities.</p><span class="more">Explore service</span></a>
+    <a class="card" href="#"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg></span><h3>Scientific Publications</h3><p>Original manuscripts, reviews, case reports, abstracts and posters, compliant with ICMJE, GPP and CONSORT.</p><span class="more">Explore service</span></a>
+    <a class="card" href="#"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span><h3>Medical Communications</h3><p>Educational slide decks, patient and physician leaflets, newsletters, health articles and research grant writing.</p><span class="more">Explore service</span></a>
+    <a class="card" href="#trainings"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5"/></svg></span><h3>Trainings &amp; Workshops</h3><p>Basic and advanced modules, in person or online, tailored to corporate teams, institutes and individuals.</p><span class="more">See trainings</span></a>
+    <a class="card" href="#"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2v6L4 20h16L14 8V2M8 2h8"/></svg></span><h3>Research Support</h3><p>Clinical pharmacology opinion, EC/IRB support, trial experts and trusted referrals for CROs and biostatistics.</p><span class="more">Explore service</span></a>
+    <a class="card" href="#contact"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></span><h3>Quality Review</h3><p>Standalone QC, editing and proof-reading of documents written in-house, before they go to sponsors or journals.</p><span class="more">Ask about QC</span></a>
+  </div>
+</div></section>
+
+<section class="why"><div class="wrap">
+  <div>
+    <span class="eyebrow">Why MeWriT</span>
+    <h2>Boutique attention, industry-grade rigour</h2>
+    <p class="lead" style="margin-top:16px">Started as a solopreneur journey in 2003 and growing as MeWriT since 2017, every project is led by the founder and backed by medical and statistical experts.</p>
+    <a class="btn btn-ghost" style="margin-top:28px" href="#">Meet our leadership</a>
+  </div>
+  <div class="why-grid">
+    <div class="why-item"><span class="num">01</span><b>Founder-led</b><p>Your project is handled by a PhD pharmacologist with 22+ years of hands-on experience.</p></div>
+    <div class="why-item"><span class="num">02</span><b>Guideline compliant</b><p>ICH, ICMJE, GPP and CONSORT followed from the first draft, not fixed at the end.</p></div>
+    <div class="why-item"><span class="num">03</span><b>Clinical expertise on call</b><p>A Chief Medical Expert and partner specialists for therapeutic input.</p></div>
+    <div class="why-item"><span class="num">04</span><b>Trainer's clarity</b><p>Writing shaped by years of teaching clinicians and pharma teams to write well.</p></div>
+  </div>
+</div></section>
+
+<section id="areas"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Therapeutic experience</span><h2>Seventeen areas and counting</h2></div></div>
+  <div class="chips">
+    <span>Oncology</span><span>Cardiology</span><span>Respiratory disorders</span><span>Autoimmune diseases</span><span>Gastroenterology</span><span>Metabolic &amp; endocrine disorders</span><span>Diabetes</span><span>Infectious diseases</span><span>Orthopaedics</span><span>Gynaecology &amp; reproductive disorders</span><span>Vaccines</span><span>Paediatrics</span><span>Ophthalmology</span><span>In-vitro diagnostics</span><span>Medical devices</span><span>Food &amp; nutraceuticals</span><span>COVID-19</span>
+  </div>
+</div></section>
+
+<section class="train" id="trainings"><div class="wrap">
+  <span class="eyebrow">Trainings</span>
+  <h2>Learn to do it right the first time</h2>
+  <div class="grid">
+    <div class="tcard">
+      <span class="tag">For teams &amp; institutes</span>
+      <h3>In-person classroom training</h3>
+      <div class="meta"><span>Basic &amp; advanced</span><span>Customised content</span><span>Hands-on</span></div>
+      <ul><li>Fundamentals of medical writing</li><li>Literature search &amp; referencing</li><li>Clinical study protocols</li><li>Clinical study reports</li><li>Publication ethics</li><li>Case report writing</li></ul>
+      <a class="btn btn-primary" href="#contact">Enquire for your team</a>
+    </div>
+    <div class="tcard">
+      <span class="tag">For individuals</span>
+      <h3>MeWriT Academy online</h3>
+      <div class="meta"><span>Self-paced</span><span>Certification</span><span>Starters &amp; experienced</span></div>
+      <ul><li>Structured learning paths</li><li>Assignments &amp; feedback</li><li>Recorded mini-workshops</li><li>Certificate on completion</li></ul>
+      <a class="btn btn-ghost" href="https://academy.mewrit.com/">Visit the Academy</a>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">How we work</span><h2>A clear path from brief to submission</h2></div></div>
+  <div class="steps">
+    <div class="step"><b class="ph">Brief &amp; scoping</b><p class="ph">We understand your data, audience, timelines and target guidelines.</p></div>
+    <div class="step"><b class="ph">Research &amp; drafting</b><p class="ph">Literature review and a structured first draft built on your source data.</p></div>
+    <div class="step"><b class="ph">Review cycles</b><p class="ph">Scientific, statistical and editorial QC with your team's comments.</p></div>
+    <div class="step"><b class="ph">Final delivery</b><p class="ph">Submission-ready, journal-formatted or print-ready documents.</p></div>
+  </div>
+</div></section>
+
+<section class="testi"><div class="wrap">
+  <div class="sec-head">
+    <div><span class="eyebrow">Testimonials</span><h2>Clients &amp; collaborators commend</h2></div>
+    <div class="slider-nav"><button aria-label="Previous" onclick="slide(-1)">&#8592;</button><button aria-label="Next" onclick="slide(1)">&#8594;</button></div>
+  </div>
+  <div class="slider" id="slider">
+    <div class="quote"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h4v4H8c0 2 1 3 3 3v3c-4 0-6-2-6-6V7zm8 0h4v4h-3c0 2 1 3 3 3v3c-4 0-6-2-6-6V7z"/></svg><p>Hetal loves medical writing and is very good at it! She is a dependable resource with a strong work ethic.</p><small>Director, research consultancy firm, India</small></div>
+    <div class="quote"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h4v4H8c0 2 1 3 3 3v3c-4 0-6-2-6-6V7zm8 0h4v4h-3c0 2 1 3 3 3v3c-4 0-6-2-6-6V7z"/></svg><p>I have always found her work to be of exceptionally high quality, delivered in a timely manner.</p><small>Senior Partner, Writing Consultancy, Germany</small></div>
+    <div class="quote"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h4v4H8c0 2 1 3 3 3v3c-4 0-6-2-6-6V7zm8 0h4v4h-3c0 2 1 3 3 3v3c-4 0-6-2-6-6V7z"/></svg><p>It is rare to find a speaker who connects with the entire audience, but Dr Hetal Shah did exactly this!</p><small>Business Development Executive, CRO, Hyderabad</small></div>
+    <div class="quote"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h4v4H8c0 2 1 3 3 3v3c-4 0-6-2-6-6V7zm8 0h4v4h-3c0 2 1 3 3 3v3c-4 0-6-2-6-6V7z"/></svg><p>Her knowledge of the subject is in depth and there is so much value addition that she brings with her work.</p><small>Medical device company, India</small></div>
+  </div>
+</div></section>
+
+<section class="consult" id="contact"><div class="wrap"><div class="box">
+  <div>
+    <span class="eyebrow" style="color:#F6B57A">Start a project</span>
+    <h2>Tell us about your document or training need</h2>
+    <p style="margin-top:14px">Share a few details and we will get back with an approach and timeline.</p>
+    <div class="contact-lines">
+      <span>Email <a href="mailto:hetal@mewrit.com">hetal@mewrit.com</a></span>
+      <span>Phone <a href="tel:+919727716506">+91 97277 16506</a></span>
+      <span>710, Santorini Square, Satellite, Ahmedabad 380015</span>
+    </div>
+  </div>
+  <form class="enquiry" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thank you, we will be in touch'">
+    <div class="row"><label>Name<input required placeholder="Your name"></label><label>Organisation<input placeholder="Company or institute"></label></div>
+    <div class="row"><label>Email<input type="email" required placeholder="you@company.com"></label>
+      <label>I need help with<select><option>Regulatory documents</option><option>Scientific publication</option><option>Medical communications</option><option>Training or workshop</option><option>Research support</option><option>Something else</option></select></label></div>
+    <label>Message<textarea placeholder="Document type, therapeutic area, timelines"></textarea></label>
+    <button class="btn btn-primary" type="submit">Send enquiry</button>
+  </form>
+</div></div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div><span class="fl"><img src="https://mewrit.com/images/final1.png" alt="MeWriT"></span><p>MeWriT Healthcare Consulting, the merit in Medical Writing &amp; Training.</p></div>
+    <div><h4>Services</h4><ul><li><a href="#">Regulatory Documentation</a></li><li><a href="#">Scientific Publications</a></li><li><a href="#">Medical Communications</a></li><li><a href="#">Research Support</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="#">Our Leadership</a></li><li><a href="#">Publications</a></li><li><a href="#">Gallery &amp; Events</a></li><li><a href="https://academy.mewrit.com/">MeWriT Academy</a></li></ul></div>
+    <div><h4>Contact</h4><ul><li>hetal@mewrit.com</li><li>+91 97277 16506</li><li>Satellite, Ahmedabad, Gujarat, India</li><li><a href="https://www.linkedin.com/company/mewrit">LinkedIn</a></li></ul></div>
+  </div>
+  <div class="bottom"><span>© 2026 MeWriT. All rights reserved.</span><span>Privacy Policy · Terms</span></div>
+</div></footer>
+
+<a class="wa" href="https://api.whatsapp.com/send?phone=919727716506" aria-label="Chat on WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg></a>
+
+<script>
+function slide(dir){const s=document.getElementById('slider');s.scrollBy({left:dir*(s.firstElementChild.offsetWidth+22),behavior:'smooth'})}
+</script>
+</body>
+</html>

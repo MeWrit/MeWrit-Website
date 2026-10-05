@@ -1,0 +1,20 @@
+---
+import { trainings } from '../data/home';
+import { href } from '../lib/url';
+---
+<section class="block train" id="trainings" aria-labelledby="train-title">
+  <div class="wrap">
+    <div class="block-head reveal"><p class="eyebrow">{trainings.eyebrow}</p><h2 id="train-title">{trainings.title}</h2></div>
+    <div class="train-grid reveal">
+      {trainings.cards.map(c => (
+        <article class:list={['tcard', { warm: c.warm }]}>
+          <span class="tag">{c.tag}</span>
+          <h3>{c.title}</h3>
+          <div class="meta">{c.meta.map(m => <span>{m}</span>)}</div>
+          <ul class="modules">{c.modules.map(m => <li>{m}</li>)}</ul>
+          <a class={`btn btn-${c.cta.style}`} href={href(c.cta.href)}>{c.cta.label}</a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

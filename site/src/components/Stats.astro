@@ -1,0 +1,10 @@
+---
+// The numbers as their own block after the hero, on phones and tablets (desktop shows them
+// in the hero instead).
+import { stats } from '../data/home';
+---
+<div class="wrap stats-after" id="next">
+  <div class="stats reveal" aria-label="MeWriT in numbers">
+    {stats.map(s => <div><b>{s.value}</b><span>{s.label}</span></div>)}
+  </div>
+</div>

@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+import { services } from '../data/home';
+import { href } from '../lib/url';
+---
+<section class="block" id="services" aria-labelledby="svc-title">
+  <div class="wrap">
+    <div class="block-head reveal"><p class="eyebrow">{services.eyebrow}</p><h2 id="svc-title">{services.title}</h2></div>
+    <ul class="svc-list reveal">
+      {services.items.map(s => (
+        <li><a class="svc" href={href(s.href)}><span class="ico"><Icon name={s.icon} stroke={1.8} /></span><div><h3>{s.title}</h3><p>{s.text}</p><span class="more">{s.more}</span></div></a></li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+import { testimonials } from '../data/home';
+---
+<section class="block testi" aria-labelledby="testi-title">
+  <div class="wrap">
+    <div class="block-head reveal"><p class="eyebrow">{testimonials.eyebrow}</p><h2 id="testi-title">{testimonials.title}</h2></div>
+    <div class="carousel reveal" id="carousel" tabindex="0" aria-label="Testimonials, swipe or use the arrows">
+      {testimonials.quotes.map(q => <figure class="quote"><Icon name="quote" size={26} /><p>{q.text}</p><small>{q.by}</small></figure>)}
+    </div>
+    <div class="car-ui">
+      <div class="dots" id="dots" role="group" aria-label="Choose testimonial"></div>
+      <div class="car-arrows">
+        <button id="prev" aria-label="Previous testimonial"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button id="next2" aria-label="Next testimonial"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>

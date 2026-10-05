@@ -1,0 +1,28 @@
+---
+// Fixed header: logo, desktop navigation with dropdowns, call to action, phone menu button.
+import { nav } from '../data/site';
+import { href } from '../lib/url';
+---
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <a class="logo" href={href('/')} aria-label="MeWriT home"><img id="headerLogo" src={href('/brand/logo-original.png')} alt="MeWriT, Writing Science Right" width="242" height="50"></a>
+    <nav class="nav-desktop" aria-label="Main">
+      <ul>
+        {nav.map(item => 'items' in item ? (
+          <li class="has-dd">
+            <button aria-expanded="false" aria-controls={item.id}>{item.label}</button>
+            <div class="dd" id={item.id}>
+              {item.items.map(link => <a href={href(link.href)}><strong>{link.label}</strong><span>{link.note}</span></a>)}
+            </div>
+          </li>
+        ) : (
+          <li><a href={href(item.href)}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <a class="btn btn-primary header-cta" href={href('/#contact')}>Get in touch</a>
+    <button class="menu-btn" id="menuOpen" aria-label="Open menu" aria-haspopup="dialog">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>

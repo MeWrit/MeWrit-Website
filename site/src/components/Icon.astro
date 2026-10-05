@@ -1,0 +1,12 @@
+---
+// A line icon from src/data/icons.ts, drawn in the surrounding text colour.
+import { icons, type IconName } from '../data/icons';
+
+interface Props { name: IconName; size?: number; stroke?: number }
+const { name, size = 24, stroke = 2 } = Astro.props;
+const def = icons[name];
+const solid = 'fill' in def && def.fill;
+---
+<svg width={size} height={size} viewBox="0 0 24 24" fill={solid ? 'currentColor' : 'none'}
+  stroke={solid ? undefined : 'currentColor'} stroke-width={solid ? undefined : stroke}
+  aria-hidden="true" set:html={def.body} />

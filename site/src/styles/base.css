@@ -1,0 +1,34 @@
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h) + 16px);background:var(--page)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{font-family:var(--sans);font-size:1rem;line-height:1.6;color:var(--body);background:var(--page);
+  padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom))}
+img,svg,canvas{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--orange-ink);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1200px;margin-inline:auto;padding-inline:max(var(--gutter), env(safe-area-inset-left))}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;padding:10px 14px;border-radius:8px;z-index:200}
+.skip:focus{left:8px}
+h1,h2,h3{font-family:var(--serif);color:var(--ink);font-weight:600;line-height:1.1;letter-spacing:-.012em}
+h1{font-size:clamp(2.2rem, 1.25rem + 4.6vw, 4.6rem)}
+h2{font-size:clamp(1.7rem, 1.2rem + 2.3vw, 2.8rem)}
+h3{font-size:1.2rem}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange-ink);margin-bottom:14px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--orange);flex:none}
+.lead{font-size:1.06rem}
+.block{position:relative;padding-top:var(--gap-section)}
+.block-head{margin-bottom:30px;max-width:640px}
+.block-head p{margin-top:12px}
+
+/* buttons: 48px tall */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:1rem;white-space:nowrap;transition:background .2s,transform .2s,box-shadow .2s,color .2s,border-color .2s}
+.btn-primary{background:var(--orange-ink);color:#fff;box-shadow:0 10px 24px rgba(178,86,11,.22)}
+.btn-outline{border:1.5px solid var(--navy-2);color:var(--navy);background:rgba(255,255,255,.6)}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.btn-row .btn{flex:1 1 auto}
+@media (hover:hover){
+  .btn-primary:hover{background:#9A4A08;transform:translateY(-1px)}
+  .btn-outline:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+}

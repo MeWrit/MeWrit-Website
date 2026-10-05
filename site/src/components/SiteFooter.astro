@@ -1,0 +1,17 @@
+---
+import { footerColumns } from '../data/site';
+import { footerBlurb } from '../data/home';
+const year = new Date().getFullYear();
+import { href } from '../lib/url';
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><img src={href('/brand/logo-original.png')} alt="MeWriT" loading="lazy" width="194" height="40"><p>{footerBlurb}</p></div>
+      {footerColumns.map(col => (
+        <div><h4>{col.title}</h4><ul>{col.links.map(l => <li><a href={href(l.href)}>{l.label}</a></li>)}</ul></div>
+      ))}
+    </div>
+    <div class="foot-bottom"><span>© {year} MeWriT. All rights reserved.</span><span>Privacy Policy · Terms</span></div>
+  </div>
+</footer>

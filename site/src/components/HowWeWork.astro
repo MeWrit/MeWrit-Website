@@ -1,0 +1,11 @@
+---
+import { howWeWork } from '../data/home';
+---
+<section class="block" aria-labelledby="proc-title">
+  <div class="wrap">
+    <div class="block-head reveal"><p class="eyebrow">{howWeWork.eyebrow}</p><h2 id="proc-title">{howWeWork.title}</h2></div>
+    <ol class="steps reveal">
+      {howWeWork.steps.map((s, i) => <li class="step" data-n={i + 1}><b>{s.title}</b><p>{s.text}</p></li>)}
+    </ol>
+  </div>
+</section>

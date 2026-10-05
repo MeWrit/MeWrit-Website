@@ -1,0 +1,64 @@
+---
+// The hero panel, "Pulse to Prose": a heartbeat line of clinical data becomes a document.
+// The static parts are drawn here; src/scripts/heartbeat.js builds the documents and moves it.
+import { hero } from '../data/home';
+---
+<div class="hero-visual" id="heroVisual">
+  <svg id="heroSvg" viewBox="0 0 400 380" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="heroAnimTitle">
+    <title id="heroAnimTitle">{hero.panelDescription}</title>
+    <defs>
+      <pattern id="gMinor" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#F6E2CF" stroke-width=".6"/></pattern>
+      <pattern id="gMajor" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#F1D0AF" stroke-width=".9"/></pattern>
+      {/* No masks or filters on anything that moves: a moving masked group, or a filtered shape
+          under changing content, made the browser redo expensive work every frame (measured:
+          100 to 250 ms stalls while the logo glided). The trace instead uses a colour gradient
+          that is counter-shifted each frame so it stays put on screen. */}
+      <linearGradient id="traceGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="0">
+        <stop offset="0" stop-color="#1E3A6E" stop-opacity="0"/><stop offset=".12" stop-color="#1E3A6E"/>
+        <stop offset=".5" stop-color="#1E3A6E"/><stop offset=".7" stop-color="#E07A1F"/>
+        <stop offset=".755" stop-color="#E07A1F"/><stop offset=".8" stop-color="#1E3A6E" stop-opacity=".45"/>
+        <stop offset=".88" stop-color="#1E3A6E" stop-opacity=".18"/><stop offset="1" stop-color="#1E3A6E" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="traceGlowGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="0">
+        <stop offset="0" stop-color="#2E508E" stop-opacity="0"/><stop offset=".14" stop-color="#2E508E" stop-opacity=".08"/>
+        <stop offset=".76" stop-color="#2E508E" stop-opacity=".08"/><stop offset=".9" stop-color="#2E508E" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="edgeL" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="edgeR" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>
+      <radialGradient id="glow"><stop offset="0" stop-color="#E07A1F" stop-opacity=".42"/><stop offset="1" stop-color="#E07A1F" stop-opacity="0"/></radialGradient>
+      <radialGradient id="paperShade" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#14213D" stop-opacity=".12"/><stop offset=".7" stop-color="#14213D" stop-opacity=".05"/><stop offset="1" stop-color="#14213D" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect x="0" y="28" width="400" height="100" fill="url(#gMinor)"/><rect x="0" y="28" width="400" height="100" fill="url(#gMajor)"/>
+    <rect x="0" y="26" width="64" height="104" fill="url(#edgeL)"/><rect x="290" y="26" width="110" height="104" fill="url(#edgeR)"/>
+    <path id="heart" d="M0 3.6C-6.2-1-3.6-6.6 0-3C3.6-6.6 6.2-1 0 3.6Z" fill="#E07A1F" transform="translate(24 16)"/>
+    <text x="35" y="19.5" font-family="'Inter Variable', Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="1.4" fill="#5E6884">CLINICAL DATA</text>
+    <line x1="300" y1="36" x2="300" y2="124" stroke="#E07A1F" stroke-opacity=".3" stroke-dasharray="3 4"/>
+    <g id="ecgMove">
+      <path id="ecgGlow" fill="none" stroke="url(#traceGlowGrad)" stroke-width="7" stroke-linejoin="round"/>
+      <path id="ecgLine" fill="none" stroke="url(#traceGrad)" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+    <circle id="ping" cx="300" cy="92" r="4" fill="none" stroke="#E07A1F" stroke-width="1.4" stroke-opacity="0"/>
+    <circle cx="300" cy="92" r="2.8" fill="#E07A1F"/>
+    <ellipse cx="200" cy="262" rx="200" ry="128" fill="url(#paperShade)"/>
+    <rect x="36" y="140" width="328" height="220" rx="16" fill="#fff" stroke="#E3E8F1" transform="rotate(3.2 200 250)"/>
+    <rect x="36" y="140" width="328" height="220" rx="16" fill="#fff" stroke="#E3E8F1" transform="rotate(-2.2 200 250)"/>
+    <rect x="36" y="140" width="328" height="220" rx="16" fill="#fff" stroke="#E3E8F1"/>
+    <g id="docs" transform="translate(36 140)"></g>
+    <g id="caret" transform="translate(36 140)" opacity="0">
+      <circle r="7" fill="url(#glow)"/>
+      <path d="M0 0L-3.2-8.2L0-11.8L3.2-8.2Z" fill="#E07A1F" transform="rotate(32)"/>
+    </g>
+    <g id="particle" opacity="0">
+      <circle id="pGlow" r="10" fill="url(#glow)"/>
+      <circle id="pT2" r="1.6" fill="#E07A1F" opacity=".25"/>
+      <circle id="pT1" r="2.3" fill="#E07A1F" opacity=".45"/>
+      <circle id="pCore" r="3.2" fill="#E07A1F"/>
+    </g>
+  </svg>
+  <button class="hero-pause" id="heroPause" aria-pressed="false" aria-label="Pause animation">
+    <svg class="i-pause" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+    <svg class="i-play" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg>
+  </button>
+  <div class="sat sat-a" aria-hidden="true"><span class="sat-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span><div><b>{hero.cards.compliant.title}</b><small>{hero.cards.compliant.text}</small></div></div>
+  <div class="sat sat-b" aria-hidden="true"><span class="sat-ico navy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5"/></svg></span><div><b>{hero.cards.ready.title}</b><small>{hero.cards.ready.text}</small></div></div>
+</div>

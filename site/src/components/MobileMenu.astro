@@ -1,0 +1,24 @@
+---
+// Phone menu: a native <dialog> (focus trap, Esc to close, drawn in the top layer).
+import { mobileNav, contact } from '../data/site';
+import { href } from '../lib/url';
+---
+<dialog class="menu-sheet" id="menu" aria-label="Menu">
+  <div class="menu-top">
+    <img src={href('/brand/logo-original.png')} alt="MeWriT">
+    <button class="menu-btn" id="menuClose" aria-label="Close menu" style="display:grid">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="menu-body" aria-label="Mobile">
+    {mobileNav.map(item => 'items' in item ? (
+      <details><summary>{item.label}</summary><div>{item.items.map(link => <a href={href(link.href)}>{link.label}</a>)}</div></details>
+    ) : (
+      <a href={href(item.href)}>{item.label}</a>
+    ))}
+  </nav>
+  <div class="menu-foot">
+    <a class="btn btn-primary" href={href('/#contact')}>Get in touch</a>
+    <a class="btn btn-outline" href={contact.whatsapp}>Chat on WhatsApp</a>
+  </div>
+</dialog>

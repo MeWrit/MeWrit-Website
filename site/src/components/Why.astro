@@ -1,0 +1,15 @@
+---
+import { why } from '../data/home';
+---
+<section class="block why" aria-labelledby="why-title">
+  <div class="wrap why-wrap">
+    <div class="reveal">
+      <p class="eyebrow">{why.eyebrow}</p>
+      <h2 id="why-title">{why.title}</h2>
+      <p class="lead" style="margin-top:14px">{why.lead}</p>
+    </div>
+    <ol class="why-grid reveal">
+      {why.points.map((p, i) => <li><span class="n">{String(i + 1).padStart(2, '0')}</span><div><b>{p.title}</b><p>{p.text}</p></div></li>)}
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+---
+// The logo intro overlay (behaviour in src/scripts/intro.js, styles in src/styles/intro.css).
+// Its images are served from public/brand exactly as they are: the drawing is matched to the
+// logo pixel for pixel, so they must not be resized or re-encoded.
+import { href } from '../lib/url';
+---
+{/* the pen rides the logo's own ECG line, then the logo glides into the header */}
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-backdrop" id="introBackdrop"></div>
+  <div class="intro-logo" id="introLogo">
+    <div class="intro-clip">
+      <img class="intro-base" id="introBase" src={href('/brand/logo-base.png')} alt="">
+      <div class="intro-curtain" id="introCurtain"></div>
+    </div>
+    {/* the logo's own line pixels, uncovered in the order the pen passes them */}
+    <canvas class="intro-ink" id="introInk" width="1112" height="230"></canvas>
+    <canvas class="intro-ink" id="introPulse" width="1112" height="230"></canvas>
+    <img class="intro-full" id="introFull" src={href('/brand/logo-original.png')} alt="">
+    <div class="intro-glow" id="introGlow"></div>
+    <img class="intro-pen" id="introPen" src={href('/brand/pen-cutout.png')} alt="">
+  </div>
+</div>

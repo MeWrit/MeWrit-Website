@@ -1,0 +1,13 @@
+---
+// Always-to-hand contact: a bar at the foot of the screen on phones (shown once the hero's
+// buttons have scrolled away) and a WhatsApp button on larger screens.
+import Icon from './Icon.astro';
+import { contact } from '../data/site';
+import { href } from '../lib/url';
+---
+<nav class="action-bar" id="actionBar" aria-label="Quick contact">
+  <a href={contact.phoneHref}>Call</a>
+  <a href={contact.whatsapp}>WhatsApp</a>
+  <a class="go" href={href('/#contact')}>Enquire</a>
+</nav>
+<a class="wa-float" href={contact.whatsapp} aria-label="Chat on WhatsApp"><Icon name="whatsapp" size={28} /></a>

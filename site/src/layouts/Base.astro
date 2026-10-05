@@ -1,0 +1,94 @@
+---
+// Page shell: head, logo intro, header, phone menu, footer, quick contact and the scripts.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/fraunces/opsz.css';
+// the prototype's stylesheet in its original order (see the note in tokens.css)
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/header.css';
+import '../styles/hero.css';
+import '../styles/intro.css';
+import '../styles/sections.css';
+import '../styles/responsive.css';
+import Intro from '../components/Intro.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import MobileMenu from '../components/MobileMenu.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import QuickContact from '../components/QuickContact.astro';
+import { site } from '../data/site';
+
+interface Props { title?: string; description?: string }
+const { title = site.title, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
+import { href } from '../lib/url';
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content={site.themeColor}>
+<title>{title}</title>
+<meta name="description" content={description}>
+{noindex && <meta name="robots" content="noindex">}
+<link rel="canonical" href={canonical}>
+<link rel="icon" href={href('/favicon.png')} type="image/png">
+<link rel="apple-touch-icon" href={href('/apple-touch-icon.png')}>
+<script is:inline>
+/* boot: runs before first paint. Decides whether the logo intro plays (once per
+   session, never with reduced motion), and sets a failsafe so content can never
+   stay hidden if a later script fails. URL switches for review:
+   ?intro (replay intro) ?nointro ?static (no motion, for screenshots)
+   ?hero=ribbons | ?hero=ecg (show one hero element only) */
+(function () {
+  var d = document.documentElement, q = location.search;
+  d.classList.add('js');
+  var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var seen = false; try { seen = sessionStorage.getItem('mewrit-intro') === '1'; } catch (e) {}
+  var stat = /[?&]static\b/.test(q);
+  if (stat) d.classList.add('static');
+  var force = /[?&]intro\b/.test(q), skip = /[?&]nointro\b/.test(q);
+  if (!reduce && !stat && !skip && (force || !seen)) {
+    d.classList.add('intro-on');
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
+  }
+  if (!reduce && !stat) d.classList.add('pre-enter');
+  var hero = (q.match(/[?&]hero=(\w+)/) || [])[1];
+  if (hero) d.setAttribute('data-hero', hero);
+  // failsafe: the page shows after 8.4 s whatever happens to the scripts. Once the intro is
+  // actually playing it moves this to just past its own end (window.mewritFailsafe).
+  var timer = 0;
+  function reveal() {
+    if (d.classList.contains('intro-on') && !d.classList.contains('logo-landed')) {   // an intro that never finished
+      var o = document.getElementById('intro'); if (o) o.style.display = 'none';
+      d.style.overflow = '';
+    }
+    d.classList.remove('pre-enter'); d.classList.add('logo-landed');
+    if (!d.classList.contains('intro-prepared')) { d.classList.add('intro-prepared'); document.dispatchEvent(new Event('mewrit:prepare')); }
+    document.dispatchEvent(new Event('mewrit:introdone'));   // the heartbeat panel waits for this
+  }
+  // (re)schedule the failsafe; 0 cancels it (the intro does that when it finishes normally)
+  window.mewritFailsafe = function (ms) { clearTimeout(timer); if (ms > 0) timer = setTimeout(reveal, ms); };
+  window.mewritFailsafe(8400);
+})();
+</script>
+<link rel="preload" as="image" href={href('/brand/logo-base.png')}>
+<link rel="preload" as="image" href={href('/brand/pen-cutout.png')}>
+<link rel="preload" as="image" href={href('/brand/logo-original.png')}>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<Intro />
+<SiteHeader />
+<MobileMenu />
+<main id="main">
+  <slot />
+</main>
+<SiteFooter />
+<QuickContact />
+<script>
+  import '../scripts/main.js';
+</script>
+</body>
+</html>

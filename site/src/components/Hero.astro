@@ -1,0 +1,32 @@
+---
+// The hero: exactly one screen. Silk ribbons behind (src/scripts/ribbons.js), the copy, the
+// heartbeat panel, and on desktop the numbers bar along its foot.
+import { Image } from 'astro:assets';
+import HeroVisual from './HeroVisual.astro';
+import { hero } from '../data/home';
+import hetal from '../assets/hetal-shah.png';
+import { href } from '../lib/url';
+---
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <canvas class="ribbons" id="ribbons" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">{hero.eyebrow}</p>
+      <h1 id="hero-title" set:html={hero.titleHtml} />
+      <p class="lead">{hero.lead}</p>
+      <div class="btn-row" id="heroCtas">
+        {hero.ctas.map(cta => <a class={`btn btn-${cta.style}`} href={href(cta.href)}>{cta.label}</a>)}
+      </div>
+      <div class="hero-founder">
+        <Image src={hetal} alt="" width={46} densities={[2, 3]} loading="eager" />
+        <div><b>{hero.founder.name}</b><span>{hero.founder.role}</span></div>
+      </div>
+    </div>
+    <div class="hero-cell">
+      <HeroVisual />
+    </div>
+    <div class="hero-stats" aria-label="MeWriT in numbers">
+      {hero.stats.map(s => <div><b>{s.value}</b><span>{s.label}</span></div>)}
+    </div>
+  </div>
+</section>
