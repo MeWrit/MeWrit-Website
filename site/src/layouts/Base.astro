@@ -13,21 +13,28 @@ import '../styles/intro.css';
 import '../styles/header-logo.css';
 import '../styles/sections.css';
 import '../styles/responsive.css';
+import '../styles/nav-variants.css';
 import Intro from '../components/Intro.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import QuickContact from '../components/QuickContact.astro';
+import PhoneDock from '../components/PhoneDock.astro';
+import NavLab from '../components/NavLab.astro';
 import { site } from '../data/site';
 import { href } from '../lib/url';
 
-interface Props { title?: string; description?: string; intro?: 'overlay' | 'header' | 'none' }
-const { title = site.title, description = site.description, intro = 'none' } = Astro.props;
+// `nav` and `dock` pick the navigation variant (the nav lab); ?nav= and ?dock override them
+interface Props {
+  title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
+  nav?: 'classic' | 'rail' | 'capsule'; dock?: boolean; lab?: boolean;
+}
+const { title = site.title, description = site.description, intro = 'none', nav = 'classic', dock = false, lab = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro}>
+<html lang="en" data-intro={intro} data-nav={nav} data-dock={dock ? '1' : '0'}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -57,6 +64,11 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
   if (!reduce && !stat) d.classList.add('pre-enter');
   var hero = (q.match(/[?&]hero=(\w+)/) || [])[1];
   if (hero) d.setAttribute('data-hero', hero);
+  // nav lab: ?nav=classic|rail|capsule, and ?dock (or ?dock=1) / ?dock=0 for the phone dock
+  var nav = (q.match(/[?&]nav=(\w+)/) || [])[1];
+  if (nav) d.setAttribute('data-nav', nav);
+  var dock = q.match(/[?&]dock(?:=(\w*))?(?=&|$)/);
+  if (dock) d.setAttribute('data-dock', dock[1] === '0' ? '0' : '1');
   // failsafe: the page shows after 8.4 s whatever happens to the scripts. Once an animation is
   // actually playing it moves this to just past its own end (window.mewritFailsafe).
   var timer = 0;
@@ -91,6 +103,8 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
 </main>
 <SiteFooter />
 <QuickContact />
+<PhoneDock />
+{lab && <NavLab />}
 <script>
   import '../scripts/main.js';
 </script>

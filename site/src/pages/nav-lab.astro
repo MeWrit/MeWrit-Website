@@ -1,0 +1,10 @@
+---
+// The nav lab: the home page with a switcher for the navigation experiments (heartbeat rail
+// and floating capsule on desktop, the bottom dock on phones). Local review page.
+import Base from '../layouts/Base.astro';
+import HomeSections from '../components/HomeSections.astro';
+import { site } from '../data/site';
+---
+<Base intro="none" nav="rail" dock lab title={`${site.title} (nav lab)`}>
+  <HomeSections />
+</Base>

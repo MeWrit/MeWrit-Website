@@ -1,0 +1,45 @@
+---
+// Nav lab, phones: an app-style dock at the bottom of the screen in place of the menu button
+// and the quick-contact bar. Services, About and Enquire open bottom sheets (native <dialog>:
+// focus trap, Esc to close); Trainings goes straight to the trainings. Shown only with
+// data-dock="1" on <html> (src/styles/nav-variants.css, src/scripts/nav-variants.js).
+import Icon from './Icon.astro';
+import { dock, contact } from '../data/site';
+import { href } from '../lib/url';
+---
+<nav class="dock" id="dock" aria-label="Main">
+  <button class="dock-item" data-sheet="sheetServices" data-key="services"><Icon name="doc-lines" size={22} stroke={1.8} /><span>Services</span></button>
+  <a class="dock-item" href={href('/#trainings')} data-key="trainings"><Icon name="cap" size={22} stroke={1.8} /><span>Trainings</span></a>
+  <button class="dock-item" data-sheet="sheetAbout" data-key="about"><Icon name="people" size={22} stroke={1.8} /><span>About</span></button>
+  <button class="dock-item dock-go" data-sheet="sheetEnquire" data-key="contact"><Icon name="chat" size={22} stroke={1.9} /><span>Enquire</span></button>
+</nav>
+
+<dialog class="sheet" id="sheetServices" aria-labelledby="sheetServicesTitle">
+  <div class="sheet-body">
+    <span class="sheet-grip" aria-hidden="true"></span>
+    <p class="sheet-title" id="sheetServicesTitle">Services</p>
+    {dock.services.map(l => <a href={href(l.href)}><strong>{l.label}</strong><span>{l.note}</span></a>)}
+    <button class="sheet-close" data-close>Close</button>
+  </div>
+</dialog>
+<dialog class="sheet" id="sheetAbout" aria-labelledby="sheetAboutTitle">
+  <div class="sheet-body">
+    <span class="sheet-grip" aria-hidden="true"></span>
+    <p class="sheet-title" id="sheetAboutTitle">About MeWriT</p>
+    {dock.about.map(l => <a href={href(l.href)}><strong>{l.label}</strong><span>{l.note}</span></a>)}
+    <button class="sheet-close" data-close>Close</button>
+  </div>
+</dialog>
+<dialog class="sheet" id="sheetEnquire" aria-labelledby="sheetEnquireTitle">
+  <div class="sheet-body">
+    <span class="sheet-grip" aria-hidden="true"></span>
+    <p class="sheet-title" id="sheetEnquireTitle">Get in touch</p>
+    <div class="sheet-quick">
+      <a href={contact.phoneHref}><Icon name="phone" size={22} />Call</a>
+      <a href={contact.whatsapp}><Icon name="whatsapp" size={22} />WhatsApp</a>
+      <a href={`mailto:${contact.email}`}><Icon name="mail" size={22} />Email</a>
+    </div>
+    <a class="btn btn-primary sheet-cta" href={href('/#contact')}>Tell us about your project</a>
+    <button class="sheet-close" data-close>Close</button>
+  </div>
+</dialog>

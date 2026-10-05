@@ -28,6 +28,15 @@ asks for one (`intro` on `src/layouts/Base.astro`).
 Review switches (add to the address): `?nointro` skips the logo animation, `?static` turns
 all motion off, and `?hero=ribbons` or `?hero=ecg` shows just one of the two hero animations.
 
+## Nav lab
+
+`/nav-lab/` is the home page with a switcher for navigation experiments: on desktop the
+standard bar, the heartbeat rail (the logo's pen writes the underline on a trace that follows
+the section being read) and the floating capsule (with rich Services and About panels); on
+phones the menu button or a bottom dock with sheets. The same variants work on any page with
+`?nav=classic|rail|capsule` and `?dock=1|0`. Code: `src/styles/nav-variants.css`,
+`src/scripts/nav-variants.js`, `src/components/PhoneDock.astro`, `src/components/NavLab.astro`.
+
 ## Where things are
 
 | What | Where |

@@ -11,3 +11,4 @@ search results until launch:
 
 - Version A (loading intro): https://mewrit.github.io/MeWrit-Website/
 - Version B (the logo draws itself in the header): https://mewrit.github.io/MeWrit-Website/version-b/
+- Nav lab (navigation experiments, with a switcher): https://mewrit.github.io/MeWrit-Website/nav-lab/

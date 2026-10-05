@@ -29,16 +29,24 @@ const logoBase = href('/brand/logo-base.png');
     <nav class="nav-desktop" aria-label="Main">
       <ul>
         {nav.map(item => 'items' in item ? (
-          <li class="has-dd">
+          <li class="has-dd" data-key={item.key}>
             <button aria-expanded="false" aria-controls={item.id}>{item.label}</button>
             <div class="dd" id={item.id}>
-              {item.items.map(link => <a href={href(link.href)}><strong>{link.label}</strong><span>{link.note}</span></a>)}
+              {item.items.map(link => (
+                <a href={href(link.href)}>
+                  <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+                  <strong>{link.label}</strong><span>{link.note}</span>
+                </a>
+              ))}
             </div>
           </li>
         ) : (
-          <li><a href={href(item.href)}>{item.label}</a></li>
+          <li data-key={item.key}><a href={href(item.href)}>{item.label}</a></li>
         ))}
       </ul>
+      {/* nav lab, heartbeat rail: the trace the links sit on, and the logo's pen that writes on it */}
+      <svg class="rail" aria-hidden="true"><path class="rail-base"/><path class="rail-read"/><path class="rail-ink-old"/><path class="rail-ink"/></svg>
+      <img class="rail-pen" src={href('/brand/pen-cutout.png')} alt="" aria-hidden="true">
     </nav>
     <a class="btn btn-primary header-cta" href={href('/#contact')}>Get in touch</a>
     <button class="menu-btn" id="menuOpen" aria-label="Open menu" aria-haspopup="dialog">

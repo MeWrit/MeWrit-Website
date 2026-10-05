@@ -1,0 +1,21 @@
+---
+// The nav lab's switcher: try each navigation variant on the live page. Only on
+// src/pages/nav-lab.astro; the same variants work on any page with ?nav= and ?dock.
+// It folds away (tap "Nav lab"); on phones it starts folded so it does not cover the hero.
+---
+<details class="lab" id="navLab" open>
+  <summary class="lab-title">Nav lab</summary>
+  <div class="lab-rows" role="group" aria-label="Navigation experiments">
+    <div class="lab-row" data-set="nav">
+      <span>Desktop</span>
+      <button data-value="classic">Standard bar</button>
+      <button data-value="rail">Heartbeat rail</button>
+      <button data-value="capsule">Floating capsule</button>
+    </div>
+    <div class="lab-row" data-set="dock">
+      <span>Phones</span>
+      <button data-value="0">Menu button</button>
+      <button data-value="1">Bottom dock</button>
+    </div>
+  </div>
+</details>

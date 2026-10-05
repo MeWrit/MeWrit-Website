@@ -17,30 +17,51 @@ export const contact = {
   academy: 'https://academy.mewrit.com/',
 };
 
-export type NavLink = { label: string; href: string; note?: string };
-export type NavItem = NavLink | { label: string; id: string; items: NavLink[] };
+// `art` picks the small illustration a link gets in the floating capsule's rich panels;
+// `key` ties a top-level entry to the page section it leads to (for the nav that follows
+// where you are reading)
+export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string };
+export type NavItem = NavLink | { label: string; id: string; key?: string; items: NavLink[] };
 
 // desktop navigation (dropdowns show a short note under each link)
 export const nav: NavItem[] = [
   {
-    label: 'About', id: 'dd-about', items: [
-      { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder' },
-      { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas' },
-      { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#' },
+    label: 'About', id: 'dd-about', key: 'about', items: [
+      { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder', art: 'person' },
+      { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas', art: 'chips' },
+      { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#', art: 'paper' },
     ],
   },
   {
-    label: 'Services', id: 'dd-svc', items: [
-      { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#services' },
-      { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#services' },
-      { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#services' },
-      { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#services' },
+    label: 'Services', id: 'dd-svc', key: 'services', items: [
+      { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#services', art: 'protocol' },
+      { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#services', art: 'chart' },
+      { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#services', art: 'slides' },
+      { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#services', art: 'check' },
     ],
   },
-  { label: 'Trainings', href: '/#trainings' },
+  { label: 'Trainings', href: '/#trainings', key: 'trainings' },
   { label: 'Gallery & Events', href: '#' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Contact', href: '/#contact', key: 'contact' },
 ];
+
+// the phone dock (nav lab): the sheets its buttons open
+export const dock = {
+  services: [
+    { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#services' },
+    { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#services' },
+    { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#services' },
+    { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#services' },
+    { label: 'Quality Review', note: 'An expert second read', href: '/#services' },
+  ],
+  about: [
+    { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder' },
+    { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas' },
+    { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#' },
+    { label: 'Gallery & Events', note: 'Workshops and conferences', href: '#' },
+    { label: 'MeWriT Academy', note: 'Online courses', href: contact.academy },
+  ],
+};
 
 // phone menu
 export const mobileNav: NavItem[] = [
