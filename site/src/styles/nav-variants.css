@@ -97,16 +97,16 @@
    menu button and the quick-contact bar; Services, About and Enquire open bottom sheets ===== */
 .dock,.sheet{display:none}
 @media (max-width:899.98px){
-  [data-dock="1"] .dock{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:35;height:66px;padding:0 6px;border-radius:24px;
+  :is([data-dock="1"],[data-nav="dock"]) .dock{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:35;height:66px;padding:0 6px;border-radius:24px;
     background:rgba(255,255,255,.86);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px);
     border:1px solid rgba(227,232,241,.95);box-shadow:0 16px 36px rgba(20,33,61,.16)}
   .dock-item{display:grid;justify-items:center;align-content:center;gap:4px;height:54px;border-radius:18px;font-size:.72rem;font-weight:600;letter-spacing:.01em;color:var(--muted);transition:color .2s,background .2s}
   .dock-item[aria-current="true"]{color:var(--navy);background:var(--soft)}
   .dock-go{color:#fff;background:var(--orange-ink);height:62px;margin-top:-20px;box-shadow:0 12px 24px rgba(178,86,11,.32)}
   .dock-go[aria-current="true"]{color:#fff;background:#9A4A08}
-  [data-dock="1"] .menu-btn,[data-dock="1"] .action-bar{display:none}
-  [data-dock="1"] body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
-  [data-dock="1"] .hero{height:calc(100svh - 90px - env(safe-area-inset-bottom))}
+  :is([data-dock="1"],[data-nav="dock"]) .menu-btn,:is([data-dock="1"],[data-nav="dock"]) .action-bar{display:none}
+  :is([data-dock="1"],[data-nav="dock"]) body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  :is([data-dock="1"],[data-nav="dock"]) .hero{height:calc(100svh - 90px - env(safe-area-inset-bottom))}
   .sheet[open]{display:block;position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:85svh;border:0;padding:0;
     border-radius:26px 26px 0 0;background:var(--page);color:var(--body);box-shadow:0 -10px 40px rgba(20,33,61,.18);overflow:auto;overscroll-behavior:contain}
   .sheet::backdrop{background:rgba(20,33,61,.35)}
@@ -127,7 +127,7 @@
 @keyframes sheetUp{from{transform:translateY(40px);opacity:0}}
 
 /* ===== the nav lab's switcher ===== */
-.lab{position:fixed;left:16px;bottom:16px;z-index:60;padding:10px 14px;border-radius:18px;
+.lab{position:fixed;left:16px;bottom:16px;z-index:60;max-width:min(640px,calc(100vw - 32px));padding:10px 14px;border-radius:18px;
   background:rgba(20,33,61,.94);color:#fff;font-size:.8rem;box-shadow:0 16px 40px rgba(20,33,61,.3)}
 .lab-title{display:flex;align-items:center;min-height:28px;cursor:pointer;list-style:none;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.68rem;color:#F9A85F}
 .lab-title::-webkit-details-marker{display:none}
@@ -135,7 +135,7 @@
 .lab[open] .lab-title::after{transform:translateY(1px) rotate(-135deg)}
 .lab-rows{display:grid;gap:8px;margin-top:6px}
 .lab-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.lab-row span{width:58px;color:rgba(255,255,255,.72)}
+.lab-row span{width:80px;color:rgba(255,255,255,.72)}
 .lab-row button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.28);color:#fff;font-size:.78rem}
 .lab-row button[aria-pressed="true"]{background:#fff;color:var(--ink);border-color:#fff}
 @media (max-width:899.98px){.lab{left:auto;right:10px;bottom:auto;top:72px;max-width:calc(100% - 20px);padding:8px 12px}}

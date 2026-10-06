@@ -37,6 +37,16 @@ phones the menu button or a bottom dock with sheets. The same variants work on a
 `?nav=classic|rail|capsule` and `?dock=1|0`. Code: `src/styles/nav-variants.css`,
 `src/scripts/nav-variants.js`, `src/components/PhoneDock.astro`, `src/components/NavLab.astro`.
 
+The switcher's "New places" row moves the links out of the top bar (desktop only):
+`?nav=spine` (a heartbeat trace down the left edge, one beat per section), `tabs` (divider
+tabs on the right edge), `dock` (a dock at the bottom; it also turns on the phone dock),
+`ask` (a search field in the header that fills in the enquiry form), `comments` (a review
+pane on the right with a comment per section) and `corners` (no bar: logo, call to action,
+index and "you are here" in the four corners). Code: `src/styles/nav-experiments.css`,
+`src/scripts/nav-experiments.js`, `src/components/NavExperiments.astro`,
+`src/components/AskBar.astro`; the ask bar's index is `askIndex` in `src/data/site.ts`, and
+`src/scripts/nav-spy.js` tracks the section being read for all of them.
+
 ## Where things are
 
 | What | Where |

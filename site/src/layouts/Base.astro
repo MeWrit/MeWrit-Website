@@ -14,6 +14,7 @@ import '../styles/header-logo.css';
 import '../styles/sections.css';
 import '../styles/responsive.css';
 import '../styles/nav-variants.css';
+import '../styles/nav-experiments.css';
 import Intro from '../components/Intro.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MobileMenu from '../components/MobileMenu.astro';
@@ -21,13 +22,14 @@ import SiteFooter from '../components/SiteFooter.astro';
 import QuickContact from '../components/QuickContact.astro';
 import PhoneDock from '../components/PhoneDock.astro';
 import NavLab from '../components/NavLab.astro';
+import NavExperiments from '../components/NavExperiments.astro';
 import { site } from '../data/site';
 import { href } from '../lib/url';
 
 // `nav` and `dock` pick the navigation variant (the nav lab); ?nav= and ?dock override them
 interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
-  nav?: 'classic' | 'rail' | 'capsule'; dock?: boolean; lab?: boolean;
+  nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners'; dock?: boolean; lab?: boolean;
 }
 const { title = site.title, description = site.description, intro = 'none', nav = 'classic', dock = false, lab = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -104,6 +106,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
 <SiteFooter />
 <QuickContact />
 <PhoneDock />
+<NavExperiments />
 {lab && <NavLab />}
 <script>
   import '../scripts/main.js';

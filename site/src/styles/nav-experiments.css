@@ -1,0 +1,139 @@
+/* ---------------- nav lab: new positions for the navigation ----------------
+   Desktop layouts (900px and up), picked by data-nav on <html>:
+   spine     a heartbeat trace down the left edge, one beat per entry
+   tabs      dossier divider tabs on the right edge
+   dock      a floating dock at the bottom, on every screen (the phone dock on phones)
+   ask       a search-first field in the header: "What do you need written?"
+   comments  review comments in a right margin, as in a word processor
+   corners   one item in each corner: logo, Get in touch, Index, where you are
+   On phones the others follow the lab's Phones setting (menu button or bottom dock).
+   Markup: src/components/NavExperiments.astro and AskBar.astro; behaviour:
+   src/scripts/nav-experiments.js. */
+
+.spine,.tabs,.deskdock,.comments,.corners,.ask{display:none}
+
+@media (min-width:900px){
+  /* every layout here replaces the standard row of links */
+  :is([data-nav="spine"],[data-nav="tabs"],[data-nav="dock"],[data-nav="ask"],[data-nav="comments"],[data-nav="corners"]) .nav-desktop{display:none}
+
+  /* ===== heartbeat spine: a trace down the left edge, a beat per entry; the entry being read
+     beats in orange ===== */
+  [data-nav="spine"] body{padding-left:136px}
+  [data-nav="spine"] .site-header{left:136px}
+  [data-nav="spine"] .spine{display:block;position:fixed;left:0;top:0;bottom:0;width:136px;z-index:41}
+  .spine-line{position:absolute;left:30px;top:20px;bottom:20px;width:1.5px;
+    background:linear-gradient(180deg,rgba(201,211,229,0),#C9D3E5 10%,#C9D3E5 90%,rgba(201,211,229,0))}
+  .spine-item{position:absolute;left:17px;top:calc(27% + var(--i) * 11%);transform:translateY(-50%);display:flex;align-items:center;gap:8px;
+    min-height:44px;padding:0 10px 0 0;font-size:.86rem;font-weight:600;color:var(--ink);white-space:nowrap;background:var(--page)}
+  .spine-item .beat{width:28px;height:36px;flex:none;overflow:visible;transform-origin:14px 18px}
+  .spine-item .beat path{fill:none;stroke:#AFBACE;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;transition:stroke .2s}
+  .spine-item:hover .beat path,.spine-item:focus-visible .beat path{stroke:var(--navy-2)}
+  .spine-item:hover span,.spine-item:focus-visible span{text-decoration:underline;text-underline-offset:4px}
+  .spine-item[aria-current="true"]{color:var(--orange-ink)}
+  .spine-item[aria-current="true"] .beat path{stroke:var(--orange);stroke-width:2}
+
+  /* ===== dossier tabs: divider tabs on the right edge; the one you are in is pulled out ===== */
+  [data-nav="tabs"] body{padding-right:156px}
+  [data-nav="tabs"] .site-header{right:156px}
+  [data-nav="tabs"] .tabs{display:grid;justify-items:end;gap:6px;position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:41}
+  .tab{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 22px 0 16px;margin-right:0;border-radius:14px 0 0 14px;
+    background:var(--tab);color:var(--ink);font-weight:600;font-size:.9rem;white-space:nowrap;
+    border:1px solid rgba(20,33,61,.07);border-right:0;box-shadow:-4px 6px 14px rgba(20,33,61,.06);
+    transform:translateX(10px);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,background .25s,color .25s}
+  .tab b{font-family:var(--serif);font-weight:600;font-size:.8rem;color:var(--tab-ink)}
+  .tab:nth-child(1){--tab:#E7EDF8;--tab-ink:var(--navy-2)}
+  .tab:nth-child(2){--tab:#FCEBDA;--tab-ink:var(--orange-ink)}
+  .tab:nth-child(3){--tab:#EEF1F7;--tab-ink:var(--navy-2)}
+  .tab:nth-child(4){--tab:#FBF1E6;--tab-ink:var(--orange-ink)}
+  .tab:nth-child(5){--tab:#DFE7F5;--tab-ink:var(--navy)}
+  .tab:hover,.tab:focus-visible{transform:translateX(0)}
+  .tab[aria-current="true"]{--tab:var(--navy);--tab-ink:#F9A85F;color:#fff;transform:translateX(-12px);box-shadow:-10px 12px 26px rgba(20,33,61,.18)}
+
+  /* ===== dock on every screen: the links float at the bottom centre ===== */
+  [data-nav="dock"] .header-cta{display:none}
+  [data-nav="dock"] .deskdock{display:flex;align-items:center;gap:2px;position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:41;
+    padding:7px 7px 7px 12px;border-radius:999px;background:rgba(255,255,255,.8);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
+    border:1px solid rgba(227,232,241,.95);box-shadow:0 18px 44px rgba(20,33,61,.14)}
+  .deskdock a:not(.btn){display:flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;font-weight:500;color:var(--ink);white-space:nowrap;transition:background .2s,color .2s}
+  .deskdock a:not(.btn):hover{background:var(--soft)}
+  .deskdock a[aria-current="true"]{background:var(--navy);color:#fff}
+  .deskdock .btn{margin-left:6px;min-height:46px}
+  [data-nav="dock"] .hero-grid{padding-bottom:104px}
+
+  /* ===== ask bar: one friendly field in the header ===== */
+  [data-nav="ask"] .ask{display:flex;align-items:center;gap:6px;position:relative;flex:1;max-width:540px;margin:0 28px}
+  .ask-field{flex:1;display:flex;align-items:center;gap:10px;height:50px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.88);
+    border:1px solid #D3DAE6;box-shadow:0 8px 22px rgba(20,33,61,.06);transition:border-color .2s,box-shadow .2s}
+  .ask-field:focus-within{border-color:var(--navy-2);box-shadow:0 0 0 4px rgba(46,80,142,.14)}
+  .ask-field svg{flex:none;color:var(--muted)}
+  .ask-field input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:16px;color:var(--ink);outline:none}
+  .ask-field input::placeholder{color:#6B7591}
+  .ask-field input::-webkit-search-cancel-button{display:none}
+  .ask-menu-btn{min-height:44px;padding:0 14px;border-radius:999px;font-weight:600;color:var(--ink)}
+  .ask-menu-btn:hover{background:rgba(255,255,255,.7)}
+  .ask-pop{position:absolute;left:0;right:0;top:calc(100% + 10px);padding:14px;border-radius:22px;background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px rgba(20,33,61,.16)}
+  .ask-hint{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+  .ask-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .ask-chips button{min-height:36px;padding:0 14px;border-radius:999px;background:var(--soft);color:var(--navy);font-weight:600;font-size:.86rem}
+  .ask-chips button:hover{background:#E6ECF6}
+  .ask-list{list-style:none;display:grid;gap:2px;margin-top:10px}
+  .ask-opt{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;cursor:pointer}
+  .ask-opt:hover,.ask-opt[aria-selected="true"]{background:var(--soft)}
+  .ask-opt b{display:block;color:var(--ink);font-weight:600}
+  .ask-opt small{display:block;color:var(--muted);font-size:.8rem}
+  .ask-opt .go{color:var(--orange-ink);font-weight:600;font-size:.86rem}
+  .ask-opt .go::after{content:" \2192"}
+  .ask-menu{position:absolute;right:0;top:calc(100% + 10px);display:grid;min-width:230px;padding:8px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px rgba(20,33,61,.16)}
+  .ask-menu a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;font-weight:500;color:var(--ink)}
+  .ask-menu a:hover{background:var(--soft)}
+  .ask-pop[hidden],.ask-menu[hidden],.ask-list[hidden]{display:none}
+
+  /* ===== margin comments: a review pane on the right, a comment per entry, as in a word
+     processor; the comment for the part being read is highlighted and points into the page ===== */
+  [data-nav="comments"] body{padding-right:260px}
+  [data-nav="comments"] .site-header{right:260px}
+  [data-nav="comments"] .comments{display:grid;align-content:start;gap:12px;position:fixed;right:0;top:0;bottom:0;width:260px;z-index:41;
+    padding:28px 18px 24px 26px;background:#F3F5F9;border-left:1px solid var(--line);overflow-y:auto}
+  .comments-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .comments-head span{min-width:22px;height:22px;display:grid;place-items:center;border-radius:11px;background:var(--orange-soft);color:var(--orange-ink);letter-spacing:0}
+  .comment{position:relative;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:12px 12px 12px 10px;border-radius:12px;background:#fff;
+    border:1px solid var(--line);border-left:3px solid #C9D3E5;box-shadow:0 4px 12px rgba(20,33,61,.05);transition:transform .25s,border-color .25s,box-shadow .25s}
+  .comment-who{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--orange-soft);color:var(--orange-ink);font-size:.64rem;font-weight:700}
+  .comment strong{display:block;color:var(--ink);font-size:.92rem;line-height:1.3}
+  .comment-body span{display:block;color:var(--muted);font-size:.8rem;line-height:1.4}
+  .comment::before{content:"";position:absolute;right:100%;top:25px;width:0;border-top:1.5px dotted var(--orange);transition:width .3s}
+  .comment:hover{transform:translateX(-4px);border-left-color:var(--navy-2)}
+  .comment[aria-current="true"]{border-left-color:var(--orange);box-shadow:0 10px 24px rgba(20,33,61,.1);transform:translateX(-8px)}
+  .comment[aria-current="true"]::before{width:20px}
+  [data-nav="comments"] .wa-float{right:284px}   /* off the review pane */
+
+  /* ===== corner frame: logo and Get in touch at the top, the index and where you are at the
+     foot; no bar, the middle is all content ===== */
+  [data-nav="corners"] .site-header,[data-nav="corners"] .site-header.is-solid{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent}
+  [data-nav="corners"] .site-header.is-solid .logo{background:rgba(251,252,254,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:14px;padding:0 12px;box-shadow:0 8px 22px rgba(20,33,61,.08)}
+  [data-nav="corners"] .corners{display:block}
+  .corner-index{position:fixed;left:24px;bottom:22px;z-index:41}
+  .corner-index summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border-radius:999px;background:var(--ink);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 12px 28px rgba(20,33,61,.22)}
+  .corner-index summary::-webkit-details-marker{display:none}
+  .corner-index summary::before{content:"";width:14px;height:2px;border-radius:1px;background:currentColor;box-shadow:0 -5px 0 currentColor,0 5px 0 currentColor}
+  .corner-index ol{position:absolute;left:0;bottom:calc(100% + 10px);list-style:none;display:grid;min-width:270px;padding:10px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px rgba(20,33,61,.16)}
+  .corner-index a{display:grid;grid-template-columns:36px 1fr;align-items:baseline;min-height:44px;align-content:center;padding:0 12px;border-radius:12px;color:var(--ink);font-weight:600}
+  .corner-index a b{font-family:var(--serif);font-weight:600;color:var(--orange-ink)}
+  .corner-index a:hover{background:var(--soft)}
+  .corner-index a[aria-current="true"]{background:var(--orange-soft)}
+  .corner-here{position:fixed;right:24px;bottom:22px;z-index:41;display:flex;align-items:center;gap:12px;min-height:48px;padding:0 7px 0 18px;border-radius:999px;
+    background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line);box-shadow:0 12px 28px rgba(20,33,61,.1)}
+  .here-n{font-family:var(--serif);font-weight:600;color:var(--orange-ink)}
+  .here-name{font-weight:600;color:var(--ink)}
+  .here-next{display:flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:var(--soft);color:var(--navy);font-weight:600;font-size:.86rem}
+  .here-next::after{content:" \2192";white-space:pre}
+  .here-next[hidden]{display:none}
+  [data-nav="corners"] .wa-float{bottom:84px}
+  [data-nav="corners"] .hero-grid{padding-bottom:92px}
+  [data-nav="corners"] .lab{left:150px}   /* beside the Index button, clear of its list */
+}
+@media (min-width:900px) and (prefers-reduced-motion:no-preference){
+  /* the entry being read beats: lub, dub, rest */
+  .spine-item[aria-current="true"] .beat{animation:spineBeat 1.6s ease-in-out infinite}
+}
+@keyframes spineBeat{0%,52%,100%{transform:scaleX(1)}8%{transform:scaleX(1.5)}16%{transform:scaleX(.92)}24%{transform:scaleX(1.18)}32%{transform:scaleX(1)}}

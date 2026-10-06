@@ -3,6 +3,7 @@
 // With `animatedLogo` (version B) the logo draws itself in place (src/scripts/header-logo.js,
 // src/styles/header-logo.css): its layers sit over the real logo image, which takes over
 // when the drawing is done.
+import AskBar from './AskBar.astro';
 import { nav } from '../data/site';
 import { href } from '../lib/url';
 
@@ -48,6 +49,7 @@ const logoBase = href('/brand/logo-base.png');
       <svg class="rail" aria-hidden="true"><path class="rail-base"/><path class="rail-read"/><path class="rail-ink-old"/><path class="rail-ink"/></svg>
       <img class="rail-pen" src={href('/brand/pen-cutout.png')} alt="" aria-hidden="true">
     </nav>
+    <AskBar />
     <a class="btn btn-primary header-cta" href={href('/#contact')}>Get in touch</a>
     <button class="menu-btn" id="menuOpen" aria-label="Open menu" aria-haspopup="dialog">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>

@@ -1,0 +1,49 @@
+---
+// Nav lab, new positions for the navigation (desktop): the heartbeat spine, dossier tabs, the
+// bottom dock, margin comments and the corner frame. Each is shown only when data-nav on <html>
+// names it (src/styles/nav-experiments.css); the ask bar lives in the header (AskBar.astro).
+import { navEntries } from '../data/site';
+import { href } from '../lib/url';
+const real = navEntries.filter(e => e.href !== '#');
+---
+<nav class="spine" aria-label="Main">
+  <span class="spine-line" aria-hidden="true"></span>
+  {navEntries.map((e, i) => (
+    <a class="spine-item" href={href(e.href)} data-key={e.key} style={`--i:${i}`}>
+      <svg class="beat" viewBox="0 0 28 36" aria-hidden="true"><path d="M14 0V11L12 13.5L15 16L26 19L5 22.5L15.5 25L14 27V36"/></svg>
+      <span>{e.label}</span>
+    </a>
+  ))}
+</nav>
+
+<nav class="tabs" aria-label="Main">
+  {navEntries.map((e, i) => <a class="tab" href={href(e.href)} data-key={e.key}><b>{String(i + 1).padStart(2, '0')}</b><span>{e.label}</span></a>)}
+</nav>
+
+<nav class="deskdock" aria-label="Main">
+  {navEntries.map(e => <a href={href(e.href)} data-key={e.key}>{e.label}</a>)}
+  <a class="btn btn-primary" href={href('/#contact')}>Get in touch</a>
+</nav>
+
+<nav class="comments" aria-label="Main">
+  <p class="comments-head">Comments <span>{navEntries.length}</span></p>
+  {navEntries.map(e => (
+    <a class="comment" href={href(e.href)} data-key={e.key}>
+      <span class="comment-who" aria-hidden="true">MW</span>
+      <span class="comment-body"><strong>{e.label}</strong><span>{e.note}</span></span>
+    </a>
+  ))}
+</nav>
+
+<div class="corners">
+  <details class="corner-index">
+    <summary>Index</summary>
+    <nav aria-label="Main">
+      <ol>{navEntries.map((e, i) => <li><a href={href(e.href)} data-key={e.key}><b>{String(i + 1).padStart(2, '0')}</b>{e.label}</a></li>)}</ol>
+    </nav>
+  </details>
+  <div class="corner-here" aria-live="polite">
+    <span class="here-n" id="hereN">00</span><span class="here-name" id="hereName">Welcome</span>
+    <a class="here-next" id="hereNext" href={href(real[0].href)}><span>Next: {real[0].label}</span></a>
+  </div>
+</div>

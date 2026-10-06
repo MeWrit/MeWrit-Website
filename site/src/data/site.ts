@@ -45,6 +45,34 @@ export const nav: NavItem[] = [
   { label: 'Contact', href: '/#contact', key: 'contact' },
 ];
 
+// the nav lab's experimental layouts (spine, tabs, dock, comments, corners) use these entries;
+// `note` is the short line the margin comments show
+export const navEntries = [
+  { label: 'About', href: '/#founder', key: 'about', note: 'Dr Hetal Shah and team' },
+  { label: 'Services', href: '/#services', key: 'services', note: 'Protocols to publications' },
+  { label: 'Trainings', href: '/#trainings', key: 'trainings', note: 'Classroom and online' },
+  { label: 'Gallery & Events', href: '#', key: 'gallery', note: 'Workshops and conferences' },
+  { label: 'Contact', href: '/#contact', key: 'contact', note: 'Start a project' },
+];
+
+// the nav lab's ask bar: what a visitor might type, and where it leads. `need` is the matching
+// choice in the enquiry form's "I need help with" list (src/data/home.ts)
+export const askIndex = [
+  { label: 'Clinical study report (CSR)', terms: 'csr clinical study report ich e3 regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
+  { label: 'Study protocol', terms: 'protocol study clinical trial regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
+  { label: 'CTD modules', terms: 'ctd module modules dossier submission regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
+  { label: 'Manuscript', terms: 'manuscript paper journal article publication', section: 'Scientific Publications', href: '/#services', need: 'Scientific publication' },
+  { label: 'Abstract or poster', terms: 'abstract poster conference congress publication', section: 'Scientific Publications', href: '/#services', need: 'Scientific publication' },
+  { label: 'Slide deck', terms: 'slides slide deck presentation', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
+  { label: 'Leaflet', terms: 'leaflet brochure patient information', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
+  { label: 'Grant application', terms: 'grant funding proposal application', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
+  { label: 'EC or IRB submission support', terms: 'ec irb ethics committee submission research', section: 'Research Support', href: '/#services', need: 'Research support' },
+  { label: 'Quality review of a document', terms: 'qc quality review check edit proofread', section: 'Quality Review', href: '/#services', need: 'Something else' },
+  { label: 'Training for my team', terms: 'training workshop team course classroom in-person', section: 'Trainings', href: '/#trainings', need: 'Training or workshop' },
+  { label: 'Online course (MeWriT Academy)', terms: 'online course academy learn certificate self-paced', section: 'MeWriT Academy', href: contact.academy, need: '' },
+];
+export const askChips = ['CSR', 'Protocol', 'Manuscript', 'Slide deck', 'Training'];
+
 // the phone dock (nav lab): the sheets its buttons open
 export const dock = {
   services: [

@@ -5,21 +5,13 @@
    with the header's existing scrolled state). */
 import D from '../data/intro.json';
 import { $, clamp, easeInOutCubic, easeInOutSine, REDUCE } from './shared.js';
+import { reading as currentReading, onReading } from './nav-spy.js';
 
 const root = document.documentElement;
 const variant = () => root.dataset.nav || 'classic';
 
-// ---- which part of the page is being read (about, services, trainings, contact, or none)
-const SECTIONS = [['founder', 'about'], ['areas', 'about'], ['services', 'services'], ['trainings', 'trainings'], ['contact', 'contact']];
-const inView = new Set(), readers = [];
-let reading = null;
-const spy = new IntersectionObserver(es => {
-  es.forEach(e => (e.isIntersecting ? inView.add(e.target.id) : inView.delete(e.target.id)));
-  let key = null;
-  for (const [id, k] of SECTIONS) if (inView.has(id)) key = k;   // the last one in page order
-  if (key !== reading) { reading = key; readers.forEach(f => f(key)); }
-}, { rootMargin: '-45% 0px -50% 0px' });
-SECTIONS.forEach(([id]) => { const el = $(id); if (el) spy.observe(el); });
+// which part of the page is being read: the shared tracker
+const reading = () => currentReading();
 
 /* ---- heartbeat rail: the links sit on a trace; the logo's pen glides along it to the link you
    point at (or the section you are reading) and writes its underline, a small heartbeat
@@ -130,7 +122,7 @@ let railRefresh = () => {};
   // section being read (or away, at the top of the page)
   let hovered = null, leave = 0;
   const forKey = key => items.find(it => it.key && it.key === key) || null;
-  const back = () => { hovered = null; if (on()) go(forKey(reading)); };
+  const back = () => { hovered = null; if (on()) go(forKey(reading())); };
   items.forEach(it => {
     const point = () => { clearTimeout(leave); hovered = it; if (on()) go(it); };
     it.li.addEventListener('mouseenter', point);
@@ -138,7 +130,7 @@ let railRefresh = () => {};
   });
   navEl.addEventListener('mouseleave', () => { leave = setTimeout(back, 350); });
   navEl.addEventListener('focusout', e => { if (!navEl.contains(e.relatedTarget)) back(); });
-  readers.push(key => { if (!hovered && on()) go(forKey(key)); });
+  onReading(key => { if (!hovered && on()) go(forKey(key)); }, false);
   addEventListener('scroll', () => { if (on()) drawRead(); }, { passive: true });
 
   // after a resize, a font swap or a switch of variant: settle at once into the finished state
@@ -146,7 +138,7 @@ let railRefresh = () => {};
   railRefresh = () => {
     if (!on()) return;
     measure(); drawRead();
-    const T = hovered || forKey(reading);
+    const T = hovered || forKey(reading());
     cancelAnimationFrame(raf); raf = 0;
     st.T = undefined; st.ink = null; st.old = null; plan = null; st.amp = 0; st.bx = -999; st.lift = 0;
     if (T) { st.ink = { x0: T.x0, x1: T.x1, p: 1 }; st.px = T.x1; st.op = 1; st.rot = 30; st.T = T; } else { st.op = 0; st.T = null; }
@@ -172,7 +164,7 @@ let railRefresh = () => {};
     // a tap on the backdrop (outside the sheet), on a link, or on Close closes it
     s.addEventListener('click', e => { if (e.target === s || e.target.closest('a') || e.target.closest('[data-close]')) s.close(); });
   });
-  readers.push(key => items.forEach(i => i.setAttribute('aria-current', String(!!key && i.dataset.key === key))));
+  onReading(key => items.forEach(i => i.setAttribute('aria-current', String(!!key && i.dataset.key === key))));
 })();
 
 /* ---- the nav lab's switcher */
@@ -197,4 +189,4 @@ let railRefresh = () => {};
 })();
 
 // review and test hook
-window.mewritNav = { reading: () => reading, refresh: () => railRefresh() };
+window.mewritNav = { reading, refresh: () => railRefresh() };

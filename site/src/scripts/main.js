@@ -8,3 +8,4 @@ import './heartbeat.js';
 import './intro.js';
 import './header-logo.js';
 import './nav-variants.js';
+import './nav-experiments.js';
