@@ -5,7 +5,7 @@ export const site = {
   name: 'MeWriT',
   title: 'MeWriT | Medical Writing & Training',
   description: 'Founder-led medical writing and training consultancy in Ahmedabad, India.',
-  themeColor: '#FBFCFE',
+  themeColor: '#EEF1F7',
 };
 
 export const contact = {
@@ -41,7 +41,7 @@ export const nav: NavItem[] = [
     ],
   },
   { label: 'Trainings', href: '/#trainings', key: 'trainings' },
-  { label: 'Gallery & Events', href: '#' },
+  { label: 'Gallery', href: '#' },
   { label: 'Contact', href: '/#contact', key: 'contact' },
 ];
 
@@ -51,7 +51,7 @@ export const navEntries = [
   { label: 'About', href: '/#founder', key: 'about', note: 'Dr Hetal Shah and team' },
   { label: 'Services', href: '/#services', key: 'services', note: 'Protocols to publications' },
   { label: 'Trainings', href: '/#trainings', key: 'trainings', note: 'Classroom and online' },
-  { label: 'Gallery & Events', href: '#', key: 'gallery', note: 'Workshops and conferences' },
+  { label: 'Gallery', href: '#', key: 'gallery', note: 'Workshops and conferences' },
   { label: 'Contact', href: '/#contact', key: 'contact', note: 'Start a project' },
 ];
 
@@ -86,7 +86,7 @@ export const dock = {
     { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder' },
     { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas' },
     { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#' },
-    { label: 'Gallery & Events', note: 'Workshops and conferences', href: '#' },
+    { label: 'Gallery', note: 'Workshops and conferences', href: '#' },
     { label: 'MeWriT Academy', note: 'Online courses', href: contact.academy },
   ],
 };
@@ -110,7 +110,7 @@ export const mobileNav: NavItem[] = [
     ],
   },
   { label: 'Trainings', href: '/#trainings' },
-  { label: 'Gallery & Events', href: '#' },
+  { label: 'Gallery', href: '#' },
   { label: 'Contact', href: '/#contact' },
   { label: 'MeWriT Academy', href: contact.academy },
 ];

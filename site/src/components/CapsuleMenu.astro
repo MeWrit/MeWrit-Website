@@ -1,0 +1,41 @@
+---
+// The floating capsule on phones: its Menu button grows the capsule into this card (a native
+// <dialog>: focus trap, Esc to close, drawn in the top layer). The same entries as the desktop
+// capsule, with About and Services opening the same small document cards. Shown with
+// data-phone="capsule" on <html> (src/styles/nav-variants.css, src/scripts/nav-variants.js).
+import Icon from './Icon.astro';
+import { nav, contact } from '../data/site';
+import { href } from '../lib/url';
+---
+<dialog class="cap-menu" id="capMenu" aria-label="Menu">
+  <div class="cap-top">
+    <img src={href('/brand/logo-original.png')} alt="MeWriT" width="242" height="50">
+    <button class="cap-close" id="capClose" aria-label="Close menu">
+      <span>Close</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="cap-body" aria-label="Mobile">
+    {nav.map(item => 'items' in item ? (
+      <details class="cap-group" name="cap-group">
+        <summary data-key={item.key}><span>{item.label}</span></summary>
+        <div class="cap-cards">
+          {item.items.map(link => (
+            <a href={href(link.href)}>
+              <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+              <strong>{link.label}</strong><span>{link.note}</span>
+            </a>
+          ))}
+        </div>
+      </details>
+    ) : (
+      <a class="cap-link" href={href(item.href)} data-key={item.key}><span>{item.label}</span></a>
+    ))}
+    <a class="cap-link cap-out" href={contact.academy}><span>MeWriT Academy</span></a>
+  </nav>
+  <div class="cap-foot">
+    <a class="btn btn-primary" href={href('/#contact')}>Get in touch</a>
+    <a class="cap-quick" href={contact.phoneHref} aria-label="Call"><Icon name="phone" size={20} /></a>
+    <a class="cap-quick cap-wa" href={contact.whatsapp} aria-label="WhatsApp"><Icon name="whatsapp" size={22} /></a>
+  </div>
+</dialog>

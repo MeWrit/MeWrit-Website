@@ -1,0 +1,20 @@
+---
+// Dr Hetal's recognition as an honours roll, set in type with no ornament: each title in the serif,
+// what it is in small capitals, the body behind it underneath, between hairlines. On her profile.
+import { founder } from '../data/home';
+---
+<div class="recognition reveal">
+  <div>
+    <p class="eyebrow">{founder.honours.eyebrow}</p>
+    <h2 id="recognition-title">{founder.honours.title}</h2>
+  </div>
+  <ul class="recognition-list" aria-labelledby="recognition-title">
+    {founder.recognition.map(r => (
+      <li>
+        <span class="rec-kind">{r.kind}</span>
+        <strong>{r.label}</strong>
+        {r.detail && <span class="rec-detail">{r.detail}</span>}
+      </li>
+    ))}
+  </ul>
+</div>

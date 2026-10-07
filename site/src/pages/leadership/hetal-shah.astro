@@ -1,0 +1,37 @@
+---
+// Dr Hetal Shah's full profile: her story, credentials and recognition. The home page links here
+// from "Meet the founder".
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Recognition from '../../components/Recognition.astro';
+import { founder } from '../../data/home';
+import { contact, site } from '../../data/site';
+import hetal from '../../assets/hetal-shah.png';
+import { href } from '../../lib/url';
+---
+<Base title={`${founder.name}, ${founder.role} | ${site.name}`} description={founder.bio}>
+  <section class="profile" aria-labelledby="profile-name">
+    <div class="wrap profile-grid">
+      <div class="profile-photo">
+        <Image src={hetal} alt={founder.name} widths={[320, 440, 622]} sizes="(min-width: 900px) 420px, calc(100vw - 32px)" loading="eager" />
+      </div>
+      <div class="profile-copy">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href={href('/')}>Home</a><span aria-current="page">Leadership</span></nav>
+        <p class="eyebrow">Founder</p>
+        <h1 id="profile-name">{founder.name}</h1>
+        <p class="founder-role">{founder.role}</p>
+        <p class="lead">{founder.bio}</p>
+        <div class="chips">{founder.chips.map(c => <span class="chip">{c}</span>)}</div>
+        <div class="btn-row">
+          <a class="btn btn-primary" href={href('/#contact')}>Work with Dr Hetal</a>
+          <a class="btn btn-outline" href={`mailto:${contact.email}`}>Email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="block profile-more" aria-labelledby="recognition-title">
+    <div class="wrap">
+      <Recognition />
+    </div>
+  </section>
+</Base>

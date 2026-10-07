@@ -4,9 +4,10 @@
 // logo pixel for pixel, so they must not be resized or re-encoded.
 import { href } from '../lib/url';
 ---
-{/* the pen rides the logo's own ECG line, then the logo glides into the header */}
+{/* the pen rides the logo's own ECG line, then the logo glides into the header. The hero's
+    ribbons flow in the backdrop (src/scripts/ribbons.js), and fade with it. */}
 <div class="intro" id="intro" aria-hidden="true">
-  <div class="intro-backdrop" id="introBackdrop"></div>
+  <div class="intro-backdrop" id="introBackdrop"><canvas class="intro-ribbons" id="introRibbons"></canvas></div>
   <div class="intro-logo" id="introLogo">
     <div class="intro-clip">
       <img class="intro-base" id="introBase" src={href('/brand/logo-base.png')} alt="">

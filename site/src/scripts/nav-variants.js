@@ -1,8 +1,9 @@
-/* Nav lab: behaviour for the navigation variants (styles in src/styles/nav-variants.css).
-   The page's variant is data-nav on <html> ("classic", "rail" or "capsule") and data-dock
-   ("1" for the phone dock). The boot script sets them from ?nav= and ?dock; the switcher on
-   the nav lab page changes them live. The capsule needs no script of its own (it tightens
-   with the header's existing scrolled state). */
+/* Behaviour for the navigation variants (styles in src/styles/nav-variants.css). The page's
+   variant is data-nav on <html> for desktop ("capsule", "classic" or "rail") and data-phone for
+   phones ("capsule", "menu" or "dock"). The boot script sets them from ?nav= and ?phone=; the
+   switcher on the nav lab page changes them live. The capsule tightens with the header's
+   scrolled state (no script); here are its lens on desktop and its card on phones. The glass
+   itself is src/scripts/glass.js. */
 import D from '../data/intro.json';
 import { $, clamp, easeInOutCubic, easeInOutSine, REDUCE } from './shared.js';
 import { reading as currentReading, onReading } from './nav-spy.js';
@@ -167,13 +168,103 @@ let railRefresh = () => {};
   onReading(key => items.forEach(i => i.setAttribute('aria-current', String(!!key && i.dataset.key === key))));
 })();
 
+/* ---- the capsule's lens (desktop): a drop of glass glides to the link you point at or tab to.
+   Its leading edge sets off a moment before the trailing one, so it stretches a little on the
+   way, and it settles with a small overshoot (the timing is in the stylesheet). */
+(function lens() {
+  const navEl = document.querySelector('.nav-desktop'), el = navEl && navEl.querySelector('.cap-lens');
+  if (!el) return;
+  const items = [...navEl.querySelectorAll(':scope > ul > li')];
+  const on = () => variant() === 'capsule' && matchMedia('(min-width: 900px)').matches;
+  let at = null, out = 0;
+  function show(li) {
+    if (!on()) return;
+    clearTimeout(out);
+    const nr = navEl.getBoundingClientRect(), r = li.firstElementChild.getBoundingClientRect();
+    const l = (r.left - nr.left).toFixed(1) + 'px', rr = (nr.right - r.right).toFixed(1) + 'px';
+    if (!at) {   // appearing: put it in place at once, then fade it in
+      el.classList.add('jump');
+      el.style.setProperty('--l', l); el.style.setProperty('--r', rr);
+      void el.offsetWidth;
+      el.classList.remove('jump'); el.classList.add('on');
+    } else if (li !== at) {
+      const right = items.indexOf(li) > items.indexOf(at);
+      el.style.setProperty('--dl', right ? '.07s' : '0s');
+      el.style.setProperty('--dr', right ? '0s' : '.07s');
+      el.style.setProperty('--l', l); el.style.setProperty('--r', rr);
+    }
+    at = li;
+  }
+  const hide = () => { clearTimeout(out); out = setTimeout(() => { el.classList.remove('on'); at = null; }, 140); };
+  items.forEach(li => {
+    li.addEventListener('mouseenter', () => show(li));
+    li.addEventListener('focusin', () => show(li));
+  });
+  // after a scroll (the capsule tightens, and the links move) it waits for the pointer to move
+  navEl.addEventListener('mousemove', e => { if (!at) { const li = e.target.closest('.nav-desktop > ul > li'); if (li) show(li); } });
+  addEventListener('scroll', () => { if (at) { el.classList.remove('on'); at = null; } }, { passive: true });
+  navEl.addEventListener('mouseleave', hide);
+  navEl.addEventListener('focusout', e => { if (!navEl.contains(e.relatedTarget)) hide(); });
+})();
+
+/* ---- the floating capsule on phones: Menu grows the capsule into its card. The card opens
+   exactly over the capsule (measured into --cap-*), so the capsule seems to unfold into it;
+   Close, Esc or a tap outside fold it back. Choosing a link closes it at once, so the page can
+   move to the section. The part of the page being read gets a small dot. */
+(function capsuleMenu() {
+  const card = $('capMenu'), btn = $('menuOpen'), pill = document.querySelector('.site-header .wrap'), logo = $('headerLogo');
+  if (!card || !btn || !pill || !logo) return;
+  const PHONE = matchMedia('(max-width: 899.98px)');
+  let folding = 0;
+  function done() {
+    clearTimeout(folding); folding = 0;
+    card.classList.remove('closing');
+    if (card.open) card.close();
+  }
+  function open() {
+    if (card.open) return;
+    const r = pill.getBoundingClientRect(), s = card.style;
+    s.setProperty('--cap-top', r.top + 'px'); s.setProperty('--cap-left', r.left + 'px');
+    s.setProperty('--cap-w', r.width + 'px'); s.setProperty('--cap-h', r.height + 'px');
+    s.setProperty('--cap-logo', logo.getBoundingClientRect().height + 'px');
+    card.querySelectorAll('details[open]').forEach(d => { d.open = false; });   // a fresh menu each time
+    card.classList.remove('closing');
+    card.showModal(); root.style.overflow = 'hidden';
+    btn.setAttribute('aria-expanded', 'true');
+  }
+  function fold() {
+    if (!card.open || folding) return;
+    if (REDUCE) { done(); return; }
+    card.classList.add('closing');
+    folding = setTimeout(done, 450);   // in case the animation's end never arrives
+  }
+  btn.addEventListener('click', () => { if (root.dataset.phone === 'capsule') open(); });
+  $('capClose').addEventListener('click', fold);
+  card.addEventListener('animationend', e => { if (e.target === card && card.classList.contains('closing')) done(); });
+  card.addEventListener('cancel', e => { e.preventDefault(); fold(); });   // Esc folds it too
+  card.addEventListener('click', e => {
+    if (e.target.closest('a')) { root.style.overflow = ''; done(); return; }
+    if (e.target === card) {   // the backdrop: a tap outside the card
+      const r = card.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) fold();
+    }
+  });
+  card.addEventListener('close', () => {
+    clearTimeout(folding); folding = 0; card.classList.remove('closing');
+    root.style.overflow = ''; btn.setAttribute('aria-expanded', 'false');
+  });
+  PHONE.addEventListener('change', () => { if (!PHONE.matches) done(); });
+  const marks = [...card.querySelectorAll('[data-key]')];
+  onReading(key => marks.forEach(m => m.setAttribute('aria-current', String(!!key && m.dataset.key === key))));
+})();
+
 /* ---- the nav lab's switcher */
 (function lab() {
   const el = $('navLab');
   if (!el) return;
   if (matchMedia('(max-width: 899.98px)').matches) el.open = false;   // folded on phones
   const sync = () => el.querySelectorAll('.lab-row').forEach(row => {
-    const v = row.dataset.set === 'nav' ? variant() : (root.dataset.dock || '0');
+    const v = row.dataset.set === 'nav' ? variant() : (root.dataset.phone || 'menu');
     row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === v)));
   });
   el.addEventListener('click', e => {
@@ -181,9 +272,13 @@ let railRefresh = () => {};
     if (!b) return;
     const set = b.closest('.lab-row').dataset.set;
     root.dataset[set] = b.dataset.value;
-    const u = new URL(location.href); u.searchParams.set(set, b.dataset.value); history.replaceState(null, '', u);
+    const u = new URL(location.href);
+    u.searchParams.set(set, b.dataset.value); u.searchParams.delete('dock');   // ?dock was the first lab's switch
+    history.replaceState(null, '', u);
     document.querySelectorAll('.has-dd > button').forEach(x => x.setAttribute('aria-expanded', 'false'));
-    sync(); requestAnimationFrame(railRefresh);
+    sync();
+    // the header's height can change with the variant: the rail and the ribbons' veil refit
+    requestAnimationFrame(() => { railRefresh(); if (window.mewritRibbons) window.mewritRibbons.refit(); });
   });
   sync();
 })();

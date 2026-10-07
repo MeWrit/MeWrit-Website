@@ -15,12 +15,7 @@ export const hero = {
     { label: 'Explore trainings', href: '/#trainings', style: 'outline' },
   ] as Cta[],
   founder: { name: 'Led by Dr Hetal Shah', role: 'PhD Pharmacologist · 22+ years in clinical research' },
-  // the two small cards that float by the heartbeat panel on desktop
-  cards: {
-    compliant: { title: 'Guideline compliant', text: 'ICH · ICMJE · GPP · CONSORT' },
-    ready: { title: 'Submission-ready', text: 'Protocols · CSRs · Manuscripts' },
-  },
-  panelDescription: 'A heartbeat line of clinical data flows into a document that writes itself, line by line, and passes quality control.',
+  panelDescription: 'A technical drawing follows a medicine from molecule to manuscript: drug development, a randomised clinical trial, a systematic review, data and statistics, a survival analysis, the clinical study report, and a manuscript accepted for publication.',
   // the numbers bar at the foot of the hero (desktop)
   stats: [
     { value: '22+', label: 'years in clinical research' },
@@ -44,14 +39,18 @@ export const founder = {
   role: 'Founder & Director',
   bio: 'A PhD Pharmacologist and Gold (Double) Medalist with more than 22 years in clinical research and medical writing across clinical sites and CROs.',
   chips: ['Section Editor, PICR', 'ISCR life member', 'DIA Global Mentor', 'GCP trained'],
-  link: { label: 'Read full profile', href: '#' },
+  link: { label: 'Read full profile', href: '/leadership/hetal-shah/' },
+  // the honours roll on her profile; `home` marks the few named in one line on the home page.
+  // `detail` names the body behind each one (checked on iscr.org, nsrcel.org, goldmansachs.com and
+  // wep.gov.in); years can be added once Dr Hetal confirms them
+  honours: { eyebrow: 'Recognition', title: 'Awards, programmes and roles' },
   recognition: [
-    { icon: 'medal', label: 'ISCR Hall of Fame Award' },
-    { icon: 'medal', label: 'Woman Entrepreneur in Pharma & Healthcare' },
-    { icon: 'mortarboard', label: 'NSRCEL, IIM Bangalore' },
-    { icon: 'mortarboard', label: 'Goldman Sachs 10,000 Women' },
-    { icon: 'people', label: 'NITI Aayog WEP Mentor' },
-  ] as { icon: IconName; label: string }[],
+    { kind: 'Award', label: 'ISCR Hall of Fame Award', detail: 'Indian Society for Clinical Research', home: true },
+    { kind: 'Award', label: 'Woman Entrepreneur in Pharma & Healthcare', detail: '' },
+    { kind: 'Programme', label: 'NSRCEL, IIM Bangalore', detail: 'The startup incubator of IIM Bangalore' },
+    { kind: 'Programme', label: 'Goldman Sachs 10,000 Women', detail: 'Business education for women entrepreneurs', home: true },
+    { kind: 'Mentor', label: 'NITI Aayog WEP Mentor', detail: 'Women Entrepreneurship Platform', home: true },
+  ],
 };
 
 export const services = {

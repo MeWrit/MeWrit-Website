@@ -92,6 +92,7 @@ if (root.classList.contains('logo-anim') && !root.classList.contains('logo-done'
     done = true;
     root.classList.add('logo-done');
     real.style.opacity = '';
+    document.dispatchEvent(new Event('mewrit:logodone'));   // the numbers in the hero wait for this
   }
   function frame(now) {
     // a stalled frame slows the animation down, it never makes it jump

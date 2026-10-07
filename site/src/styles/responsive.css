@@ -23,7 +23,7 @@
   .logo img{height:50px}
   .nav-desktop{display:block}
   .nav-desktop > ul{display:flex;gap:2px;list-style:none;align-items:center}
-  .nav-desktop > ul > li > a,.nav-desktop > ul > li > button{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;font-weight:500;color:var(--ink)}
+  .nav-desktop > ul > li > a,.nav-desktop > ul > li > button{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;white-space:nowrap;border-radius:10px;font-weight:500;color:var(--ink)}
   .nav-desktop button::after{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg)}
   .has-dd{position:relative}
   .dd{position:absolute;top:calc(100% + 8px);left:0;min-width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.18s}
@@ -41,6 +41,17 @@
   [data-hero="ribbons"] .hero-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"copy" "stats"}
 
   .founder-card{grid-template-columns:.8fr 1.2fr;gap:56px;align-items:center}
+  .profile{padding-top:calc(var(--header-h) + 64px)}
+  .profile-grid{grid-template-columns:.8fr 1.2fr;gap:64px;align-items:center}
+  /* the honours roll: its heading on the left, the roll on the right; what each one is set
+     against the right edge */
+  .recognition{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.6fr);gap:64px;margin-top:64px;padding:48px 56px 26px}
+  .recognition-list{margin-top:0}
+  .recognition-list li{grid-template-columns:1fr auto;grid-template-areas:"title kind" "detail kind";column-gap:32px;align-items:baseline;padding:20px 0}
+  .recognition-list li:first-child{border-top:0;padding-top:4px}
+  .rec-kind{grid-area:kind;justify-self:end}
+  .recognition-list strong{grid-area:title;font-size:1.38rem}
+  .rec-detail{grid-area:detail}
   .recog{flex-wrap:wrap;overflow:visible;margin:0;padding-inline:0}
   .svc-list{grid-template-columns:repeat(3,1fr);gap:20px}
   .svc{grid-template-columns:1fr;align-content:start;padding:28px;min-height:0;gap:0}
@@ -48,7 +59,7 @@
   .svc .ico{width:52px;height:52px;margin-bottom:18px}
   .svc h3{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin-bottom:8px}
   .svc p{font-size:.95rem;color:var(--body)}
-  .svc .more{display:inline-flex;margin-top:14px;font-weight:600;color:var(--orange-ink);font-size:.92rem}
+  .svc .more{display:inline-flex;margin-top:14px;font-weight:600;color:var(--accent-ink);font-size:.92rem}
   .why-wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:center}
   .why-grid{margin-top:0}
   .areas .chips[data-collapsed="true"] .chip:nth-child(n+10){display:inline-flex}
@@ -64,7 +75,7 @@
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 @media (hover:hover) and (min-width:900px){
   .has-dd:hover .dd{opacity:1;visibility:visible;transform:none}
-  .nav-desktop > ul > li > a:hover,.nav-desktop > ul > li > button:hover{background:rgba(255,255,255,.7)}
+  .nav-desktop > ul > li > a:hover,.nav-desktop > ul > li > button:hover{background:var(--accent-soft)}
   .svc{transition:transform .25s,box-shadow .25s}
   .svc:hover{transform:translateY(-4px);box-shadow:0 1px 0 var(--line), 0 18px 40px rgba(20,33,61,.08)}
 }

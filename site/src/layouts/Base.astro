@@ -4,6 +4,8 @@
 // "header" (version B: the logo draws itself in the header) or "none" (every other page).
 import '@fontsource-variable/inter';
 import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
 // the prototype's stylesheet in its original order (see the note in tokens.css)
 import '../styles/tokens.css';
 import '../styles/base.css';
@@ -21,22 +23,25 @@ import MobileMenu from '../components/MobileMenu.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import QuickContact from '../components/QuickContact.astro';
 import PhoneDock from '../components/PhoneDock.astro';
+import CapsuleMenu from '../components/CapsuleMenu.astro';
 import NavLab from '../components/NavLab.astro';
 import NavExperiments from '../components/NavExperiments.astro';
 import { site } from '../data/site';
 import { href } from '../lib/url';
 
-// `nav` and `dock` pick the navigation variant (the nav lab); ?nav= and ?dock override them
+// `nav` picks the desktop navigation and `phone` the phone one: the floating capsule on both
+// unless a page asks otherwise (the nav lab's switcher, ?nav= and ?phone= override them)
 interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
-  nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners'; dock?: boolean; lab?: boolean;
+  nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners';
+  phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean;
 }
-const { title = site.title, description = site.description, intro = 'none', nav = 'classic', dock = false, lab = false } = Astro.props;
+const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro} data-nav={nav} data-dock={dock ? '1' : '0'}>
+<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -51,7 +56,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
 /* boot: runs before first paint. Starts the page's logo animation (on every load, never
    with reduced motion), and sets a failsafe so content can never stay hidden if a later
    script fails. URL switches for review: ?nointro ?static (no motion, for screenshots)
-   ?hero=ribbons | ?hero=ecg (show one hero element only) */
+   ?hero=ribbons | ?hero=drawing (show one hero element only) */
 (function () {
   var d = document.documentElement, q = location.search;
   d.classList.add('js');
@@ -66,11 +71,13 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
   if (!reduce && !stat) d.classList.add('pre-enter');
   var hero = (q.match(/[?&]hero=(\w+)/) || [])[1];
   if (hero) d.setAttribute('data-hero', hero);
-  // nav lab: ?nav=classic|rail|capsule, and ?dock (or ?dock=1) / ?dock=0 for the phone dock
+  // nav lab: ?nav= picks the desktop navigation, ?phone=capsule|menu|dock the phone one
+  // (?dock and ?dock=0 from the first lab still work: the bottom dock, or the menu button)
   var nav = (q.match(/[?&]nav=(\w+)/) || [])[1];
   if (nav) d.setAttribute('data-nav', nav);
-  var dock = q.match(/[?&]dock(?:=(\w*))?(?=&|$)/);
-  if (dock) d.setAttribute('data-dock', dock[1] === '0' ? '0' : '1');
+  var phone = (q.match(/[?&]phone=(\w+)/) || [])[1], dock = q.match(/[?&]dock(?:=(\w*))?(?=&|$)/);
+  if (!phone && dock) phone = dock[1] === '0' ? 'menu' : 'dock';
+  if (phone) d.setAttribute('data-phone', phone);
   // failsafe: the page shows after 8.4 s whatever happens to the scripts. Once an animation is
   // actually playing it moves this to just past its own end (window.mewritFailsafe).
   var timer = 0;
@@ -82,7 +89,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
     d.classList.add('logo-done');   // the header version: show the finished logo
     d.classList.remove('pre-enter'); d.classList.add('logo-landed');
     if (!d.classList.contains('intro-prepared')) { d.classList.add('intro-prepared'); document.dispatchEvent(new Event('mewrit:prepare')); }
-    document.dispatchEvent(new Event('mewrit:introdone'));   // the heartbeat panel waits for this
+    document.dispatchEvent(new Event('mewrit:introdone'));   // the hero's drawing waits for this
   }
   // (re)schedule the failsafe; 0 cancels it (an animation does that when it finishes normally)
   window.mewritFailsafe = function (ms) { clearTimeout(timer); if (ms > 0) timer = setTimeout(reveal, ms); };
@@ -106,6 +113,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
 <SiteFooter />
 <QuickContact />
 <PhoneDock />
+<CapsuleMenu />
 <NavExperiments />
 {lab && <NavLab />}
 <script>

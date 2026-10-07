@@ -2,18 +2,25 @@
    stylesheet cut into consecutive parts, imported in this order by src/layouts/Base.astro. */
 /* =====================================================================
    MeWriT site styles. Mobile first: base styles target a 360px phone; larger screens
-   only add (min-width 600, 900, 1200). One continuous page surface: no
-   section bands; content is grouped by spacing and edge-free colour washes.
-   Colour rule: --orange is decoration only; orange text or button fills use
-   --orange-ink (4.97:1 with white).
+   only add (min-width 600, 900, 1200).
+   Colour: the logo's blue (#1C3472) and orange, on a soft blue-grey page so that white
+   cards stand out instead of glaring white on white; deep blue bands for the testimonials
+   and the footer. --accent (orange) is decoration only; orange text and button fills use
+   --accent-ink (5.1:1 on the page, 5.8:1 under white text). Mustard (--gold) is kept for a
+   few places: the hover highlights, and gold on the deep blue (the numbers card on phones,
+   the testimonials), plus a gold touch on the founder's recognition. Gold text on light
+   surfaces is --gold-ink.
    ===================================================================== */
 :root{
-  --ink:#14213D; --navy:#1E3A6E; --navy-2:#2E508E; --body:#45506A; --muted:#5E6884;
-  --orange:#E07A1F; --orange-ink:#B2560B; --orange-soft:#FDF1E6;
-  --page:#FBFCFE; --soft:#F3F6FB; --line:#E3E8F1;
-  --radius:18px; --radius-lg:26px; --shadow:0 18px 50px rgba(20,33,61,.08);
+  --brand:#1C3472; --brand-2:#2B4A92; --brand-deep:#13244F; --brand-soft:#E5EBF6;
+  --accent:#E07A1F; --accent-ink:#A34D09; --accent-soft:#FDF1E6;
+  --gold:#E0A82E; --gold-deep:#C48A12; --gold-ink:#865D00; --gold-soft:#FBEFD3;
+  --ink:#13244F; --navy:#1C3472; --navy-2:#2B4A92; --body:#45506A; --muted:#5E6884;
+  --page:#EEF1F7; --soft:#E6EBF4; --line:#D9DFEA; --card:#FFFFFF;
+  --radius:18px; --radius-lg:26px; --shadow:0 18px 50px rgba(19,36,79,.10);
   --serif:"Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
   --sans:"Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
   --gutter:16px; --gap-section:clamp(88px, 13vw, 168px);
   --header-h:64px; --bar-h:64px;
 }

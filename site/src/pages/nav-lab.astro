@@ -1,10 +1,10 @@
 ---
-// The nav lab: the home page with a switcher for the navigation experiments (heartbeat rail
-// and floating capsule on desktop, the bottom dock on phones). Local review page.
+// The nav lab: the home page with a switcher for the navigation experiments. It opens on the
+// chosen navigation, the floating capsule on desktop and on phones; the others stay for comparison.
 import Base from '../layouts/Base.astro';
 import HomeSections from '../components/HomeSections.astro';
 import { site } from '../data/site';
 ---
-<Base intro="none" nav="rail" dock lab title={`${site.title} (nav lab)`}>
+<Base intro="none" lab title={`${site.title} (nav lab)`}>
   <HomeSections />
 </Base>

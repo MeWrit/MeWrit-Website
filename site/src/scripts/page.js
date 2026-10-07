@@ -1,13 +1,26 @@
-/* Page behaviour: menu, header, phone action bar, areas toggle, testimonials carousel,
-   enquiry form, scroll reveal and the entrance when there is no intro. */
+/* Page behaviour: section links, menu, header, phone action bar, areas toggle, testimonials
+   carousel, enquiry form, scroll reveal and the entrance when there is no intro. */
 import { $, REDUCE, STATIC } from './shared.js';
+import { href } from '../lib/url';
 
 const root = document.documentElement;
 
+// Links to the home page's sections ("/#services") lead there from any page. On a page that has
+// the section itself (version B, the nav lab) they stay on that page.
+const home = new URL(href('/'), location.href).pathname;
+if (location.pathname !== home) document.querySelectorAll('a[href*="#"]').forEach(a => {
+  const u = new URL(a.href, location.href);
+  if (u.origin === location.origin && u.pathname === home && u.hash.length > 1 && document.getElementById(u.hash.slice(1))) a.setAttribute('href', u.hash);
+});
+
 // menu: native dialog (focus trap, Esc, top layer). overflow:hidden on <html> unsticks
 // nothing visible: the full-screen dialog covers the page, and it is restored on close.
+// With the floating capsule on phones the capsule opens its own card instead (nav-variants.js).
 const menu = $('menu');
-$('menuOpen').addEventListener('click', () => { menu.showModal(); root.style.overflow = 'hidden'; });
+$('menuOpen').addEventListener('click', () => {
+  if (root.dataset.phone === 'capsule') return;
+  menu.showModal(); root.style.overflow = 'hidden';
+});
 const closeMenu = () => { if (menu.open) menu.close(); };
 $('menuClose').addEventListener('click', closeMenu);
 menu.addEventListener('close', () => { root.style.overflow = ''; });
@@ -36,8 +49,12 @@ addEventListener('scroll', onScroll, { passive: true }); onScroll();
 const bar = $('actionBar');
 let ctasGone = false, formNear = false, typing = false;
 const sync = () => bar.classList.toggle('show', ctasGone && !formNear && !typing);
-new IntersectionObserver(([e]) => { ctasGone = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe($('heroCtas'));
-new IntersectionObserver(([e]) => { formNear = e.isIntersecting; sync(); }, { rootMargin: '0px 0px -30% 0px' }).observe($('contact'));
+// it appears once the page's own buttons have scrolled away (the hero's on the home page, the
+// first row of buttons elsewhere), and steps aside near the enquiry form, if the page has one
+const ctas = $('heroCtas') || document.querySelector('main .btn-row'), contactEl = $('contact');
+if (ctas) new IntersectionObserver(([e]) => { ctasGone = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe(ctas);
+else { ctasGone = true; sync(); }
+if (contactEl) new IntersectionObserver(([e]) => { formNear = e.isIntersecting; sync(); }, { rootMargin: '0px 0px -30% 0px' }).observe(contactEl);
 document.addEventListener('focusin', e => { if (e.target.matches('input,select,textarea')) { typing = true; sync(); } });
 document.addEventListener('focusout', () => { typing = false; sync(); });
 

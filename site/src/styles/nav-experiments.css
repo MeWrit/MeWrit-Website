@@ -2,11 +2,11 @@
    Desktop layouts (900px and up), picked by data-nav on <html>:
    spine     a heartbeat trace down the left edge, one beat per entry
    tabs      dossier divider tabs on the right edge
-   dock      a floating dock at the bottom, on every screen (the phone dock on phones)
+   dock      a floating dock at the bottom
    ask       a search-first field in the header: "What do you need written?"
    comments  review comments in a right margin, as in a word processor
    corners   one item in each corner: logo, Get in touch, Index, where you are
-   On phones the others follow the lab's Phones setting (menu button or bottom dock).
+   On phones every page follows the lab's Phones setting (capsule, menu button or bottom dock).
    Markup: src/components/NavExperiments.astro and AskBar.astro; behaviour:
    src/scripts/nav-experiments.js. */
 
@@ -29,8 +29,8 @@
   .spine-item .beat path{fill:none;stroke:#AFBACE;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;transition:stroke .2s}
   .spine-item:hover .beat path,.spine-item:focus-visible .beat path{stroke:var(--navy-2)}
   .spine-item:hover span,.spine-item:focus-visible span{text-decoration:underline;text-underline-offset:4px}
-  .spine-item[aria-current="true"]{color:var(--orange-ink)}
-  .spine-item[aria-current="true"] .beat path{stroke:var(--orange);stroke-width:2}
+  .spine-item[aria-current="true"]{color:var(--accent-ink)}
+  .spine-item[aria-current="true"] .beat path{stroke:var(--accent);stroke-width:2}
 
   /* ===== dossier tabs: divider tabs on the right edge; the one you are in is pulled out ===== */
   [data-nav="tabs"] body{padding-right:156px}
@@ -42,9 +42,9 @@
     transform:translateX(10px);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,background .25s,color .25s}
   .tab b{font-family:var(--serif);font-weight:600;font-size:.8rem;color:var(--tab-ink)}
   .tab:nth-child(1){--tab:#E7EDF8;--tab-ink:var(--navy-2)}
-  .tab:nth-child(2){--tab:#FCEBDA;--tab-ink:var(--orange-ink)}
+  .tab:nth-child(2){--tab:#FCEBDA;--tab-ink:var(--accent-ink)}
   .tab:nth-child(3){--tab:#EEF1F7;--tab-ink:var(--navy-2)}
-  .tab:nth-child(4){--tab:#FBF1E6;--tab-ink:var(--orange-ink)}
+  .tab:nth-child(4){--tab:#FBF1E6;--tab-ink:var(--accent-ink)}
   .tab:nth-child(5){--tab:#DFE7F5;--tab-ink:var(--navy)}
   .tab:hover,.tab:focus-visible{transform:translateX(0)}
   .tab[aria-current="true"]{--tab:var(--navy);--tab-ink:#F9A85F;color:#fff;transform:translateX(-12px);box-shadow:-10px 12px 26px rgba(20,33,61,.18)}
@@ -81,7 +81,7 @@
   .ask-opt:hover,.ask-opt[aria-selected="true"]{background:var(--soft)}
   .ask-opt b{display:block;color:var(--ink);font-weight:600}
   .ask-opt small{display:block;color:var(--muted);font-size:.8rem}
-  .ask-opt .go{color:var(--orange-ink);font-weight:600;font-size:.86rem}
+  .ask-opt .go{color:var(--accent-ink);font-weight:600;font-size:.86rem}
   .ask-opt .go::after{content:" \2192"}
   .ask-menu{position:absolute;right:0;top:calc(100% + 10px);display:grid;min-width:230px;padding:8px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px rgba(20,33,61,.16)}
   .ask-menu a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;font-weight:500;color:var(--ink)}
@@ -95,15 +95,15 @@
   [data-nav="comments"] .comments{display:grid;align-content:start;gap:12px;position:fixed;right:0;top:0;bottom:0;width:260px;z-index:41;
     padding:28px 18px 24px 26px;background:#F3F5F9;border-left:1px solid var(--line);overflow-y:auto}
   .comments-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .comments-head span{min-width:22px;height:22px;display:grid;place-items:center;border-radius:11px;background:var(--orange-soft);color:var(--orange-ink);letter-spacing:0}
+  .comments-head span{min-width:22px;height:22px;display:grid;place-items:center;border-radius:11px;background:var(--accent-soft);color:var(--accent-ink);letter-spacing:0}
   .comment{position:relative;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:12px 12px 12px 10px;border-radius:12px;background:#fff;
     border:1px solid var(--line);border-left:3px solid #C9D3E5;box-shadow:0 4px 12px rgba(20,33,61,.05);transition:transform .25s,border-color .25s,box-shadow .25s}
-  .comment-who{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--orange-soft);color:var(--orange-ink);font-size:.64rem;font-weight:700}
+  .comment-who{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);font-size:.64rem;font-weight:700}
   .comment strong{display:block;color:var(--ink);font-size:.92rem;line-height:1.3}
   .comment-body span{display:block;color:var(--muted);font-size:.8rem;line-height:1.4}
-  .comment::before{content:"";position:absolute;right:100%;top:25px;width:0;border-top:1.5px dotted var(--orange);transition:width .3s}
+  .comment::before{content:"";position:absolute;right:100%;top:25px;width:0;border-top:1.5px dotted var(--accent);transition:width .3s}
   .comment:hover{transform:translateX(-4px);border-left-color:var(--navy-2)}
-  .comment[aria-current="true"]{border-left-color:var(--orange);box-shadow:0 10px 24px rgba(20,33,61,.1);transform:translateX(-8px)}
+  .comment[aria-current="true"]{border-left-color:var(--accent);box-shadow:0 10px 24px rgba(20,33,61,.1);transform:translateX(-8px)}
   .comment[aria-current="true"]::before{width:20px}
   [data-nav="comments"] .wa-float{right:284px}   /* off the review pane */
 
@@ -118,12 +118,12 @@
   .corner-index summary::before{content:"";width:14px;height:2px;border-radius:1px;background:currentColor;box-shadow:0 -5px 0 currentColor,0 5px 0 currentColor}
   .corner-index ol{position:absolute;left:0;bottom:calc(100% + 10px);list-style:none;display:grid;min-width:270px;padding:10px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px rgba(20,33,61,.16)}
   .corner-index a{display:grid;grid-template-columns:36px 1fr;align-items:baseline;min-height:44px;align-content:center;padding:0 12px;border-radius:12px;color:var(--ink);font-weight:600}
-  .corner-index a b{font-family:var(--serif);font-weight:600;color:var(--orange-ink)}
+  .corner-index a b{font-family:var(--serif);font-weight:600;color:var(--accent-ink)}
   .corner-index a:hover{background:var(--soft)}
-  .corner-index a[aria-current="true"]{background:var(--orange-soft)}
+  .corner-index a[aria-current="true"]{background:var(--accent-soft)}
   .corner-here{position:fixed;right:24px;bottom:22px;z-index:41;display:flex;align-items:center;gap:12px;min-height:48px;padding:0 7px 0 18px;border-radius:999px;
     background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line);box-shadow:0 12px 28px rgba(20,33,61,.1)}
-  .here-n{font-family:var(--serif);font-weight:600;color:var(--orange-ink)}
+  .here-n{font-family:var(--serif);font-weight:600;color:var(--accent-ink)}
   .here-name{font-weight:600;color:var(--ink)}
   .here-next{display:flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:var(--soft);color:var(--navy);font-weight:600;font-size:.86rem}
   .here-next::after{content:" \2192";white-space:pre}

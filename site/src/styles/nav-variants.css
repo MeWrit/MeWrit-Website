@@ -1,7 +1,12 @@
-/* ---------------- nav lab: navigation variants ----------------
-   Picked by data-nav on <html> ("classic" is the standard bar, "rail", "capsule") and
-   data-dock="1" for the phone dock. Switch with ?nav=classic|rail|capsule and ?dock=1|0,
-   or with the switcher on the nav lab page (src/pages/nav-lab.astro). */
+/* ---------------- navigation variants ----------------
+   The floating capsule is the site's navigation, on desktop and on phones, in a frosted liquid
+   glass. The nav lab keeps the other variants for comparison. Picked by data-nav on <html> for
+   desktop ("capsule", "classic" for the standard bar, "rail") and data-phone for phones
+   ("capsule", "menu" for the menu button, "dock"). Switch with ?nav= and ?phone=, or with the
+   switcher on the nav lab page (src/pages/nav-lab.astro). */
+
+/* the light the pointer catches on the desktop capsule fades in and out (registered so it can) */
+@property --sheen{syntax:'<number>';inherits:true;initial-value:0}
 
 /* ===== heartbeat rail (900px and up): the links sit on a trace like the logo's ECG line;
    the logo's pen glides along it and writes the underline, a heartbeat running with it ===== */
@@ -12,73 +17,93 @@
   .rail path{fill:none;stroke-linecap:round;stroke-linejoin:round}
   .rail-base{stroke:#D5DCE8;stroke-width:1.4}
   .rail-read{stroke:rgba(46,80,142,.42);stroke-width:1.4}
-  .rail-ink,.rail-ink-old{stroke:var(--orange);stroke-width:2.4}
+  .rail-ink,.rail-ink-old{stroke:var(--accent);stroke-width:2.4}
   [data-nav="rail"] .rail-pen{display:block;position:absolute;left:0;top:0;max-width:none;height:auto;opacity:0;pointer-events:none;will-change:transform,opacity}
   /* the rail does the highlighting, so the links lose their pill hover */
   [data-nav="rail"] .nav-desktop > ul > li > a:hover,[data-nav="rail"] .nav-desktop > ul > li > button:hover{background:none}
 }
 
+/* ===== liquid glass: the capsule's material. Frosted (a light tint over a blur of what is
+   behind), lit along its rim, with soft depth. On computers running a Chromium browser the rim
+   also bends what is behind it like the edge of a thick lens (src/scripts/glass.js draws a filter
+   for each glass element and sets it in --lg-cap, --lg-dd or --lg-card). With reduced
+   transparency asked for, the glass turns nearly opaque. ===== */
+:root{
+  --glass-fill:rgba(255,255,255,.4);
+  --glass-fill-solid:rgba(255,255,255,.5);
+  --glass-panel:rgba(255,255,255,.74);
+  --glass-frost:blur(6px) saturate(1.8) brightness(1.05);
+  --glass-frost-panel:blur(24px) saturate(1.8) brightness(1.04);
+  --glass-light:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.5),inset 0 12px 18px -14px rgba(255,255,255,.95),inset 0 -12px 18px -14px rgba(20,33,61,.13);
+  --glass-depth:0 0 0 .5px rgba(20,33,61,.12),0 2px 6px rgba(20,33,61,.05),0 14px 34px rgba(20,33,61,.1);
+  --glass-rim:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.25) 26%,rgba(255,255,255,0) 50%,rgba(255,255,255,.3) 74%,rgba(255,255,255,.9));
+}
+@media (prefers-reduced-transparency:reduce){
+  :root{--glass-fill:rgba(255,255,255,.94);--glass-fill-solid:rgba(255,255,255,.97);--glass-panel:rgba(255,255,255,.97)}
+}
+/* the capsule's glass and its lit rim sit behind its content (they show only where a capsule
+   rule below gives them content). They are kept off the capsule itself, so the panels inside
+   it can still frost the page behind them. */
+.site-header .wrap::before,.site-header .wrap::after{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none}
+.site-header .wrap::before{background-color:var(--glass-fill);
+  background-image:radial-gradient(260px circle at var(--mx,50%) var(--my,-100%),rgba(255,255,255,calc(.6 * var(--sheen))),rgba(255,255,255,0) 70%);
+  -webkit-backdrop-filter:var(--glass-frost);backdrop-filter:var(--lg-cap,) var(--glass-frost);
+  box-shadow:var(--glass-light),var(--glass-depth);transition:background-color .35s,--sheen .35s}
+.site-header.is-solid .wrap::before{background-color:var(--glass-fill-solid)}
+.site-header .wrap::after{padding:1px;background:var(--glass-rim);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+
 /* ===== floating capsule (900px and up): the bar lifts off the edge into a glass capsule that
-   tightens as you scroll; About and Services open one rich panel with small document cards ===== */
-.dd-art{display:none}
+   tightens as you scroll; a drop of glass glides to the link you point at; About and Services
+   open one glass panel with small document cards ===== */
+.dd-art,.cap-lens{display:none}
 @media (min-width:900px){
   [data-nav="capsule"] .site-header{top:14px;pointer-events:none}
   [data-nav="capsule"] .site-header,[data-nav="capsule"] .site-header.is-solid{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent}
-  [data-nav="capsule"] .site-header .wrap{pointer-events:auto;position:relative;width:calc(100% - 48px);max-width:1160px;height:70px;padding:0 10px 0 24px;border-radius:999px;
-    background:rgba(255,255,255,.62);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
-    border:1px solid rgba(227,232,241,.95);box-shadow:0 12px 34px rgba(20,33,61,.07);
-    transition:max-width .55s cubic-bezier(.2,.7,.2,1),height .55s cubic-bezier(.2,.7,.2,1),background .35s,box-shadow .35s}
-  [data-nav="capsule"] .site-header.is-solid .wrap{max-width:1010px;height:60px;background:rgba(255,255,255,.88);box-shadow:0 16px 40px rgba(20,33,61,.12)}
+  [data-nav="capsule"] .site-header .wrap{pointer-events:auto;position:relative;isolation:isolate;width:calc(100% - 48px);max-width:1160px;height:70px;padding:0 10px 0 24px;border-radius:999px;
+    transition:max-width .55s cubic-bezier(.2,.7,.2,1),height .55s cubic-bezier(.2,.7,.2,1)}
+  [data-nav="capsule"] .site-header .wrap::before,[data-nav="capsule"] .site-header .wrap::after{content:""}
+  [data-nav="capsule"] .site-header.is-solid .wrap{max-width:1010px;height:60px}
   [data-nav="capsule"] .logo img{transition:height .55s cubic-bezier(.2,.7,.2,1)}
   [data-nav="capsule"] .site-header.is-solid .logo img{height:42px}
-  [data-nav="capsule"] .header-cta{transition:min-height .55s,padding .55s}
+  /* version B: the logo keeps its size while it draws itself */
+  [data-nav="capsule"].logo-anim:not(.logo-done) .site-header.is-solid .logo img{height:50px}
+  [data-nav="capsule"] .header-cta{transition:min-height .55s,padding .55s;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 6px 16px rgba(163,77,9,.22)}
   [data-nav="capsule"] .site-header.is-solid .header-cta{min-height:42px;padding:9px 18px}
-  /* the panel: one wide card centred under the capsule */
+  /* the lens: a drop of glass under the link you point at. It glides from link to link, its
+     leading edge a moment ahead of the trailing one, so it stretches a little on the way
+     (src/scripts/nav-variants.js). It replaces the links' own hover. */
+  [data-nav="capsule"] .nav-desktop{position:relative;isolation:isolate}
+  [data-nav="capsule"] .nav-desktop > ul > li > a:hover,[data-nav="capsule"] .nav-desktop > ul > li > button:hover{background:none}
+  /* a soft light behind the words keeps them clear when dark content passes under the glass */
+  [data-nav="capsule"] .nav-desktop > ul > li > :is(a,button){text-shadow:0 0 10px rgba(255,255,255,.85)}
+  [data-nav="capsule"] .cap-lens{display:block;position:absolute;top:50%;left:var(--l,0px);right:var(--r,100%);height:44px;margin-top:-22px;z-index:-1;border-radius:999px;opacity:0;pointer-events:none;
+    background:rgba(224,168,46,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(196,138,18,.5),0 4px 12px rgba(176,122,10,.18);
+    transition:left .46s cubic-bezier(.3,1.2,.5,1) var(--dl,0s),right .46s cubic-bezier(.3,1.2,.5,1) var(--dr,0s),opacity .25s}
+  [data-nav="capsule"] .cap-lens.on{opacity:1}
+  [data-nav="capsule"] .cap-lens.jump{transition:opacity .25s}
+  /* the panel: one wide card of glass centred under the capsule */
   [data-nav="capsule"] .has-dd{position:static}
-  [data-nav="capsule"] .dd{left:50%;top:calc(100% + 12px);width:min(780px,calc(100vw - 64px));min-width:0;padding:12px;border-radius:26px;
-    display:grid;grid-template-columns:repeat(2,1fr);gap:6px;transform:translate(-50%,10px);box-shadow:0 24px 60px rgba(20,33,61,.14)}
+  [data-nav="capsule"] .dd{left:50%;top:calc(100% + 12px);width:min(780px,calc(100vw - 64px));min-width:0;padding:12px;border:0;border-radius:26px;
+    display:grid;grid-template-columns:repeat(2,1fr);gap:6px;transform:translate(-50%,10px);
+    background:var(--glass-panel);-webkit-backdrop-filter:var(--glass-frost-panel);backdrop-filter:var(--lg-dd,) var(--glass-frost-panel);
+    box-shadow:var(--glass-light),0 0 0 .5px rgba(20,33,61,.12),0 24px 60px rgba(20,33,61,.16)}
   [data-nav="capsule"] .has-dd:focus-within .dd,[data-nav="capsule"] .has-dd button[aria-expanded="true"] + .dd{transform:translate(-50%,0)}
-  [data-nav="capsule"] .dd a{display:grid;grid-template-columns:72px 1fr;grid-template-rows:auto auto;column-gap:16px;align-content:center;padding:12px;border-radius:18px;transition:background .2s}
-  [data-nav="capsule"] .dd a:hover,[data-nav="capsule"] .dd a:focus-visible{background:var(--soft)}
+  [data-nav="capsule"] .dd a{display:grid;grid-template-columns:72px 1fr;grid-template-rows:auto auto;column-gap:16px;align-content:center;padding:12px;border-radius:18px;transition:background .2s,box-shadow .2s}
+  [data-nav="capsule"] .dd a:hover,[data-nav="capsule"] .dd a:focus-visible{background:var(--gold-soft);box-shadow:inset 0 0 0 1px rgba(196,138,18,.45),0 2px 8px rgba(176,122,10,.12)}
   [data-nav="capsule"] .dd strong{align-self:end;font-size:.98rem}
   [data-nav="capsule"] .dd a > span:last-child{align-self:start}
   [data-nav="capsule"] .dd-art{display:block;grid-row:1 / span 2;position:relative;width:72px;height:58px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:0 6px 14px rgba(20,33,61,.06);overflow:hidden}
-  .dd-art i,.dd-art b{position:absolute;display:block}
-  .dd-art i{left:12px;height:4px;border-radius:2px;background:#CBD5E4;transform-origin:left center}
-  .dd-art i:nth-child(1){top:14px;width:34px;background:var(--navy-2)}
-  .dd-art i:nth-child(2){top:25px;width:46px}
-  .dd-art i:nth-child(3){top:36px;width:28px}
-  .dd-art b{right:9px;bottom:9px;width:9px;height:9px;border-radius:50%;background:var(--orange)}
-  /* a bar chart */
-  .dd-art[data-art="chart"] i{top:auto;bottom:11px;width:7px;border-radius:2px;background:var(--navy-2);transform-origin:center bottom}
-  .dd-art[data-art="chart"] i:nth-child(1){left:13px;height:16px}
-  .dd-art[data-art="chart"] i:nth-child(2){left:25px;height:26px}
-  .dd-art[data-art="chart"] i:nth-child(3){left:37px;height:19px}
-  .dd-art[data-art="chart"] b{left:49px;right:auto;bottom:11px;width:7px;height:32px;border-radius:2px}
-  /* a slide */
-  .dd-art[data-art="slides"]{background:#EEF2F9}
-  .dd-art[data-art="slides"] i{background:#fff}
-  .dd-art[data-art="slides"] i:nth-child(1){background:var(--navy-2)}
-  .dd-art[data-art="slides"] b{width:18px;height:18px;border-radius:5px;right:9px;bottom:9px}
-  /* a checklist */
-  .dd-art[data-art="check"] i{left:22px}
-  .dd-art[data-art="check"] i::before{content:"";position:absolute;left:-9px;top:-1px;width:6px;height:6px;border-radius:2px;background:var(--orange)}
-  .dd-art[data-art="check"] b{display:none}
-  /* a person */
-  .dd-art[data-art="person"] b{left:12px;top:12px;right:auto;bottom:auto;width:16px;height:16px;background:var(--navy-2)}
-  .dd-art[data-art="person"] i:nth-child(1){left:34px;top:14px;width:24px;background:#CBD5E4}
-  .dd-art[data-art="person"] i:nth-child(2){top:34px}
-  .dd-art[data-art="person"] i:nth-child(3){top:44px}
-  /* tags */
-  .dd-art[data-art="chips"] i{height:9px;border-radius:5px;background:#EAF0F9;border:1px solid #D3DCEB}
-  .dd-art[data-art="chips"] i:nth-child(1){top:12px;width:22px;background:var(--orange-soft);border-color:#F5D3B3}
-  .dd-art[data-art="chips"] i:nth-child(2){top:12px;left:38px;width:22px}
-  .dd-art[data-art="chips"] i:nth-child(3){top:26px;width:34px}
-  .dd-art[data-art="chips"] b{display:none}
-  /* a paper: title and two columns */
-  .dd-art[data-art="paper"] i:nth-child(2){width:20px}
-  .dd-art[data-art="paper"] i:nth-child(3){top:25px;left:38px;width:20px}
-  .dd-art[data-art="paper"] b{left:12px;right:auto;bottom:10px;width:46px;height:4px;border-radius:2px;background:#CBD5E4}
+}
+/* smaller laptops and tablets on their side: a slightly smaller logo and closer links, so the
+   capsule keeps every link on one line down to 900px */
+@media (min-width:900px) and (max-width:1099.98px){
+  [data-nav="capsule"] .site-header .wrap{padding:0 8px 0 18px;gap:8px}
+  [data-nav="capsule"] .logo img{height:44px}
+  [data-nav="capsule"] .nav-desktop > ul > li > :is(a,button){padding:0 10px}
+  [data-nav="capsule"] .header-cta{padding:10px 18px}
+  [data-nav="capsule"].logo-anim:not(.logo-done) .la,[data-nav="capsule"].logo-anim:not(.logo-done) .site-header.is-solid .logo img{height:44px}
 }
 @media (min-width:900px) and (hover:hover){
   [data-nav="capsule"] .has-dd:hover .dd{transform:translate(-50%,0)}
@@ -90,23 +115,142 @@
   [data-nav="capsule"] .dd-art i:nth-child(2){animation-delay:.08s}
   [data-nav="capsule"] .dd-art i:nth-child(3){animation-delay:.16s}
 }
+@media (prefers-reduced-motion:reduce){.cap-lens{transition:opacity .25s!important}}
+
+/* the small document cards in the capsule's panels and in its phone card */
+.dd-art i,.dd-art b{position:absolute;display:block}
+.dd-art i{left:12px;height:4px;border-radius:2px;background:#CBD5E4;transform-origin:left center}
+.dd-art i:nth-child(1){top:14px;width:34px;background:var(--navy-2)}
+.dd-art i:nth-child(2){top:25px;width:46px}
+.dd-art i:nth-child(3){top:36px;width:28px}
+.dd-art b{right:9px;bottom:9px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+/* a bar chart */
+.dd-art[data-art="chart"] i{top:auto;bottom:11px;width:7px;border-radius:2px;background:var(--navy-2);transform-origin:center bottom}
+.dd-art[data-art="chart"] i:nth-child(1){left:13px;height:16px}
+.dd-art[data-art="chart"] i:nth-child(2){left:25px;height:26px}
+.dd-art[data-art="chart"] i:nth-child(3){left:37px;height:19px}
+.dd-art[data-art="chart"] b{left:49px;right:auto;bottom:11px;width:7px;height:32px;border-radius:2px}
+/* a slide */
+.dd-art[data-art="slides"]{background:#EEF2F9}
+.dd-art[data-art="slides"] i{background:#fff}
+.dd-art[data-art="slides"] i:nth-child(1){background:var(--navy-2)}
+.dd-art[data-art="slides"] b{width:18px;height:18px;border-radius:5px;right:9px;bottom:9px}
+/* a checklist */
+.dd-art[data-art="check"] i{left:22px}
+.dd-art[data-art="check"] i::before{content:"";position:absolute;left:-9px;top:-1px;width:6px;height:6px;border-radius:2px;background:var(--accent)}
+.dd-art[data-art="check"] b{display:none}
+/* a person */
+.dd-art[data-art="person"] b{left:12px;top:12px;right:auto;bottom:auto;width:16px;height:16px;background:var(--navy-2)}
+.dd-art[data-art="person"] i:nth-child(1){left:34px;top:14px;width:24px;background:#CBD5E4}
+.dd-art[data-art="person"] i:nth-child(2){top:34px}
+.dd-art[data-art="person"] i:nth-child(3){top:44px}
+/* tags */
+.dd-art[data-art="chips"] i{height:9px;border-radius:5px;background:#EAF0F9;border:1px solid #D3DCEB}
+.dd-art[data-art="chips"] i:nth-child(1){top:12px;width:22px;background:var(--accent-soft);border-color:#F5D3B3}
+.dd-art[data-art="chips"] i:nth-child(2){top:12px;left:38px;width:22px}
+.dd-art[data-art="chips"] i:nth-child(3){top:26px;width:34px}
+.dd-art[data-art="chips"] b{display:none}
+/* a paper: title and two columns */
+.dd-art[data-art="paper"] i:nth-child(2){width:20px}
+.dd-art[data-art="paper"] i:nth-child(3){top:25px;left:38px;width:20px}
+.dd-art[data-art="paper"] b{left:12px;right:auto;bottom:10px;width:46px;height:4px;border-radius:2px;background:#CBD5E4}
 @keyframes artIn{from{transform:scaleX(0)}}
 @keyframes artUp{from{transform:scaleY(0)}}
+
+/* ===== the floating capsule on phones (below 900px): the header floats as the same glass
+   capsule, tightening as you scroll and slipping away while you read on down. Its Menu button
+   grows the capsule into a glass card with the same entries and document cards
+   (src/components/CapsuleMenu.astro, src/scripts/nav-variants.js) ===== */
+.menu-label,.cap-menu{display:none}
+@media (max-width:899.98px){
+  [data-phone="capsule"]{--header-h:76px}   /* the hero and the sections you jump to clear the capsule */
+  [data-phone="capsule"] .site-header{top:calc(10px + env(safe-area-inset-top));pointer-events:none}
+  [data-phone="capsule"] .site-header,[data-phone="capsule"] .site-header.is-solid{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent}
+  [data-phone="capsule"] .site-header.is-hidden{transform:translateY(calc(-100% - 60px))}
+  [data-phone="capsule"] .site-header .wrap{pointer-events:auto;position:relative;isolation:isolate;width:calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));height:58px;padding:0 7px 0 16px;border-radius:999px;
+    transition:width .5s cubic-bezier(.2,.7,.2,1),height .5s cubic-bezier(.2,.7,.2,1)}
+  [data-phone="capsule"] .site-header .wrap::before,[data-phone="capsule"] .site-header .wrap::after{content:""}
+  /* a tighter shadow than on desktop: the hero's eyebrow sits just below, and its orange text
+     keeps 4.5:1 only on the clean page colour */
+  [data-phone="capsule"] .site-header .wrap::before{box-shadow:var(--glass-light),0 0 0 .5px rgba(20,33,61,.12),0 2px 6px rgba(20,33,61,.05),0 8px 16px rgba(20,33,61,.08)}
+  [data-phone="capsule"] .site-header.is-solid .wrap{width:calc(100% - 40px - env(safe-area-inset-left) - env(safe-area-inset-right));height:54px}
+  [data-phone="capsule"] .logo{min-height:44px}
+  [data-phone="capsule"] .logo img{height:34px;transition:height .5s cubic-bezier(.2,.7,.2,1)}
+  [data-phone="capsule"] .site-header.is-solid .logo img{height:31px}
+  /* version B: the logo keeps its size while it draws itself */
+  [data-phone="capsule"].logo-anim:not(.logo-done) .site-header .logo img{height:34px}
+  [data-phone="capsule"].logo-anim:not(.logo-done) .la{height:34px}
+  [data-phone="capsule"] .site-header .menu-btn{display:flex;align-items:center;gap:8px;width:auto;height:44px;margin:0;padding:0 16px 0 14px;border-radius:999px;
+    background:var(--ink);color:#fff;font-weight:600;font-size:.9rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 4px 12px rgba(20,33,61,.22)}
+  [data-phone="capsule"] .site-header .menu-btn svg{width:18px;height:18px}
+  [data-phone="capsule"] .menu-label{display:inline}
+  /* the card opens exactly over the capsule (the script measures the capsule into --cap-*), so
+     the capsule seems to grow into it */
+  .cap-menu[open]{display:flex;flex-direction:column;position:fixed;inset:var(--cap-top,10px) auto auto var(--cap-left,12px);width:var(--cap-w,calc(100% - 24px));max-width:none;height:auto;
+    max-height:calc(100svh - var(--cap-top,10px) - 12px);margin:0;padding:0;border:0;border-radius:28px;overflow:hidden;color:var(--body);
+    background:var(--glass-panel);-webkit-backdrop-filter:var(--glass-frost-panel);backdrop-filter:var(--lg-card,) var(--glass-frost-panel);
+    box-shadow:var(--glass-light),0 0 0 .5px rgba(20,33,61,.12),0 24px 60px rgba(20,33,61,.22)}
+  .cap-menu::backdrop{background:rgba(20,33,61,.22);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+  .cap-top{flex:none;display:flex;align-items:center;justify-content:space-between;height:var(--cap-h,58px);padding:0 7px 0 16px}
+  .cap-top img{height:var(--cap-logo,34px);width:auto}
+  .cap-close{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 16px;border-radius:999px;background:rgba(20,33,61,.07);color:var(--ink);font-weight:600;font-size:.9rem}
+  .cap-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 16px 6px;border-top:1px solid rgba(20,33,61,.08)}
+  .cap-group summary,.cap-link{display:flex;align-items:center;justify-content:space-between;min-height:54px;font-size:1.06rem;font-weight:600;color:var(--ink);border-bottom:1px solid rgba(20,33,61,.08);list-style:none;cursor:pointer}
+  .cap-group summary::-webkit-details-marker{display:none}
+  .cap-group summary::after{content:"";width:8px;height:8px;margin-right:6px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .25s}
+  .cap-group[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+  .cap-link::after{content:"";width:7px;height:7px;margin-right:8px;border-right:2px solid #A3ACBF;border-top:2px solid #A3ACBF;transform:rotate(45deg)}
+  .cap-out::after{transform:none}   /* leaves the site: an arrow pointing out */
+  /* the part of the page you are reading */
+  .cap-body [aria-current="true"] > span::after{content:"";display:inline-block;width:6px;height:6px;margin-left:9px;border-radius:50%;background:var(--accent);vertical-align:middle}
+  .cap-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0 14px}
+  .cap-cards a{display:grid;align-content:start;gap:3px;padding:12px;border-radius:18px;background:rgba(255,255,255,.6);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(20,33,61,.08)}
+  .cap-cards .dd-art{display:block;position:relative;width:72px;height:58px;margin-bottom:8px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:0 6px 14px rgba(20,33,61,.06);overflow:hidden}
+  .cap-cards strong{color:var(--ink);font-size:.92rem;font-weight:600;line-height:1.3}
+  .cap-cards a > span:last-child{font-size:.8rem;line-height:1.35;color:var(--muted)}
+  .cap-foot{flex:none;display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:12px;border-top:1px solid rgba(20,33,61,.08)}
+  .cap-foot .btn{min-height:48px}
+  .cap-quick{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:rgba(20,33,61,.07);color:var(--navy)}
+  .cap-wa{background:#25D366;color:#fff}
+}
+@media (max-width:899.98px) and (prefers-reduced-motion:no-preference){
+  /* the capsule grows into the card, and folds back into the capsule */
+  .cap-menu[open]{animation:capGrow .5s cubic-bezier(.2,.75,.2,1)}
+  .cap-menu[open]::backdrop{animation:capDim .4s ease}
+  .cap-menu.closing{animation:capFold .32s cubic-bezier(.45,0,.6,1) forwards}
+  .cap-menu.closing::backdrop{animation:capDim .32s ease reverse forwards}
+  .cap-menu[open] .cap-body > *,.cap-menu[open] .cap-foot{animation:capItem .45s cubic-bezier(.2,.7,.2,1) both}
+  .cap-menu[open] .cap-body > :nth-child(2){animation-delay:.03s}
+  .cap-menu[open] .cap-body > :nth-child(3){animation-delay:.06s}
+  .cap-menu[open] .cap-body > :nth-child(4){animation-delay:.09s}
+  .cap-menu[open] .cap-body > :nth-child(5){animation-delay:.12s}
+  .cap-menu[open] .cap-body > :nth-child(6){animation-delay:.15s}
+  .cap-menu[open] .cap-foot{animation-delay:.18s}
+  /* the cards draw themselves each time a group opens */
+  .cap-group[open] .dd-art i{animation:artIn .55s cubic-bezier(.2,.7,.2,1) both}
+  .cap-group[open] .dd-art[data-art="chart"] i{animation-name:artUp}
+  .cap-cards .dd-art i:nth-child(2){animation-delay:.08s}
+  .cap-cards .dd-art i:nth-child(3){animation-delay:.16s}
+}
+@keyframes capGrow{from{clip-path:inset(0 0 calc(100% - var(--cap-h,58px)) 0 round calc(var(--cap-h,58px) / 2))}to{clip-path:inset(-90px -90px -90px -90px round 28px)}}
+@keyframes capFold{from{clip-path:inset(-90px -90px -90px -90px round 28px)}to{clip-path:inset(0 0 calc(100% - var(--cap-h,58px)) 0 round calc(var(--cap-h,58px) / 2))}}
+@keyframes capDim{from{opacity:0}}
+@keyframes capItem{from{opacity:0;transform:translateY(-8px)}}
 
 /* ===== phone dock (below 900px): one floating dock at the foot of the screen in place of the
    menu button and the quick-contact bar; Services, About and Enquire open bottom sheets ===== */
 .dock,.sheet{display:none}
 @media (max-width:899.98px){
-  :is([data-dock="1"],[data-nav="dock"]) .dock{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:35;height:66px;padding:0 6px;border-radius:24px;
+  [data-phone="dock"] .dock{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:35;height:66px;padding:0 6px;border-radius:24px;
     background:rgba(255,255,255,.86);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px);
     border:1px solid rgba(227,232,241,.95);box-shadow:0 16px 36px rgba(20,33,61,.16)}
   .dock-item{display:grid;justify-items:center;align-content:center;gap:4px;height:54px;border-radius:18px;font-size:.72rem;font-weight:600;letter-spacing:.01em;color:var(--muted);transition:color .2s,background .2s}
   .dock-item[aria-current="true"]{color:var(--navy);background:var(--soft)}
-  .dock-go{color:#fff;background:var(--orange-ink);height:62px;margin-top:-20px;box-shadow:0 12px 24px rgba(178,86,11,.32)}
-  .dock-go[aria-current="true"]{color:#fff;background:#9A4A08}
-  :is([data-dock="1"],[data-nav="dock"]) .menu-btn,:is([data-dock="1"],[data-nav="dock"]) .action-bar{display:none}
-  :is([data-dock="1"],[data-nav="dock"]) body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
-  :is([data-dock="1"],[data-nav="dock"]) .hero{height:calc(100svh - 90px - env(safe-area-inset-bottom))}
+  .dock-go{color:#fff;background:var(--accent-ink);height:62px;margin-top:-20px;box-shadow:0 12px 24px rgba(163,77,9,.32)}
+  .dock-go[aria-current="true"]{color:#fff;background:#8C4207}
+  [data-phone="dock"] .menu-btn,[data-phone="dock"] .action-bar{display:none}
+  [data-phone="dock"] body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  [data-phone="dock"] .hero{height:calc(100svh - 90px - env(safe-area-inset-bottom))}
   .sheet[open]{display:block;position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:85svh;border:0;padding:0;
     border-radius:26px 26px 0 0;background:var(--page);color:var(--body);box-shadow:0 -10px 40px rgba(20,33,61,.18);overflow:auto;overscroll-behavior:contain}
   .sheet::backdrop{background:rgba(20,33,61,.35)}
@@ -138,4 +282,4 @@
 .lab-row span{width:80px;color:rgba(255,255,255,.72)}
 .lab-row button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.28);color:#fff;font-size:.78rem}
 .lab-row button[aria-pressed="true"]{background:#fff;color:var(--ink);border-color:#fff}
-@media (max-width:899.98px){.lab{left:auto;right:10px;bottom:auto;top:72px;max-width:calc(100% - 20px);padding:8px 12px}}
+@media (max-width:899.98px){.lab{left:auto;right:10px;bottom:auto;top:calc(var(--header-h) + 8px);max-width:calc(100% - 20px);padding:8px 12px}}

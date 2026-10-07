@@ -2,13 +2,13 @@
 .hero{position:relative;height:100vh;height:100svh;min-height:540px;padding-top:var(--header-h);display:flex;isolation:isolate;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;z-index:-2;background:
   radial-gradient(70% 45% at 92% 6%, rgba(224,122,31,.07), transparent 70%),
-  radial-gradient(60% 50% at 0% 100%, rgba(46,80,142,.06), transparent 70%)}
-/* the ribbons flow through the copy and fade out before the heartbeat panel; the fading is
+  radial-gradient(55% 40% at 0% 58%, rgba(43,74,146,.07), transparent 70%)}
+/* the ribbons flow through the copy and fade out before the hero's drawing; the fading is
    done inside the canvas by src/scripts/ribbons.js (no CSS mask: see the note there) */
 .ribbons{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
 .hero-grid{flex:1;display:grid;grid-template-rows:auto minmax(0,1fr);gap:22px;padding-block:18px 20px;min-height:0}
 .hero h1{margin-bottom:14px}
-.hero h1 em{font-style:italic;color:var(--orange-ink)}
+.hero h1 em{font-style:italic;color:var(--accent-ink)}
 .hero .lead{margin-bottom:22px;max-width:46ch}
 .hero-cell{container-type:size;min-height:0;display:grid;place-items:center}
 .hero-visual{position:relative;width:min(100cqw, calc(100cqh * 400 / 380));aspect-ratio:400 / 380;
@@ -22,7 +22,7 @@
 .hero-pause[aria-pressed="true"] .i-play{display:block}
 .hero-pause[aria-pressed="true"] .i-pause{display:none}
 /* hero extras: founder line (tablet up), stats bar and floating cards (desktop) */
-.hero-founder,.hero-stats,.sat{display:none}
+.hero-founder,.hero-stats{display:none}
 @media (min-width:600px){
   .hero-founder{display:flex;align-items:center;gap:12px;margin-top:24px}
   .hero-founder img{width:46px;height:46px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #fff,0 6px 16px rgba(20,33,61,.14)}
@@ -34,28 +34,14 @@
   .hero-stats::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--line) 0,var(--line) 60%,rgba(227,232,241,0))}
   .hero-stats div{padding:0 20px;border-left:1px solid var(--line)}
   .hero-stats div:first-child{padding-left:0;border-left:0}
-  .hero-stats b{display:block;font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,1.1rem + 1vw,2.2rem);line-height:1.1;color:var(--navy)}
-  .hero-stats span{display:block;font-size:.84rem;color:var(--muted);margin-top:4px}
+  .hero-stats b{display:block;font-family:var(--serif);font-weight:600;font-size:clamp(2rem,1.2rem + 1.4vw,2.9rem);line-height:1.05;color:var(--navy);font-variant-numeric:tabular-nums}
+  .hero-stats div > span{display:block;font-size:.92rem;line-height:1.35;color:var(--body);margin-top:6px}
   .stats-after{display:none}
-  .sat{display:flex;align-items:center;gap:10px;position:absolute;z-index:2;background:#fff;border-radius:14px;padding:9px 16px 9px 10px;white-space:nowrap;
-    box-shadow:0 1px 0 var(--line),0 16px 34px rgba(20,33,61,.11)}
-  .sat b{display:block;color:var(--ink);font-size:.84rem;line-height:1.25}
-  .sat small{display:block;color:var(--muted);font-size:.74rem}
-  .sat-ico{width:30px;height:30px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);display:grid;place-items:center;flex:none}
-  .sat-ico.navy{background:#EAF0F9;color:var(--navy-2)}
-  /* they hang off the panel's top and bottom margins, never over the animation */
-  .sat-a{left:6%;bottom:-26px}
-  .sat-b{right:14%;top:-26px}
 }
-@media (min-width:900px) and (prefers-reduced-motion:no-preference){
-  .sat-a{animation:floaty 8s ease-in-out infinite}
-  .sat-b{animation:floaty 10s ease-in-out -4s infinite}
-}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 /* review switches: one hero element only */
 [data-hero="ribbons"] .hero-cell{display:none}
 [data-hero="ribbons"] .hero-grid{grid-template-rows:1fr;align-content:center}
-[data-hero="ecg"] .ribbons{display:none}
+[data-hero="drawing"] .ribbons{display:none}
 
 /* page entrance (after the intro, or right after load) */
 .js .hero-copy > *,.js .hero-cell,.js .ribbons,.js .nav-desktop,.js .header-cta,.js .menu-btn{transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
