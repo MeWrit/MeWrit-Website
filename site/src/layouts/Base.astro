@@ -2,6 +2,8 @@
 // Page shell: head, logo animation, header, phone menu, footer, quick contact and the scripts.
 // `intro` picks the page's logo animation: "overlay" (the loading intro, home page only),
 // "header" (version B: the logo draws itself in the header) or "none" (every other page).
+// `theme` "dark" dresses the header, its menus and the quick contact for a dark page
+// (src/styles/theme-dark.css); "light" is the site as it always was.
 import '@fontsource-variable/inter';
 import '@fontsource-variable/fraunces/opsz.css';
 import '@fontsource/ibm-plex-mono/500.css';
@@ -17,6 +19,7 @@ import '../styles/sections.css';
 import '../styles/responsive.css';
 import '../styles/nav-variants.css';
 import '../styles/nav-experiments.css';
+import '../styles/theme-dark.css';
 import Intro from '../components/Intro.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MobileMenu from '../components/MobileMenu.astro';
@@ -34,18 +37,18 @@ import { href } from '../lib/url';
 interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
   nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners';
-  phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean;
+  phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean; theme?: 'light' | 'dark';
 }
-const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false } = Astro.props;
+const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone}>
+<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content={site.themeColor}>
+<meta name="theme-color" content={theme === 'dark' ? '#030817' : site.themeColor}>
 <title>{title}</title>
 <meta name="description" content={description}>
 {noindex && <meta name="robots" content="noindex">}
@@ -105,7 +108,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of
 <body>
 <a class="skip" href="#main">Skip to content</a>
 {intro === 'overlay' && <Intro />}
-<SiteHeader animatedLogo={intro === 'header'} />
+<SiteHeader />
 <MobileMenu />
 <main id="main">
   <slot />

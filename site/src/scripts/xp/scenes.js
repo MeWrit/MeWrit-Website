@@ -1,92 +1,119 @@
 /* The experience's scenes, in scroll order (src/pages/experience.astro has their words, matched by
-   id). Each scene names the formation the particles take (formations.js), the camera's shot as the
-   scene starts (a) and as it ends (b), and its look: the background, the floor grid, the
-   construction rings, how the shape turns. Callouts pin a label to one of the formation's anchors
-   once the reveal passes `min` (phone: false keeps one off phones); readouts are the figures in the corner, counting up with the reveal
-   where they have a `to`. Every figure here is illustrative. A shape either turns (spin, radians
-   a second) or rocks to and fro (rock: [how far, how fast]).
+   id): an opening, then the five practices a client chooses from (CHAPTERS, the rail along the
+   foot, and the shapes of the second scene; each practice stands on its own), then the close. Each
+   scene names the formation the particles take (formations.js), the practice it belongs to
+   (chapter, -1 for none), the camera's shot as the scene starts (a) and as it ends (b), and its
+   look: the background, the floor grid, how the shape turns. Callouts pin a label to one of the formation's
+   anchors once the reveal passes `min` (phone: false keeps one off phones, and off computer
+   screens where the picture is drawn small enough to crowd it); readouts are the figures in the
+   corner, counting up with the reveal where they have a `to` (a third value shows once the reveal
+   is complete). The figures are MeWriT's own; a scene whose picture or figures are only
+   illustrative says so in its `note`, shown under them. A shape either turns (spin, radians a
+   second) or rocks to and fro (rock: [how far, how fast]).
    A shot is [camera position, the point it looks at, field of view, shift right, shift up]; the
-   shifts move the picture off centre (as a fraction of the screen) to leave room for the words. */
+   shifts move the picture off centre (as a fraction of the screen) to leave room for the words.
+   Shots are framed for a 1440 x 900 stage, the shape right of the words and below the figures
+   (experience.js fits other screens). Phones stand further back still, so a scene whose camera
+   stands well back gives phones their own shots (pa, pb), short of the depth where particles fade. */
 import { F } from './formations.js';
 
 const NAVY = ['#0B1A42', '#030817'], WARM = ['#1A1838', '#050817'], DEEP = ['#08122E', '#02050F'];
 
-export const CHAPTERS = ['Drug development', 'Clinical trials', 'Medical research', 'Data & statistics', 'Analysis', 'Reporting', 'Manuscript & publication'];
+export const CHAPTERS = ['Regulatory writing', 'Scientific publications', 'Medical communications', 'Training', 'AI/ML advisory'];
+
+// past the close, the tail: the shapes dissolve into dust that stays behind the rest of the page, on
+// a plain night (the page's own background, #030817, at the foot), dimmer and with less bloom; the
+// dust itself, faint behind the shapes in the scenes, is brought up (dust) and a little larger (size)
+// so it still shows, as a field of faint motes
+export const TAIL = { bg: ['#060C22', '#030817'], glow: ['#1C3472', .22], gain: .6, bloom: .35, dust: 8, size: 1.5 };
 
 export const SCENES = [
   {
-    id: 'open', form: F.MOLECULE, chapter: -1,
-    a: [[0, .5, 18.5], [0, 0, 0], 36, .19, 0], b: [[1.5, .9, 16.5], [0, .1, 0], 36, .19, 0],
-    rock: [.62, .32], gain: .9, bg: NAVY, glow: ['#1C3472', .55], rings: 1,
-    readout: [['Status', 'Ready'], ['Particles', 'N'], ['Chapters', '07']],
+    // the page writes itself as the loading screen lifts (its reveal runs on time, not scroll)
+    id: 'open', form: F.PAGE, chapter: -1,
+    a: [[0, .41, 27.45], [0, 0, 0], 38, .22, -.11], b: [[1.77, .97, 27.61], [0, .2, 0], 38, .22, -.1],
+    pa: [[0, 1.91, 14.43], [0, 1.7, 0], 38, 0, 0], pb: [[.92, 2.1, 14.35], [0, 1.7, 0], 38, 0, 0],
+    rock: [.2, .3], bg: NAVY, glow: ['#1C3472', .55],
+    readout: [['Since', '2017'], ['Experience', '22+ years'], ['Practices', '05']],
   },
   {
-    id: 'drug', form: F.MOLECULE, chapter: 0,
-    a: [[3, 1.4, 16.5], [0, 0, 0], 38, .2, 0], b: [[-2, 1.9, 14.5], [0, .2, 0], 38, .2, 0],
-    rock: [.62, .32], gain: .9, bg: NAVY, glow: ['#1C3472', .6], rings: 1,
-    callouts: [{ at: 'core', label: 'Aromatic core', min: 0 }, { at: 'amide', label: 'Amide bond', min: 0 }, { at: 'carbonyl', label: 'Carbonyl', min: 0, side: 'l' }, { at: 'hydroxyl', label: 'Hydroxyl', min: 0, side: 'l' }],
-    readout: [['Compound', 'MW-0712'], ['Stage', 'Preclinical'], ['Heavy atoms', '18']],
+    // the five practices as shapes, a button above each (experience.js pins them)
+    id: 'practices', form: F.CHOICE, chapter: -1,
+    a: [[-2.37, 1.78, 35.56], [0, 0, 0], 42, .23, -.06], b: [[2.45, 2.67, 35.48], [0, .1, 0], 42, .23, -.06],
+    pa: [[-1.16, 1.96, 17.67], [.2, .87, 0], 38, 0, 0], pb: [[1.56, 2.4, 17.67], [.2, .9, 0], 38, 0, 0],   // phones: the two-row layout
+    bg: NAVY, glow: ['#1C3472', .6], grid: .5,
+    readout: [['Writing', 'Fixed fee per project'], ['Advisory', 'By the hour'], ['Training', 'By topics and days']],
   },
   {
-    id: 'enrol', form: F.CROWD, chapter: 1,
-    a: [[1.5, .4, 19], [0, .3, -2], 42, .12, 0], b: [[-2.4, 1.1, 10.5], [.6, .4, -2], 42, .12, 0], size: .82, gain: 1.5,
-    bg: WARM, glow: ['#3A2A3A', .5],
-    callouts: [{ at: 'participant', label: 'Participant 001, enrolled', min: .15 }],
-    readout: [['Screened', { to: 1306 }], ['Enrolled', { to: 480 }], ['Sites', '12']],
-  },
-  {
-    id: 'randomise', form: F.STREAMS, chapter: 1,
+    id: 'reg-designs', form: F.STREAMS, chapter: 0,
     a: [[0, 2.2, 12.5], [0, .2, -14], 46, .1, 0], b: [[0, 2.6, 7.5], [0, .8, -18], 50, .1, 0],
     bg: DEEP, glow: ['#1C3472', .45], floor: [-1.9, .45],
-    callouts: [{ at: 'source', label: 'Randomised 1:1', min: 0 }, { at: 'treatment', label: 'Arm A, treatment', min: 0 }, { at: 'control', label: 'Arm B, control', min: 0, side: 'l' }],
-    readout: [['Allocation', '1:1'], ['Arm A', '240'], ['Arm B', '240']],
+    callouts: [{ at: 'split', label: 'Randomised 1:1', min: 0, dy: -30 }, { at: 'treatment', label: 'Arm A, treatment', min: 0 }, { at: 'control', label: 'Arm B, control', min: 0, side: 'l' }],
+    readout: [['Trial documents', { to: 100 }, '100+'], ['Phases', 'I to IV'], ['Also', 'BA/BE, PMS, RWE, IITs']],
+    note: 'The trial shown is illustrative',
   },
   {
-    id: 'research', form: F.PAPERS, chapter: 2,
-    a: [[0, -3, 14.5], [0, -1.6, -3], 44, .12, 0], b: [[0, 9.6, 13.5], [0, 10.4, -3], 44, .12, 0],
-    spin: .04, bg: NAVY, glow: ['#1C3472', .5],
-    callouts: [{ at: 'included', label: 'Included in the review', min: .55 }],
-    readout: [['Records', { to: 2400 }], ['Screened', { to: 312 }], ['Included', { to: 18 }]],
-  },
-  {
-    id: 'data', form: F.LANDSCAPE, chapter: 3,
-    a: [[-9, 5, 11], [0, -1, -6], 46, .1, 0], b: [[7, 6, 3.5], [-1, -1.2, -12], 46, .1, 0],
-    bg: DEEP, glow: ['#1C3472', .4], floor: [-2.75, .35], grid: .5,
-    callouts: [{ at: 'peak', label: 'Primary endpoint', min: .6 }, { at: 'second', label: 'Secondary endpoint', min: .4 }, { at: 'near', label: 'Subgroup', min: .1, side: 'l' }],
-    readout: [['Variables', { to: 1326 }], ['Observations', { to: 38400 }], ['Missing', '0.4%']],
-  },
-  {
-    id: 'analysis', form: F.CURVES, chapter: 4,
-    a: [[-3.5, 1.8, 18], [0, .5, 0], 38, .06, 0], b: [[3, .4, 15.5], [.6, .5, 0], 38, .06, 0],
-    bg: NAVY, glow: ['#1C3472', .45], grid: 1,
-    callouts: [{ at: 'treatment', label: 'Treatment', min: .9 }, { at: 'control', label: 'Control', min: .9 }, { at: 'effect', label: 'HR 0.72, 95% CI 0.58 to 0.89', min: .62 }, { at: 'axis', label: 'Months', min: 0, side: 'l' }],
-    readout: [['Hazard ratio', '0.72'], ['95% CI', '0.58 to 0.89'], ['p', '< 0.001']],
-  },
-  {
-    id: 'reporting', form: F.DOSSIER, chapter: 5,
-    a: [[0, 1.4, 20], [0, -.2, -2], 40, .1, -.02], b: [[1.4, .6, 16.5], [0, -.2, -2], 40, .1, -.02],
+    id: 'reg-dossier', form: F.DOSSIER, chapter: 0,
+    a: [[0, 1.69, 23.93], [0, -.2, -2], 54, .2, -.04], b: [[1.88, .88, 22.91], [0, -.2, -2], 50, .18, -.04],
+    pa: [[0, 1.25, 17.95], [0, -.2, -2], 50, 0, 0], pb: [[1.51, .66, 17.92], [0, -.2, -2], 48, 0, 0],
     bg: NAVY, glow: ['#1C3472', .5],
-    callouts: ['Protocol', 'SAP', 'IB', 'CSR, ICH E3', 'CTD 2.5', 'CTD 2.7', 'Narratives'].map((label, j) => ({ at: 'p' + j, label, min: .04 + .9 * j / 7 + .08, dy: j % 2 ? 46 : 12, phone: ![1, 2, 5].includes(j) })),
-    readout: [['Documents', { to: 7 }], ['Standard', 'ICH E3'], ['Pages', { to: 1840 }]],
+    callouts: ['CSR, ICH E3', 'CTD 2.5', 'CTD 2.7', 'MAA dossier', 'Narratives', 'CIP / CER', 'Regulatory response'].map((label, j) => ({ at: 'p' + j, label, min: .04 + .9 * j / 7 + .08, dy: j % 2 ? 60 : 12, phone: ![1, 2, 5, 6].includes(j) })),
+    readout: [['CSRs, ICH E3', { to: 30 }, '30+'], ['CTD summaries', { to: 30 }, '30+'], ['Narratives', { to: 1500 }, '1,500+']],
   },
   {
-    id: 'manuscript', form: F.MANUSCRIPT, chapter: 6,
-    a: [[-2.4, 0, 21.5], [0, 1.3, 0], 40, .08, 0], b: [[1.4, 2.1, 19.5], [0, 1.5, 0], 40, .08, 0],
+    id: 'pub-literature', form: F.PAPERS, chapter: 1,
+    a: [[0, -4.87, 25.73], [0, 3.75, -3], 53, .12, -.05], b: [[0, 12.31, 24.71], [0, 3.75, -3], 53, .14, -.01],
+    pa: [[0, -2, 16.16], [0, 3.75, -3], 57, 0, 0], pb: [[0, 8.15, 16.11], [0, 2.25, -3], 60, 0, 0],
+    spin: .04, size: 1.2, bg: NAVY, glow: ['#1C3472', .5],
+    callouts: [{ at: 'included', label: 'Included in the review', min: .55 }],
+    readout: [['Publications and presentations', { to: 70 }, '70+'], ['Acknowledged in', { to: 25 }, '25+ papers'], ['Book chapters', '4']],
+  },
+  {
+    id: 'pub-manuscript', form: F.MANUSCRIPT, chapter: 1,
+    a: [[-2.38, .01, 21.33], [0, 1.3, 0], 47, .22, -.05], b: [[1.5, 2.14, 20.94], [0, 1.5, 0], 46, .22, -.04],
     bg: NAVY, glow: ['#1C3472', .5],
     callouts: [{ at: 'title', label: 'Title', min: .1 }, { at: 'abstract', label: 'Structured abstract', min: .3 }, { at: 'figure', label: 'Figure 2', min: .55 }, { at: 'stamp', label: 'Accepted', min: .98 }],
-    readout: [['Guidelines', 'ICMJE, GPP'], ['Words', { to: 3480 }], ['Status', 'In review', 'Accepted']],
+    readout: [['Guidelines', 'ICMJE, GPP'], ['Congress presentations', { to: 30 }, '30'], ['Status', 'In review', 'Accepted']],
   },
   {
-    id: 'publication', form: F.GLOBE, chapter: 6,
-    a: [[0, 2.6, 22], [0, 0, 0], 38, .12, 0], b: [[-1.6, 4, 19], [0, .4, 0], 38, .12, 0],
-    spin: .03, spinFrom: -1.27, spinBy: .9, bg: DEEP, glow: ['#1C3472', .7], orbit: 1,
-    callouts: [{ at: 'home', label: 'Ahmedabad', min: 0 }, ...['London', 'Boston', 'Singapore', 'Tokyo', 'Sydney'].map((c, j) => ({ at: c, label: c, min: .5, side: j % 2 ? 'l' : 'r', facing: true }))],
-    readout: [['Cities', { to: 16 }], ['From', 'Ahmedabad'], ['Readers', 'Worldwide']],
+    id: 'med-evidence', form: F.LANDSCAPE, chapter: 2,
+    a: [[-12, 16.34, 17.67], [0, -1, -9], 67, .21, -.01], b: [[14.07, 20.11, 12.11], [0, -1, -9], 65, .24, .01],
+    pa: [[-5.17, 12.22, 9.59], [0, -1, -4.5], 63, 0, 0], pb: [[6.15, 13.77, 7.5], [0, -1, -4.5], 70, 0, 0],
+    size: 2, gain: 1.6, bg: DEEP, glow: ['#1C3472', .4], floor: [-2.75, .35], grid: .5,
+    callouts: [{ at: 'peak', label: 'Primary outcome', min: .6, side: 'l' }, { at: 'second', label: 'Secondary outcome', min: .4 }, { at: 'near', label: 'Subgroup', min: .1, side: 'l' }],
+    readout: [['Evidence', 'Real-world'], ['Readers', 'Clinicians, payers, regulators'], ['Formats', 'Papers, statements, reports']],
+  },
+  {
+    id: 'med-narrative', form: F.CURVES, chapter: 2,
+    a: [[-5.14, 2.41, 26.44], [0, .5, 0], 46, .24, -.07], b: [[4.43, .34, 24.71], [.6, .5, 0], 44, .23, -.07],
+    pa: [[-3.81, 1.91, 19.58], [0, .5, 0], 45, 0, 0], pb: [[3.66, .37, 19.76], [.6, .5, 0], 44, 0, 0],
+    bg: NAVY, glow: ['#1C3472', .45], grid: 1,
+    callouts: [{ at: 'treatment', label: 'Treatment', min: .9 }, { at: 'control', label: 'Control', min: .9 }, { at: 'effect', label: 'HR 0.72, 95% CI 0.58 to 0.89', min: .62, side: 'l' }, { at: 'axis', label: 'Months', min: 0, side: 'l', phone: false }],
+    readout: [['Hazard ratio', '0.72'], ['95% CI', '0.58 to 0.89'], ['p', '< 0.001']],
+    note: 'Figures are illustrative',
+  },
+  {
+    id: 'training', form: F.CROWD, chapter: 3,
+    a: [[2.42, .46, 31.91], [0, .3, -2], 51, .23, -.11], b: [[-6.62, 2.09, 28.1], [.6, .4, -2], 57, .24, -.1],
+    pa: [[1.34, .09, 16.72], [0, 0, -2], 42, 0, 0], pb: [[-4.33, .76, 16.45], [.1, -.27, -2], 42, 0, 0], size: 1, gain: 1.7,
+    bg: WARM, glow: ['#3A2A3A', .5],
+    callouts: [{ at: 'participant', label: '3,000+ trained', min: .3 }, { at: 'left', label: 'Pharma and CRO teams', min: .5 }, { at: 'right', label: 'Clinicians and residents', min: .5, side: 'l' }, { at: 'far', label: 'Students', min: .5 }],
+    readout: [['Professionals trained', { to: 3000 }, '3,000+'], ['Training since', '2008'], ['Formats', 'Half-day to 3 days']],
+  },
+  {
+    id: 'ai', form: F.NETWORK, chapter: 4,
+    a: [[-7.62, 5.08, 25.4], [0, 0, 0], 47, .22, -.12], b: [[16.58, 3.33, 18.85], [.5, 0, 0], 43, .18, -.11],
+    pa: [[-5.64, 3.76, 18.81], [0, 0, 0], 50, 0, 0], pb: [[14.71, 2.66, 15.08], [1.85, 0, 0], 41, 0, 0],
+    bg: NAVY, glow: ['#1C3472', .5], grid: .5,
+    callouts: [{ at: 'input', label: 'Source data and drafts', min: .05 }, { at: 'model', label: 'The model', min: .35, side: 'l' }, { at: 'output', label: 'Generated content', min: .65 }, { at: 'review', label: 'Expert review, in the loop', min: .85, dy: 40 }],
+    readout: [['Review', 'Human in the loop'], ['Checks', 'Accuracy, relevance, quality'], ['Engagement', 'Hourly advisory']],
   },
   {
     id: 'close', form: F.GLOBE, chapter: -1,
-    a: [[0, 4.5, 23], [0, .5, 0], 38, 0, -.04], b: [[0, 7, 30], [0, 1.5, 0], 38, 0, -.1],
-    spin: .03, spinFrom: -.37, spinBy: .5, bg: DEEP, glow: ['#1C3472', .8], orbit: 1,
-    readout: [['MeWriT', 'Writing Science Right']],
+    a: [[0, 2.82, 23.83], [0, 0, 0], 41, .22, -.15], b: [[0, 6.19, 25.57], [0, 1.5, 0], 39, .21, -.06],
+    pa: [[0, 2.11, 17.83], [0, 0, 0], 38, 0, 0], pb: [[0, 4.66, 17.24], [0, 1.5, 0], 38, 0, 0],
+    spin: .03, spinFrom: -1.27, spinBy: .9, bg: DEEP, glow: ['#1C3472', .75], orbit: 1,
+    callouts: [{ at: 'home', label: 'Ahmedabad', min: 0 }, ...['London', 'Boston', 'Singapore', 'Tokyo', 'Sydney'].map((c, j) => ({ at: c, label: c, min: .5, side: j % 2 ? 'l' : 'r', facing: true }))],
+    readout: [['Working with', 'Sponsors, CROs, clinicians'], ['Based in', 'Ahmedabad, India'], ['Reach', 'Global']],
   },
 ];

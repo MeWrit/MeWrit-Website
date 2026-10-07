@@ -1,15 +1,32 @@
 /* ---------------- the experience page (src/pages/experience.astro) ----------------
-   A loading screen that draws the molecule, then a tall track whose stage stays pinned: the 3D
-   canvas, a shade for the words, the labels pinned to the shapes, the words of each scene, and the
-   HUD (the figures in the corner, the scroll hint, the chapters along the foot). Dark throughout:
-   deep navy with the logo's orange, the site's serif for titles and its monospace for labels. */
+   A loading screen (the brand line, the step, a counter and a bar, over the particles gathering into
+   the opening's page), then a tall track whose stage stays pinned: a shade for the words, the labels
+   pinned to the shapes, the words of each scene, and the HUD (the figures in the corner, the scroll
+   hint, the five practices along the foot). The 3D canvas is not in the stage: it is fixed behind the
+   whole page (z-index -1: over the page's background, under everything else), so the dust it ends on
+   drifts behind the sections that follow. Dark throughout: deep navy with the logo's orange, the
+   site's serif for titles and its monospace for labels. */
 .xp{--xp-ink:#F2F5FC;--xp-soft:rgba(214,224,246,.84);--xp-dim:rgba(170,186,224,.66);--xp-line:rgba(201,216,255,.2);--xp-gold:#F0C35C;
-  position:relative;background:#030817;color:var(--xp-ink)}
-html.xp-lock{overflow:hidden}
-.xp-track{position:relative;height:calc(var(--units) * 115svh + 100svh)}
-.xp-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate}
-.xp-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  position:relative;color:var(--xp-ink)}
+/* the page paints a background on both html and body, so the body's is not the viewport's: it is
+   drawn over anything at z-index -1 unless the body is a stacking context of its own. Isolated, its
+   background comes first, then the canvas, then everything else (no containing block, so fixed
+   things stay fixed to the screen). experience.js sets the class: a body:has(#xp) rule did the same
+   but made every restyle of the page several times slower in Chrome */
+body.xp-page{isolation:isolate}
+html.xp-lock{overflow:hidden;scrollbar-gutter:stable}
+/* a stage height for each scene, one for the last, and the tail (110svh, which experience.js counts
+   on) where the shapes dissolve into the dust */
+.xp-track{position:relative;height:calc(var(--units) * 115svh + 210svh)}
+.xp-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate;transition:opacity .8s ease .15s}
+/* as tall as the screen can get (lvh), so a phone's bars coming and going never resize it */
+.xp-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#030817}
+/* while loading, the canvas covers the page (the loading screen's words sit over it) and the stage
+   waits, to fade in with the words */
+html.xp-lock .xp-canvas{z-index:150}
+html.xp-lock .xp-stage{opacity:0}
 .xp-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,23,.8) 0%,rgba(3,8,23,.44) 34%,rgba(3,8,23,0) 58%)}
+.xp-nogl{background:#030817}
 .xp-nogl .xp-canvas{display:none}
 .xp-nogl .xp-stage{background:radial-gradient(60% 55% at 64% 48%,#13244F 0%,#060E26 55%,#030817 100%)}
 
@@ -18,8 +35,6 @@ html.xp-lock{overflow:hidden}
 .xp-scene{grid-area:1 / 1;justify-self:start;max-width:min(620px,46vw);opacity:0;transform:translateY(22px);transition:opacity .45s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
 .xp-scene.on{opacity:1;transform:none;pointer-events:auto;transition-delay:.12s}
 .xp-scene.was{transform:translateY(-22px)}
-.xp-scene.center{justify-self:center;text-align:center;max-width:min(860px,92vw);position:relative}
-.xp-scene.center::before{content:"";position:absolute;inset:-18% -14%;z-index:-1;background:radial-gradient(closest-side,rgba(3,8,23,.72),rgba(3,8,23,0));pointer-events:none}
 .xp-kicker{font-family:var(--mono);font-size:.76rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;min-height:1.2em}
 .xp-title{font-family:var(--serif);font-weight:500;font-size:clamp(2.6rem,1.1rem + 4.4vw,5.9rem);line-height:.98;letter-spacing:-.022em;color:var(--xp-ink);margin-bottom:24px;text-wrap:balance}
 .xp-scene[data-scene="open"] .xp-title{font-size:clamp(3rem,1.2rem + 5.6vw,7.4rem)}
@@ -29,13 +44,33 @@ html.xp-lock{overflow:hidden}
 .xp-scene.was .xp-title .c{opacity:1;filter:none;transform:none}
 @keyframes xpChar{from{opacity:0;filter:blur(10px);transform:translateY(.14em)}to{opacity:1;filter:blur(0);transform:none}}
 .xp-text{font-size:clamp(1rem,.92rem + .3vw,1.16rem);line-height:1.62;color:var(--xp-soft);max-width:42ch}
-.xp-scene.center .xp-text{margin-inline:auto}
 .xp-docs{list-style:none;display:flex;flex-wrap:wrap;gap:6px 0;margin-top:22px;font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#C9D8FF}
 .xp-docs li + li::before{content:"\00B7";margin:0 12px;color:var(--accent)}
-.xp-cta{justify-content:center;margin-top:30px}
+.xp-cta{margin-top:30px}
 .xp-cta .btn{flex:0 0 auto}
 .xp-btn-ghost{color:var(--xp-ink);border:1px solid rgba(201,216,255,.42);background:rgba(255,255,255,.04)}
 @media (hover:hover){.xp-btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(201,216,255,.7)}}
+
+/* the practices scene: its hint under the words, and a button above each of the five shapes, pinned
+   there by experience.js (the layer is a point; each button is placed from it) with a stem down to
+   its shape; where the shapes stand too close for that, every other button hangs below its shape */
+.xp-pickhint{margin-top:20px;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--xp-gold)}
+.xp-pickhint::before{content:"";display:inline-block;width:20px;height:1px;margin-right:10px;vertical-align:middle;background:currentColor}
+.xp-picks{position:absolute;left:0;top:0;width:0;height:0}
+.xp-pick{position:absolute;left:0;top:0;display:grid;justify-items:center;gap:4px;width:max-content;max-width:118px;padding:7px 8px 6px;
+  font-family:var(--mono);font-size:.62rem;font-weight:600;line-height:1.3;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:var(--xp-ink);
+  border:1px solid rgba(201,216,255,.3);border-radius:3px;background:rgba(4,10,28,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .35s ease,border-color .25s,background-color .25s;will-change:transform}
+.xp-pick.on{opacity:1;pointer-events:auto}
+.xp-pick .n{color:var(--accent)}
+.xp-pick::after{content:"";position:absolute;left:var(--stem,50%);top:100%;width:1px;height:10px;background:rgba(240,195,92,.75)}
+.xp-pick.below::after{top:auto;bottom:100%}
+@media (hover:hover){.xp-pick:hover{border-color:rgba(240,195,92,.85);background-color:rgba(12,24,58,.82)}}
+.xp-pick:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-color:rgba(240,195,92,.85)}
+.xp-nogl .xp-picks{position:static;display:flex;flex-wrap:wrap;gap:8px;width:auto;height:auto;margin-top:18px}
+.xp-nogl .xp-pick{position:static;max-width:none}
+.xp-nogl .xp-pick::after{display:none}
+.xp-nogl .xp-scene.on .xp-pick{opacity:1;pointer-events:auto}
 
 /* the labels pinned to the shapes: a ringed dot on the point, a leader line, the label */
 .xp-callouts{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -61,8 +96,7 @@ html.xp-lock{overflow:hidden}
 .xp-frame i:nth-child(3){bottom:20px;left:20px;border-bottom-width:1px;border-left-width:1px}
 .xp-frame i:nth-child(4){bottom:20px;right:20px;border-bottom-width:1px;border-right-width:1px}
 .xp-panel{position:absolute;top:calc(var(--header-h) + 40px);right:clamp(28px,4vw,60px);width:262px;padding:14px 16px 12px;border:1px solid rgba(201,216,255,.12);border-radius:4px;background:rgba(3,8,23,.52);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
-.xp-readout{display:grid;gap:9px;opacity:0}
-.xp-readout.on{animation:xpFade .6s .2s both}
+.xp-readout{display:grid;gap:9px}
 .xp-readout div{display:flex;justify-content:space-between;gap:20px;padding-bottom:7px;border-bottom:1px solid var(--xp-line)}
 .xp-readout dt{color:var(--xp-dim)}
 .xp-readout dd{color:var(--xp-ink);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
@@ -72,37 +106,26 @@ html.xp-lock{overflow:hidden}
 .xp-hint.gone{opacity:0;pointer-events:none}
 @keyframes xpDrip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .xp-railnav{position:absolute;left:clamp(24px,6vw,104px);right:clamp(104px,9vw,150px);bottom:26px;pointer-events:auto}
-.xp-rail{list-style:none;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}
+.xp-rail{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .xp-rail button{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:9px;width:100%;padding:12px 0 6px;text-align:left;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(170,186,224,.55);transition:color .3s}
 .xp-rail i{grid-column:1 / -1;display:block;height:2px;background:rgba(201,216,255,.16);overflow:hidden}
 .xp-rail b{display:block;height:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0)}
 .xp-rail .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.xp-rail button[aria-current="step"]{color:var(--xp-ink)}
-.xp-rail button[aria-current="step"] .n{color:var(--accent)}
+.xp-rail button[aria-current="true"]{color:var(--xp-ink)}
+.xp-rail button[aria-current="true"] .n{color:var(--accent)}
 @media (hover:hover){.xp-rail button:hover{color:var(--xp-ink)}}
 .xp-rail button:focus-visible,.xp-hint:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+/* past the last scene the stage's layers fade out (experience.js); once they are going, nothing in
+   it takes the pointer */
+.xp-stage.xp-gone *{pointer-events:none}
 
-/* the loading screen: the molecule drawn like a technical drawing, a counter, a bar */
-.xp-loader{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:radial-gradient(70% 60% at 50% 46%,#0B1838 0%,#040A1C 70%);color:#C9D8FF;transition:opacity .9s ease .3s,visibility 0s linear 1.3s}
+/* the loading screen: the brand line, the step, the counter and the bar, over the particles (the
+   canvas, raised under it while loading); a plain night behind them until the first frame is drawn */
+.xp-loader{position:fixed;inset:0;z-index:200;color:#C9D8FF;transition:opacity .9s ease .3s,visibility 0s linear 1.3s}
+.xp-loader::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 46%,#0B1838 0%,#040A1C 70%);transition:opacity .7s ease}
+.xp-loader.lit::before{opacity:0}
 .xp-loader.out{opacity:0;visibility:hidden}
 .xp-loader[hidden]{display:none}
-.xp-load-art{width:min(600px,88vw);height:auto;overflow:visible;transition:transform 1.25s cubic-bezier(.65,0,.25,1),opacity .8s ease .45s,filter 1s ease .3s}
-.xp-loader.out .xp-load-art{transform:translate(var(--ex,0px),var(--ey,0px)) scale(var(--es,1.4));opacity:0;filter:blur(6px)}
-.xp-load-art line,.xp-load-art circle{fill:none;stroke-linecap:round}
-.xp-load-guides line{stroke:rgba(224,122,31,.5);stroke-width:1}
-.xp-load-ring{stroke:rgba(224,122,31,.55);stroke-width:1;stroke-dasharray:3 7;animation:xpSpin 40s linear infinite,xpFade .9s .15s both}
-.xp-load-ring.b{stroke:rgba(143,168,232,.4);stroke-dasharray:1 5;animation-direction:reverse,normal}
-.xp-load-art .tick{stroke:rgba(224,122,31,.65);opacity:0;animation:xpFade .4s var(--d) both}
-.xp-load-art .d{stroke-dasharray:1;stroke-dashoffset:1;animation:xpDraw .8s var(--d) cubic-bezier(.6,0,.2,1) forwards}
-.xp-load-art .bond{stroke:#DDE6FF;stroke-width:1.7}
-.xp-load-art .inner{stroke:rgba(143,168,232,.85);stroke-width:1.2}
-.xp-load-art circle.atom{fill:#DDE6FF;stroke:none;opacity:0;transform-box:fill-box;transform-origin:center;animation:xpPop .5s var(--d) cubic-bezier(.2,.7,.2,1.4) both}
-.xp-load-art text{font-family:var(--mono);font-size:13px;font-weight:600;fill:#DDE6FF;text-anchor:middle;dominant-baseline:central}
-.xp-load-art text.atom{opacity:0;animation:xpFade .5s var(--d) both}
-.xp-load-art text.O{fill:#F29A4A}
-.xp-load-art text.N{fill:#F0C35C}
-.xp-load-dim line{stroke:rgba(201,216,255,.5);stroke-width:1}
-.xp-load-dim text{font-size:8.5px;letter-spacing:.24em;fill:rgba(201,216,255,.62);opacity:0;animation:xpFade .6s 1.9s both}
 .xp-load-brand{position:absolute;top:30px;left:clamp(20px,4vw,48px);font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,216,255,.72)}
 .xp-load-foot{position:absolute;left:clamp(20px,4vw,48px);right:clamp(20px,4vw,48px);bottom:clamp(24px,5vh,48px);display:grid;grid-template-columns:1fr auto;align-items:end;gap:14px 24px}
 .xp-load-label{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
@@ -111,15 +134,11 @@ html.xp-lock{overflow:hidden}
 .xp-load-bar i{display:block;height:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0)}
 .xp-load-foot,.xp-load-brand{transition:opacity .5s ease,transform .6s ease}
 .xp-loader.out .xp-load-foot,.xp-loader.out .xp-load-brand{opacity:0;transform:translateY(12px)}
-@keyframes xpDraw{to{stroke-dashoffset:0}}
-@keyframes xpFade{from{opacity:0}to{opacity:1}}
-@keyframes xpPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-@keyframes xpSpin{to{transform:rotate(360deg)}}
 
-/* phones and narrow windows: the picture in the upper part, the words at the foot, the chapters
+/* phones and narrow windows: the picture in the upper part, the words at the foot, the practices
    as a row of short bars under the capsule */
 @media (max-width:759.98px){
-  .xp-track{height:calc(var(--units) * 100svh + 100svh)}
+  .xp-track{height:calc(var(--units) * 100svh + 210svh)}
   .xp-shade{background:linear-gradient(0deg,rgba(3,8,23,.94) 0%,rgba(3,8,23,.7) 36%,rgba(3,8,23,0) 62%)}
   .xp-scenes{align-items:end;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
   .xp-scene{max-width:none}
@@ -127,6 +146,8 @@ html.xp-lock{overflow:hidden}
   .xp-title,.xp-scene[data-scene="open"] .xp-title{font-size:clamp(2.2rem,1.3rem + 4.6vw,3.1rem);margin-bottom:14px}
   .xp-text{font-size:.98rem;line-height:1.55}
   .xp-docs{margin-top:14px;font-size:.62rem}
+  .xp-pickhint{margin-top:14px;font-size:.62rem}
+  .xp-pick{max-width:116px;padding:5px 7px 4px;font-size:.55rem;letter-spacing:.1em}
   .xp-cta{margin-top:20px}
   .xp-panel,.xp-hint,.xp-frame{display:none}
   .xp-railnav{left:20px;right:20px;bottom:auto;top:calc(var(--header-h) + 8px)}
@@ -142,18 +163,17 @@ html.xp-lock{overflow:hidden}
 }
 
 /* without scripts: the words in order, as a normal page */
+html:not(.js) .xp{background:#030817}
 html:not(.js) .xp-track{height:auto}
 html:not(.js) .xp-stage{position:static;height:auto;padding:calc(var(--header-h) + 40px) 0 40px}
 html:not(.js) .xp-scenes{position:static;display:block}
 html:not(.js) .xp-scene{opacity:1;transform:none;margin-bottom:72px;max-width:none}
 html:not(.js) .xp-title .c{opacity:1;filter:none;transform:none}
-html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
+html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas,html:not(.js) .xp-picks{display:none}
 
 @media (prefers-reduced-motion:reduce){
   .xp-title .c{opacity:1;filter:none;transform:none;animation:none !important}
   .xp-scene{transform:none !important;transition:opacity .25s linear}
-  .xp-hint i,.xp-load-ring{animation:none}
-  .xp-load-art .d{animation:none;stroke-dashoffset:0}
-  .xp-load-art circle.atom,.xp-load-art text.atom,.xp-load-art .tick,.xp-load-dim text{animation:none;opacity:1}
+  .xp-hint i{animation:none}
   .xp-co span{transition:none;transform:none}
 }

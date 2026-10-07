@@ -1,0 +1,34 @@
+---
+// Training and the MeWriT Academy, a light panel: how the classes are taught and the way in, the
+// common topics in two columns, then the workshops delivered so far as three compact rows in one
+// white card. Its id is "trainings", the anchor the site's navigation links to.
+import { training } from '../../data/pitch';
+
+const external = { target: '_blank', rel: 'noopener' };
+---
+<section class="pitch-sec pitch-light pitch-training" id="trainings" aria-labelledby="pitch-training-title">
+  <div class="wrap">
+    <div class="pitch-panel">
+      <div class="learn-grid">
+        <div class="learn-head reveal">
+          <p class="eyebrow pitch-eyebrow">{training.eyebrow}</p>
+          <h2 id="pitch-training-title">{training.title}</h2>
+          <p class="lead pitch-lead">{training.lead}</p>
+          <div class="btn-row learn-ctas">
+            {training.ctas.map(c => <a class={`btn btn-${c.style}`} href={c.href} {...(c.external ? external : {})}>{c.label}{c.external && <span class="sr-only">{' '}(opens in a new tab)</span>}</a>)}
+          </div>
+        </div>
+        <ul class="learn-mods reveal">{training.modules.map(m => <li>{m}</li>)}</ul>
+      </div>
+      <div class="learn-for reveal">
+        <h3>{training.deliveredFor.title}</h3>
+        {training.deliveredFor.groups.map(g => (
+          <div class="learn-row">
+            <h4 class="learn-k">{g.label}</h4>
+            <ul class="learn-names">{g.items.map((n, i) => <>{i > 0 && ' '}<li>{n}</li></>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

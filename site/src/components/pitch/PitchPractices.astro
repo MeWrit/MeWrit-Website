@@ -1,0 +1,53 @@
+---
+// The five practices, the first light panel after the experience: a white card each with the
+// number, what each covers, who it is for, the standards it writes to and a way to start. On phones
+// a list longer than six shows five items and keeps the rest in a native <details>; wider screens
+// show every list whole.
+import { practices } from '../../data/pitch';
+
+const SHOW = 5, LONG = 6;
+const external = { target: '_blank', rel: 'noopener' };
+// the title's two sentences, each to start its own line (the words read on as one heading)
+const lines = practices.title.split(/(?<=\.)\s+/);
+---
+<section class="pitch-sec pitch-light pitch-practices" id="practices" aria-labelledby="pitch-practices-title">
+  <div class="wrap">
+    <div class="pitch-panel">
+      <div class="pitch-head split reveal">
+        <div>
+          <p class="eyebrow pitch-eyebrow">{practices.eyebrow}</p>
+          <h2 id="pitch-practices-title">{lines.map((l, i) => <>{i > 0 && ' '}<span class="pitch-line">{l}</span></>)}</h2>
+        </div>
+        <p class="pitch-lead">{practices.lead}</p>
+      </div>
+      <div class="prac-grid">
+        {practices.list.map((p, i) => {
+          const long = p.items.length > LONG;
+          return (
+            <article class:list={['prac-card', 'reveal', { wide: i < 2 }]} id={`practice-${p.id}`} aria-labelledby={`practice-${p.id}-name`}>
+              <p class="prac-num" aria-hidden="true"><span>{p.num}</span><i></i></p>
+              <h3 class="prac-name" id={`practice-${p.id}-name`}>{p.name}</h3>
+              <p class="prac-full">{p.full}</p>
+              <p class="prac-lead">{p.lead}</p>
+              <ul class:list={['prac-items', { 'prac-all': long }]}>{p.items.map(t => <li>{t}</li>)}</ul>
+              {long && (
+                <div class="prac-short">
+                  <ul class="prac-items">{p.items.slice(0, SHOW).map(t => <li>{t}</li>)}</ul>
+                  <details class="prac-more">
+                    <summary>and {p.items.length - SHOW} more</summary>
+                    <ul class="prac-items">{p.items.slice(SHOW).map(t => <li>{t}</li>)}</ul>
+                  </details>
+                </div>
+              )}
+              <div class="prac-foot">
+                <p class="prac-for"><span class="prac-k">For</span>{' '}{p.audience}</p>
+                <ul class="prac-std">{p.standards.map(s => <li>{s}</li>)}</ul>
+                <a class="text-link prac-link" href={p.link.href} {...(p.link.external ? external : {})}>{p.link.label}{p.link.external && <span class="sr-only">{' '}(opens in a new tab)</span>}</a>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>

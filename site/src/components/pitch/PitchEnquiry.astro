@@ -1,0 +1,36 @@
+---
+// The enquiry, last on the page: the home page's enquiry card (src/components/Enquiry.astro) with
+// its structure, classes and ids kept as they are, so the form script and the phone bar's check for
+// the form (src/scripts/page.js) work here as they do there; set in a light panel, with the pitch's
+// copy. The form sends nothing yet: wiring it to email or a form service is a later step.
+import Icon from '../Icon.astro';
+import { enquiry } from '../../data/pitch';
+import { contact } from '../../data/site';
+---
+<section class="block pitch-sec pitch-light pitch-enq" id="contact" aria-labelledby="enq-title">
+  <div class="wrap">
+    <div class="pitch-panel">
+      <div class="enquire-card reveal">
+        <div>
+          <p class="eyebrow">{enquiry.eyebrow}</p>
+          <h2 id="enq-title">{enquiry.title}</h2>
+          <p style="margin-top:12px">{enquiry.text}</p>
+          <div class="quick">
+            <a href={contact.phoneHref}><Icon name="phone" size={22} />Call</a>
+            <a href={contact.whatsapp}><Icon name="whatsapp" size={22} />WhatsApp</a>
+            <a href={`mailto:${contact.email}`}><Icon name="mail" size={22} />Email</a>
+          </div>
+        </div>
+        <form class="form" id="enquiry" novalidate>
+          <div class="row"><label>Name<input name="name" autocomplete="name" required></label><label>Organisation<input name="org" autocomplete="organization"></label></div>
+          <div class="row"><label>Email<input name="email" type="email" inputmode="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" inputmode="tel" autocomplete="tel"></label></div>
+          <label>I need help with<select name="need">{enquiry.needs.map(n => <option>{n}</option>)}</select></label>
+          <label>Message<textarea name="msg"></textarea></label>
+          <button class="btn btn-primary" type="submit">Send enquiry</button>
+          <p class="ok" role="status">{enquiry.thanks}</p>
+          <p class="note">{enquiry.note}</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

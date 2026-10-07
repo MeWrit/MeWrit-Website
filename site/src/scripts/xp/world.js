@@ -2,8 +2,10 @@
    between the formations (formations.js): the shader flies each particle from its place in one
    formation to its place in the next, through a flow field, each leaving at its own moment, and
    lights the shape as the reveal passes. Behind it a background with a soft glow, a floor grid and
-   construction rings; after it, bloom and a finishing pass (a touch of lens fringing, a vignette,
-   film grain). experience.js decides everything that changes; this only draws it. */
+   the globe's orbits; after it, bloom and a finishing pass (a touch of lens fringing, a vignette,
+   film grain). The canvas is the page's backdrop, so it can be taller than the stage the shots are
+   framed for (camera() takes the stage's height). experience.js decides everything that changes;
+   this only draws it. */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -14,11 +16,11 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { buildFormations, random } from './formations.js';
 
 const PARTICLE_VS = /* glsl */`
-uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo;
-uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain;
+uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
+uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDust;
 uniform vec3 uMouseO, uMouseD;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
-attribute float aKeyFrom, aKeyTo;
+attribute float aKeyFrom, aKeyTo, aPick;
 attribute vec4 aRand, aStream;
 varying vec3 vColor;
 varying float vAlpha;
@@ -48,12 +50,14 @@ vec3 placeOf(vec3 p, float key, float spin, float stream, out float fade) {
   }
   return spinY(p, spin);
 }
-// before the reveal reaches it, a particle waits as a faint blueprint; it flares as it lights
-vec3 shade(vec3 c, float key, float reveal) {
+// before the reveal reaches it, a particle waits as a faint blueprint (or dark, in a formation whose
+// ghost is 0); it flares as it lights. Where it stays dark until written, the flare only trails the
+// reveal, like fresh ink behind a pen
+vec3 shade(vec3 c, float key, float reveal, float ghostK) {
   if (key <= 0.) return c;
   float lit = smoothstep(key - .02, key + .01, reveal);
-  float front = exp(-pow((reveal - key) * 26., 2.)) * step(.002, reveal);
-  vec3 ghost = vec3(dot(c, vec3(.3, .59, .11))) * vec3(.42, .52, .9) * .55;
+  float front = exp(-pow((reveal - key) * 26., 2.)) * step(.002, reveal) * mix(step(key - .004, reveal), 1., step(.5, ghostK));
+  vec3 ghost = vec3(dot(c, vec3(.3, .59, .11))) * vec3(.42, .52, .9) * .55 * ghostK;
   return mix(ghost, c, lit) + c * front * 1.8;
 }
 void main() {
@@ -67,7 +71,12 @@ void main() {
   vec3 p = mix(a, b, e);
   p += flow(p * .2 + aRand.y * 4., uTime * .5 + aRand.y * 6.) * sin(3.14159 * m) * uFlow * uMotion;
   if (uMotion < .5) { e = step(.5, m); p = mix(a, b, e); }   // reduced motion: each particle swaps place, no flight
-  vec3 col = mix(shade(aColFrom, aKeyFrom, uRevealFrom), shade(aColTo, aKeyTo, uRevealTo), e);
+  vec3 col = mix(shade(aColFrom, aKeyFrom, uRevealFrom, uGhostFrom), shade(aColTo, aKeyTo, uRevealTo, uGhostTo), e);
+  // the dust's own brightness (1 in the scenes, where it stays faint behind the shapes; up in the
+  // tail, where it is all there is), on particles as they become dust
+  if (aKeyTo < -.5) col *= mix(1., uDust, aKeyFrom < -.5 ? 1. : e);
+  // the practices' shapes: the one picked brightens, the others dim (aPick: its shape, -1 for the rest)
+  if (uPickOn > .5 && uPick > -.5 && aPick > -.5) col *= abs(aPick - uPick) < .5 ? 1.55 : .55;
   // the pointer parts the particles and warms them
   vec3 w = p - uMouseO;
   vec3 off = w - uMouseD * dot(w, uMouseD);
@@ -169,7 +178,7 @@ const circle = (r, n = 192, y = null) => Array.from({ length: n }, (_, i) => {
   return y === null ? [[Math.cos(t0) * r, Math.sin(t0) * r, 0], [Math.cos(t1) * r, Math.sin(t1) * r, 0], t0 * r] : [[Math.cos(t0) * r, y, Math.sin(t0) * r], [Math.cos(t1) * r, y, Math.sin(t1) * r], t0 * r];
 });
 
-export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false }) {
+export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false });
   renderer.setPixelRatio(dpr);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -196,21 +205,16 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   const floor = new THREE.LineSegments(lineGeometry(fsegs), lineMat('#5B7BD8'));
   floor.frustumCulled = false; floor.renderOrder = -5; scene.add(floor);
 
-  // construction rings around the molecule (in its plane, facing the camera), a centre line and ticks
-  const rsegs = [...circle(5.6), ...circle(6.3, 256)];
-  for (let k = 0; k < 72; k++) { const t = k / 72 * Math.PI * 2, r0 = k % 6 ? 6.3 : 6.05; rsegs.push([[Math.cos(t) * r0, Math.sin(t) * r0, 0], [Math.cos(t) * 6.55, Math.sin(t) * 6.55, 0]]); }
-  rsegs.push([[-8.2, 0, 0], [8.2, 0, 0]], [[0, -7.2, 0], [0, 7.2, 0]]);
-  const rings = new THREE.LineSegments(lineGeometry(rsegs), lineMat('#E07A1F', { uNear: { value: 30 }, uFar: { value: 60 } }));
-  rings.frustumCulled = false; rings.renderOrder = -4; scene.add(rings);
-  // and around the globe: a tilted orbit and the equator, dashed
+  // around the globe: a tilted orbit and the equator, dashed
   const orbit = new THREE.Group();
   const o1 = new THREE.LineSegments(lineGeometry(circle(6.4, 256, 0)), lineMat('#8FA8E8', { uNear: { value: 30 }, uFar: { value: 60 } }));
   const o2 = new THREE.LineSegments(lineGeometry(circle(5.1, 256, 0)), lineMat('#E07A1F', { uNear: { value: 30 }, uFar: { value: 60 } }));
   o1.rotation.z = .38; o1.rotation.x = .2;
   orbit.add(o1, o2); orbit.children.forEach(c => { c.frustumCulled = false; c.renderOrder = -4; }); scene.add(orbit);
 
-  // the particles: every formation's places, colours and keys as attributes, two of them bound at a time
-  const { list, stream } = buildFormations(N);
+  // the particles: every formation's places, colours and keys as attributes, two of them bound at a
+  // time; and, for every particle, which of the practices' shapes it belongs to (aPick)
+  const { list, stream, pick } = buildFormations(N, undefined, { compact });
   const attrs = list.map(fm => ({ pos: new THREE.BufferAttribute(fm.pos, 3), col: new THREE.BufferAttribute(fm.col, 3), key: new THREE.BufferAttribute(fm.key, 1) }));
   const R = random(77), rnd = new Float32Array(N * 4);
   for (let i = 0; i < N; i++) {
@@ -221,22 +225,27 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   geo.setAttribute('position', attrs[0].pos);   // three.js counts the points from this one
   geo.setAttribute('aRand', new THREE.BufferAttribute(rnd, 4));
   geo.setAttribute('aStream', new THREE.BufferAttribute(stream, 4));
+  geo.setAttribute('aPick', new THREE.BufferAttribute(pick, 1));
   const U = {
     uTime: { value: 0 }, uMorph: { value: 0 }, uRevealFrom: { value: 1 }, uRevealTo: { value: 0 }, uSpinFrom: { value: 0 }, uSpinTo: { value: 0 },
-    uStreamFrom: { value: 0 }, uStreamTo: { value: 0 }, uScale: { value: 1 }, uSize: { value: .06 }, uMouse: { value: 0 }, uMotion: { value: 1 }, uFlow: { value: 1.6 }, uGain: { value: 1 },
-    uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
+    uStreamFrom: { value: 0 }, uStreamTo: { value: 0 }, uGhostFrom: { value: 1 }, uGhostTo: { value: 1 }, uScale: { value: 1 }, uSize: { value: .06 }, uMouse: { value: 0 }, uMotion: { value: 1 }, uFlow: { value: 1.6 }, uGain: { value: 1 },
+    uPick: { value: -1 }, uPickOn: { value: 0 }, uDust: { value: 1 }, uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
   const points = new THREE.Points(geo, mat);
   points.frustumCulled = false; scene.add(points);
-  let pair = [-1, -1];
+  let pair = [-1, -1], streamOf = -1;
   function setPair(a, b, streamForm) {
     if (a !== pair[0]) { geo.setAttribute('aFrom', attrs[a].pos); geo.setAttribute('aColFrom', attrs[a].col); geo.setAttribute('aKeyFrom', attrs[a].key); }
     if (b !== pair[1]) { geo.setAttribute('aTo', attrs[b].pos); geo.setAttribute('aColTo', attrs[b].col); geo.setAttribute('aKeyTo', attrs[b].key); }
-    pair = [a, b];
+    pair = [a, b]; streamOf = streamForm;
     U.uStreamFrom.value = a === streamForm ? 1 : 0; U.uStreamTo.value = b === streamForm ? 1 : 0;
+    U.uGhostFrom.value = list[a].ghost ?? 1; U.uGhostTo.value = list[b].ghost ?? 1;
   }
   setPair(0, 0, -1);
+  // the first time a formation is bound its buffers go up to the GPU, which costs a frame: warm()
+  // does it ahead of time, binding one and drawing once into a tiny target nobody sees
+  const warmTarget = new THREE.WebGLRenderTarget(4, 4, { depthBuffer: false });
 
   // after the scene: bloom, then colour (tone mapping, sRGB), then the finish
   const composer = new EffectComposer(renderer);
@@ -261,6 +270,12 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   return {
     N, renderer, anchors: i => list[i].anchors,
     setPair,
+    warm(i) {
+      const [a, b] = pair, s = streamOf;
+      setPair(i, i, -1);
+      renderer.setRenderTarget(warmTarget); renderer.render(scene, camera); renderer.setRenderTarget(null);
+      setPair(a, b, s);
+    },
     resize(w, h, ratio = px) {
       W = Math.max(1, w); H = Math.max(1, h); px = ratio;
       renderer.setPixelRatio(px); composer.setPixelRatio(px);
@@ -268,27 +283,26 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       bgMat.uniforms.uRes.value.set(W, H); bgMat.uniforms.uPx.value = px;
       finish.uniforms.uRes.value.set(W * px, H * px);
     },
-    // the camera: position, the point it looks at, field of view, and the picture's shift
-    camera(pos, target, fov, sx, sy) {
+    // the camera: position, the point it looks at, field of view, and the picture's shift, in a frame
+    // fh tall at the top of the canvas (the stage the shots are framed for; the canvas may run on below it)
+    camera(pos, target, fov, sx, sy, fh = H) {
       camera.position.set(pos[0], pos[1], pos[2]);
-      camera.fov = fov; camera.aspect = W / H;
+      camera.fov = fov; camera.aspect = W / fh;
       look.set(target[0], target[1], target[2]); camera.lookAt(look);
-      camera.setViewOffset(W, H, -sx * W, sy * H, W, H);
+      camera.setViewOffset(W, fh, -sx * W, sy * fh, W, H);
       camera.updateProjectionMatrix(); camera.updateMatrixWorld();
-      U.uScale.value = H * px / (2 * Math.tan(fov * Math.PI / 360));
+      U.uScale.value = fh * px / (2 * Math.tan(fov * Math.PI / 360));
     },
     // everything else that changes from frame to frame
     set(s) {
       U.uTime.value = s.time; U.uMorph.value = s.morph; U.uRevealFrom.value = s.revealFrom; U.uRevealTo.value = s.revealTo;
       U.uSpinFrom.value = s.spinFrom; U.uSpinTo.value = s.spinTo; U.uMotion.value = s.motion; U.uFlow.value = s.flow;
-      U.uSize.value = s.size; U.uGain.value = s.gain;
+      U.uSize.value = s.size; U.uGain.value = s.gain; U.uPick.value = s.pick; U.uPickOn.value = s.pickOn; U.uDust.value = s.dust;
       mixColor(bgMat.uniforms.uTop.value, s.bgA[0], s.bgB[0], s.k);
       mixColor(bgMat.uniforms.uBottom.value, s.bgA[1], s.bgB[1], s.k);
       mixColor(bgMat.uniforms.uGlow.value, s.glowA[0], s.glowB[0], s.k).multiplyScalar(s.glow);
       bgMat.uniforms.uGlowAt.value.set(s.glowAt[0], s.glowAt[1]); bgMat.uniforms.uGrid.value = s.grid;
       floor.position.y = s.floorY; floor.material.uniforms.uOpacity.value = s.floor * .16;
-      rings.material.uniforms.uOpacity.value = s.rings * .34; rings.rotation.z = s.time * .05; rings.material.uniforms.uDash.value = 0;
-      rings.rotation.y = s.spinRings;
       orbit.rotation.y = s.time * .04;
       o1.material.uniforms.uOpacity.value = s.orbit * .3; o1.material.uniforms.uDash.value = .5; o1.material.uniforms.uDashOffset.value = -s.time * .4;
       o2.material.uniforms.uOpacity.value = s.orbit * .22; o2.material.uniforms.uDash.value = .28;
@@ -312,6 +326,6 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     facing(p) { tmp.set(p[0], p[1], p[2]); tmp2.copy(camera.position).sub(tmp); return tmp.dot(tmp2) > 0; },
     render() { composer.render(); },
     compile() { renderer.compile(scene, camera); },
-    dispose() { composer.dispose(); renderer.dispose(); geo.dispose(); mat.dispose(); },
+    dispose() { composer.dispose(); warmTarget.dispose(); renderer.dispose(); geo.dispose(); mat.dispose(); },
   };
 }

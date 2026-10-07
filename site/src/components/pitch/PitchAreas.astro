@@ -1,0 +1,21 @@
+---
+// Where we work, a light panel: the therapeutic areas in the site's chips, then who we work with and
+// the standards we write to, side by side in one white card.
+import { where } from '../../data/pitch';
+---
+<section class="pitch-sec pitch-light pitch-areas" id="areas" aria-labelledby="pitch-areas-title">
+  <div class="wrap">
+    <div class="pitch-panel">
+      <div class="pitch-head reveal"><p class="eyebrow pitch-eyebrow">{where.eyebrow}</p><h2 id="pitch-areas-title">{where.title}</h2></div>
+      <ul class="chips where-chips reveal">{where.areas.map(a => <li class="chip">{a}</li>)}</ul>
+      <div class="where-cols reveal">
+        {where.columns.map(c => (
+          <div class="where-col">
+            <h3>{c.title}</h3>
+            <ul>{c.items.map(t => <li>{t}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

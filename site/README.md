@@ -24,8 +24,11 @@ npm run preview    # serve dist/ to check the production build
 Both share everything else, including the hero ribbons, which flow through the copy and fade
 out before the hero's drawing. In version A they are already flowing behind the loading
 intro, on the same clock, so when the intro fades they carry straight on into the hero. Any
-other page added later gets no logo animation unless it asks for one (`intro` on
-`src/layouts/Base.astro`).
+other page gets no logo animation on load unless it asks for one (`intro` on
+`src/layouts/Base.astro`). On every page, though, the header logo draws itself again now and
+then, in place: 30 seconds after the finished logo is on show (`LOGO_INTERVAL` in
+`src/scripts/header-logo.js`), with the same pen and the logo's own ink. Not while the tab is
+hidden, the header is off the screen or under an open menu, with reduced motion, or with `?static`.
 
 ## The hero's drawing
 
@@ -39,26 +42,65 @@ The drawing itself is `src/scripts/pipeline-engine.js`.
 
 ## The experience (`/experience/`)
 
-"From molecule to manuscript" as an immersive page. A loading screen draws a molecule like a
-technical drawing, with a counter; as it lifts, the drawing flies to where the same molecule forms
-in 3D. From there one cloud of glowing particles (64,000 on computers, 24,000 on phones) carries
-the work behind a medicine through eleven scenes as you scroll: a molecule, an icon array of trial
-participants lighting up as they enrol, two randomised arms flowing away, a spiral of papers, a
-landscape of data, Kaplan-Meier curves, a fan of regulatory documents, the accepted manuscript and
-a globe with arcs from Ahmedabad. Each shape reveals itself as you scroll, labels pin to its
-parts, figures count up in the corner, and the chapters along the foot jump between scenes. The
-pointer parts the particles on computers.
+MeWriT's five practices as an immersive page: regulatory writing, scientific publications,
+medical communications, training and AI/ML advisory. Each practice stands on its own and a client
+chooses the ones they need, so the page presents a choice, not a sequence of steps. One cloud of
+glowing particles (64,000 on computers, 24,000 on phones) carries the whole page. While it loads,
+the dust gathers into a blank page and the page's outline (its frame, margin marks, header band and
+page number) draws itself in step with the counter; as the loading screen lifts, the page moves
+aside for the words and writes itself, top to bottom, in about four seconds. From there the
+particles take a shape for each of eleven scenes as you scroll:
 
-- The words are draft copy for Dr Hetal to confirm: `src/data/experience.ts`.
-- Every figure on it is illustrative (the page says so).
+| Scene | Practice | Shape |
+|---|---|---|
+| `open` | (none) | a page of a clinical document, writing itself (the `PAGE` formation) |
+| `practices` | (none) | the five practices as shapes, a button above each: a stack of pages under a seal, a journal page, a slide, a group of people, a small network (the `CHOICE` formation) |
+| `reg-designs` | 01 Regulatory writing | two randomised arms flowing from one source |
+| `reg-dossier` | 01 Regulatory writing | a fan of submission documents (CSR, CTD, MAA, narratives, CIP/CER, responses) |
+| `pub-literature` | 02 Scientific publications | a spiral of papers, the ones in the review in orange |
+| `pub-manuscript` | 02 Scientific publications | the accepted manuscript |
+| `med-evidence` | 03 Medical communications | a landscape of real-world evidence |
+| `med-narrative` | 03 Medical communications | Kaplan-Meier curves |
+| `training` | 04 Training | an icon array of people, the trained ones lighting up |
+| `ai` | 05 AI/ML advisory | a network in layers, a signal lit from input to output and a ring of expert review around the output (the `NETWORK` formation) |
+| `close` | (none) | a globe with arcs from Ahmedabad, and the calls to action |
+
+Past the close comes a tail: the globe dissolves into drifting dust, the words and the figures
+fade out, and the dust stays, behind the rest of the page, for as long as you read on.
+
+Each shape reveals itself as you scroll (the opening's page writes itself on time instead), labels
+pin to its parts and figures sit in the corner. The practices along the foot (01 to 05) jump to
+each practice; the one on screen fills as its scenes go by and empties as you move on. In the
+practices scene a click on a shape's button jumps to that practice, and hovering or focusing a
+button brightens its shape and dims the others. On computers the pointer parts the particles
+anywhere on the page.
+
+- The words: `src/data/experience.ts`, one entry per scene (copy and figures from the MeWriT deck,
+  July 2026, and Dr Hetal's CV; for Dr Hetal to confirm). The practices, the scenes' shapes,
+  labels, figures and camera shots: `src/scripts/xp/scenes.js`.
+- The figures in the corner are MeWriT's own. The two scenes whose picture or figures are
+  illustrative (the trial, the survival curves) say so under them.
 - The 3D is drawn with three.js (MIT licence), pinned in `package.json`; every shape is generated
-  in code, with no models or images. It loads on its own, only on this page, so the words never wait
-  for it; without WebGL the words still follow the scroll, and with reduced motion the shapes change
-  in place without flying.
+  in code, with no models or images (nothing on the page is drawn from the logo). It loads on its
+  own, only on this page, so the words never wait for it; while the loading screen is up, every
+  shape's buffers go up to the GPU (the last quarter of the counter), so a first change of shape
+  does not stall a frame. Without WebGL the words still follow the scroll (the practices' buttons
+  sit under their words), and with reduced motion the shapes change in place without flying and
+  the opening's page appears written.
+- The canvas is the page's backdrop: fixed, at z-index -1, under everything that follows, so the
+  sections after the experience float over the dust. The page's body is made a stacking context of
+  its own for that to hold (html and body both paint a background; see `xp.css`). It draws while
+  the page is in view, every other frame on phones once only the dust is left, and pauses in a
+  hidden tab.
+- Framing: scenes are framed for a 1440 x 900 window, the shape right of the words and below the
+  figures. Other computer screens scale and move the picture into the room they have (measured from
+  their own words and panel); phones put it above the words, with their own shots where a scene's
+  camera stands far back, and set the practices' five shapes in two rows. Where the five buttons
+  would crowd each other (narrower computer screens), every other one hangs below its shape.
 - Code: the page `src/pages/experience.astro`, styles `src/styles/xp.css`, and in `src/scripts/xp/`
-  the shapes (`formations.js`), the scenes and their camera shots (`scenes.js`), the renderer
-  (`world.js`) and what ties them to the scroll (`experience.js`).
-- Review switch: `?static` skips the loading screen.
+  the shapes (`formations.js`), the scenes, their camera shots and the tail's look (`scenes.js`),
+  the renderer (`world.js`) and what ties them to the scroll (`experience.js`).
+- Review switch: `?static` skips the loading screen (the opening's page appears written).
 
 ## Small touches
 
@@ -88,8 +130,20 @@ scrolling on phones), as does `?glass=flat`. Code: the liquid glass and capsule
 sections of `src/styles/nav-variants.css`, `src/scripts/nav-variants.js` (the lens and the
 phone card), `src/components/CapsuleMenu.astro` (the phone card).
 
-Review switches (add to the address): `?nointro` skips the logo animation, `?static` turns
-all motion off, and `?hero=ribbons` or `?hero=drawing` shows just one of the two hero animations.
+Review switches (add to the address): `?nointro` skips the page's own logo animation (the
+replays still run), `?static` turns all motion off, `?logoloop=6` shortens the wait before each
+logo replay from 30 to 6 seconds, and `?hero=ribbons` or `?hero=drawing` shows just one of the two
+hero animations.
+
+## Dark pages
+
+`<Base theme="dark">` dresses the page chrome for a dark, immersive page
+(`src/styles/theme-dark.css`): the capsule, its panels, the phone capsule and its card turn to
+dark navy glass with ice text and gold highlights, and the quick contact goes dark (WhatsApp
+stays green). The page itself gets a dark background (#030817), light text and headings and a
+gold focus ring, unless its own sections set them. The logo is never recoloured or redrawn: it
+is a registered trade mark, so on a dark page it sits unchanged on a plate of frosted white glass
+inside the capsule (as it does on the footer's white plate), and so does its drawing.
 
 ## Nav lab
 
@@ -144,4 +198,9 @@ index and "you are here" in the four corners). Code: `src/styles/nav-experiments
   load animation is over (`src/scripts/tickers.js`); they read from the numbers in
   `src/data/home.ts`, so changing a number there is all it takes.
 - The enquiry form is a sample: it validates and thanks the visitor but sends nothing yet.
+- In Chrome the capsule's glass and its panels currently show what is behind them without the
+  blur: `.site-header` carries a `view-transition-name` (`src/styles/base.css`, for the page
+  transitions), and with it the header's glass cannot reach the page behind (measured: with the
+  name removed the panels blur again). Giving the header its name only during a page transition
+  would bring the blur back. The dark theme's tints are set to read well either way.
 - Fonts (Fraunces and Inter) are served from this site, not from Google.

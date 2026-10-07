@@ -1,0 +1,27 @@
+---
+// In print, on the night between two panels: what authors wrote in their acknowledgements, word for
+// word, each quote with where it appeared. A row to swipe on phones (the next quote shows at the
+// edge), one wide then two pairs on tablets, two then three across on desktop. No autoplay.
+import Icon from '../Icon.astro';
+import { acknowledged } from '../../data/pitch';
+---
+<section class="pitch-sec pitch-night pitch-ack" id="acknowledged" aria-labelledby="pitch-ack-title">
+  <div class="wrap">
+    <div class="pitch-head split reveal">
+      <div>
+        <p class="eyebrow pitch-eyebrow">{acknowledged.eyebrow}</p>
+        <h2 id="pitch-ack-title">{acknowledged.title}</h2>
+      </div>
+      <p class="pitch-lead">{acknowledged.lead}</p>
+    </div>
+    <div class="ack-row reveal">
+      {acknowledged.quotes.map(q => (
+        <figure class="ack">
+          <Icon name="quote" size={22} />
+          <blockquote><p>{q.text}</p></blockquote>
+          <figcaption>{q.source}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>

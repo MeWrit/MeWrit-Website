@@ -1,0 +1,27 @@
+---
+// The pitch sections that follow the experience, read as one piece with it: the particle world
+// stays alive behind the page, and the content floats over it as frosted light panels (the
+// practices, why MeWriT, where we work, training, who leads the work, the enquiry) separated by
+// bands of night (the figures, the acknowledgements in print). .pitch has no background, so the
+// night shows in every gap. Copy in src/data/pitch.ts, styles in src/styles/pitch.css (imported
+// here, so a page needs only this component).
+import '../../styles/pitch.css';
+import PitchPractices from './PitchPractices.astro';
+import PitchProof from './PitchProof.astro';
+import PitchWhy from './PitchWhy.astro';
+import PitchAreas from './PitchAreas.astro';
+import PitchTraining from './PitchTraining.astro';
+import PitchAcknowledged from './PitchAcknowledged.astro';
+import PitchCredentials from './PitchCredentials.astro';
+import PitchEnquiry from './PitchEnquiry.astro';
+---
+<div class="pitch">
+  <PitchPractices />
+  <PitchProof />
+  <PitchWhy />
+  <PitchAreas />
+  <PitchTraining />
+  <PitchAcknowledged />
+  <PitchCredentials />
+  <PitchEnquiry />
+</div>

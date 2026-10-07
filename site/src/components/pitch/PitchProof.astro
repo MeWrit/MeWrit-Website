@@ -1,0 +1,25 @@
+---
+// The experience in numbers, a band of night between the first two panels: eight figures from
+// MeWriT's records, each over a hairline that starts in orange like the chapters along the foot of
+// the experience. The numbers are static: src/scripts/tickers.js counts only the hero's numbers and
+// the home page's stats card.
+import { proof } from '../../data/pitch';
+
+// "1,500+" as the number and what follows it, so the plus can take the accent colour
+const parts = (v: string) => { const m = v.match(/^([\d,.]+)(.*)$/); return m ? [m[1], m[2]] : [v, '']; };
+---
+<section class="pitch-sec pitch-night pitch-proof" id="proof" aria-labelledby="pitch-proof-title">
+  <div class="wrap">
+    <div class="pitch-head reveal">
+      <p class="eyebrow pitch-eyebrow">{proof.eyebrow}</p>
+      <h2 id="pitch-proof-title">{proof.title}</h2>
+    </div>
+    <ul class="proof-grid reveal">
+      {proof.figures.map(f => {
+        const [num, rest] = parts(f.value);
+        return <li class="proof-fig"><b class="proof-num">{num}{rest && <span class="proof-plus">{rest}</span>}</b>{' '}<span class="proof-label">{f.label}</span></li>;
+      })}
+    </ul>
+    <p class="proof-note">{proof.note}</p>
+  </div>
+</section>

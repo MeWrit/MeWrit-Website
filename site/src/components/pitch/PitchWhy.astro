@@ -1,0 +1,44 @@
+---
+// Why MeWriT, one light panel in two parts: six reasons, each a number over a hairline, a short
+// title and a sentence (three by two on desktop, one column on phones); then, after a hairline, how
+// we work: four steps joined by a hairline (a row on desktop, a line down the left on phones) and
+// how each kind of work is charged.
+import { why } from '../../data/pitch';
+
+const n = (i: number) => String(i + 1).padStart(2, '0');
+// the title's two sentences, each to start its own line (the words read on as one heading)
+const lines = why.title.split(/(?<=\.)\s+/);
+---
+<section class="pitch-sec pitch-light pitch-why" id="why" aria-labelledby="pitch-why-title">
+  <div class="wrap">
+    <div class="pitch-panel">
+      <div class="pitch-head reveal">
+        <p class="eyebrow pitch-eyebrow">{why.eyebrow}</p>
+        <h2 id="pitch-why-title">{lines.map((l, i) => <>{i > 0 && ' '}<span class="pitch-line">{l}</span></>)}</h2>
+      </div>
+      <ol class="why-points reveal">
+        {why.points.map((p, i) => (
+          <li class="why-pt">
+            <p class="why-n" aria-hidden="true"><span>{n(i)}</span><i></i></p>
+            <h3>{p.title}</h3>
+            <p class="why-text">{p.text}</p>
+          </li>
+        ))}
+      </ol>
+      <div class="how reveal">
+        <p class="eyebrow pitch-eyebrow">{why.how.eyebrow}</p>
+        <h3 class="how-title" id="pitch-how-title">{why.how.title}</h3>
+        <ol class="how-steps" aria-labelledby="pitch-how-title">
+          {why.how.steps.map((s, i) => (
+            <li class="how-step">
+              <p class="how-n" aria-hidden="true"><span>{n(i)}</span><i></i></p>
+              <h4>{s.title}</h4>
+              <p class="how-text">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+        <ul class="how-terms">{why.how.terms.split(' · ').map((t, i) => <>{i > 0 && ' '}<li>{t}</li></>)}</ul>
+      </div>
+    </div>
+  </div>
+</section>

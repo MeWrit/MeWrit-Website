@@ -1,0 +1,266 @@
+/* ---------------- the pitch sections (src/components/pitch/) ----------------
+   What follows the experience, read as one piece with it. The particle world stays alive behind the
+   whole page (the experience's canvas is fixed behind everything), so .pitch has no background of
+   its own: the content floats over the night in frosted light panels with the main site's palette
+   and dark text, and between them run bands of night with light text (the figures, the
+   acknowledgements). The night shows in every gap. Phone first; grids from 760px and 1100px.
+   Contrast is measured on what is really behind the text. A panel over the night renders #E0E3EA
+   (#D7DAE1 at .9 with the blur), where --accent-ink (4.1:1) and --muted (4.0:1) fall short, so orange
+   text in the panels is --pitch-ink (#8C4207, the site's own deeper orange: the primary button's
+   hover), 5.2:1 there and 7.2:1 on white, and grey text on a panel's own ground is --body; --muted
+   stays on the white cards (5.5:1). --line vanishes on that ground too, so hairlines drawn on a
+   panel use --pitch-rule; inside white cards they keep --line. On the night: ink, soft, #9DAED6 for
+   labels and the orange (5.0:1 or better on the night and its glow), never --xp-dim. */
+.pitch{--xp-ink:#F2F5FC;--xp-soft:rgba(214,224,246,.84);--xp-line:rgba(201,216,255,.2);--pitch-ice:#C9D8FF;--pitch-label:#9DAED6;
+  --pitch-ink:#8C4207;--pitch-rule:rgba(19,36,79,.15);--pitch-gap:clamp(40px,7vw,110px);position:relative;z-index:1}
+.pitch .pitch-sec{padding-top:var(--pitch-gap)}
+.pitch h2{font-weight:500;line-height:1.02;letter-spacing:-.02em;text-wrap:balance}
+.pitch h3{font-weight:500}
+.pitch-head{margin-bottom:clamp(36px,5vw,64px)}
+.pitch .pitch-eyebrow{margin-bottom:18px}
+.pitch-lead{margin-top:22px;font-size:clamp(1rem,.94rem + .3vw,1.16rem);line-height:1.62;max-width:56ch}
+
+/* the light panels: frosted, as wide as the site's column (on phones the full width less 10px a
+   side), lit along the top edge, a deep soft shadow into the night. With a mouse a panel blurs
+   what is behind it and lets a little more through, so the particles glow faintly at its edges;
+   never on phones and tablets, where the blur costs too much */
+.pitch-panel{position:relative;padding:clamp(40px,6vw,88px) clamp(20px,4vw,56px);border-radius:28px;background:rgba(238,241,247,.94);color:var(--body);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 40px 90px -40px rgba(3,8,23,.75)}
+@media (hover:hover) and (pointer:fine){.pitch-panel{background:rgba(238,241,247,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}}
+@media (prefers-reduced-transparency:reduce){.pitch-panel{background:var(--page);-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (max-width:599.98px){
+  .pitch-light > .wrap{padding-inline:max(10px,env(safe-area-inset-left))}
+  .pitch-panel{border-radius:20px}
+}
+.pitch-light h2{font-size:clamp(2.1rem,1.2rem + 3vw,4rem);color:var(--ink)}
+.pitch-line{display:block}   /* a title of two sentences: each starts its own line */
+.pitch-light h3{color:var(--ink)}
+.pitch-light .eyebrow,.pitch-light .text-link{color:var(--pitch-ink)}
+.pitch-light .pitch-lead{color:var(--body)}
+/* the dark theme (src/styles/theme-dark.css) dresses a dark page at no extra specificity; inside a
+   light panel the light site's own button, focus ring and form controls come back */
+.pitch-panel{color-scheme:light}
+.pitch-light .btn-outline{border-color:var(--navy);color:var(--navy);background:rgba(255,255,255,.7)}
+.pitch-light :focus-visible{outline-color:var(--pitch-ink)}
+
+/* the bands of night: no panel, light text, orange labels; a little more air than the gaps alone */
+.pitch-night{color:var(--xp-soft)}
+.pitch-night > .wrap{padding-block:clamp(8px,2.6vw,40px)}
+.pitch-night h2{font-size:clamp(2.3rem,1.3rem + 3.6vw,4.6rem);line-height:1;letter-spacing:-.022em;color:var(--xp-ink)}
+.pitch-night .eyebrow{color:var(--accent)}
+.pitch-night .pitch-lead{color:var(--xp-soft)}
+.pitch-night :focus-visible{outline-color:var(--dk-gold,var(--accent))}   /* the dark theme's gold where it is on */
+
+/* a number over a hairline that starts in orange and runs out on hover: the practices, the
+   reasons and the steps */
+.prac-num,.why-n,.how-n{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:.76rem;font-weight:600;letter-spacing:.16em;color:var(--pitch-ink)}
+.prac-num i,.why-n i,.how-n i{position:relative;flex:1;height:1px;background:var(--pitch-rule)}
+.prac-num i{background:var(--line)}
+.prac-num i::after,.why-n i::after,.how-n i::after{content:"";position:absolute;inset:0;background:var(--accent);transform-origin:left center;transform:scaleX(.14);transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+
+/* the practices: a white card each, the number over its hairline, the lists in hairline rows, and
+   the card's foot (who it is for, the standards, the link) held at the bottom so the feet line up
+   along a row */
+.prac-grid{display:grid;gap:16px}
+.prac-card{display:flex;flex-direction:column;padding:26px 22px 16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.prac-num{margin-bottom:22px}
+.prac-name{font-size:clamp(1.6rem,1.3rem + 1vw,2.05rem);line-height:1.08;letter-spacing:-.015em}
+.prac-full{margin-top:8px;font-family:var(--mono);font-size:.7rem;font-weight:500;line-height:1.5;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.prac-lead{margin-top:16px;font-size:.98rem;line-height:1.6}
+.prac-items{list-style:none;margin-top:20px}
+.prac-items li{position:relative;padding:8px 0 8px 20px;border-top:1px solid var(--line);font-size:.92rem;line-height:1.45;color:var(--ink);break-inside:avoid}
+.prac-items li::before{content:"";position:absolute;left:1px;top:calc(8px + .72em - 3.5px);width:7px;height:7px;border:1px solid var(--accent);border-radius:50%}
+.prac-more .prac-items,.prac-short .prac-more{margin-top:0}
+/* phones: a list longer than six shows five, the rest behind "and N more" (wider screens show the whole list) */
+.prac-all{display:none}
+.prac-more{border-top:1px solid var(--line)}
+.prac-more summary{display:inline-flex;align-items:center;gap:10px;min-height:44px;list-style:none;cursor:pointer;font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--pitch-ink)}
+.prac-more summary::-webkit-details-marker{display:none}
+.prac-more summary::before{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid rgba(224,122,31,.6);border-radius:50%;font-size:.9rem;line-height:1;transition:transform .3s ease}
+.prac-more[open] summary::before{transform:rotate(45deg)}
+.prac-foot{margin-top:auto;padding-top:24px}
+.prac-for{font-size:.88rem;line-height:1.55}
+.prac-k{margin-right:8px;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--pitch-ink)}
+.prac-std{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.prac-std li{padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--page);font-family:var(--mono);font-size:.64rem;font-weight:600;line-height:1.4;letter-spacing:.1em;text-transform:uppercase;color:var(--navy)}
+/* the link wraps as text in the narrowest cards, its arrow staying with the last word */
+.pitch .prac-link{display:inline-block;margin-top:8px;padding-block:11px;line-height:1.45}
+.prac-link::after{margin-left:6px}
+.prac-link[target]::after{content:"\2197"}
+
+/* the figures, on the night: each over a hairline that starts in orange, like the chapters along
+   the foot of the experience; the number in the serif with its plus in orange, the label in the
+   monospace */
+.proof-grid{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 18px}
+.proof-fig{position:relative;padding-top:20px;border-top:1px solid var(--xp-line)}
+.proof-fig::before{content:"";position:absolute;left:0;top:-1px;width:28px;height:1px;background:var(--accent)}
+.proof-num{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(2.5rem,1.4rem + 3.2vw,4.5rem);line-height:1;letter-spacing:-.02em;color:var(--xp-ink);font-variant-numeric:lining-nums tabular-nums}
+.proof-plus{margin-left:.04em;font-size:.62em;vertical-align:.5em;color:var(--accent)}
+.proof-label{display:block;margin-top:14px;max-width:26ch;font-family:var(--mono);font-size:.7rem;font-weight:500;line-height:1.55;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch-label)}
+.proof-note{margin-top:clamp(40px,5vw,56px);font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--pitch-label)}
+
+/* why MeWriT: six reasons, each a number over its hairline, a short title in the serif and a
+   sentence; one column on phones, two on tablets, three by two from 1100px */
+.why-points{list-style:none;display:grid;gap:34px}
+.why-n{margin-bottom:18px}
+.why-pt h3{font-size:clamp(1.35rem,1.2rem + .5vw,1.6rem);line-height:1.15;letter-spacing:-.012em}
+.why-text{margin-top:10px;font-size:.96rem;line-height:1.6}
+
+/* how we work, after a hairline: four steps joined by a line, down the left on phones (the number,
+   then its line running on to the next), across from 760px (two rows on tablets, one from 1100px);
+   then how each kind of work is charged, in the monospace */
+.how{margin-top:clamp(56px,8vw,104px);padding-top:clamp(40px,5vw,64px);border-top:1px solid var(--pitch-rule)}
+.how-title{font-size:clamp(1.7rem,1.3rem + 1.4vw,2.4rem);line-height:1.08;letter-spacing:-.015em;text-wrap:balance}
+.how-steps{list-style:none;display:grid;margin-top:clamp(28px,4vw,44px)}
+.how-step{display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:16px}
+.how-n{grid-row:1 / span 2;flex-direction:column;align-items:flex-start;gap:10px}
+.how-n i{flex:1;width:1px;height:auto;margin-left:9px}
+.how-n i::after{transform-origin:center top;transform:scaleY(.14)}
+.how-step:last-child .how-n i{visibility:hidden}
+.how-step h4{font-family:var(--serif);font-weight:500;font-size:1.25rem;line-height:1.2;color:var(--ink)}
+.how-text{margin-top:8px;padding-bottom:30px;font-size:.95rem;line-height:1.6}
+.how-step:last-child .how-text{padding-bottom:0}
+.how-terms{list-style:none;margin-top:clamp(32px,4vw,48px);padding-top:18px;border-top:1px solid var(--pitch-rule);font-family:var(--mono);font-size:.7rem;font-weight:500;line-height:1.9;letter-spacing:.12em;text-transform:uppercase;color:var(--body);text-wrap:balance}
+
+/* where we work: the site's chips, then who we work with and the standards, side by side in one
+   white card */
+.where-chips{list-style:none}
+.where-cols{display:grid;margin-top:clamp(28px,4vw,44px);border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.where-col{padding:26px 22px 18px}
+.where-col + .where-col{border-top:1px solid var(--line)}
+.where-col h3{font-size:1.25rem;margin-bottom:12px}
+.where-col ul,.learn-mods{list-style:none}
+.where-col li,.learn-mods li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:.95rem;line-height:1.5;color:var(--ink)}
+.where-col li::before,.learn-mods li::before{content:"";flex:none;width:6px;height:6px;margin-top:.55em;border-radius:50%;background:var(--accent)}
+
+/* training: how it is taught and the way in on the left, the common topics in two columns on the
+   right, then the workshops delivered so far as three compact rows in one white card */
+.learn-grid{display:grid;gap:30px}
+.learn-ctas{margin-top:26px}
+.learn-mods li{break-inside:avoid;border-top-color:var(--pitch-rule)}
+.learn-for{margin-top:clamp(40px,6vw,72px);padding:26px 22px 8px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.learn-for h3{font-size:1.25rem;margin-bottom:14px}
+.learn-row{display:grid;gap:8px;padding:16px 0 18px;border-top:1px solid var(--line)}
+.learn-k{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--pitch-ink)}
+/* phones: a name a line. From 760px the names run on as text, whole, with a dot after each and then a
+   space, so a line can end on a dot but never start with one */
+.learn-names{list-style:none;font-size:.92rem;line-height:1.5;color:var(--body)}
+.learn-names li{padding:3px 0}
+
+/* in print: the authors' own words, on the night. Each quote in a card of navy glass the dust shows
+   through, its source under a hairline that starts in orange (it runs out on hover); a row to
+   swipe on phones, the next card showing at the edge */
+.ack-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:calc(-1 * var(--gutter));padding:4px var(--gutter) 14px;scroll-padding-inline:var(--gutter);scrollbar-width:none;overscroll-behavior-x:contain}
+.ack-row::-webkit-scrollbar{display:none}
+.ack{flex:0 0 86%;scroll-snap-align:start;display:flex;flex-direction:column;padding:24px 22px 20px;border:1px solid rgba(201,216,255,.16);border-radius:18px;
+  background:linear-gradient(180deg,rgba(30,52,110,.32),rgba(30,52,110,.14))}
+.ack svg{flex:none;color:var(--accent)}
+.ack blockquote{flex:1;margin-top:16px}
+.ack blockquote p{font-family:var(--serif);font-size:1.06rem;line-height:1.55;color:var(--xp-ink)}
+.ack figcaption{position:relative;margin-top:22px;padding-top:14px;border-top:1px solid var(--xp-line);font-family:var(--mono);font-size:.66rem;font-weight:500;line-height:1.6;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch-label)}
+.ack figcaption::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--accent);transform-origin:left center;transform:scaleX(.1);transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+
+/* who leads the work: a slim panel, kept secondary because the site leads with its services; the
+   values in small capitals under a hairline */
+.pitch-slim{padding-block:clamp(30px,4.4vw,56px)}
+.cred-band{display:grid;gap:12px}
+.cred-band .pitch-eyebrow{margin-bottom:10px}
+.pitch .cred-title{font-size:clamp(1.3rem,1.15rem + .6vw,1.62rem);line-height:1.22;letter-spacing:-.01em}
+.cred-text{font-size:.95rem;line-height:1.65;max-width:68ch}
+.cred-band .text-link{margin-top:4px}
+.cred-values{list-style:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--pitch-rule);font-family:var(--mono);font-size:.7rem;font-weight:500;line-height:2;letter-spacing:.12em;text-transform:uppercase;color:var(--body);text-wrap:balance}
+.cred-values li{display:inline;white-space:nowrap}   /* a value stays whole; a dot after each, then a space */
+.cred-values li:not(:last-child)::after{content:"\00B7";margin:0 4px 0 12px;color:var(--accent)}
+
+/* the enquiry: the home page's card (src/styles/sections.css) in a panel. The card's own white
+   ground, padding and shadow give way to the panel's; the quick links and the fields turn white so
+   they stand out on it, the fields edged at 3:1 */
+.pitch .enquire-card{padding:0;border-radius:0;background:none;box-shadow:none}
+.pitch .enquire-card h2{font-size:clamp(2rem,1.3rem + 2.2vw,3.2rem)}
+.pitch .quick a{background:var(--card);box-shadow:0 0 0 1px var(--line)}
+.pitch .form input,.pitch .form select,.pitch .form textarea{background:var(--card);border-color:#8994AA}
+.pitch .form .note{color:var(--body)}
+
+/* =========================== 760px and up =========================== */
+@media (min-width:760px){
+  .prac-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .prac-card{padding:30px 28px 18px}
+  .prac-all{display:block}
+  .prac-short{display:none}
+  .proof-grid{gap:44px 28px}
+  .why-points{grid-template-columns:repeat(2,minmax(0,1fr));gap:44px 40px}
+  /* the steps across: the number, then its hairline running on over the gap to just short of the
+     next number */
+  .how-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 32px}
+  .how-step{display:block}
+  .how-n{flex-direction:row;align-items:center;gap:14px;margin-bottom:20px}
+  .how-n i{width:auto;height:1px;margin-left:0}
+  .how-n i::after{transform-origin:left center;transform:scaleX(.14)}
+  .how-step:last-child .how-n i{visibility:visible}
+  .how-step:nth-child(odd) .how-n i{margin-right:-18px}
+  .how-text{padding-bottom:0}
+  .how-terms li{display:inline;white-space:nowrap}
+  .how-terms li:not(:last-child)::after{content:"\00B7";margin:0 4px 0 12px;color:var(--accent)}
+  .ack-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;overflow:visible;margin-inline:0;padding:0}
+  .ack:first-child{grid-column:1 / -1}
+  .where-cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .where-col{padding:34px 36px 24px}
+  .where-col + .where-col{border-top:0;border-left:1px solid var(--line)}
+  .learn-mods{columns:2;column-gap:40px}
+  .learn-for{padding:36px 40px 14px}
+  .learn-row{grid-template-columns:150px minmax(0,1fr);gap:24px;align-items:baseline}
+  .learn-names{line-height:1.7}
+  .learn-names li{display:inline;padding:0;white-space:nowrap}   /* the longest name fits the narrowest column here */
+  .learn-names li:not(:last-child)::after{content:"\00B7";margin:0 6px 0 10px;color:var(--accent)}
+}
+
+/* tablets: two columns. The first card, the fourth (the longest list) and the fifth (else alone on
+   its row) run the full width, their lists in two columns */
+@media (min-width:760px) and (max-width:1099.98px){
+  .prac-card:is(:nth-child(1),:nth-child(4),:nth-child(5)){grid-column:1 / -1}
+  .prac-card:is(:nth-child(1),:nth-child(4),:nth-child(5)) .prac-items{columns:2;column-gap:36px}
+}
+
+/* =========================== 1100px and up =========================== */
+@media (min-width:1100px){
+  .pitch-head.split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);column-gap:72px;align-items:end}
+  .pitch-head.split .pitch-lead{margin-top:0;padding-bottom:6px}
+  /* 24 tracks: the first two cards are the wide ones (13 and 11, lists in two columns), then 7, 10
+     and 7, so the training card's eleven topics sit in the widest of the three and the row's
+     cards end up about the same height */
+  .prac-grid{grid-template-columns:repeat(24,minmax(0,1fr));gap:20px}
+  .prac-card:nth-child(1){grid-column:span 13}
+  .prac-card:nth-child(2){grid-column:span 11}
+  .prac-card:nth-child(3),.prac-card:nth-child(5){grid-column:span 7}
+  .prac-card:nth-child(4){grid-column:span 10}
+  .prac-card.wide .prac-items{columns:2;column-gap:32px}
+  /* inside the panel the second row's cards are narrower than they were on the open night, so
+     their titles step down a size: "communications", the longest word, fits the narrowest card */
+  .prac-card:nth-child(n+3) .prac-name{font-size:clamp(1.45rem,.55rem + 1.35vw,1.75rem)}
+  .proof-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:64px 32px}
+  .why-points{grid-template-columns:repeat(3,minmax(0,1fr));gap:52px 44px}
+  .how-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .how-step:not(:last-child) .how-n i{margin-right:-18px}
+  .ack-row{grid-template-columns:repeat(6,minmax(0,1fr));gap:20px}
+  .ack{grid-column:span 2}
+  .ack:nth-child(-n+2){grid-column:span 3}
+  .ack:nth-child(-n+2) blockquote p{font-size:1.24rem;line-height:1.5}
+  .learn-grid{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:44px;align-items:start}   /* wide enough for both buttons on one row */
+  .learn-mods{margin-top:6px;column-gap:32px}
+  .cred-band{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);column-gap:72px}
+  .cred-values{grid-column:1 / -1;margin-top:24px}
+}
+
+/* hover: a card's edge darkens and its hairline runs out in orange (the cards keep the scroll
+   reveal's transition, src/styles/sections.css, so the edge changes at once) */
+@media (hover:hover){
+  .prac-card:hover{border-color:#BFC9DA}
+  .ack:hover{border-color:rgba(201,216,255,.32)}
+  .prac-card:hover .prac-num i::after,.why-pt:hover .why-n i::after,.how-step:hover .how-n i::after,.ack:hover figcaption::before{transform:none}
+  .pitch-light .text-link:hover{text-decoration:underline;text-underline-offset:.22em}
+  .pitch-light .btn-outline:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .prac-more summary:hover{color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){
+  .prac-num i::after,.why-n i::after,.how-n i::after,.ack figcaption::before,.prac-more summary::before{transition:none}
+}
