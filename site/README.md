@@ -35,6 +35,38 @@ and statistics, analysis, reporting, manuscript and publication). Twenty-four do
 every stage, from the atoms of a molecule to the seal on the accepted paper. The figures in it
 (the trial size, the hazard ratio and so on) are illustrative. Code: `src/scripts/pipeline.js`,
 frame in `src/components/HeroVisual.astro`; the labels are set in IBM Plex Mono (open font licence).
+The drawing itself is `src/scripts/pipeline-engine.js`.
+
+## The experience (`/experience/`)
+
+"From molecule to manuscript" as an immersive page. A loading screen draws a molecule like a
+technical drawing, with a counter; as it lifts, the drawing flies to where the same molecule forms
+in 3D. From there one cloud of glowing particles (64,000 on computers, 24,000 on phones) carries
+the work behind a medicine through eleven scenes as you scroll: a molecule, an icon array of trial
+participants lighting up as they enrol, two randomised arms flowing away, a spiral of papers, a
+landscape of data, Kaplan-Meier curves, a fan of regulatory documents, the accepted manuscript and
+a globe with arcs from Ahmedabad. Each shape reveals itself as you scroll, labels pin to its
+parts, figures count up in the corner, and the chapters along the foot jump between scenes. The
+pointer parts the particles on computers.
+
+- The words are draft copy for Dr Hetal to confirm: `src/data/experience.ts`.
+- Every figure on it is illustrative (the page says so).
+- The 3D is drawn with three.js (MIT licence), pinned in `package.json`; every shape is generated
+  in code, with no models or images. It loads on its own, only on this page, so the words never wait
+  for it; without WebGL the words still follow the scroll, and with reduced motion the shapes change
+  in place without flying.
+- Code: the page `src/pages/experience.astro`, styles `src/styles/xp.css`, and in `src/scripts/xp/`
+  the shapes (`formations.js`), the scenes and their camera shots (`scenes.js`), the renderer
+  (`world.js`) and what ties them to the scroll (`experience.js`).
+- Review switch: `?static` skips the loading screen.
+
+## Small touches
+
+- The labels above the section headings are set in the monospace and decode into place the first
+  time they come into view (`src/scripts/decode.js`); screen readers get them as they are.
+- Moving between pages, the page fades across, the capsule stays put and Dr Hetal's photo moves
+  from the home page to her profile (view transitions, in `src/styles/base.css`; browsers without
+  them simply change page).
 
 ## Profiles
 
@@ -90,7 +122,7 @@ index and "you are here" in the four corners). Code: `src/styles/nav-experiments
 | The two home pages | `src/pages/index.astro` (A) and `src/pages/version-b.astro` (B) |
 | Head, header, menu, footer, boot script | `src/layouts/Base.astro` |
 | Styles | `src/styles/` (imported in order by `Base.astro`; the order matters) |
-| Behaviour and animations | `src/scripts/` (`main.js` loads the rest in order): `intro.js` (A), `header-logo.js` (B), `pen-ink.js` (the pen and ink both use), `ribbons.js`, `pipeline.js` (the hero's drawing), `page.js`, `nav-variants.js` and `glass.js` (the navigation), `tickers.js` (the counting numbers) |
+| Behaviour and animations | `src/scripts/` (`main.js` loads the rest in order): `intro.js` (A), `header-logo.js` (B), `pen-ink.js` (the pen and ink both use), `ribbons.js`, `pipeline.js` (the hero's drawing) on `pipeline-engine.js`, `page.js`, `nav-variants.js` and `glass.js` (the navigation), `tickers.js` (the counting numbers) |
 | Founder photo | `src/assets/` (resized and converted to WebP at build time) |
 | Logo, logo without its line, pen | `public/brand/` (served exactly as they are) |
 | Logo intro data: the pen's path and the logo's line pixels | `src/data/intro.json` |

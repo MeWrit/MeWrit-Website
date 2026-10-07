@@ -1,0 +1,121 @@
+---
+// "From molecule to manuscript": the immersive page. A loading screen draws the molecule, then one
+// cloud of particles carries the work behind a medicine through eleven scenes as you scroll (the
+// scenes in src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in
+// src/scripts/xp/world.js). The words are real page content: they read in order without the 3D.
+import Base from '../layouts/Base.astro';
+import { experience } from '../data/experience';
+import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
+import { moleculeSkeleton } from '../scripts/xp/formations.js';
+import { site } from '../data/site';
+import { href } from '../lib/url';
+import '../styles/xp.css';
+
+// the words, in the scenes' order (a scene without words fails the build)
+const words = SCENES.map(s => {
+  const w = experience.scenes.find(x => x.id === s.id);
+  if (!w) throw new Error(`experience: no words for the scene "${s.id}"`);
+  return w;
+});
+// titles letter by letter, each letter with its own moment (the same on every build)
+let seed = 11;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const letters = (t: string) => t.split(' ').map(word => [...word].map(ch => ({ ch, d: Math.round(rnd() * 560) })));
+
+// the loading screen's drawing: the molecule's skeleton, flat (y up in the molecule, down in SVG)
+const sk = moleculeSkeleton(), U = 34;
+const A = sk.atoms.map(a => ({ ...a, x: a.x * U, y: -a.y * U }));
+const LABEL: Record<number, string> = { 11: 'O', 12: 'N', 15: 'OH', 16: 'O' };
+const cut = (i: number) => (LABEL[i] ? 13 : 0);
+const seg = (i: number, j: number, off = 0, shrink = 0) => {
+  const a = A[i], b = A[j], dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = -uy * off, ny = ux * off;
+  const s0 = cut(i) + shrink, s1 = cut(j) + shrink;
+  return { x1: a.x + ux * s0 + nx, y1: a.y + uy * s0 + ny, x2: b.x - ux * s1 + nx, y2: b.y - uy * s1 + ny };
+};
+const centre = (ids: number[]) => ids.reduce((s, i) => [s[0] + A[i].x / 6, s[1] + A[i].y / 6], [0, 0]);
+const ringC = sk.rings.map(centre);
+const bondLines = sk.bonds.flatMap(([i, j, order = 1]) => order === 2 ? [seg(i, j, 4.5), seg(i, j, -4.5)] : [seg(i, j)]);
+const innerLines = sk.inner.map(([i, j, r]) => {
+  const c = ringC[r], k = .22, p = (q: { x: number; y: number }) => ({ x: q.x + (c[0] - q.x) * k, y: q.y + (c[1] - q.y) * k });
+  const a = p(A[i]), b = p(A[j]), dx = b.x - a.x, dy = b.y - a.y;
+  return { x1: a.x + dx * .18, y1: a.y + dy * .18, x2: b.x - dx * .18, y2: b.y - dy * .18 };
+});
+const xs = A.map(a => a.x), minX = Math.min(...xs), maxX = Math.max(...xs);
+const f1 = (n: number) => n.toFixed(1);
+---
+<Base intro="none" title={`${experience.title} | ${site.name}`} description={experience.description}>
+  <div class="xp-loader" id="xpLoader" aria-hidden="true">
+    <p class="xp-load-brand">MeWriT · Medical writing</p>
+    <svg class="xp-load-art" viewBox="-230 -170 460 380" role="presentation">
+      <g class="xp-load-guides">
+        <circle class="xp-load-ring" r="150"></circle>
+        <circle class="xp-load-ring b" r="128"></circle>
+        <line class="d" style="--d:.1s" x1="-222" y1="0" x2="222" y2="0" pathLength="1"></line>
+        <line class="d" style="--d:.2s" x1="0" y1="-158" x2="0" y2="158" pathLength="1"></line>
+        {Array.from({ length: 24 }, (_, i) => { const t = i / 24 * Math.PI * 2, r0 = i % 2 ? 150 : 143; return <line class="tick" style={`--d:${(.3 + i * .025).toFixed(3)}s`} x1={f1(Math.cos(t) * r0)} y1={f1(Math.sin(t) * r0)} x2={f1(Math.cos(t) * 157)} y2={f1(Math.sin(t) * 157)}></line>; })}
+      </g>
+      <g class="xp-load-mol">
+        {bondLines.map((l, i) => <line class="d bond" style={`--d:${(.5 + i * .045).toFixed(3)}s`} x1={f1(l.x1)} y1={f1(l.y1)} x2={f1(l.x2)} y2={f1(l.y2)} pathLength="1"></line>)}
+        {innerLines.map((l, i) => <line class="d inner" style={`--d:${(1.4 + i * .05).toFixed(3)}s`} x1={f1(l.x1)} y1={f1(l.y1)} x2={f1(l.x2)} y2={f1(l.y2)} pathLength="1"></line>)}
+        {A.map((a, i) => LABEL[i]
+          ? <text class={`atom ${a.kind}`} style={`--d:${(1.2 + i * .03).toFixed(3)}s`} x={f1(a.x)} y={f1(a.y)}>{LABEL[i]}</text>
+          : <circle class="atom" style={`--d:${(.9 + i * .03).toFixed(3)}s`} cx={f1(a.x)} cy={f1(a.y)} r="2.6"></circle>)}
+      </g>
+      <g class="xp-load-dim">
+        <line class="d" style="--d:1.6s" x1={f1(minX)} y1="182" x2={f1(maxX)} y2="182" pathLength="1"></line>
+        <line class="d" style="--d:1.7s" x1={f1(minX)} y1="174" x2={f1(minX)} y2="190" pathLength="1"></line>
+        <line class="d" style="--d:1.7s" x1={f1(maxX)} y1="174" x2={f1(maxX)} y2="190" pathLength="1"></line>
+        <text x="0" y="203">FIG. 0 · COMPOUND MW-0712</text>
+      </g>
+    </svg>
+    <div class="xp-load-foot">
+      <p class="xp-load-label">Synthesising</p>
+      <p class="xp-load-num">000</p>
+      <div class="xp-load-bar"><i></i></div>
+    </div>
+  </div>
+
+  <section class="xp" id="xp" aria-label={experience.title} style={`--units:${SCENES.length}`}>
+    <div class="xp-track">
+      <div class="xp-stage">
+        <canvas class="xp-canvas" aria-hidden="true"></canvas>
+        <div class="xp-shade" aria-hidden="true"></div>
+        <div class="xp-callouts" aria-hidden="true"></div>
+        <div class="xp-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="xp-scenes">
+          {SCENES.map((s, i) => {
+            const w = words[i], Tag = i === 0 ? 'h1' : 'h2';
+            return (
+              <article class={`xp-scene${w.cta ? ' center' : ''}`} data-scene={s.id}>
+                <p class="xp-kicker"><span class="sr-only">{w.kicker}</span><span class="xp-kick" aria-hidden="true">{w.kicker}</span></p>
+                <Tag class="xp-title"><span class="sr-only">{w.title}</span><span aria-hidden="true">{letters(w.title).map((word, wi) => <>{wi > 0 && ' '}<span class="w">{word.map(l => <span class="c" style={`--d:${l.d}`}>{l.ch}</span>)}</span></>)}</span></Tag>
+                <p class="xp-text">{w.text}</p>
+                {w.docs && <ul class="xp-docs" aria-label="What we write">{w.docs.map(d => <li>{d}</li>)}</ul>}
+                {w.cta && <div class="btn-row xp-cta">
+                  <a class="btn btn-primary" href={href('/#contact')}>Start a project</a>
+                  <a class="btn xp-btn-ghost" href={href('/#services')}>Explore our services</a>
+                </div>}
+              </article>
+            );
+          })}
+        </div>
+        <div class="xp-hud">
+          <div class="xp-panel" aria-hidden="true">
+            <dl class="xp-readout"></dl>
+            <p class="xp-note">Figures are illustrative</p>
+          </div>
+          <button class="xp-hint" type="button"><span>Scroll to explore</span><i aria-hidden="true"></i></button>
+          <nav class="xp-railnav" aria-label="Chapters">
+            <ol class="xp-rail">
+              {CHAPTERS.map((c, j) => <li><button type="button" aria-current="false"><i aria-hidden="true"><b></b></i><span class="n" aria-hidden="true">{String(j + 1).padStart(2, '0')}</span><span class="t">{c}</span></button></li>)}
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/xp/experience.js';
+</script>

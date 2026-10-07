@@ -11,3 +11,4 @@ import './nav-variants.js';
 import './nav-experiments.js';
 import './glass.js';
 import './tickers.js';
+import './decode.js';

@@ -2,6 +2,18 @@
 *{margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h) + 16px);background:var(--page)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* moving between pages: the page fades across and rises a little, the capsule stays put, and Dr
+   Hetal's photo moves from the home page to her profile. Browsers without view transitions simply
+   change page. */
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{navigation:auto}
+  ::view-transition-old(root){animation:.26s ease both vtOut}
+  ::view-transition-new(root){animation:.42s cubic-bezier(.2,.7,.2,1) both vtIn}
+  .site-header{view-transition-name:capsule}
+  .founder-photo,.profile-photo{view-transition-name:founder-photo}
+}
+@keyframes vtOut{to{opacity:0}}
+@keyframes vtIn{from{opacity:0;transform:translateY(12px)}}
 body{font-family:var(--sans);font-size:1rem;line-height:1.6;color:var(--body);background:var(--page);
   padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom))}
 img,svg,canvas{display:block;max-width:100%}
@@ -16,7 +28,8 @@ h1,h2,h3{font-family:var(--serif);color:var(--ink);font-weight:600;line-height:1
 h1{font-size:clamp(2.2rem, 1.25rem + 4.6vw, 4.6rem)}
 h2{font-size:clamp(1.7rem, 1.2rem + 2.3vw, 2.8rem)}
 h3{font-size:1.2rem}
-.eyebrow{display:flex;align-items:center;gap:10px;font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:14px}
+/* section labels in the monospace, like the labels on a technical drawing (they decode into place: src/scripts/decode.js) */
+.eyebrow{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.76rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:14px}
 .eyebrow::before{content:"";width:22px;height:2px;background:var(--accent);flex:none}
 .lead{font-size:1.06rem}
 .block{position:relative;padding-top:var(--gap-section)}

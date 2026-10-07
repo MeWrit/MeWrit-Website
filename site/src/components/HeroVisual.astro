@@ -1,7 +1,7 @@
 ---
 // The hero panel, "From molecule to manuscript": a technical drawing of the work behind a medicine,
-// from the molecule to the accepted paper. The frame is drawn here; src/scripts/pipeline.js draws
-// the seven stages and moves them.
+// from the molecule to the accepted paper. The frame is drawn here; src/scripts/pipeline-engine.js
+// draws the seven stages, and src/scripts/pipeline.js plays them.
 import { hero } from '../data/home';
 const MONO = '"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace';
 ---
@@ -18,13 +18,13 @@ const MONO = '"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace';
     <path d="M24 54V48H30M370 48H376V54M376 290V296H370M30 296H24V290" fill="none" stroke="#1C3472" stroke-opacity=".4" stroke-width="1"/>
     <text x="24" y="30" font-family={MONO} font-size="8.2" font-weight="500" letter-spacing="1.4" fill="#5E6884">FROM MOLECULE TO MANUSCRIPT</text>
     <path d="M24 40H376" stroke="#1C3472" stroke-opacity=".14" stroke-width="1"/>
-    <g id="pipeStages"></g>
-    <g id="pipeDots"></g>
+    <g class="pipe-stages"></g>
+    <g class="pipe-dots"></g>
     <path d="M24 304H376" stroke="#1C3472" stroke-opacity=".14" stroke-width="1"/>
-    <text id="pipeTitle" x="24" y="326" font-family={MONO} font-size="10.6" font-weight="600" letter-spacing="1.1" fill="#13244F">DRUG DEVELOPMENT</text>
-    <text id="pipeCount" x="376" y="326" text-anchor="end" font-family={MONO} font-size="10.6" font-weight="500" letter-spacing=".6" fill="#5E6884">01 / 07</text>
-    <text id="pipeNote" x="24" y="342" font-family={MONO} font-size="8.4" font-weight="500" letter-spacing=".4" fill="#5E6884"></text>
-    <g id="pipeProgress"></g>
+    <text class="pipe-title" x="24" y="326" font-family={MONO} font-size="10.6" font-weight="600" letter-spacing="1.1" fill="#13244F">DRUG DEVELOPMENT</text>
+    <text class="pipe-count" x="376" y="326" text-anchor="end" font-family={MONO} font-size="10.6" font-weight="500" letter-spacing=".6" fill="#5E6884">01 / 07</text>
+    <text class="pipe-note" x="24" y="342" font-family={MONO} font-size="8.4" font-weight="500" letter-spacing=".4" fill="#5E6884"></text>
+    <g class="pipe-progress"></g>
   </svg>
   <button class="hero-pause" id="heroPause" aria-pressed="false" aria-label="Pause animation">
     <svg class="i-pause" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>

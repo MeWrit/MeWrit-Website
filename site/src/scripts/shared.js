@@ -13,3 +13,16 @@ export const whenPrepared = fn => {
   if (!INTRO || document.documentElement.classList.contains('intro-prepared')) fn();
   else document.addEventListener('mewrit:prepare', fn, { once: true });
 };
+// text decodes into place: each character cycles through look-alikes, settling left to right
+// over `dur` ms (spaces and punctuation stay put). e is the time since it started.
+const GLYPHS = '0123456789ABCDEFHKLMNPRSTUXZ#%+';
+export const scramble = (text, e, dur = 520) => {
+  const n = text.length, done = clamp(e / dur) * n;
+  let out = '';
+  for (let i = 0; i < n; i++) {
+    const ch = text[i];
+    if (i < done || ' .·,:/&'.includes(ch)) { out += ch; continue; }
+    out += GLYPHS[(i * 7 + Math.floor(e / 45) * 13) % GLYPHS.length];
+  }
+  return out;
+};
