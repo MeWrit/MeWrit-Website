@@ -479,3 +479,28 @@ What follows from them:
   The user was asked to try ?tier=low and to give the laptop's GPU and display scale.
 - The laptop's electric noise while scrolling: coil whine from the GPU's power stage under load, harmless. The 60 frame cap halves the work on fast screens; the rest is the laptop's own settings.
 - Asked in passing (no work): could ray tracing or path tracing make the light more realistic and consistent at no cost to speed? Answer given: bake path-traced light into the textures, which is the step 7 plan.
+
+**The next round (10 and 11 October 2026), the user's words (verbatim) and what followed (1e3f1b6):**
+- "so we can do path tracing once and store it since it will always be deterministic in all cases? and can we do it now ( i want see a sample and the difference it makes)? or later?"
+  - Answer given: yes, per state. Light adds up, so the sun of each hour, the sky and each lamp group are baked as separate layers and mixed at any strength. The shelves are baked full, and the books keep a little live light. Gloss stays live, and the page blends between baked hours on a move.
+  - The full bake stays in step 7.
+  - A sample experiment was started: path-traced stills of the contents view and the record view, against today's frames.
+  - It runs in its own git worktree, .claude/worktrees/agent-afb72269478f6ac77, with its own dev server on port 4325, and writes to the scratchpad's pt folder.
+  - It probably caused an abrupt reboot of the PC (full GPU load for minutes).
+  - Since then: warn the user before any heavy GPU job, and keep runs under 2 minutes with pauses.
+  - The user said "go ahead, i'm still here though"; the two short runs were under way when this was written. Results pending.
+- Footer: "need some good ideas for a footer, maybe a collapsible one? but also one that is compatible with mobile screens, we will also add a made with love by [my name] linked to my github".
+  - Chosen: the stationery foot. A thin line along the bottom, matching the letterhead (MeWriT, phone, email, Open).
+  - It opens upward into four columns: the logo and its line; the practices (dimmed until built); Dr Hetal Shah, the Academy and LinkedIn; phone, email, WhatsApp and the Ahmedabad office.
+  - Its last row: "© year MeWriT" and "Made with ♥ by Ansh Shah", linked to https://github.com/Git-Ansh (the user chose this wording).
+  - It opens by itself at the film's end. On phones it is a sheet from the bottom.
+  - Views keep clear of the line (compose uses the foot's top).
+  - There are no privacy or terms pages, so none are linked.
+- "the loading animation for this bookshelf is still shit so need something better there" and "have these 2 things [the cartouche's logo, the frieze's headline] typed out or something instead of just appearing out of thin air".
+  - Offered four new concepts (register, index card, one volume, gilded frieze). The user picked none and noted: "this but not as flashy just something better than them appearing out of nowhere".
+  - So, each time the camera arrives at the record:
+    - the pen writes the cartouche's logo (the logo player has a reset() for the next arrival);
+    - the headline is typed letter by letter, whole again after, so the font's spacing returns;
+    - the boards follow one by one.
+  - The loader's card draws in from the left, with the same typing and pen.
+- Years: counted from 2004 (the user confirmed).
