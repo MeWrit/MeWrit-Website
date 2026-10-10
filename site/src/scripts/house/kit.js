@@ -54,6 +54,23 @@ export function tube(points, radius, material, segs = 64, radial = 12) {
 export const group = (...kids) => { const g = new THREE.Group(); kids.forEach(k => k && g.add(k)); return g; };
 // a flat panel facing +z (for paper, screens, labels)
 export function panel(w, h, material) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material); m.receiveShadow = true; return m; }
+// a hipped roof over a rectangle (its eaves at y, its ridge h above, along the longer side), closed
+// underneath by its soffit; each face flat
+export function hipRoof(x0, x1, z0, z1, y, h, material) {
+  const alongX = x1 - x0 >= z1 - z0, P = [];
+  const v = (x, yy, z) => alongX ? [x, yy, z] : [z, yy, x];   // (built along x, turned if the ridge runs along z)
+  const [a0, a1, b0, b1] = alongX ? [x0, x1, z0, z1] : [z0, z1, x0, x1];
+  const hd = (b1 - b0) / 2, bm = (b0 + b1) / 2;
+  const A = v(a0, y, b0), B = v(a1, y, b0), C = v(a1, y, b1), D = v(a0, y, b1), E = v(a0 + hd, y + h, bm), F = v(a1 - hd, y + h, bm);
+  // (the faces wound so each looks outward; when the ridge runs along z the turn mirrors them, so their
+  // order is reversed)
+  const tris = [[A, F, B], [A, E, F], [D, C, F], [D, F, E], [B, F, C], [A, D, E], [A, B, C], [A, C, D]];
+  for (const t of tris) (alongX ? t : [t[0], t[2], t[1]]).forEach(p => P.push(...p));
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  g.computeVertexNormals();
+  return shadows(new THREE.Mesh(g, material));
+}
 
 // ---------- surfaces, drawn on canvases ----------
 export function canvasTex(w, h, draw, { srgb = true, repeat = null, aniso = 8 } = {}) {

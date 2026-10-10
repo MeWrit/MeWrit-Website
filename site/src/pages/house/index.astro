@@ -1,7 +1,8 @@
 ---
 // The house (site/docs/redesign-plan.md, sections 11 and 11.10): the film rebuilt in illustrated 3D,
 // one house (the study, and through its doorway the library hall), each chapter's object performing in
-// the centre. This is the look test (section 11.8, step 2): the study, the title page and the contents.
+// the centre. Built so far: the study, the title page and the contents (step 2), and the walk into the
+// library hall to the record (step 3, section 11.12).
 // 00, the title page, is the manuscript itself: its words printed on the page (real text, laid on the
 // page in perspective by film.js), the lamp's light its backdrop. The same page is the loader: shown on
 // paper from the first paint, its lines written as the house loads; when the house is ready the camera
@@ -12,14 +13,16 @@ import { lamp } from '../../data/lamp';
 import { site, contact } from '../../data/site';
 import { href } from '../../lib/url';
 import { osf } from '../../scripts/lamp/figures.js';
+import { LAYOUT, PX as REC_PX, BAND, CORNICE } from '../../scripts/house/record-layout.js';
 import LogoDraw from '../../components/LogoDraw.astro';
 import '../../styles/lamp.css';
 import '../../styles/logo-draw.css';
 import '../../styles/house.css';
 
-// the chapters of the house, in order (How we work is removed, section 11.4); the look test builds two
+// the chapters of the house, in order (How we work is removed, section 11.4); built so far: the title
+// page and the contents (step 2), on the record (step 3: the walk into the hall)
 const ORDER = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory', 'correspondence'];
-const BUILT = ['title-page', 'contents'];
+const BUILT = ['title-page', 'contents', 'on-the-record'];
 const words = ORDER.map(id => {
   const w = lamp.chapters.find(c => c.id === id);
   if (!w) throw new Error(`house: no words for the chapter "${id}"`);
@@ -28,9 +31,18 @@ const words = ORDER.map(id => {
 const built = words.filter(w => BUILT.includes(w.id));
 // the scroll each chapter takes, in screens: the move that brings the camera to it, then a short dwell
 // where the camera holds still for reading (long enough to stop on, short enough that scrolling on
-// moves the camera again at once)
-const SCROLL: Record<string, [number, number]> = { 'title-page': [0, .08], contents: [1.6, .35] };
-const screens = built.reduce((t, w) => t + SCROLL[w.id][0] + SCROLL[w.id][1], 0);
+// moves the camera again at once), and for 02 between the two the record's filling, the camera still
+const SCROLL: Record<string, number[]> = { 'title-page': [0, .08], contents: [1.6, .35], 'on-the-record': [2.2, .3, .85] };
+const screens = built.reduce((t, w) => t + SCROLL[w.id].reduce((a, v) => a + v, 0), 0);
+// 02's figures, from its line ("100+ trial documents, 30+ clinical study reports, ..."): each a number,
+// its "+", its words
+const recCh = words.find(w => w.id === 'on-the-record');
+const figures = recCh ? recCh.line.replace(/\.$/, '').split(/,\s+(?=\d)/).map(s => {
+  const m = /^([\d,]+)(\+?)\s+(.+)$/.exec(s.trim());
+  if (!m) throw new Error(`house: cannot read the figure "${s}"`);
+  return { text: m[1] + m[2], n: +m[1].replace(/,/g, ''), plus: m[2], label: m[3] };
+}) : [];
+if (recCh && figures.length !== LAYOUT.boards.length) throw new Error(`house: ${figures.length} figures for ${LAYOUT.boards.length} bays`);
 const logo = href('/brand/logo-original.png');
 const links = [
   { label: 'Practices', go: 'contents' }, { label: 'Academy', go: 'training' }, { label: 'Publications', go: 'on-the-record' },
@@ -46,12 +58,16 @@ const titleLines = tw.length > 1 ? [tw.slice(0, cut).join(' '), tw.slice(cut).jo
 const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
 // the contents' words are on the display (the editor's document); the chapters to come keep a caption
 const contentsCh = words[1];
-const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
+const caps = built.filter(w => !['title-page', 'contents', 'on-the-record'].includes(w.id));
 // each chapter's share of its scroll that is the move (film.js reads the moves and dwells from the section)
-const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d); });
+const ARRIVE = built.map(w => SCROLL[w.id][0] / SCROLL[w.id].reduce((a, v) => a + v, 0));
+// 02's band (record-layout.js): where each of its parts sits in it, in units, for the loader's card
+const bandVars = (r: { x: number; y: number; w: number; h: number }) => `--x:${r.x.toFixed(3)};--y:${r.y.toFixed(3)};width:${(r.w * REC_PX).toFixed(1)}px;height:${(r.h * REC_PX).toFixed(1)}px`;
+// (the cornice's place down the band, for the card's drawing of it)
+const cornice = [(BAND.top - CORNICE[1]) / LAYOUT.h, (BAND.top - CORNICE[0]) / LAYOUT.h].map(v => `${(v * 100).toFixed(2)}%`);
 ---
 <Base intro="none" theme="light" page="house" title={`${lamp.shortTitle} | ${site.name}`} description={lamp.description}>
-  <script is:inline define:vars={{ ids: BUILT, A: ARRIVE, key: 'mewrit-house-place' }}>
+  <script is:inline define:vars={{ ids: BUILT, A: ARRIVE, key: 'mewrit-house-place', band: [LAYOUT.w, LAYOUT.h, REC_PX] }}>
   /* before the first paint: while the house loads, the chapter the reader is coming to shows its own
      object flat on the paper veil (the title page's sheet; the display's screen), the letterhead and
      the list wait, and the page does not scroll (film.js lifts these; if it never runs, they lift
@@ -78,6 +94,15 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
       d.style.setProperty('--hs-card-x', ((W - cw) / 2) + 'px');
       d.style.setProperty('--hs-card-y', ((H + 76 - cw * 3.4 / 5.9) / 2) + 'px');
       if (sc < .55) d.classList.add('hs-card-compact');
+    }
+    if (at === 2) {
+      // the record's lettered band as a card on the paper, as wide as the window allows below the
+      // letterhead (its parts are set out at band[2] px to a unit: --rc-u is a unit on the screen)
+      var W2 = innerWidth, H2 = innerHeight, u = Math.min(W2 * .88 / band[0], (H2 - 230) / band[1]);
+      d.style.setProperty('--rc-u', u + 'px');
+      d.style.setProperty('--rc-s', u / band[2]);
+      d.style.setProperty('--rc-x', ((W2 - band[0] * u) / 2) + 'px');
+      d.style.setProperty('--rc-y', ((H2 + 76 - band[1] * u) / 2) + 'px');
     }
     setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
   })();
@@ -149,6 +174,19 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
             <div class="ed-foot"><span class="ed-hint"><span class="ed-hint-fine">Click a practice to open it</span><span class="ed-hint-touch">Tap a practice to open it</span></span><span>MeWriT</span></div>
           </div>
         </div>
+
+        <!-- 02, on the record: its words are on the record (laid on its band by film.js): the cartouche
+             with the logo, the frieze with the headline, a board for each figure over its bay; the
+             source beneath. While the house loads after a return to 02, the band is a card on the paper -->
+        {recCh && (
+          <div class="hs-rec" aria-label={`${recCh.num} ${recCh.name}`} style={`--band-w:${LAYOUT.w};--band-h:${LAYOUT.h};--cor0:${cornice[0]};--cor1:${cornice[1]}`}>
+            <i class="rec-card" aria-hidden="true"></i>
+            <div class="rec-crest" aria-hidden="true" style={bandVars(LAYOUT.crest)}><LogoDraw class="rec-logo" /></div>
+            <h2 class="rec-frieze" id="on-the-record" style={bandVars(LAYOUT.frieze)}>{recCh.headline}</h2>
+            <ol class="rec-boards">{figures.map((f, i) => <li class="rec-board" data-to={f.n} data-plus={f.plus} style={bandVars(LAYOUT.boards[i])}><b class="rec-n">{f.text}</b><span class="rec-l">{f.label}</span></li>)}</ol>
+            <p class="rec-note">{lamp.footnote}</p>
+          </div>
+        )}
 
         <!-- the paper the title page is first shown on, while the house loads -->
         <div class="hs-veil" aria-hidden="true"></div>

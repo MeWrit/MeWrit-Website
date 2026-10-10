@@ -92,7 +92,7 @@ html.hs-loading .hs-stage :is(.lp-lh,.hs-list,.hs-caps){opacity:0}
    its navy bezel drawn round it in the 3D bezel's proportion (0.13 of 5.9, 22 of its 1000 px); the
    practices are written in as the house loads; then the camera stands where the 3D screen fills the
    card, the paper clears and the camera draws back to the display on the desk ---------- */
-html.hs-from-1:not(.hs-in) .hs-page{opacity:0}
+html:is(.hs-from-1,.hs-from-2):not(.hs-in) .hs-page{opacity:0}
 html.hs-from-1:not(.hs-in) .lp-ed{z-index:5;visibility:visible;opacity:1;transform:translate(var(--hs-card-x),var(--hs-card-y)) scale(var(--hs-card-s));box-shadow:0 0 0 22px #1D2C53,0 50px 110px rgba(40,30,20,.24);animation:hsWrite 1.6s cubic-bezier(.3,.6,.3,1) 2s forwards}
 html.hs-from-1:not(.hs-in) .lp-ed [data-doc="contents"]{opacity:1;visibility:visible}
 html.hs-from-1:not(.hs-in) .lp-ed [data-doc="draft"]{opacity:0;visibility:hidden}
@@ -122,6 +122,37 @@ html.hs-from-1:not(.hs-done) .lp-ed{z-index:5}   /* (above the paper while it cl
 .lp-ed .ed-hint.soon::after{content:"This practice's chapter is being built"}
 .ed-caret{display:inline-block;width:1.5px;height:1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hsCaret 1s steps(2,jump-none) infinite}
 @keyframes hsCaret{50%{opacity:0}}
+
+/* ---------- 02, on the record: the words on the record's band, laid on it in perspective by film.js
+   (each part set out at 50 px to a unit: src/scripts/house/record-layout.js): the cartouche's logo, the
+   frieze's headline in gilt, each board's figure over its bay; the source beneath, on the room ---------- */
+.hs-rec{position:absolute;inset:0;z-index:2;pointer-events:none;visibility:hidden;opacity:0}
+.hs-rec :is(.rec-crest,.rec-frieze,.rec-board){position:absolute;left:0;top:0;margin:0;transform-origin:0 0;box-sizing:border-box}
+.rec-boards{list-style:none;margin:0;padding:0}
+.rec-card{display:none}
+.rec-crest{display:grid;place-items:center}
+.rec-crest .ld{width:72%;height:auto}
+.rec-frieze{display:grid;place-items:center;font:500 100px/1 var(--serif);letter-spacing:.012em;color:#E2C27C;white-space:nowrap;text-shadow:0 2px 0 rgba(10,16,36,.35)}
+.rec-board{display:grid;align-content:center;justify-items:center;gap:8px;text-align:center;padding-top:6px}
+.rec-n{display:block;min-height:1em;font:600 92px/1 var(--serif);letter-spacing:-.01em;color:#13244F}
+.rec-l{display:block;font:500 31px/1.1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.13em;color:rgba(19,36,79,.74)}
+.rec-note{position:absolute;left:50%;bottom:clamp(12px,2.2vh,24px);transform:translateX(-50%);margin:0;white-space:nowrap;font:italic 400 .84rem/1.4 var(--serif);color:rgba(246,241,231,.9);text-shadow:0 1px 8px rgba(20,14,8,.65);opacity:0;transition:opacity .6s ease}
+.rec-note.on{opacity:1}
+/* coming back to 02: while the house loads, the band is a card on the paper in the 3D band's own
+   colours (the cartouche ivory in its brass, the frieze navy, the boards ivory, the oak behind and the
+   cornice across); the pen writes the logo on the cartouche and the figures count as the house loads.
+   Then the camera stands where the 3D band fills the card, the paper and the card's colours clear, and
+   the camera draws back */
+html.hs-from-2:not(.hs-done) .hs-rec{visibility:visible;opacity:1;z-index:5}
+html.hs-from-2:not(.hs-in) .hs-rec :is(.rec-crest,.rec-frieze,.rec-board){transform:translate(calc(var(--rc-x) + var(--x) * var(--rc-u)),calc(var(--rc-y) + var(--y) * var(--rc-u))) scale(var(--rc-s))}
+html.hs-from-2:not(.hs-done) .rec-card{display:block;position:absolute;left:var(--rc-x);top:var(--rc-y);width:calc(var(--band-w) * var(--rc-u));height:calc(var(--band-h) * var(--rc-u));background:linear-gradient(to bottom,transparent 0,transparent var(--cor0),#5E432B var(--cor0),#5E432B var(--cor1),#7E5D3F var(--cor1));box-shadow:0 40px 90px rgba(40,30,20,.18);transition:opacity .5s ease}
+html.hs-from-2.hs-in .rec-card{opacity:0}
+html.hs-from-2 .hs-rec :is(.rec-crest,.rec-frieze,.rec-board){transition:background-color .5s ease,box-shadow .5s ease}
+html.hs-from-2:not(.hs-in) .rec-crest{background-color:#F4EEE2;box-shadow:0 0 0 17px #C9A452}
+html.hs-from-2:not(.hs-in) .rec-frieze{background-color:#22325A}
+html.hs-from-2:not(.hs-in) .rec-board{background-color:#F2ECDF}
+html.hs-loading.hs-from-2 .rec-crest .ld-layers{display:block}
+html.hs-loading.hs-from-2 .rec-crest .ld-real{opacity:0}
 
 /* ---------- the scroll cue, at the foot of the title page's frame: the words and a line with a mark
    running down it; in paper colour (the title's frame is in lamplight shade there) ---------- */
@@ -191,6 +222,14 @@ html:not(.js) .hs-caps{position:static;transform:none;margin:0 auto;display:bloc
 html:not(.js) .hs-cap{opacity:1;visibility:visible;margin-bottom:72px}
 html:not(.js) .hs-line{opacity:1;transform:none}
 html:not(.js) :is(.hs-canvas,.lp-ed,.hs-list){display:none}
+html:not(.js) .hs-rec{position:static;visibility:visible;opacity:1;max-width:820px;margin:0 auto 72px;text-align:center}
+html:not(.js) .hs-rec :is(.rec-crest,.rec-frieze,.rec-board,.rec-note){position:static;transform:none;width:auto;height:auto}
+html:not(.js) .hs-rec :is(.rec-crest,.rec-card){display:none}
+html:not(.js) .rec-frieze{font-size:clamp(2.3rem,1.1rem + 2.9vw,4.2rem);color:var(--hs-ink);text-shadow:none}
+html:not(.js) .rec-boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin:28px 0}
+html:not(.js) .rec-n{font-size:3rem}
+html:not(.js) .rec-l{font-size:1rem}
+html:not(.js) .rec-note{opacity:1;color:var(--hs-dim);text-shadow:none}
 
 @media (prefers-reduced-motion:reduce){
   html.js .hs-page:not(.quad),html.js .hs-page:not(.quad) :is(.pg-logo,.pg-rule){animation-duration:.01s}

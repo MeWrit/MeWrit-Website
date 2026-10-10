@@ -346,7 +346,28 @@ What the user said, verbatim, in order:
     - ambient occlusion baked into textures, matcap materials (lighting faked by a texture, no live lights), point clouds and Houdini height fields precomputed;
     - no video.
     It is cheap per pixel because everything costly is computed beforehand.
-- **Next, then:** the performance study the user asked for ("we also need to optimze this exteremly well for low performance without losing quality, this is not useful if it cant work on majority of the devices, i have seen heavier sites run smoothly on low performing devices, figure out how they do it and how we can implement it on our site."): how such sites stay smooth, measured against ours under the DevTools presets (CPU 3.4x and 10.5x; Slow 4G, 3G) and a software GPU; then a plan, agreed before building; then step 3, the library hall at night and the walk through the doorway.
+- **More directions, same evening (verbatim):**
+  - "also if we a loading the full mewrit logo use the pen drawing the underline animation from version-b, also have it played at frequent intervals in the header and on load"
+  - "make the version-b animation quicker adding that, the load time takes too long right now"
+  - "and if i am loading directly at the monitor i cant scroll up or down" / "the scroll problem still persists" / "actually i have to scroll for 2-3 full rotations before the cam starts panning"
+  - "also some way to let the user know they can click the options on the monitor?" / "remove the mouse animation, text is enough" / "but remove that text from the loading screen"
+  - "just add the mewrit logo to all loading screen smartly and creatively"
+  Done:
+  - Version B's pen (src/components/LogoDraw.astro, src/scripts/logo-player.js, at twice its pace) writes the logo in the loaders. The letterhead's logo draws after the intro and every 20 seconds.
+  - Each chapter's scroll is a move plus a short dwell (a third of a screen). A return lands just into the dwell, so the first turn of the wheel moves the camera.
+  - The display's foot reads "Click (Tap) a practice to open it" only while it can be used.
+  - Loading is faster: no environment map, shaders compiled in the background, a 2 s minimum.
+- **Performance plan (proposed 10 October 2026, for the user's decision):** the research (sources in the agent's report: GitHub globe tiers, Bruno Simon's baked room, the three.js manual, Arm's mobile bandwidth note, Lusion and igloo inc case studies, Apple's scroll sequences) and our measurements point the same way:
+  - A. **Tiers chosen once at load**, from the GPU's name plus a short real-frame timing: top (pixel ratio up to 2, live occlusion and shadows), middle (1.5, baked light only), low (1, baked light, a steady 30 frames a second). Software renderers go straight to the floor (D).
+  - B. **Bake the light** (sun, lamp, sky, contact shade, occlusion) into textures for each hour, offline. At runtime the materials become "colour times baked light", blending between two baked hours as the day moves. The ink and paper stay as one finishing pass. This is where Hubtown and the baked-room sites get their speed; quality can rise (bounced light).
+  - C. **Precompute the room** (geometry and baked textures, compressed) so the browser loads it instead of building it in JavaScript. This fixes the low-tier CPU's load (15 s).
+  - D. **A floor for the weakest devices:** each chapter as a still or a short clip with the same live text, later.
+- **The user's decision on the performance plan (verbatim):**
+  - On the approach: "lets do this perf optimization the last since it onl concerns low end devices, i prefer option 1 btw" (option 1: tiers plus baked light, a precomputed room, a floor for the weakest).
+  - On the bake tool: "do it in the browser as long as this problem is only constrained to low end devices." (a three.js baker, no Blender).
+  So: it is done last, in step 7 (speed and polish), after the places are built. Build the hall with that in mind: static, merged, instanced, with UV2-friendly simple geometry.
+- **Now: step 3**, the library hall at night and the walk from the study through the doorway into it, checked frame by frame.
+- **Earlier note:** the performance study the user asked for ("we also need to optimze this exteremly well for low performance without losing quality, this is not useful if it cant work on majority of the devices, i have seen heavier sites run smoothly on low performing devices, figure out how they do it and how we can implement it on our site."): how such sites stay smooth, measured against ours under the DevTools presets (CPU 3.4x and 10.5x; Slow 4G, 3G) and a software GPU; then a plan, agreed before building; then step 3, the library hall at night and the walk through the doorway.
 
 What follows from them:
 - **Performance is built in from the start** (stage.js): a frame is drawn only when something changes; the resting frame is kept and shown again with only the small living things drawn over it; shadows drawn once; static meshes merged; the occlusion at half resolution; one finishing pass (occlusion, tone, ink, paper); a pixel budget by tier (high, mid, low), measured on the machine while the loader shows and lowered if moving frames come slowly. The aim: the least visible loss.
@@ -360,3 +381,77 @@ What follows from them:
 - The title page's words are always its markup, at every size; the 3D page never draws them, so nothing changes or shifts as the camera moves.
 - Every resize of the 3D is drawn again in the same moment (an emptied canvas is never shown); no scrollbar on the film's page (a custom scroll indicator to be discussed).
 - "Begin reading" glides the scroll slowly: about four and a half seconds to the display, eased at both ends.
+
+### 11.12 The house plan: the rooms, the compass, the outside (10 October 2026, night)
+
+What the user said, verbatim, as step 3 began:
+- "remember we are not go per the lamplight theme now, do it like we did with the home page of this house right now"
+- "the cam pans and everything should be just as smooth and upto the standards that this home page build has set"
+- "the outside should be consistent from windows and all angles"
+- "add hills on the sunset facing window side so we can show a beautiful sunset"
+- "and we have more than 2 rooms so plan for that accordingly"
+
+What follows from them:
+- **The house's way, not the lamplight's.** Every chapter is built as 00 and 01 were:
+  - the illustrated 3D, and the paper letterhead (no night header, no engraved worlds);
+  - the chapter's words on a real surface in the scene where one exists (HTML laid on it in perspective, sharp and selectable);
+  - camera moves eased at both ends, never reversing, framed for each window;
+  - a loader of the chapter's own when a reader returns to it.
+- **The compass.** The study's window looks south across the valley. +x is west, -x is east, +z is north. This keeps every hour already set (stage.js HOURS) consistent: dawn in the south-east, the sun crossing the south, evening and sunset in the south-west and west.
+- **The outside is one landscape all round the house,** the same from every window and angle (it replaces the old view, which was built only for the study's window). It is real 3D, in the house's illustrated look:
+  - **The terrace:** the house stands on a terrace garden: lawn, a hedge along the terrace edge, the big tree to the west of the study's window, shrubs.
+  - **Beyond the edge:** the land drops to the valley.
+  - **South:** across the valley, the hillside of fields and villages seen from the study, as before.
+  - **West (the sunset side):** high hills, so the evening sun sinks toward them and the sunset glows above them. They are seen through the hall's west windows and to the right of the study's window.
+  - **East:** the valley opens to low hills, where the dawn comes.
+  - **North:** a wooded slope rising close behind the house.
+  - **The sky:** one dome that travels with the camera, so it reads as infinitely far from every window. It holds the sun's disc and glow, and clouds painted in it and lit by the hour.
+  - **The distance:** far things are small models at a distance (forced perspective), kept far enough from every room that it never shows.
+- **The rooms (one floor; a loop, so the film never retraces its steps):**
+  - **The study** (00, 01, 07, 08): built. Its window faces south; the doorway in its south wall leads to the hall. A door in its east wall comes later: it is the return from the seminar room for 07.
+  - **The library hall** (02): south of the study's doorway, double height. Its west wall has four tall windows facing the sunset hills. Its south wall holds the record: four bays of bound work under a frieze. The east and north walls are lined with stacks, and a door in the east wall leads on to the archive.
+  - **The archive** (03): east of the hall. Lower, lined with archive shelving; the archive table at its centre; small high windows to the south.
+  - **The reading room** (04): east of the archive. Reading tables with green lamps, the reading stand; windows south and east.
+  - **The lecture room** (05): north of the reading room. The lectern and the screen; tall east windows for the dawn.
+  - **The seminar room** (06): west of the lecture room, between it and the study. Seminar tables and the whiteboard; north windows for an even daylight. Its west door opens into the study's east wall.
+  - **The route:** study, then (south doorway) the hall, the archive, the reading room, the lecture room, the seminar room, and back into the study (east door) to the display (07), then the desk by the window at sunset (08).
+- **Kept clear:** the garden to the south and west of the study, so the study's window view stays open. No room stands in front of a window that looks out.
+- **The house from outside:** every room has outer walls, a plinth down to the garden and a roof, so any window that sees another part of the house sees it whole.
+- **02, On the record, in the hall:**
+  - **The walk:** the camera moves left from the display to the doorway, through it, then on and left into the hall. It ends level with the record and facing it, still facing south as it did at the display. It is one continuous path, every coordinate moving one way only, eased at both ends; the lens does not change.
+  - **The record:** four bays, one for each figure from lamp.ts: 100+ trial documents, 30+ clinical study reports, 70+ publications, 3,000+ professionals trained. "Twenty-two years, on the record" is lettered on the frieze above them. Each bay's figure is on an ivory board over it, and the source note ("Figures from MeWriT records, July 2026.") is on a small plate on the plinth. All of these are HTML laid on the record.
+  - **The performance:** once the camera has arrived it holds still, and the record performs as the reader scrolls. Bay by bay, the volumes are set on the shelves, shelf by shelf from the top, like lines being written, and each bay's figure counts up as it fills. A short rest follows with every bay full.
+  - **The light:** evening, the light going. The low sun comes through the west windows in long stripes across the floor, and the record's lamps come up as it fills.
+
+**Step 3, built (10 October 2026, night):**
+- **New modules** (in src/scripts/house/):
+  - hall.js: the library hall.
+  - route.js: walks along monotone cubic paths at an even pace, eased at both ends.
+  - record-layout.js: the record's lettered band, shared by the 3D, the words and the loader.
+- **outside.js, rewritten:** one landscape all round the house, as planned in 11.12.
+- **study.js:** the placeholder hall is gone. The study now has outer walls, a plinth and a slate roof. Its floor and ceiling stop at the back wall, the doorway has an oak threshold, and the door folds flat against the study's wall, clear of the walk.
+- **The stage:**
+  - The sky travels with the camera and holds the sun's disc and painted clouds, lit by the hour.
+  - One sun shadow box covers the whole house, drawn at 4096 on the top tier so the study's shadows stay as crisp as before.
+  - Each lamp can be dimmed on its own.
+  - The far plane and the haze reach the new landscape.
+- **02 in the film:**
+  - the walk (2.2 screens), the record's performance (0.85) and a rest (0.3);
+  - the hall's lamps (the record's spot, a warm room light, glows and pools on the tables) come on as the reader walks in;
+  - the record's words are laid on its band and appear as the camera arrives, as a caption would;
+  - the source line is beneath;
+  - the chapter list and the header's Publications link reach 02.
+- **The 02 loader:** a refresh at 02 shows the band as a card on the paper (the pen writes the logo on the cartouche, the figures count as the house loads). The camera then draws back from where the 3D band fills the card to the record.
+- **Two old faults found and fixed on the way:**
+  - The environment map, removed for speed in the last commit, had darkened the study and turned the steel near black. It is back, and the approved frames match again side by side.
+  - Shader pre-compilation had used the wrong target, so parts of the house first seen mid-move compiled there: stalls of 130 to 220 ms in the move from the title page. It is fixed.
+- **Measured (1440x900, this PC):**
+  - the walk: median 6.9 ms a frame, worst 11.5 ms;
+  - the move from the title page: worst 25 ms;
+  - at CPU 3.4x: the walk's median 9.8 ms, worst 34 ms;
+  - a refresh at 02: ready at 1.1 s, the camera drawing back at 3.2 s (after the pen).
+- **Checked:**
+  - the walk at 11 moments and the performance at 4;
+  - the rests at 1440x900, 1920x1080, 1280x720, 1243x1148 and 390x844;
+  - errors: none.
+  On square windows the record's view keeps its lettering clear of the chapter list.

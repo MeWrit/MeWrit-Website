@@ -26,13 +26,16 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const RAD = Math.PI / 180;
 
 // the tiers: how many pixels a frame may hold, the occlusion's share of the resolution (0: none) and
 // its samples, the anti-aliasing, the shadow maps' sizes (0: the lamp casts none)
+// (the sun's map covers the whole house, study and hall: the top tier draws it at 4096, so the study's
+// shadows stay as crisp as when the map covered the study alone)
 export const TIERS = {
-  high: { budget: 4.2e6, maxRatio: 2, ao: .5, aoSamples: 16, pdSamples: 12, smaa: true, shadow: 2048, lampShadow: 1024 },
+  high: { budget: 4.2e6, maxRatio: 2, ao: .5, aoSamples: 16, pdSamples: 12, smaa: true, shadow: 4096, lampShadow: 1024 },
   mid: { budget: 2.4e6, maxRatio: 1.5, ao: .5, aoSamples: 10, pdSamples: 8, smaa: true, shadow: 2048, lampShadow: 1024 },
   low: { budget: 1.3e6, maxRatio: 1, ao: 0, aoSamples: 8, pdSamples: 8, smaa: true, shadow: 1024, lampShadow: 0 },
 };
@@ -150,18 +153,50 @@ void main() {
 };
 
 // the hours: the sun (its colour, strength, the way it comes in), the sky's fill, the sky itself
-// (zenith, horizon, ground), the lamps, the exposure. Blended by setHour(a, b, k)
+// (zenith, horizon, ground; the clouds' lit and shaded colours, how much of them shows; the sun's
+// disc), the lamps, the exposure. Blended by setHour(a, b, k). The compass (section 11.12): -z is
+// south, +x west; so the sun comes up in the south-east (dawn), crosses the south and goes down in the
+// south-west and west, behind the hills there
 export const HOURS = {
   // first light: the room still in shade, the lamp lit (the title page); the sun comes the same way as
   // the morning's, so the shadows need no redrawing as one becomes the other
-  early: { sun: '#FFD9B8', sunK: .85, sunDir: [-.55, -.42, .72], fillSky: '#C3CADB', fillGround: '#8A7B6C', fillK: .45, zenith: '#7A8BB2', horizon: '#E8D6C6', ground: '#8C857B', lamp: 1.7, exposure: .97 },
-  morning: { sun: '#FFE7C7', sunK: 3.1, sunDir: [-.55, -.42, .72], fillSky: '#EAF0F8', fillGround: '#B8A388', fillK: 1.05, zenith: '#9FB8DA', horizon: '#EEF1F2', ground: '#C9C2B4', lamp: .55, exposure: 1 },
-  day: { sun: '#FFF4E2', sunK: 3.4, sunDir: [-.4, -.62, .68], fillSky: '#EEF3F9', fillGround: '#BCA98F', fillK: 1.1, zenith: '#8DAAD6', horizon: '#EDF1F4', ground: '#CBC4B6', lamp: .2, exposure: 1 },
-  evening: { sun: '#FFB980', sunK: 2.1, sunDir: [-.75, -.22, .62], fillSky: '#B9B4CF', fillGround: '#8E7766', fillK: .62, zenith: '#3B4A7A', horizon: '#E7A983', ground: '#5E5560', lamp: 1.4, exposure: .96 },
-  night: { sun: '#9DB2E6', sunK: .45, sunDir: [-.3, -.75, .6], fillSky: '#40507F', fillGround: '#2A2630', fillK: .3, zenith: '#0A1638', horizon: '#1D2B55', ground: '#0B0F1E', lamp: 2.4, exposure: .92 },
-  dawn: { sun: '#FFD3A8', sunK: 1.6, sunDir: [.7, -.18, .68], fillSky: '#C9C8DF', fillGround: '#8E8090', fillK: .7, zenith: '#5D6FA6', horizon: '#F2C4A5', ground: '#6C6470', lamp: .9, exposure: .97 },
-  sunset: { sun: '#FF9D66', sunK: 2.4, sunDir: [-.85, -.14, .5], fillSky: '#B79FB8', fillGround: '#7E6158', fillK: .58, zenith: '#2C3768', horizon: '#F0A36F', ground: '#4E4352', lamp: 1.6, exposure: .95 },
+  early: { sun: '#FFD9B8', sunK: .85, sunDir: [-.55, -.42, .72], fillSky: '#C3CADB', fillGround: '#8A7B6C', fillK: .45, zenith: '#7A8BB2', horizon: '#E8D6C6', ground: '#8C857B', cloudLit: '#FFE6D2', cloudShade: '#B5B9CE', clouds: .85, disc: 1, lamp: 1.7, exposure: .97 },
+  morning: { sun: '#FFE7C7', sunK: 3.1, sunDir: [-.55, -.42, .72], fillSky: '#EAF0F8', fillGround: '#B8A388', fillK: 1.05, zenith: '#9FB8DA', horizon: '#EEF1F2', ground: '#C9C2B4', cloudLit: '#FFFFFF', cloudShade: '#C8D0E0', clouds: .9, disc: 1, lamp: .55, exposure: 1 },
+  day: { sun: '#FFF4E2', sunK: 3.4, sunDir: [-.4, -.62, .68], fillSky: '#EEF3F9', fillGround: '#BCA98F', fillK: 1.1, zenith: '#8DAAD6', horizon: '#EDF1F4', ground: '#CBC4B6', cloudLit: '#FFFFFF', cloudShade: '#C4CCDE', clouds: .9, disc: 1, lamp: .2, exposure: 1 },
+  evening: { sun: '#FFB980', sunK: 2.3, sunDir: [-.75, -.22, .62], fillSky: '#BDB6CC', fillGround: '#957A64', fillK: .8, zenith: '#3B4A7A', horizon: '#E7A983', ground: '#5E5560', cloudLit: '#FFCB9A', cloudShade: '#8A86A6', clouds: .9, disc: 1, lamp: 1.4, exposure: .99 },
+  night: { sun: '#9DB2E6', sunK: .45, sunDir: [-.3, -.75, .6], fillSky: '#40507F', fillGround: '#2A2630', fillK: .3, zenith: '#0A1638', horizon: '#1D2B55', ground: '#0B0F1E', cloudLit: '#3C4A72', cloudShade: '#182040', clouds: .5, disc: 0, lamp: 2.4, exposure: .92 },
+  dawn: { sun: '#FFD3A8', sunK: 1.6, sunDir: [.7, -.18, .68], fillSky: '#C9C8DF', fillGround: '#8E8090', fillK: .7, zenith: '#5D6FA6', horizon: '#F2C4A5', ground: '#6C6470', cloudLit: '#FFD2B4', cloudShade: '#9894B2', clouds: .85, disc: 1, lamp: .9, exposure: .97 },
+  sunset: { sun: '#FF9D66', sunK: 2.4, sunDir: [-.85, -.14, .5], fillSky: '#B79FB8', fillGround: '#7E6158', fillK: .58, zenith: '#2C3768', horizon: '#F0A36F', ground: '#4E4352', cloudLit: '#FFB487', cloudShade: '#7A6A8C', clouds: .9, disc: 1, lamp: 1.6, exposure: .95 },
 };
+
+// the clouds: soft puffs painted once on a canvas that tiles, laid on a high ceiling in the sky (so they
+// lie in perspective, smaller toward the horizon); red holds how lit the puff is, alpha its density
+let cloudTex = null;
+function cloudTexture() {
+  if (cloudTex) return cloudTex;
+  const S = 1024, c = document.createElement('canvas'); c.width = c.height = S;
+  const x = c.getContext('2d');
+  let seed = 7;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  // banks of puffs, each a few dozen soft rounds, its top lit and its base in shade; drawn three times
+  // over (wrapped), so the tile repeats without a seam
+  const banks = [];
+  for (let i = 0; i < 16; i++) banks.push({ x: r() * S, y: r() * S, w: 90 + r() * 170, h: 26 + r() * 40, n: 14 + Math.floor(r() * 18) });
+  x.clearRect(0, 0, S, S);
+  for (const ox of [-S, 0, S]) for (const oy of [-S, 0, S]) for (const b of banks) {
+    for (let k = 0; k < b.n; k++) {
+      const px = b.x + ox + (r() - .5) * b.w * 1.6, py = b.y + oy + (r() - .5) * b.h, s = 18 + r() * 34;
+      const lit = Math.round(150 + 105 * Math.max(0, Math.min(1, (b.y + oy - py) / b.h + .55)));
+      const g = x.createRadialGradient(px, py, 0, px, py, s);
+      g.addColorStop(0, `rgba(${lit},0,0,.5)`); g.addColorStop(.6, `rgba(${lit},0,0,.22)`); g.addColorStop(1, `rgba(${lit},0,0,0)`);
+      x.fillStyle = g; x.fillRect(px - s, py - s, s * 2, s * 2);
+    }
+  }
+  cloudTex = new THREE.CanvasTexture(c);
+  cloudTex.wrapS = cloudTex.wrapT = THREE.RepeatWrapping;
+  cloudTex.colorSpace = THREE.NoColorSpace;
+  return cloudTex;
+}
 
 // a soft round glow (for lamps' bulbs and shades): drawn with the colour, left out of the normals
 let glowTex = null;
@@ -185,11 +220,18 @@ export function createStage(canvas, { tier = 'high' } = {}) {
   renderer.info.autoReset = false;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog('#EEF1F2', 110, 430);   // the haze of distance, outside only (the hour sets its colour)
+  // the haze of distance, outside only (the hour sets its colour): the landscape reaches some 450 units
+  // from the house all round, so the far plane and the haze reach past it
+  scene.fog = new THREE.Fog('#EEF1F2', 140, 640);
   const fx = new THREE.Scene();   // the small living things, drawn over the finished frame
-  const camera = new THREE.PerspectiveCamera(40, 1, .05, 400);
-  // (no environment map: its reflections on the few glossy things were barely seen, and making it cost
-  // the first visit most of a second and every pixel a little)
+  const camera = new THREE.PerspectiveCamera(40, 1, .05, 700);
+  // a soft room's light for every surface: an even ambient from all round, and the sheen of the metals
+  // and the glass (the steel of the display's stand, the lamp, the brass). Without it the house went
+  // dull and the steel near black (10 October 2026: it was taken out for speed, and put back)
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+  scene.environmentIntensity = .22;
+  pmrem.dispose();
 
   // ---------- the lights ----------
   const sun = new THREE.DirectionalLight('#ffffff', 3);
@@ -201,15 +243,26 @@ export function createStage(canvas, { tier = 'high' } = {}) {
   scene.add(fill);
   // the lamps (the study's desk lamp, and any the house adds): each a spot with a warm glow
   const lamps = [];
-  function addLamp({ at, aim, color = '#FFD9A0', power = 40, angle = .62, penumbra = .85, shadow = true, distance = 0 }) {
-    const L = new THREE.SpotLight(color, power, distance, angle, penumbra, 1.6);
+  let lampK = 1;
+  function addLamp({ at, aim, color = '#FFD9A0', power = 40, angle = .62, penumbra = .85, shadow = true, distance = 0, decay = 1.6 }) {
+    const L = new THREE.SpotLight(color, power, distance, angle, penumbra, decay);
     L.position.set(...at); L.target.position.set(...aim);
     L.shadow.bias = -.0006; L.shadow.normalBias = .03; L.shadow.radius = 4; L.shadow.camera.near = .2; L.shadow.camera.far = 40;
     scene.add(L, L.target);
-    const lamp = { light: L, power, shadow };
+    const lamp = { light: L, power, shadow, k: 1 };
     lamps.push(lamp);
     shadowSizes();
     return L;
+  }
+  // a lamp's own share of its light (the film brings a room's lamps up and down): its power, times the
+  // hour's lamplight, times this
+  function setLampK(light, k) {
+    const l = lamps.find(o => o.light === light);
+    if (!l || Math.abs(l.k - k) < 1e-4) return;
+    // (never hidden: a light switched off would change the shaders' count of lights and stall a frame
+    // while they compile again; at nought it costs a little and shows nothing)
+    l.k = k; l.light.intensity = l.power * lampK * k;
+    stage.dirty = true;
   }
   function addGlow(at, { color = '#FFE2B0', size = 1.6, k = 1 } = {}) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: k }));
@@ -219,18 +272,38 @@ export function createStage(canvas, { tier = 'high' } = {}) {
   }
 
   // ---------- the sky: one dome for the whole house, coloured by the hour ----------
-  const skyU = { uZenith: { value: new THREE.Color() }, uHorizon: { value: new THREE.Color() }, uGround: { value: new THREE.Color() }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSunCol: { value: new THREE.Color() } };
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 16), new THREE.ShaderMaterial({
-    side: THREE.BackSide, depthWrite: false, uniforms: skyU,
-    vertexShader: /* glsl */`varying vec3 vDir; void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+  // It travels with the camera (aim), so from every window it is infinitely far and the sun stands in
+  // the same place: its glow, its disc, and the clouds painted on a high ceiling, lit by the hour (the
+  // side toward the sun brighter). Everything else is drawn over it.
+  const skyU = {
+    uZenith: { value: new THREE.Color() }, uHorizon: { value: new THREE.Color() }, uGround: { value: new THREE.Color() }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSunCol: { value: new THREE.Color() },
+    uCloudLit: { value: new THREE.Color() }, uCloudShade: { value: new THREE.Color() }, uClouds: { value: .9 }, uDisc: { value: 1 }, tClouds: { value: cloudTexture() },
+  };
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(300, 48, 24), new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false, uniforms: skyU,
+    vertexShader: /* glsl */`varying vec3 vDir; void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
     fragmentShader: /* glsl */`
-uniform vec3 uZenith, uHorizon, uGround, uSun, uSunCol;
+uniform vec3 uZenith, uHorizon, uGround, uSun, uSunCol, uCloudLit, uCloudShade;
+uniform float uClouds, uDisc;
+uniform sampler2D tClouds;
 varying vec3 vDir;
 void main() {
-  float e = vDir.y;
+  vec3 d = normalize(vDir);
+  float e = d.y;
   vec3 c = e > 0. ? mix(uHorizon, uZenith, pow(smoothstep(0., .62, e), .8)) : mix(uHorizon, uGround, smoothstep(0., .08, -e));
-  float s = max(0., dot(normalize(vDir), normalize(-uSun)));
-  c += uSunCol * (pow(s, 24.) * .25 + pow(s, 4.) * .06) * step(0., e + .02);
+  float s = max(0., dot(d, normalize(-uSun))), up = step(0., e + .01);
+  c += uSunCol * (pow(s, 24.) * .25 + pow(s, 4.) * .06) * up;
+  // the clouds, on a ceiling seen in perspective; brighter on the side toward the sun
+  if (e > .015) {
+    vec2 uv = d.xz / (e + .1) * .16;
+    vec4 cl = texture2D(tClouds, uv + vec2(.31, .17));
+    float a = cl.a * uClouds * smoothstep(.015, .12, e);
+    float lit = clamp(cl.r * (.75 + .45 * pow(s, 3.)), 0., 1.);
+    c = mix(c, mix(uCloudShade, uCloudLit, lit), a);
+  }
+  // the sun's disc (about a degree across), soft at its rim; the hills and the house stand in front of it
+  float disc = smoothstep(.99982, .99992, s) * uDisc * up;
+  c = mix(c, uSunCol * 2.4 + .4, disc);
   gl_FragColor = vec4(c, 1.);
 }`,
   }));
@@ -278,12 +351,36 @@ void main() {
     camera.fov = pose.fov; camera.aspect = W / H;
     camera.setViewOffset(W, H, -(pose.sx || 0) * W, (pose.sy || 0) * H, W, H);
     camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+    sky.position.copy(camera.position); sky.updateMatrixWorld();   // (the sky goes with the eye)
   }
 
   // ---------- the hour ----------
   const ca = new THREE.Color(), cb = new THREE.Color(), va = new THREE.Vector3();
   const blendC = (out, a, b, k) => out.copy(ca.set(a)).lerp(cb.set(b), k);
-  const centre = new THREE.Vector3(8, 0, -3);   // where the sun's shadows are drawn about (the film moves it)
+  // where the sun's shadows are drawn: a box round a centre (the film sets it for each place, and blends
+  // it as the camera goes from one to the next), as half its width and half its height across the sun's
+  // light; the sun stands back from the centre along its light
+  const centre = new THREE.Vector3(6, 0, -3);
+  let boxKey = '';
+  function placeSun() {
+    const cam = sun.shadow.camera, back = Math.max(cam.right, cam.top) * 1.3 + 50;
+    sun.position.copy(centre).addScaledVector(va, -back); sun.target.position.copy(centre); sun.target.updateMatrixWorld();
+    if (Math.abs(cam.far - back * 2) > .5) { cam.near = 1; cam.far = back * 2; cam.updateProjectionMatrix(); }
+  }
+  // (top and bottom: the box's reach above and below the centre, across the light; bottom is negative)
+  function setShadowBox(c, hw, top, bottom = -top) {
+    const key = `${c[0].toFixed(2)},${c[1].toFixed(2)},${c[2].toFixed(2)},${hw.toFixed(2)},${top.toFixed(2)},${bottom.toFixed(2)}`;
+    if (key === boxKey) return;
+    boxKey = key;
+    centre.set(c[0], c[1], c[2]);
+    const cam = sun.shadow.camera;
+    cam.left = -hw; cam.right = hw; cam.top = top; cam.bottom = bottom; cam.updateProjectionMatrix();
+    // (a wider box puts more of the house in each texel of the map: the bias that keeps a surface from
+    // shading itself grows with it)
+    sun.shadow.normalBias = Math.max(.03, 2 * hw / sun.shadow.mapSize.x * .7);
+    placeSun();
+    renderer.shadowMap.needsUpdate = true; stage.dirty = true;
+  }
   let hourKey = '';
   function setHour(a, b = a, k = 0) {
     const key = `${a}|${b}|${k.toFixed(4)}`;
@@ -292,13 +389,15 @@ void main() {
     const A = HOURS[a], B = HOURS[b], mix = (x, y) => x + (y - x) * k;
     blendC(sun.color, A.sun, B.sun, k); sun.intensity = mix(A.sunK, B.sunK);
     va.set(mix(A.sunDir[0], B.sunDir[0]), mix(A.sunDir[1], B.sunDir[1]), mix(A.sunDir[2], B.sunDir[2])).normalize();
-    sun.position.copy(centre).addScaledVector(va, -60); sun.target.position.copy(centre); sun.target.updateMatrixWorld();
+    placeSun();
     blendC(fill.color, A.fillSky, B.fillSky, k); blendC(fill.groundColor, A.fillGround, B.fillGround, k); fill.intensity = mix(A.fillK, B.fillK);
     blendC(skyU.uZenith.value, A.zenith, B.zenith, k); blendC(skyU.uHorizon.value, A.horizon, B.horizon, k); blendC(skyU.uGround.value, A.ground, B.ground, k);
+    blendC(skyU.uCloudLit.value, A.cloudLit, B.cloudLit, k); blendC(skyU.uCloudShade.value, A.cloudShade, B.cloudShade, k);
+    skyU.uClouds.value = mix(A.clouds, B.clouds); skyU.uDisc.value = mix(A.disc, B.disc);
     scene.fog.color.copy(skyU.uHorizon.value);
     skyU.uSun.value.copy(va); skyU.uSunCol.value.copy(sun.color);
-    const lampK = mix(A.lamp, B.lamp);
-    lamps.forEach(l => { l.light.intensity = l.power * lampK; });
+    lampK = mix(A.lamp, B.lamp);
+    lamps.forEach(l => { l.light.intensity = l.power * lampK * l.k; });
     final.uniforms.uExposure.value = mix(A.exposure, B.exposure);
     // (the shadows are drawn again only if the sun has moved; its strength and colour need none)
     if (lastDir.distanceToSquared(va) > 1e-8) { lastDir.copy(va); renderer.shadowMap.needsUpdate = true; }
@@ -311,6 +410,7 @@ void main() {
     const t = TIERS[tierName];
     const size = (light, s) => { if (light.shadow.mapSize.x !== s) { light.shadow.mapSize.set(s, s); if (light.shadow.map) { light.shadow.map.dispose(); light.shadow.map = null; } } };
     size(sun, t.shadow);
+    sun.shadow.normalBias = Math.max(.03, 2 * sun.shadow.camera.right / t.shadow * .7);
     lamps.forEach(l => { l.light.castShadow = l.shadow && t.lampShadow > 0; if (l.light.castShadow) size(l.light, t.lampShadow); });
     renderer.shadowMap.needsUpdate = true;
   }
@@ -359,7 +459,7 @@ void main() {
   }
 
   const stage = {
-    renderer, scene, fx, fxU, camera, sun, addLamp, addGlow, setHour, aim, centre, composer, passes: { gbuf, gtao, final, smaa },
+    renderer, scene, fx, fxU, camera, sun, sky, addLamp, setLampK, addGlow, setHour, setShadowBox, aim, centre, composer, passes: { gbuf, gtao, final, smaa },
     dirty: true,
     get tier() { return tierName; }, get ratio() { return px; },
     setTier, resize, draw, present,
@@ -376,14 +476,39 @@ void main() {
     },
     stats() { const r = renderer.info.render; return { calls: r.calls, triangles: r.triangles, tier: tierName, ratio: +px.toFixed(3), pixels: Math.round(W * H * px * px), geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs ? renderer.info.programs.length : 0 }; },
     // every shader the film will use, compiled in the background while the loader shows (the scene's,
-    // the passes', the living things'), so the first frames do not stall on compiling them
+    // the passes', the living things'), so the first frames do not stall on compiling them. Each is
+    // compiled for the surface it really draws into: three.js builds a different program for the screen
+    // than for an image drawn off screen (its colour output differs), so compiled for the wrong one, every
+    // part of the house first seen mid-move was compiled again there (four stalls of 130 ms in the move
+    // from the title page, as the doorway and the window opened up: measured 10 October 2026)
     async compile() {
-      const g = new THREE.PlaneGeometry(1, 1), flat = new THREE.Scene(), lit = new THREE.Scene(), ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-      [gtao.gtaoMaterial, gtao.pdMaterial, final.material, smaa._materialEdges, smaa._materialWeights, smaa._materialBlend, show.material].forEach(m => { if (m) flat.add(new THREE.Mesh(g, m)); });
+      const g = new THREE.PlaneGeometry(1, 1), flat = new THREE.Scene(), onScreen = new THREE.Scene(), lit = new THREE.Scene(), ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      [gtao.gtaoMaterial, gtao.pdMaterial, final.material, smaa._materialEdges, smaa._materialWeights, smaa._materialBlend].forEach(m => { if (m) flat.add(new THREE.Mesh(g, m)); });
+      onScreen.add(new THREE.Mesh(g, show.material));
       lit.add(new THREE.Mesh(g, gbuf.material));
-      const c = (s, cam) => renderer.compileAsync ? renderer.compileAsync(s, cam) : Promise.resolve(renderer.compile(s, cam));
-      await Promise.all([c(scene, camera), c(lit, camera), c(fx, camera), c(flat, ortho)]);
+      // (the normals pass draws the instanced books with its own variant of the shader, with and without
+      // their colours: compiled here too, or the first frame that shows the hall's shelves stalls)
+      for (const coloured of [false, true]) {
+        const im = new THREE.InstancedMesh(g, gbuf.material, 1);
+        im.setMatrixAt(0, new THREE.Matrix4());
+        if (coloured) im.setColorAt(0, new THREE.Color(1, 1, 1));
+        lit.add(im);
+      }
+      // (the programs are chosen as each call begins, with the target then set; the waits come after)
+      const keep = renderer.getRenderTarget();
+      const c = (s, cam, target) => { renderer.setRenderTarget(target); return renderer.compileAsync ? renderer.compileAsync(s, cam) : Promise.resolve(renderer.compile(s, cam)); };
+      const jobs = [c(scene, camera, composer.readBuffer), c(lit, camera, gbuf.target), c(flat, ortho, composer.readBuffer), c(fx, camera, null), c(onScreen, ortho, null)];
+      renderer.setRenderTarget(keep);
+      await Promise.all(jobs);
       g.dispose();
+      // and every picture the house is painted with sent to the GPU now (it is otherwise sent the first
+      // time its surface comes into view: the hall's woods and boards when the doorway first shows it,
+      // a stall of a tenth of a second or more mid-move)
+      if (renderer.initTexture) {
+        const seen = new Set();
+        const send = m => { if (!m) return; for (const k of ['map', 'alphaMap', 'normalMap', 'roughnessMap', 'emissiveMap']) { const t = m[k]; if (t && t.isTexture && !seen.has(t)) { seen.add(t); renderer.initTexture(t); } } if (m.uniforms) for (const u of Object.values(m.uniforms)) { const t = u && u.value; if (t && t.isTexture && !t.isRenderTargetTexture && !seen.has(t)) { seen.add(t); renderer.initTexture(t); } } };
+        for (const s of [scene, fx]) s.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(send); });
+      }
     },
     dispose() { composer.dispose(); gbuf.dispose(); show.dispose(); renderer.dispose(); },
   };

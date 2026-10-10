@@ -9,6 +9,11 @@
    camera draws back to the title (so the sheet becomes the manuscript). On scroll the camera pulls out
    and wide (the study revealed as the morning comes up in the window), then moves in to the display,
    whose editor holds the contents, the menu.
+   02, on the record (section 11.12): the camera walks from the display through the doorway into the
+   library hall (hall.js; one continuous way, route.js) as the day goes to evening and the hall's lamps
+   come on, and stops square before the record; there it holds still while the record performs (the
+   volumes set on the shelves bay by bay, each figure counting up on its board, the record's light
+   coming up), its words HTML laid on the record's band. A return to 02 loads on a card of that band.
    A frame is drawn only when something changes; at rest the kept frame is shown again with the dust and
    the steam drawn over it (stage.js). The machine is measured while the loader shows, and the tier is
    lowered if moving frames come too slowly.
@@ -19,6 +24,10 @@ import { clamp, REDUCE, STATIC } from '../shared.js';
 import { splitLines } from '../lamp/text.js';
 import { createStage, TIER_ORDER } from './stage.js';
 import { buildStudy, STUDY } from './study.js';
+import { buildHall, HALL, RECORD_TOP } from './hall.js';
+import { FACE, BAND, LAYOUT, PX as REC_PX } from './record-layout.js';
+import { route } from './route.js';
+import { bake } from './kit.js';
 import { createLogoPlayer } from '../logo-player.js';
 
 const sec = document.getElementById('hs');
@@ -28,6 +37,9 @@ function start() {
   const root = document.documentElement;
   const track = sec.querySelector('.hs-track'), stage = sec.querySelector('.hs-stage'), canvas = sec.querySelector('.hs-canvas');
   const page = sec.querySelector('.hs-page'), veil = sec.querySelector('.hs-veil');
+  // 02's words: on the record's band (the cartouche, the frieze, the four boards), and its source below
+  const rec = sec.querySelector('.hs-rec');
+  const recParts = rec ? { crest: rec.querySelector('.rec-crest'), frieze: rec.querySelector('.rec-frieze'), boards: [...rec.querySelectorAll('.rec-board')], note: rec.querySelector('.rec-note') } : null;
   const capEls = [...sec.querySelectorAll('.hs-cap')], heads = capEls.map(c => c.querySelector('.hs-hl'));
   const list = [...sec.querySelectorAll('.hs-list a')], lhRun = sec.querySelector('.lh-run');
   const ed = sec.querySelector('.lp-ed'), docs = ed ? [...ed.querySelectorAll('[data-doc]')] : [];
@@ -42,22 +54,32 @@ function start() {
 
   // ---------- the chapters built so far ----------
   // view: where the camera rests; via: a view the way passes through (split: the share of the way to
-  // it); hour: the light at rest; spot: the lamp's pool round the page; doc: the editor's document.
+  // it); walk: a route through fixed points instead (route.js); hour: the light at rest; spot: the
+  // lamp's pool round the page; doc: the editor's document; record: the chapter where the record fills.
   // Each chapter's scroll (screens, from the page): the move that brings the camera to it, then a short
-  // dwell where it holds still; A is the move's share
+  // dwell where it holds still, and (02) between the two the time its object performs while the camera
+  // holds still; A is the move's share, B where the performance ends
   const scroll = JSON.parse(sec.dataset.scroll || '[[0,.08],[1.6,.35]]');
   const CH = [
     { id: 'title-page', view: 'page', hour: 'early', spot: 1, doc: 'draft' },
     { id: 'contents', view: 'display', via: 'wide', split: .46, hour: 'morning', spot: 0, doc: 'contents', menu: true },
-  ].map((c, i) => { const [move, dwell] = scroll[i] || [1, .3]; return { ...c, span: move + dwell, A: move / (move + dwell), cap: capEls.find(el => el.dataset.ch === c.id) || null }; });
-  const S = CH.length;
+    { id: 'on-the-record', view: 'record', walk: 'door', hour: 'evening', spot: 0, doc: 'contents', record: true },
+  ].slice(0, scroll.length).map((c, i) => {
+    const [move, dwell, perform = 0] = scroll[i] || [1, .3], span = move + perform + dwell;
+    // (02's words are on the record itself; its caption is the source line beneath)
+    return { ...c, span, A: move / span, B: (move + perform) / span, cap: capEls.find(el => el.dataset.ch === c.id) || (c.record && recParts ? recParts.note : null) };
+  });
+  const S = CH.length, RI = CH.findIndex(c => c.record);
+  // the walks: from the display, left to the doorway, through it, and on and left into the hall, to the
+  // record (the eyes between the two views')
+  const WALKS = { door: route([[-7.55, 8.8, 3.4], [-7.55, 9, -7.25], [-13.8, 9.1, -16.5]]) };
 
   // ---------- the views ----------
   // The room's views look level (the picture shifted by the lens, so verticals stay upright) and are
   // framed for the window they are seen in: their highest things just below the letterhead, their foot
   // just above the chapter's words, the things that must show across them inside; the lens widens only
   // as far as that needs. The title page's view looks squarely down at the page.
-  let W = 0, H = 0, aspect = 1.6, capTops = [], edCompact = false;
+  let W = 0, H = 0, aspect = 1.6, capTops = [], edCompact = false, listRight = 0;
   const SCR = STUDY.SCREEN, SCR_TOP = SCR[0][1] + .13, SCR_FOOT = SCR[2][1] - .13;
   // the editor's own size: 1000 px wide, in the glass's proportions
   const ED_W = 1000, ED_H = ED_W * (SCR[0][1] - SCR[2][1]) / (SCR[1][0] - SCR[0][0]);
@@ -66,6 +88,10 @@ function start() {
     // (the contents' words are on the screen: the whole display shows, down to its stand's foot)
     // (the eye a little high, so the slope before the display stays below the frame, never cut by it)
     display: { p: [6.5, 8.6, 6.0], fov: 40, gap: .04, top: [[6.5, SCR_TOP, -5.3]], foot: [6.5, 0, STUDY.CUP[2] + 1.05], safe: [[2.9, 4, -5.3], [10.1, 4, -5.3], [STUDY.CUP[0] + 1.1, 1, STUDY.CUP[2]]] },
+    // 02: level with the record and facing it down the hall, the whole of it from its cartouche to its
+    // plinth, its ends inside the frame
+    // (its lettering kept clear of the chapter list down the left, where the list shows: clearList)
+    record: { p: [-32.5, 9.2, -32], fov: 40, gap: .035, top: [[-32.5, RECORD_TOP + .5, FACE]], foot: [-32.5, HALL.FLOOR, FACE + .6], safe: [[BAND.x0 - 1.4, 4, FACE], [BAND.x1 + 1.4, 4, FACE]], clearList: true },
   };
   const headRow = () => (76 + 18) / Math.max(1, H);   // the letterhead's foot, and a little air
   function compose(v, capTop) {
@@ -73,7 +99,10 @@ function start() {
     const topRow = headRow(), footRow = capTop - v.gap, tTop = Math.min(...v.top.map(tn)), tFoot = tn(v.foot);
     let T = Math.tan(v.fov * Math.PI / 360);
     T = Math.max(T, .5 * (tFoot - tTop) / Math.max(.2, footRow - topRow));
-    for (const q of v.safe) T = Math.max(T, Math.abs(q[0] - cx) / (cz - q[2]) / aspect * 1.04);
+    // (the share of the frame's width the view may use either side of its middle: all of it, or what
+    // the chapter list leaves)
+    const room = v.clearList && listRight > 0 ? Math.max(.4, 1 - 2 * (listRight + 18) / Math.max(1, W)) : 1;
+    for (const q of v.safe) T = Math.max(T, Math.abs(q[0] - cx) / (cz - q[2]) / aspect * 1.04 / room);
     T = Math.min(T, Math.tan(35 * Math.PI / 180));
     return { p: v.p, yaw: 0, pitch: 0, fov: 2 * Math.atan(T) * R2D, sx: 0, sy: .5 + tFoot / (2 * T) - footRow };
   }
@@ -92,12 +121,22 @@ function start() {
       page: pagePose(.7 * (1 - hr), hr + (1 - hr) * .47),
       wide: compose(VIEWS.wide, VIEWS.wide.cap),
       display: compose(VIEWS.display, capTops[1] || .8),
+      record: compose(VIEWS.record, capTops[2] || .94),
     };
   }
   // the sheet the page is shown as while loading: the same squared view, the page filling the sheet
   function sheetPose() {
     const s = stage.getBoundingClientRect(), r = page.getBoundingClientRect();
     return pagePose(r.height / Math.max(1, H), (r.top - s.top + r.height / 2) / Math.max(1, H));
+  }
+  // the record's card shown while loading 02: straight before the record's band, at the distance where
+  // a unit of it is the card's unit on the screen, the lens shifted so the band sits where the card is
+  // (the page's first script set the card: --rc-u, --rc-x, --rc-y)
+  function recordCardPose() {
+    const s = stage.getBoundingClientRect(), cs = getComputedStyle(root), num = n => parseFloat(cs.getPropertyValue(n)) || 0;
+    const u = num('--rc-u') || 20, T = Math.tan(20 * Math.PI / 180), D = Math.max(1, H) / (2 * T * u);
+    const cx = num('--rc-x') - s.left + LAYOUT.w * u / 2, cy = num('--rc-y') - s.top + LAYOUT.h * u / 2;
+    return { p: [(BAND.x0 + BAND.x1) / 2, (BAND.top + BAND.bottom) / 2, FACE + D], yaw: 0, pitch: 0, fov: 40, sx: cx / Math.max(1, W) - .5, sy: .5 - cy / Math.max(1, H) };
   }
   // the screen card shown while loading the contents: level with the display's glass, at the distance
   // where the glass fills the card exactly, the lens shifted so it sits where the card is
@@ -120,15 +159,21 @@ function start() {
   const XofP = P => { const i = Math.min(S - 1, Math.max(0, Math.floor(P))); return starts[i] + (P - i) * CH[i].span; };
   const targetP = () => { const [r, len] = span(); return len <= 0 ? 0 : PofX(clamp(-r.top / len) * total); };
   const scrollFor = P => { const [r, len] = span(); return scrollY + r.top + len * XofP(P) / total; };
-  // a chapter's resting place: just into its dwell (a stray touch does not move the camera, and
-  // scrolling back moves it again almost at once)
-  const restP = i => i === 0 ? 0 : i + CH[i].A + (1 - CH[i].A) * .12;
+  // a chapter's resting place: just into its dwell, after any performance (a stray touch does not move
+  // the camera, and scrolling back moves it again almost at once)
+  const restP = i => i === 0 ? 0 : i + CH[i].B + (1 - CH[i].B) * .12;
+  // where the scroll is: moving to chapter i (phase 0, m of the way), its object performing (phase 1, k
+  // of it), or at rest (phase 2)
   const at = P => {
-    const i = Math.min(S - 1, Math.max(0, Math.floor(P))), u = Math.min(1, P - i), a = CH[i].A;
-    return i > 0 && u < a ? { i, phase: 0, m: u / a } : { i, phase: 2, m: 0 };
+    const i = Math.min(S - 1, Math.max(0, Math.floor(P))), u = Math.min(1, P - i), c = CH[i];
+    if (i > 0 && u < c.A) return { i, phase: 0, m: u / c.A, k: 0 };
+    if (u < c.B) return { i, phase: 1, m: 0, k: (u - c.A) / (c.B - c.A) };
+    return { i, phase: 2, m: 0, k: 1 };
   };
   // whose words show: the arriving chapter's once the camera is nearly there
   const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < .8 ? -1 : st.i;
+  // how full the record is: empty until the camera has arrived before it, full once it has performed
+  const fillOf = st => RI < 0 ? 0 : st.i > RI ? 1 : st.i < RI ? 0 : st.phase === 0 ? 0 : st.k;
 
   // ---------- where the reader comes back to ----------
   // A refresh returns to the chapter the reader was at (the place is kept for half an hour in this
@@ -180,7 +225,8 @@ function start() {
     if (c === active) return;
     active = c;
     const cap = c >= 0 ? CH[c].cap : null;
-    stage.dataset.cap = cap ? 'on' : 'off';
+    // (the paper glow is for a caption's headline; 02's words are on the record, its line needs none)
+    stage.dataset.cap = cap && !CH[c].record ? 'on' : 'off';
     CH.forEach((ch, j) => { if (ch.cap) ch.cap.classList.toggle('on', j === c); });
     if (c >= 0) {
       stage.dataset.ch = CH[c].id;
@@ -192,17 +238,21 @@ function start() {
   }
 
   // ---------- the 3D ----------
-  let world = null, study = null, ready = false, benchMs = 0;
+  let world = null, study = null, hall = null, ready = false, benchMs = 0;
   const logo = new Image();
   logo.src = sec.dataset.logo;
   // (how far the loading has got, for whichever loader shows: set on the page's root, inherited)
-  const setP = v => root.style.setProperty('--hs-p', String(Math.max(+(root.style.getPropertyValue('--hs-p') || 0), v)));
+  let loadP = 0, loaderK = 0;
+  const setP = v => { loadP = Math.max(loadP, v); root.style.setProperty('--hs-p', String(Math.max(+(root.style.getPropertyValue('--hs-p') || 0), v))); };
   function sizeUp() {
     W = stage.clientWidth; H = stage.clientHeight; aspect = W / Math.max(1, H);
     heads.forEach(h => h && splitLines(h));
     // where each chapter's words begin, as a share of the stage's height (the views sit just above)
     const s = stage.getBoundingClientRect();
     capTops = CH.map(c => c.cap ? (c.cap.getBoundingClientRect().top - s.top) / Math.max(1, H) : 1);
+    // where the chapter list ends on the left (0 when it is not shown)
+    const listEl = sec.querySelector('.hs-list'), lr = listEl && listEl.offsetParent ? listEl.getBoundingClientRect() : null;
+    listRight = lr && lr.width > 0 ? lr.right - s.left : 0;
     // the editor's setting for this window: the glass's width on the screen at the display's resting view
     const rest = compose(VIEWS.display, capTops[1] || 1), D = VIEWS.display.p[2] - SCR[0][2];
     edCompact = (SCR[1][0] - SCR[0][0]) * H / (2 * D * Math.tan(rest.fov * Math.PI / 360)) / ED_W < .55;
@@ -241,9 +291,17 @@ function start() {
     mark('study');
     pc = study.pageCentre; pn = study.pageNormal; pSize = study.pageSize;
     world.scene.add(study.group);
+    // the library hall, through the doorway (section 11.12), merged as the study is
+    hall = buildHall({ hi: big });
+    bake(hall.group);
+    world.scene.add(hall.group);
+    addHallLights();
+    mark('hall');
     world.addLamp({ at: study.lamp.at, aim: study.lamp.aim, power: 46, angle: .58 });
     world.addGlow(study.lamp.bulb, { size: 1.5, k: .85 });
-    world.centre.set(6, 0, -3);
+    // the sun's shadows: one box over the whole house (study and hall), so a room seen through a doorway
+    // is never lit through its own walls
+    world.setShadowBox([-15, 10, -32], 84, 70);
     world.setHour('early');
     addLife();
     setP(.5);
@@ -281,6 +339,19 @@ function start() {
     Promise.all([new Promise(r => setTimeout(r, wait)), loaderDrawn]).then(() => {
       if (STATIC) { finishIntro(); return; }
       mark('intro');
+      if (fromI === RI) {
+        // the record: the camera stands where the 3D band fills the card, its words are laid on the band
+        // where the card already is (no jump), the paper and the card clear, and the camera draws back
+        introFrom = recordCardPose();
+        introStart = performance.now();
+        world.aim(introFrom);
+        placeRecord(1);
+        page.classList.add('quad');
+        root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
+        if (veil) veil.classList.add('off');
+        wake();
+        return;
+      }
       if (fromI === 1) {
         // the contents: the camera stands where the 3D screen fills the card, the editor is laid on the
         // screen where the card already is (no jump), the paper clears, and the camera draws back
@@ -324,12 +395,14 @@ function start() {
   // not held for it)
   const HEAD_EVERY = 20000, LOGO_SPEED = 2;
   const sheetLogo = page && page.querySelector('.pg-logo.ld'), bootLogo = ed && ed.querySelector('.ed-logo.ld'), headLogo = sec.querySelector('.lp-lh-logo .ld');
+  const crestLogo = recParts && recParts.crest ? recParts.crest.querySelector('.ld') : null;
   const players = new Map();
   const playerOf = el => { if (!el) return null; if (!players.has(el)) players.set(el, createLogoPlayer(el, { speed: LOGO_SPEED })); return players.get(el); };
   let loaderDrawn = Promise.resolve();
   if (!STATIC && !REDUCE) {
     if (fromI === 0 && sheetLogo) loaderDrawn = playerOf(sheetLogo).play();
     else if (fromI === 1 && bootLogo) loaderDrawn = playerOf(bootLogo).play().then(() => { ed.classList.add('docked'); return new Promise(r => setTimeout(r, 750)); });
+    else if (fromI === RI && crestLogo) loaderDrawn = playerOf(crestLogo).play();
   }
   let headTimer = 0;
   function headerDrawing() {
@@ -341,6 +414,43 @@ function start() {
       playerOf(headLogo).play({ replay: true }).then(() => { headTimer = setTimeout(go, HEAD_EVERY); });
     };
     headTimer = setTimeout(go, 700);   // (once the letterhead has faded in)
+  }
+
+  // ---------- the hall's lamps: they come on as the light goes and the reader walks in ----------
+  // The record's light (a wide spot from the ceiling, coming up as the record fills), a warm light from
+  // the pendants for the room, and the glows: the pendants', the reading lamps' (with their pools on the
+  // tables) and each bay's picture light (lit as its bay fills)
+  let recLight = null, roomLight = null;
+  const hallGlows = [], bayGlows = [], pools = [];
+  let poolTex = null;
+  function addHallLights() {
+    recLight = world.addLamp({ at: [-32.5, 33, -50], aim: [-32.5, 7, FACE], power: 80, angle: .64, penumbra: .8, shadow: false, decay: 1, color: '#FFDDB2' });
+    world.setLampK(recLight, 0);
+    roomLight = new THREE.PointLight('#FFD3A0', 0, 120, 1);
+    roomLight.position.set(-32.5, 24, -44);
+    world.scene.add(roomLight);
+    hall.pendants.forEach(p => hallGlows.push({ s: world.addGlow(p, { size: 7, k: 0, color: '#FFE0B0' }), k: .8 }));
+    hall.lamps.forEach(p => hallGlows.push({ s: world.addGlow(p, { size: 3.2, k: 0, color: '#FFE6B8' }), k: .9 }));
+    hall.bayLamps.forEach(p => bayGlows.push(world.addGlow(p, { size: 4.5, k: 0, color: '#FFE2B4' })));
+    // the reading lamps' pools of light on the tables (drawn over the wood, left out of the normals)
+    poolTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.4, 'rgba(255,255,255,.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+    hall.lamps.forEach(([x, y, z]) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(6, 7), new THREE.MeshBasicMaterial({ map: poolTex, color: '#FFB86A', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, fog: false }));
+      m.rotation.x = -Math.PI / 2; m.position.set(x, y - 1.43, z); m.userData.noG = true; m.renderOrder = 2;
+      world.scene.add(m); pools.push(m);
+    });
+  }
+  // how far the hall's lamps are on (0 to 1), how full the record is: set each frame
+  const hallState = { on: -1, fill: -1 };
+  function hallLamps(on, fill, shares) {
+    if (!hall || (Math.abs(on - hallState.on) < 1e-4 && Math.abs(fill - hallState.fill) < 1e-4)) return;
+    hallState.on = on; hallState.fill = fill;
+    world.setLampK(recLight, on * (.25 + .75 * fill));
+    roomLight.intensity = 32 * on;
+    hallGlows.forEach(g => { g.s.material.opacity = g.k * on; });
+    pools.forEach(p => { p.material.opacity = .42 * on; });
+    bayGlows.forEach((s, b) => { s.material.opacity = .85 * on * Math.min(1, (shares ? shares[b] : fill) * 3); });
+    world.dirty = true;
   }
 
   // ---------- life at rest, drawn over the kept frame: dust in the window's light, the coffee's steam ----------
@@ -460,6 +570,29 @@ void main() {
     docs.forEach(el => { const v = (docMix[el.dataset.doc] || 0).toFixed(3); if (el.dataset.op !== v) { el.dataset.op = v; el.style.opacity = v; el.style.visibility = +v > 0 ? 'inherit' : 'hidden'; } });
     if (edState.live !== live) { edState.live = live; ed.classList.toggle('live', live); ed.setAttribute('aria-hidden', live ? 'false' : 'true'); }
   }
+  // 02: the record's words, laid on its band in perspective (each part at its own size: record-layout.js,
+  // set out at REC_PX to a unit); shown once the camera is through the doorway, so they are never drawn
+  // over the study's wall
+  if (recParts) [recParts.crest, recParts.frieze, ...recParts.boards].forEach((el, j) => { const r = j === 0 ? LAYOUT.crest : j === 1 ? LAYOUT.frieze : LAYOUT.boards[j - 2]; if (el) { el.style.width = `${r.w * REC_PX}px`; el.style.height = `${r.h * REC_PX}px`; } });
+  const recState = { tf: [], vis: '' };
+  function placeRecord(vis) {
+    if (!recParts || !hall) return;
+    if (fromI === RI && !introStart && !introDone) return;   // (the words are the loader's card until its intro begins)
+    const els = [recParts.crest, recParts.frieze, ...recParts.boards], quads = [hall.crest, hall.frieze, ...hall.boards];
+    if (vis > 0) els.forEach((el, j) => { if (!el) return; const q = project4(quads[j]); const tf = q ? quad(el.offsetWidth, el.offsetHeight, q) : 'scale(0)'; if (recState.tf[j] !== tf) { recState.tf[j] = tf; el.style.transform = tf; } });
+    const v = vis.toFixed(3);
+    if (recState.vis !== v) { recState.vis = v; rec.style.opacity = v; rec.style.visibility = vis > 0 ? 'visible' : 'hidden'; }
+  }
+  // the figures count up as their bays fill (a bay not begun shows its words only)
+  const counts = recParts ? recParts.boards.map(el => ({ n: el.querySelector('.rec-n'), to: +el.dataset.to || 0, plus: el.dataset.plus || '', shown: null })) : [];
+  const fmt = v => v.toLocaleString('en-GB');
+  function countUp(shares) {
+    counts.forEach((c, b) => {
+      const s = shares ? shares[b] : 0, v = Math.round(c.to * s), t = s >= 1 ? fmt(c.to) + c.plus : v < 1 ? '' : fmt(v);
+      if (c.shown !== t) { c.shown = t; if (c.n) c.n.textContent = t; }
+    });
+  }
+
   // the lamp's pool round the page, on the screen
   const sq = [0, 0, 0];
   function spotOn(k) {
@@ -484,7 +617,7 @@ void main() {
   }
 
   // ---------- every frame ----------
-  let Pr = startP, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null;
+  let Pr = startP, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null, recShares = null;
   function frame(dt, now) {
     if (glide) {
       const t = clamp((now - glide.t0) / glide.dur);
@@ -504,6 +637,8 @@ void main() {
     // the scroll cue: at the title page only, until the reader scrolls
     const cue = introDone && Pt < .02 && !glide ? 'on' : 'off';
     if (stage.dataset.cue !== cue) stage.dataset.cue = cue;
+    // coming back to 02: on the loader's card the figures count, bay by bay, as the house loads
+    if (!introStart && !introDone && RI >= 0 && fromI === RI) { loaderK = Math.min(loadP, loaderK + dt * .55); countUp(counts.map((c, b) => clamp(loaderK * counts.length - b))); }
     if (!world || !ready) return true;
     // the intro: from the sheet back to the title page
     if (!introDone && introStart) {
@@ -520,15 +655,30 @@ void main() {
       hA = c.hour; spot = c.spot || 0; docMix[c.doc] = 1;
     } else if (st.phase === 0) {
       const a = CH[st.i - 1], b = CH[st.i];
-      if (b.via) {
+      if (b.walk) {
+        // a walk: one continuous way through its points (route.js), the day going as it goes
+        cam = WALKS[b.walk].pose(V[a.view], V[b.view], st.m); hA = a.hour; hB = b.hour; hK = easeSine(st.m); spot = 0;
+      } else if (b.via) {
         if (st.m < b.split) { const k = easeSine(st.m / b.split); cam = lerpPose(V[a.view], V[b.via], k); hA = a.hour; hB = b.hour; hK = k; spot = a.spot * (1 - k); }
         else { const k = easeSine((st.m - b.split) / (1 - b.split)); cam = lerpPose(V[b.via], V[b.view], k); hA = b.hour; spot = 0; }
       } else { const k = easeSine(st.m); cam = lerpPose(V[a.view], V[b.view], k); hA = a.hour; hB = b.hour; hK = k; spot = mix(a.spot, b.spot, k); }
-      const d = sstep(.55, .85, st.m); docMix[a.doc] = 1 - d; docMix[b.doc] = d;
+      // (the display's document changes on the way, unless both chapters keep the same one)
+      const d = sstep(.55, .85, st.m); docMix[a.doc] = 1 - d; docMix[b.doc] = (docMix[b.doc] || 0) + d;
     } else { const c = CH[st.i]; cam = V[c.view]; hA = c.hour; spot = c.spot; docMix[c.doc] = 1; }
-    if (probe) cam = { yaw: 0, pitch: 0, sx: 0, sy: .5, fov: 40, ...probe };
+    // (a held pose for review: in its own hour if it names one, without the title page's pool)
+    if (probe) { cam = { yaw: 0, pitch: 0, sx: 0, sy: 0, fov: 40, ...probe }; spot = probe.spot || 0; if (probe.hour) { hA = probe.hour; hB = probe.hourB || null; hK = probe.hourK || 0; } }
     world.setHour(hA, hB || hA, hK);
     editorDocs(docMix, introDone && st.phase === 2 && !!CH[st.i].menu);
+    // the hall: its lamps come on as the reader walks in; the record fills as it performs
+    if (hall) {
+      const ci = introDone ? st.i : fromI;
+      const on = probe && probe.lamps !== undefined ? probe.lamps : RI < 0 ? 0 : ci > RI ? 1 : ci < RI ? 0 : !introDone || st.phase > 0 ? 1 : sstep(.38, .82, st.m);
+      const fill = probe && probe.fill !== undefined ? probe.fill : !introDone ? (fromI >= RI ? 1 : 0) : fillOf(st);
+      const sh = hall.record.setFill(fill);
+      if (sh) { recShares = sh; world.dirty = true; }
+      hallLamps(on, fill, recShares);
+      countUp(recShares);
+    }
     const key = `${poseKey(cam)}|${spot.toFixed(4)}`, moved = key !== lastKey;
     watch(dt * 1000, moved);   // (before drawing: a change of tier is drawn in this same frame)
     let show = false;
@@ -538,6 +688,10 @@ void main() {
       spotOn(spot);
       world.draw(); lastKey = key;
       placeEditor();
+      // (the record's words as a chapter's words come: once the camera is nearly there, and only ever
+      // with it through the doorway)
+      const recVis = probe ? 1 : !introDone ? (fromI === RI ? 1 : 0) : st.i !== RI ? 0 : st.phase > 0 ? 1 : sstep(.8, .96, st.m);
+      placeRecord(recVis * sstep(-9.5, -17, cam.p[2]));
       show = true;
     }
     life(time, 1 - spot * .8);
@@ -563,7 +717,8 @@ void main() {
 
   window.mewritHouse = {
     get ready() { return ready && introDone; }, get P() { return Pr; }, settle() { Pr = targetP(); lastKey = ''; wake(); }, get stage() { return world; },
-    restP, scrollFor, chapters: CH.map(c => c.id), A: CH[S - 1].A, get bench() { return benchMs; }, marks,
+    restP, scrollFor, chapters: CH.map(c => c.id), A: CH[S - 1].A, As: CH.map(c => c.A), Bs: CH.map(c => c.B), get bench() { return benchMs; }, marks,
+    get state() { const st = at(Math.min(Pr, S - 1e-6)); return { P: +Pr.toFixed(4), i: st.i, phase: st.phase, m: +st.m.toFixed(3), k: +st.k.toFixed(3), fill: +fillOf(st).toFixed(3), cam: world ? world.camera.position.toArray().map(v => +v.toFixed(2)) : null }; },
     // review: hold the camera at a pose ({ p, yaw, pitch, fov, sx, sy }), or null to give it back
     probe(p) { probe = p; lastKey = ''; wake(); },
     views, VIEWS,

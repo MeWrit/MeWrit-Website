@@ -1,7 +1,8 @@
 /* The study, built in three dimensions for the house (site/docs/redesign-plan.md, section 11): the
    room of the design board's drawing, every object a solid that stands on its surface. The back wall
-   holds, from the left, the doorway into the library hall (the hall seen through it), two framed
-   certificates, the tall window (two lights and a transom, the town far below it); against it the
+   (the south wall: section 11.12's compass) holds, from the left, the doorway into the library hall
+   (hall.js; seen through it), two framed certificates, the tall window (two lights and a transom, the
+   valley below it); against it the
    oak desk: reference volumes and a snake plant at the back left, the display on its stand (where the
    editor is laid), the lamp at the back right with its light on the desk, coffee on a saucer, the
    keyboard pushed back to read, the manuscript in front of the display (the title page's object, the
@@ -10,8 +11,8 @@
    Returns { group, lamp: the lamp's light points, screen: the display's glass corners (for the
    editor), manuscript: the top sheet's corners (for the loader's page to land on), doorway }. */
 import * as THREE from 'three';
-import { PAL, mat, rbox, box, at, lathe, cyl, tube, group, panel, shadows, plasterTex, oakTex, boardsTex, paperTex, typeLines, roundRect, spineTex, shelfBooks, canvasTex, rng, contact, bake } from './kit.js';
-import { buildOutside } from './outside.js';
+import { PAL, mat, rbox, box, at, lathe, cyl, tube, group, panel, shadows, plasterTex, oakTex, boardsTex, paperTex, typeLines, roundRect, spineTex, canvasTex, rng, contact, bake, hipRoof } from './kit.js';
+import { buildOutside, GARDEN } from './outside.js';
 
 export const STUDY = {
   WALL: -7, FLOOR: -7.5, CEIL: 15.5,
@@ -65,78 +66,43 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     runs(11.9, .18, .1, .02, [doorGap, winGap]);
     // the cornice
     G.add(at(rbox(X1 - X0, .5, .5, .1, trim), (X0 + X1) / 2, CEIL - .25, WALL + .25));
-    // floor, ceiling, the side walls
-    const floor = shadows(new THREE.Mesh(new THREE.PlaneGeometry(70, 40), mat(PAL.floor, { map: boardsTex(PAL.floor, '#5A4330'), r: .78 })), false, true);
-    floor.rotation.x = -Math.PI / 2; floor.position.set(4, FLOOR, 12); G.add(floor);
-    const ceil = shadows(new THREE.Mesh(new THREE.PlaneGeometry(70, 40), mat('#F4EFE6', { r: 1 })), false, true);
-    ceil.rotation.x = Math.PI / 2; ceil.position.set(4, CEIL, 12); G.add(ceil);
-    const side = (x, ry) => { const m = shadows(new THREE.Mesh(new THREE.PlaneGeometry(40, CEIL - FLOOR), wallMat), false, true); m.rotation.y = ry; m.position.set(x, (CEIL + FLOOR) / 2, 12); return m; };
-    G.add(side(-26, Math.PI / 2), side(34, -Math.PI / 2));
+    // floor and ceiling, ending at the back wall's outer face (the hall's own begin there); the side
+    // walls and the north wall solid, so the study is whole from outside (section 11.12)
+    const Z1 = 32, D = Z1 - (WALL - T);
+    const floor = shadows(new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, D), mat(PAL.floor, { map: boardsTex(PAL.floor, '#5A4330'), r: .78 })), false, true);
+    floor.rotation.x = -Math.PI / 2; floor.position.set((X0 + X1) / 2, FLOOR, (Z1 + WALL - T) / 2); G.add(floor);
+    const ceil = shadows(new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, D), mat('#F4EFE6', { r: 1 })), true, true);
+    ceil.rotation.x = Math.PI / 2; ceil.position.set((X0 + X1) / 2, CEIL, (Z1 + WALL - T) / 2); G.add(ceil);
+    G.add(shadows(at(box(T, CEIL - FLOOR, D, wallMat), X0 - T / 2, (CEIL + FLOOR) / 2, (Z1 + WALL - T) / 2)));
+    G.add(shadows(at(box(T, CEIL - FLOOR, D, wallMat), X1 + T / 2, (CEIL + FLOOR) / 2, (Z1 + WALL - T) / 2)));
+    G.add(shadows(at(box(X1 - X0 + 2 * T, CEIL - FLOOR, T, wallMat), (X0 + X1) / 2, (CEIL + FLOOR) / 2, Z1 + T / 2)));
+    // outside: the plinth down to the garden, the roof (hipped, in slate)
+    // (its top a little below the floor: level with it, the two would fight for the same pixels)
+    G.add(shadows(at(box(X1 - X0 + 2 * T + .6, FLOOR - .3 - GARDEN, D + T + .6, mat('#CEC4B1', { r: .92 })), (X0 + X1) / 2, (FLOOR - .3 + GARDEN) / 2, (Z1 + WALL - T) / 2 + T / 2)));
+    // (no eave to the south: the hall's taller wall rises there)
+    G.add(hipRoof(X0 - T - 1.2, X1 + T + 1.2, WALL - T, Z1 + T + 1.2, CEIL + .2, 13, mat('#6B7385', { r: .8 })));
+    // the threshold in the doorway, a strip of oak across the wall's thickness
+    G.add(at(rbox(DOOR.x1 - DOOR.x0, .12, T + .1, .03, mat(PAL.oakDark, { r: .6 })), (DOOR.x0 + DOOR.x1) / 2, FLOOR + .06, WALL - T / 2));
   }
 
-  // ---------- the doorway: its architrave, the door folded back against the hall's wall ----------
+  // ---------- the doorway: its architrave, the door folded back flat against the study's wall ----------
+  // (the hall's side of the doorway is the hall's: hall.js)
   {
     const z = WALL + .06, w = .7;
     G.add(at(rbox(w, DOOR.top - FLOOR + w, .16, .04, trim), DOOR.x0 - w / 2, (FLOOR + DOOR.top + w) / 2, z));
     G.add(at(rbox(w, DOOR.top - FLOOR + w, .16, .04, trim), DOOR.x1 + w / 2, (FLOOR + DOOR.top + w) / 2, z));
     G.add(at(rbox(DOOR.x1 - DOOR.x0 + 2 * w, w, .16, .04, trim), (DOOR.x0 + DOOR.x1) / 2, DOOR.top + w / 2, z));
-    // the reveal (the wall's thickness, lined) and the door, open, panelled
+    // the reveal (the wall's thickness, lined) and the door, open into the study and folded back against
+    // the wall to the doorway's left, its panels toward the room
     G.add(at(box(.5, DOOR.top - FLOOR, .5, trim), DOOR.x0 + .25, (FLOOR + DOOR.top) / 2, WALL - .25));
     G.add(at(box(.5, DOOR.top - FLOOR, .5, trim), DOOR.x1 - .25, (FLOOR + DOOR.top) / 2, WALL - .25));
     const doorW = DOOR.x1 - DOOR.x0 - .2, door = group(rbox(doorW, DOOR.top - FLOOR - .2, .3, .05, mat('#E8E0D0', { r: .7 })));
-    [[.32, .62], [.32, .22]].forEach(([fy, fh]) => door.add(at(rbox(doorW * .7, (DOOR.top - FLOOR) * fh * .9, .06, .04, mat('#E1D8C6', { r: .72 })), 0, (DOOR.top - FLOOR) * (fy - .5) + (fy > .5 ? 0 : 0), .17)));
-    door.add(at(cyl(.12, .12, .5, mat(PAL.gold, { r: .35, m: .8 }), 16), doorW * .4, -.5, .3, { x: Math.PI / 2 }));
-    door.position.set(DOOR.x0 + .1, (FLOOR + DOOR.top) / 2, WALL - .5); door.rotation.y = Math.PI * .52;
-    door.children.forEach(c => { c.position.x += doorW / 2; });
+    [[.32, .62], [.32, .22]].forEach(([fy, fh]) => door.add(at(rbox(doorW * .7, (DOOR.top - FLOOR) * fh * .9, .06, .04, mat('#E1D8C6', { r: .72 })), 0, (DOOR.top - FLOOR) * (fy - .5), .17)));
+    door.add(at(cyl(.12, .12, .5, mat(PAL.gold, { r: .35, m: .8 }), 16), -doorW * .4, -.5, .3, { x: Math.PI / 2 }));
+    door.position.set(DOOR.x0 - .05, (FLOOR + DOOR.top) / 2, WALL + .34);
+    door.children.forEach(c => { c.position.x -= doorW / 2; });
     G.add(door);
-  }
-
-  // ---------- the library hall, seen through the doorway (built out in full later) ----------
-  {
-    const H = new THREE.Group(), Z0 = WALL - .5, Z1 = -64, XL = -34, XR = -1.2;
-    const hallFloor = shadows(new THREE.Mesh(new THREE.PlaneGeometry(XR - XL, Z0 - Z1), mat('#8A6A4F', { map: boardsTex('#8A6A4F', '#56402D', 13), r: .75 })), false, true);
-    hallFloor.rotation.x = -Math.PI / 2; hallFloor.position.set((XL + XR) / 2, FLOOR, (Z0 + Z1) / 2); H.add(hallFloor);
-    const hallWall = mat('#E6DECD', { map: plasterTex('#E6DECD', 9), r: .95 });
-    const wallR = shadows(new THREE.Mesh(new THREE.PlaneGeometry(Z0 - Z1, 30), hallWall)); wallR.rotation.y = -Math.PI / 2; wallR.position.set(XR, FLOOR + 15, (Z0 + Z1) / 2); H.add(wallR);
-    const wallL = shadows(new THREE.Mesh(new THREE.PlaneGeometry(Z0 - Z1, 30), hallWall)); wallL.rotation.y = Math.PI / 2; wallL.position.set(XL, FLOOR + 15, (Z0 + Z1) / 2); H.add(wallL);
-    const hallCeil = shadows(new THREE.Mesh(new THREE.PlaneGeometry(XR - XL, Z0 - Z1), mat('#EFE8DC', { r: 1 })), false, true); hallCeil.rotation.x = Math.PI / 2; hallCeil.position.set((XL + XR) / 2, FLOOR + 26, (Z0 + Z1) / 2); H.add(hallCeil);
-    // the far wall with its tall window, bright
-    const far = shadows(new THREE.Mesh(new THREE.PlaneGeometry(XR - XL, 30), hallWall)); far.position.set((XL + XR) / 2, FLOOR + 15, Z1); H.add(far);
-    const glow = new THREE.Mesh(new THREE.PlaneGeometry(7, 15), mat('#F8F4EA', { emissive: '#FFF6E2', ek: 1.6 })); glow.position.set((XL + XR) / 2, FLOOR + 11, Z1 + .05); H.add(glow);
-    // stacks: bookcases along both walls, a run of them down the middle, every shelf full
-    const caseMat = mat('#B78E66', { map: oakTex('#B78E66', '#7A5A3C', 21), r: .7 });
-    const COLS = ['#2B3A5C', '#3D4E73', '#8C3B2E', '#B4500F', '#D2A24C', '#5E7D66', '#E9E2D3', '#C9D3E3', '#6B4E3A', '#1D2C53', '#A88B5E', '#7A8FA8'];
-    const rows = [];
-    const stack = (x, z0, z1, facing) => {
-      const len = Math.abs(z1 - z0), cz = (z0 + z1) / 2, hgt = 21, depth = 1.6;
-      const back = at(rbox(depth * .3, hgt, len, .05, caseMat), x - facing * depth * .45, FLOOR + hgt / 2, cz); H.add(back);
-      for (let y = FLOOR + .6; y < FLOOR + hgt; y += 2.6) {
-        H.add(at(rbox(depth, .14, len, .03, caseMat), x, y, cz));
-        if (y + 2.4 < FLOOR + hgt) rows.push({ y: y + .07, x, z0: Math.min(z0, z1), z1: Math.max(z0, z1), facing });
-      }
-      for (const zz of [z0, z1]) H.add(at(rbox(depth, hgt, .2, .04, caseMat), x, FLOOR + hgt / 2, zz));
-    };
-    stack(XR - .9, Z0 - 1, Z1 + 4, -1);
-    stack(XL + .9, Z0 - 1, Z1 + 4, 1);
-    // the books, along the cases: the instancing helper lays a row along its x and its depth along -z;
-    // turned a quarter (-90 degrees about y) its x runs along the hall's z and its depth along +x, so each
-    // case's books start at the case's inner back (xBack) and come out toward the aisle
-    const shelf = (facing, xBack) => {
-      const these = rows.filter(r => r.facing === facing).map(r => ({ x0: r.z0 + .3, x1: r.z1 - .3, y: r.y, z: 0, depth: 1.3, wMin: .28, wMax: .5, hMin: 1.4, hMax: 2.2 }));
-      const m = shelfBooks(these, COLS, facing > 0 ? 31 : 47, { cast: false, plain: true });
-      m.rotation.y = -Math.PI / 2; m.position.x = xBack;
-      return m;
-    };
-    H.add(shelf(-1, XR - 2.8 + 1.2));
-    H.add(shelf(1, XL + .3));
-    // reading lamps down the hall (their light pools)
-    for (const z of [-16, -30, -44]) {
-      const t = at(rbox(5, .3, 2.4, .06, mat('#A27C58', { r: .65 })), (XL + XR) / 2, FLOOR + 7.4, z); H.add(t);
-      H.add(at(cyl(.12, .12, 1.6, mat('#2E3B2F', { r: .5 }), 12), (XL + XR) / 2 + 1.4, FLOOR + 8.4, z));
-      const shade = at(cyl(.35, .9, .7, mat('#2F5B45', { r: .45, emissive: '#2F5B45', ek: .2 }), 24), (XL + XR) / 2 + 1.4, FLOOR + 9.3, z); H.add(shade);
-      const bulb = at(new THREE.Mesh(new THREE.SphereGeometry(.28, 16, 8), mat('#FFE9C0', { emissive: '#FFD58A', ek: 2.4 })), (XL + XR) / 2 + 1.4, FLOOR + 9.0, z); H.add(bulb);
-    }
-    G.add(H);
+    G.add(contact(doorW, .9, DOOR.x0 - doorW / 2, WALL + .4, { y: FLOOR, k: .22 }));
   }
 
   // ---------- the certificates, in slim navy frames ----------
