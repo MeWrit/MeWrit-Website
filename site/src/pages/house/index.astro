@@ -44,12 +44,16 @@ const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
 // the contents' words are on the display (the editor's document); the chapters to come keep a caption
 const contentsCh = words[1];
 const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
+// the share of a chapter's scroll its arrival takes (film.js reads it from the section)
+const ARRIVE = .62;
 ---
 <Base intro="none" theme="light" page="house" title={`${lamp.shortTitle} | ${site.name}`} description={lamp.description}>
-  <script is:inline>
-  /* before the first paint: while the house loads, the title page is a sheet on the paper veil, the
-     letterhead and the list wait, and the page does not scroll (film.js lifts these; if it never runs,
-     they lift themselves) */
+  <script is:inline define:vars={{ ids: BUILT, A: ARRIVE, key: 'mewrit-house-place' }}>
+  /* before the first paint: while the house loads, the chapter the reader is coming to shows its own
+     object flat on the paper veil (the title page's sheet; the display's screen), the letterhead and
+     the list wait, and the page does not scroll (film.js lifts these; if it never runs, they lift
+     themselves). The chapter: the place a refresh left (kept for half an hour in this tab, to the
+     nearer chapter), else the one the address names (#contents), else the title page */
   (function () {
     var d = document.documentElement;
     // (the film puts the reader back where they were itself, once the house is ready: the browser's
@@ -57,6 +61,21 @@ const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
     try { history.scrollRestoration = 'manual'; } catch (e) {}
     if (/[?&]static\b/.test(location.search)) return;
     d.classList.add('hs-loading', 'hs-lock');
+    var at = 0, s = null;
+    try { s = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
+    if (s && s.P > .02 && Date.now() - s.t < 1800000) { var i = Math.floor(s.P), u = s.P - i; at = i > 0 && u < A / 2 ? i - 1 : i; }
+    else { var h = ids.indexOf(location.hash.slice(1)); if (h > 0) at = h; }
+    at = Math.max(0, Math.min(ids.length - 1, at));
+    d.classList.add('hs-from-' + at);
+    if (at === 1) {
+      // the display's screen as a card on the paper, as large as the window allows below the letterhead
+      // (its proportions are the screen's, 5.9 by 3.4; the editor is laid out 1000 px wide)
+      var W = innerWidth, H = innerHeight, cw = Math.min(W * .84, (H - 210) * 5.9 / 3.4), sc = cw / 1000;
+      d.style.setProperty('--hs-card-s', sc);
+      d.style.setProperty('--hs-card-x', ((W - cw) / 2) + 'px');
+      d.style.setProperty('--hs-card-y', ((H + 76 - cw * 3.4 / 5.9) / 2) + 'px');
+      if (sc < .55) d.classList.add('hs-card-compact');
+    }
     setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
   })();
   </script>
@@ -64,7 +83,7 @@ const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
 
-  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-spans={JSON.stringify(built.map(w => SPANS[w.id]))}>
+  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-spans={JSON.stringify(built.map(w => SPANS[w.id]))} data-arrive={ARRIVE}>
     <canvas class="hs-canvas" aria-hidden="true"></canvas>
     <div class="hs-track">
       <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">
@@ -110,6 +129,9 @@ const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
           <!-- 01, the contents: the chapter's words are the document's own heading, on the screen -->
           <div class="ed-doc" data-doc="contents">
             <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>MeWriT · Practices</b><span class="ed-saved">Five practices</span><span class="ed-av"><i>HS</i></span></div>
+            <!-- the document's letterhead (the original logo, unaltered); in the contents' loader the screen
+                 boots with it at its middle, and it docks here -->
+            <img class="ed-logo" src={logo} alt="" aria-hidden="true" width="1112" height="230">
             <div class="ed-body ed-contents">
               <header class="ed-head" id="contents" aria-label={`${contentsCh.num} ${contentsCh.name}`}>
                 <p class="ed-kick">Contents</p>
@@ -117,7 +139,7 @@ const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
                 <p class="ed-l">{contentsCh.line}</p>
               </header>
               <ol class="ed-toc ed-toc-full">
-                {lamp.contents.map(e => { const ch = lamp.chapters.find(c => c.id === e.go); return <li data-toc><a href={e.href} data-chapter={e.go}><span class="n">{e.num}</span><span class="t">{e.name}<small>{ch ? ch.line : ''}</small></span><span class="d"></span><span class="p">{e.page}</span></a></li>; })}
+                {lamp.contents.map((e, i) => { const ch = lamp.chapters.find(c => c.id === e.go); return <li data-toc style={`--i:${i}`}><a href={e.href} data-chapter={e.go}><span class="n">{e.num}</span><span class="t">{e.name}<small>{ch ? ch.line : ''}</small></span><span class="d"></span><span class="p">{e.page}</span></a></li>; })}
               </ol>
             </div>
             <div class="ed-foot"><span>Choose a practice</span><span>MeWriT</span></div>

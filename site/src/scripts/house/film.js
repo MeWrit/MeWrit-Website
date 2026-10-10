@@ -54,8 +54,10 @@ function start() {
   // framed for the window they are seen in: their highest things just below the letterhead, their foot
   // just above the chapter's words, the things that must show across them inside; the lens widens only
   // as far as that needs. The title page's view looks squarely down at the page.
-  let W = 0, H = 0, aspect = 1.6, capTops = [];
+  let W = 0, H = 0, aspect = 1.6, capTops = [], edCompact = false;
   const SCR = STUDY.SCREEN, SCR_TOP = SCR[0][1] + .13, SCR_FOOT = SCR[2][1] - .13;
+  // the editor's own size: 1000 px wide, in the glass's proportions
+  const ED_W = 1000, ED_H = ED_W * (SCR[0][1] - SCR[2][1]) / (SCR[1][0] - SCR[0][0]);
   const VIEWS = {
     wide: { p: [6.5, 10.4, 19.5], fov: 40, gap: 0, cap: .985, top: [[6.5, SCR_TOP, -5.3], [12.9, STUDY.WIN.y1 + .35, -7], [-1.05, 5.95, -6.9]], foot: [6.5, 0, STUDY.DESK.z0], safe: [[-4.2, 4, -7], [16.4, 4, -7]] },
     // (the contents' words are on the screen: the whole display shows, down to its stand's foot)
@@ -94,11 +96,19 @@ function start() {
     const s = stage.getBoundingClientRect(), r = page.getBoundingClientRect();
     return pagePose(r.height / Math.max(1, H), (r.top - s.top + r.height / 2) / Math.max(1, H));
   }
+  // the screen card shown while loading the contents: level with the display's glass, at the distance
+  // where the glass fills the card exactly, the lens shifted so it sits where the card is
+  function screenPose() {
+    const s = stage.getBoundingClientRect(), r = ed.getBoundingClientRect(), T = Math.tan(20 * Math.PI / 180);
+    const gw = SCR[1][0] - SCR[0][0], gx = (SCR[0][0] + SCR[1][0]) / 2, gy = (SCR[0][1] + SCR[2][1]) / 2;
+    const D = gw * Math.max(1, H) / (2 * T * Math.max(1, r.width));
+    return { p: [gx, gy, SCR[0][2] + D], yaw: 0, pitch: 0, fov: 40, sx: (r.left - s.left + r.width / 2) / Math.max(1, W) - .5, sy: .5 - (r.top - s.top + r.height / 2) / Math.max(1, H) };
+  }
   const lerpPose = (a, b, k) => ({ p: a.p.map((v, j) => mix(v, b.p[j], k)), yaw: mix(a.yaw, b.yaw, k), pitch: mix(a.pitch, b.pitch, k), fov: mix(a.fov, b.fov, k), sx: mix(a.sx, b.sx, k), sy: mix(a.sy, b.sy, k) });
   const poseKey = c => `${c.p[0].toFixed(4)},${c.p[1].toFixed(4)},${c.p[2].toFixed(4)},${c.yaw.toFixed(3)},${c.pitch.toFixed(3)},${c.fov.toFixed(3)},${c.sx.toFixed(4)},${c.sy.toFixed(4)}`;
 
   // ---------- the scroll: chapter i runs from P = i to i + 1, over its span of screens ----------
-  const A = .62;   // the share of a chapter's scroll its arrival takes
+  const A = +sec.dataset.arrive || .62;   // the share of a chapter's scroll its arrival takes
   const starts = [];
   CH.reduce((a, c, i) => { starts[i] = a; return a + c.span; }, 0);
   const total = CH.reduce((a, c) => a + c.span, 0);
@@ -116,19 +126,15 @@ function start() {
   const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < .8 ? -1 : st.i;
 
   // ---------- where the reader comes back to ----------
-  // A refresh returns to the place in the film the reader left (kept for half an hour in this tab); a
-  // link to a chapter (#contents) opens on that chapter. The camera then stands there from the start:
-  // the loader's sheet lifts away as the veil clears on that view, with no run from the title page
+  // A refresh returns to the chapter the reader was at (the place is kept for half an hour in this
+  // tab), a link to a chapter (#contents) opens on it: the page's first script chose the chapter before
+  // the first paint (hs-from-N) and shows that chapter's object as the loader; the film starts there.
+  // Each chapter's loader is its own: the title page's sheet becomes the manuscript; the display's
+  // screen becomes the display
   const KEY = 'mewrit-house-place';
-  let startP = 0;
-  if (!STATIC) {
-    let saved = null;
-    try { saved = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { /* storage off */ }
-    const hashI = CH.findIndex(c => location.hash === `#${c.id}`);
-    if (saved && saved.P > .02 && Date.now() - saved.t < 30 * 60 * 1000) startP = Math.min(S - 1e-3, saved.P);
-    else if (hashI > 0) startP = restP(hashI);
-  }
-  const restoring = startP > .02;
+  const fromI = STATIC ? 0 : Math.min(S - 1, +(([...root.classList].map(c => /^hs-from-(\d+)$/.exec(c)).find(Boolean) || [0, 0])[1]));
+  const startP = fromI > 0 ? restP(fromI) : 0;
+  const restoring = fromI > 0;
   addEventListener('pagehide', () => { try { sessionStorage.setItem(KEY, JSON.stringify({ P: introDone ? Pr : startP, t: Date.now() })); } catch (e) { /* storage off */ } });
 
   // going to a chapter: a glide of the scroll (asked for by a link; never on its own), unhurried, so the
@@ -175,13 +181,17 @@ function start() {
   let world = null, study = null, ready = false, benchMs = 0;
   const logo = new Image();
   logo.src = sec.dataset.logo;
-  const setP = v => { if (page) page.style.setProperty('--hs-p', String(Math.max(+(page.style.getPropertyValue('--hs-p') || 0), v))); };
+  // (how far the loading has got, for whichever loader shows: set on the page's root, inherited)
+  const setP = v => root.style.setProperty('--hs-p', String(Math.max(+(root.style.getPropertyValue('--hs-p') || 0), v)));
   function sizeUp() {
     W = stage.clientWidth; H = stage.clientHeight; aspect = W / Math.max(1, H);
     heads.forEach(h => h && splitLines(h));
     // where each chapter's words begin, as a share of the stage's height (the views sit just above)
     const s = stage.getBoundingClientRect();
     capTops = CH.map(c => c.cap ? (c.cap.getBoundingClientRect().top - s.top) / Math.max(1, H) : 1);
+    // the editor's setting for this window: the glass's width on the screen at the display's resting view
+    const rest = compose(VIEWS.display, capTops[1] || 1), D = VIEWS.display.p[2] - SCR[0][2];
+    edCompact = (SCR[1][0] - SCR[0][0]) * H / (2 * D * Math.tan(rest.fov * Math.PI / 360)) / ED_W < .55;
     if (world) { world.resize(canvas.clientWidth || W, canvas.clientHeight || H); lastKey = ''; wake(); }
   }
   new ResizeObserver(sizeUp).observe(stage);
@@ -246,17 +256,16 @@ function start() {
     const wait = Math.max(0, (REDUCE ? 200 : 2400) - (performance.now() - t0));
     setTimeout(() => {
       if (STATIC) { finishIntro(); return; }
-      if (restoring) {
-        // the camera already stands where the reader left: the sheet lifts away, the veil clears, and
-        // the title page's words come back on the manuscript (wherever it is in this view)
-        page.classList.add('leaving');
+      if (fromI === 1) {
+        // the contents: the camera stands where the 3D screen fills the card, the editor is laid on the
+        // screen where the card already is (no jump), the paper clears, and the camera draws back
+        introFrom = screenPose();
+        introStart = performance.now();
+        world.aim(introFrom);
+        placeEditor();
+        page.classList.add('quad');   // (the title page, on the manuscript below the frame)
         root.classList.add('hs-in'); root.classList.remove('hs-loading');
         if (veil) veil.classList.add('off');
-        setTimeout(() => {
-          page.classList.add('quad'); lastKey = ''; wake();
-          setTimeout(() => { page.classList.add('arriving'); page.classList.remove('leaving'); setTimeout(() => page.classList.remove('arriving'), 700); }, 760);
-        }, 470);
-        setTimeout(finishIntro, 1250);
         wake();
         return;
       }
@@ -276,7 +285,7 @@ function start() {
     intro = 1; introDone = true;
     if (page) page.classList.add('quad');
     if (veil) veil.classList.add('off');
-    root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
+    root.classList.add('hs-in', 'hs-done'); root.classList.remove('hs-loading', 'hs-lock');
     wake();
   }
 
@@ -369,18 +378,18 @@ void main() {
     const f6 = v => +v.toFixed(7);
     return `matrix3d(${f6(a / w)},${f6(d / w)},0,${f6(g / w)},${f6(b / h)},${f6(e / h)},0,${f6(k / h)},0,0,1,0,${f6(x0)},${f6(y0)},0,1)`;
   }
-  const ED_W = 1000, ED_H = ED_W * (SCR[0][1] - SCR[2][1]) / (SCR[1][0] - SCR[0][0]);
   if (ed) { ed.style.width = `${ED_W}px`; ed.style.height = `${ED_H.toFixed(2)}px`; }
   const pq = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], edState = {}, pgState = {};
   function project4(pts) { let ok = true; pts.forEach((p, i) => { world.project(p, pq[i]); if (pq[i][2] > 1 || pq[i][2] < -1) ok = false; }); return ok ? pq.map(q => [q[0], q[1]]) : null; }
   function placeEditor() {
     if (!ed || !world) return;
+    if (fromI === 1 && !introStart && !introDone) return;   // (the editor is the loader's card until its intro begins)
     const q = project4(SCR);
     const tf = q ? quad(ED_W, ED_H, q) : 'scale(0)';
     if (edState.tf !== tf) { edState.tf = tf; ed.style.transform = tf; }
-    // small on the screen (a phone), the documents take their larger setting
-    const compact = !!q && Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]) / ED_W < .55;
-    if (edState.compact !== compact) { edState.compact = compact; ed.classList.toggle('compact', compact); }
+    // small on the screen (a phone), the documents take their larger setting: chosen by the display's
+    // size at its resting view for this window, so it never changes while the camera moves
+    if (edState.compact !== edCompact) { edState.compact = edCompact; ed.classList.toggle('compact', edCompact); }
     if (!edState.shown) { edState.shown = true; ed.style.visibility = 'visible'; ed.style.opacity = '1'; }
   }
   // the title page: its words are always the markup, laid exactly on the 3D page at every size (the 3D
@@ -448,9 +457,11 @@ void main() {
     const V = views();
     let cam, hA, hB = null, hK = 0, spot = 0;
     const docMix = {};
-    if (!introDone && !restoring) {
-      cam = introStart ? lerpPose(introFrom, V.page, easeIO(intro)) : V.page;
-      hA = 'early'; spot = 1; docMix.draft = 1;
+    if (!introDone) {
+      // the intro: from the loader's card (the sheet, the screen) back to the chapter the reader comes to
+      const c = CH[fromI];
+      cam = introStart ? lerpPose(introFrom, V[c.view], easeIO(intro)) : V[c.view];
+      hA = c.hour; spot = c.spot || 0; docMix[c.doc] = 1;
     } else if (st.phase === 0) {
       const a = CH[st.i - 1], b = CH[st.i];
       if (b.via) {

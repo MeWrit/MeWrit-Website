@@ -50,12 +50,16 @@ html.hs-loading .hs-stage :is(.lp-lh,.hs-list,.hs-caps){opacity:0}
 
 /* the editor on the display: its contents are the menu (lamp.css draws the editor); each practice
    with its line beneath */
-.lp-ed{transform-origin:0 0}
+/* (its size is set here as well as by film.js, so the loader's card has it from the first paint: the
+   screen's proportions, 5.9 by 3.4, at 1000 px wide) */
+.lp-ed{transform-origin:0 0;width:1000px;height:576.27px}
 .lp-ed .ed-toc a{display:flex;align-items:baseline;gap:14px;width:100%;color:inherit;text-decoration:none}
 .lp-ed .ed-toc li{cursor:pointer}
 .lp-ed .ed-toc li:has(a:is(:hover,:focus-visible)){background:rgba(224,168,46,.2)}
 .lp-ed .ed-toc li:has(a:is(:hover,:focus-visible)) .t{color:var(--hs-pen)}
 .lp-ed .ed-contents{grid-template-columns:minmax(0,.78fr) minmax(0,1.5fr);gap:36px;align-items:center;padding:24px 34px 16px}
+.lp-ed .ed-logo{position:absolute;left:36px;top:60px;width:150px;height:auto;z-index:1;pointer-events:none;transform-origin:50% 50%}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-logo{width:190px}
 .lp-ed .ed-head .ed-kick{font:500 15px/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--pen);margin:0 0 16px}
 .lp-ed .ed-head .ed-h{font:500 50px/1.02 var(--serif);letter-spacing:-.02em;color:var(--ink);margin:0 0 16px;text-wrap:balance}
 .lp-ed .ed-head .ed-l{font:italic 400 19px/1.45 var(--serif);color:var(--body);margin:0}
@@ -64,18 +68,37 @@ html.hs-loading .hs-stage :is(.lp-lh,.hs-list,.hs-caps){opacity:0}
 .lp-ed .ed-toc-full .t small{font:400 14px/1.35 var(--sans);color:rgba(69,80,106,.88);letter-spacing:0;max-width:46ch}
 .lp-ed .ed-toc-full li{padding-top:8px;padding-bottom:8px}
 /* small on the screen (a phone): the same document in larger type, the practices without their lines,
-   so each reads and can be tapped */
-.lp-ed.compact .ed-contents{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:30px;padding:26px 36px 16px}
-.lp-ed.compact .ed-head .ed-kick{font-size:26px;margin-bottom:18px}
-.lp-ed.compact .ed-head .ed-h{font-size:76px;line-height:1}
-.lp-ed.compact .ed-head .ed-l{font-size:30px}
-.lp-ed.compact .ed-toc-full li{padding-top:9px;padding-bottom:9px}
-.lp-ed.compact .ed-toc .n{font-size:26px}
-.lp-ed.compact .ed-toc .t{font-size:42px;line-height:1.1}
-.lp-ed.compact .ed-toc-full .t small{display:none}
-.lp-ed.compact .ed-toc .p{font-size:34px}
-.lp-ed.compact :is(.ed-bar,.ed-foot){font-size:18px}
-.lp-ed.compact .ed-bar b{font-size:19px}
+   so each reads and can be tapped (also while the screen is the loader's card on a small window) */
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-contents{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:30px;padding:26px 36px 16px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-head .ed-kick{font-size:26px;margin-bottom:18px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-head .ed-h{font-size:76px;line-height:1}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-head .ed-l{font-size:30px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-toc-full li{padding-top:9px;padding-bottom:9px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-toc .n{font-size:26px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-toc .t{font-size:42px;line-height:1.1}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-toc-full .t small{display:none}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-toc .p{font-size:34px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) :is(.ed-bar,.ed-foot){font-size:18px}
+:is(.lp-ed.compact,html.hs-card-compact:not(.hs-in) .lp-ed) .ed-bar b{font-size:19px}
+
+/* ---------- coming back to the contents: the display's screen is the loader's card, on the paper,
+   its navy bezel drawn round it in the 3D bezel's proportion (0.13 of 5.9, 22 of its 1000 px); the
+   practices are written in as the house loads; then the camera stands where the 3D screen fills the
+   card, the paper clears and the camera draws back to the display on the desk ---------- */
+html.hs-from-1:not(.hs-in) .hs-page{opacity:0}
+html.hs-from-1:not(.hs-in) .lp-ed{z-index:5;visibility:visible;opacity:1;transform:translate(var(--hs-card-x),var(--hs-card-y)) scale(var(--hs-card-s));box-shadow:0 0 0 22px #1D2C53,0 50px 110px rgba(40,30,20,.24);animation:hsWrite 1.6s cubic-bezier(.3,.6,.3,1) 2s forwards}
+html.hs-from-1:not(.hs-in) .lp-ed [data-doc="contents"]{opacity:1;visibility:visible}
+html.hs-from-1:not(.hs-in) .lp-ed [data-doc="draft"]{opacity:0;visibility:hidden}
+html.hs-from-1:not(.hs-in) .lp-ed .ed-toc li{opacity:clamp(0,calc(max(var(--hs-p0),var(--hs-p,0)) * 7 - var(--i) - .5),1);transition:opacity .5s ease}
+/* the screen boots: the logo at its middle, three times its letterhead size, revealed by the title
+   page's soft wipe; then it docks at the document's head, and the heading and the practices follow */
+html.hs-from-1:not(.hs-in) .lp-ed .ed-logo{transform:translate(389px,213px) scale(3);clip-path:inset(0 100% 0 0);animation:hsReveal 1.1s cubic-bezier(.65,0,.35,1) .2s forwards,hsDock 1s cubic-bezier(.6,0,.2,1) 1.45s forwards}
+html.hs-card-compact:not(.hs-in) .lp-ed .ed-logo{transform:translate(369px,208px) scale(2.4)}
+@keyframes hsDock{to{transform:none}}
+html.hs-from-1:not(.hs-in) .lp-ed :is(.ed-head,.ed-toc){opacity:0;animation:hsShow .7s ease 2.05s forwards}
+@keyframes hsShow{to{opacity:1}}
+html.hs-from-1 .lp-ed{transition:box-shadow 1s ease}
+html.hs-from-1:not(.hs-done) .lp-ed{z-index:5}   /* (above the paper while it clears, until the intro ends) */
 .lp-ed.live{pointer-events:auto}
 .ed-caret{display:inline-block;width:1.5px;height:1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hsCaret 1s steps(2,jump-none) infinite}
 @keyframes hsCaret{50%{opacity:0}}
@@ -135,10 +158,6 @@ html.js:not(.static) .hs-page:not(.quad) .pg-lines i{transform:scaleX(clamp(0,ca
 .hs-page.quad :is(.pg-rule,.pg-lines,.pg-mark,.pg-foot){opacity:0;transition:opacity .9s ease}
 /* (behind the camera, the page's words are hidden) */
 .hs-page.far{opacity:0;pointer-events:none}
-/* returning to a place in the film (a refresh, a link to a chapter): the sheet lifts away as the veil
-   clears on the view the reader left, and the words come back on the manuscript after */
-.hs-page.leaving{opacity:0;transition:opacity .45s ease}
-.hs-page.arriving{transition:opacity .6s ease}
 
 /* without scripts: the title page as a plain page, then the words */
 html:not(.js) .hs-veil{display:none}
