@@ -40,10 +40,27 @@ function start() {
   const page = sec.querySelector('.hs-page'), veil = sec.querySelector('.hs-veil');
   // 02's words: on the record's band (the cartouche, the frieze, the four boards), and its source below
   // (the years on the record go up each new year: the page was built with its own year's count; the
-  // reader's year decides, so the frieze turns over on the first of January without a rebuild)
+  // reader's year decides, so the frieze turns over on the first of January without a rebuild; and the
+  // colophon's year)
   sec.querySelectorAll('[data-years]').forEach(el => { el.textContent = capital(inWords(yearsIn(new Date().getFullYear()))); });
+  sec.querySelectorAll('[data-year]').forEach(el => { el.textContent = String(new Date().getFullYear()); });
   const rec = sec.querySelector('.hs-rec');
   const recParts = rec ? { crest: rec.querySelector('.rec-crest'), frieze: rec.querySelector('.rec-frieze'), boards: [...rec.querySelectorAll('.rec-board')], note: rec.querySelector('.rec-note') } : null;
+  // the frieze's headline is typed when the reader arrives: letter by letter while it types (each letter
+  // its own span), then whole again (the font's own spacing between the letters)
+  const recHl = recParts && recParts.frieze ? recParts.frieze.querySelector('.rec-hl') : null, recHlHTML = recHl ? recHl.innerHTML : '';
+  let typeT = 0;
+  function typeHeadline(on) {
+    if (!recHl) return;
+    clearTimeout(typeT);
+    recHl.classList.remove('typing'); recHl.innerHTML = recHlHTML;
+    if (!on || REDUCE) return;
+    const text = recHl.textContent;
+    recHl.textContent = '';
+    [...text].forEach((c, i) => { const s = document.createElement('span'); s.className = 'ch'; s.style.setProperty('--i', i); s.textContent = c; recHl.appendChild(s); });
+    recHl.classList.add('typing');
+    typeT = setTimeout(() => { recHl.classList.remove('typing'); recHl.innerHTML = recHlHTML; }, 200 + text.length * 34 + 260);
+  }
   const capEls = [...sec.querySelectorAll('.hs-cap')], heads = capEls.map(c => c.querySelector('.hs-hl'));
   const list = [...sec.querySelectorAll('.hs-list a')], lhRun = sec.querySelector('.lh-run');
   const ed = sec.querySelector('.lp-ed'), docs = ed ? [...ed.querySelectorAll('[data-doc]')] : [];
@@ -101,7 +118,7 @@ function start() {
   // framed for the window they are seen in: their highest things just below the letterhead, their foot
   // just above the chapter's words, the things that must show across them inside; the lens widens only
   // as far as that needs. The title page's view looks squarely down at the page.
-  let W = 0, H = 0, aspect = 1.6, capTops = [], edCompact = false, listRight = 0;
+  let W = 0, H = 0, aspect = 1.6, capTops = [], edCompact = false, listRight = 0, footTop = 1;
   const SCR = STUDY.SCREEN, SCR_TOP = SCR[0][1] + .13, SCR_FOOT = SCR[2][1] - .13;
   // the editor's own size: 1000 px wide, in the glass's proportions
   const ED_W = 1000, ED_H = ED_W * (SCR[0][1] - SCR[2][1]) / (SCR[1][0] - SCR[0][0]);
@@ -118,7 +135,8 @@ function start() {
   const headRow = () => (76 + 18) / Math.max(1, H);   // the letterhead's foot, and a little air
   function compose(v, capTop) {
     const [cx, cy, cz] = v.p, tn = q => (cy - q[1]) / (cz - q[2]);
-    const topRow = headRow(), footRow = capTop - v.gap, tTop = Math.min(...v.top.map(tn)), tFoot = tn(v.foot);
+    // (the view's foot stays above the chapter's words and above the stationery's foot line)
+    const topRow = headRow(), footRow = Math.min(capTop, footTop) - v.gap, tTop = Math.min(...v.top.map(tn)), tFoot = tn(v.foot);
     let T = Math.tan(v.fov * Math.PI / 360);
     T = Math.max(T, .5 * (tFoot - tTop) / Math.max(.2, footRow - topRow));
     // (the share of the frame's width the view may use either side of its middle: all of it, or what
@@ -272,9 +290,11 @@ function start() {
     // where each chapter's words begin, as a share of the stage's height (the views sit just above)
     const s = stage.getBoundingClientRect();
     capTops = CH.map(c => c.cap ? (c.cap.getBoundingClientRect().top - s.top) / Math.max(1, H) : 1);
-    // where the chapter list ends on the left (0 when it is not shown)
+    // where the chapter list ends on the left (0 when it is not shown), where the foot line begins
     const listEl = sec.querySelector('.hs-list'), lr = listEl && listEl.offsetParent ? listEl.getBoundingClientRect() : null;
     listRight = lr && lr.width > 0 ? lr.right - s.left : 0;
+    const fb = sec.querySelector('.hf-bar');
+    footTop = fb ? Math.min(1, (fb.getBoundingClientRect().top - s.top) / Math.max(1, H)) : 1;
     // the editor's setting for this window: the glass's width on the screen at the display's resting view
     const rest = compose(VIEWS.display, capTops[1] || 1), D = VIEWS.display.p[2] - SCR[0][2];
     edCompact = (SCR[1][0] - SCR[0][0]) * H / (2 * D * Math.tan(rest.fov * Math.PI / 360)) / ED_W < .55;
@@ -427,6 +447,24 @@ function start() {
     else if (fromI === 1 && bootLogo) loaderDrawn = playerOf(bootLogo).play().then(() => { ed.classList.add('docked'); return new Promise(r => setTimeout(r, 750)); });
     else if (fromI === RI && crestLogo) loaderDrawn = playerOf(crestLogo).play();
   }
+  // (02's cartouche waits with its logo not yet written, unless its own loader is writing it now; on the
+  // loader's card the headline is typed and the boards follow at once)
+  if (crestLogo && !(fromI === RI && !STATIC)) crestLogo.classList.add('ld-first');
+  if (fromI === RI && !STATIC) setTimeout(() => recArrive(true), 260);
+
+  // ---------- the stationery's foot: its button opens and closes it; at the film's end it opens by itself
+  // (and closes again when the reader scrolls back, unless the reader opened it) ----------
+  const foot = sec.querySelector('.hs-foot'), footBtn = foot && foot.querySelector('.hf-toggle'), footPanel = foot && foot.querySelector('.hf-panel');
+  let footBy = '';
+  function setFoot(open, by = '') {
+    if (!foot) return;
+    foot.dataset.open = open ? 'true' : 'false';
+    footBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) footPanel.removeAttribute('inert'); else footPanel.setAttribute('inert', '');
+    footBy = open ? by : '';
+  }
+  if (footBtn) footBtn.addEventListener('click', () => setFoot(foot.dataset.open !== 'true', 'reader'));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && foot && foot.dataset.open === 'true') { setFoot(false); footBtn.focus(); } });
   let headTimer = 0;
   function headerDrawing() {
     if (STATIC || REDUCE || !headLogo) return;
@@ -609,6 +647,19 @@ void main() {
     const v = vis.toFixed(3);
     if (recState.vis !== v) { recState.vis = v; rec.style.opacity = v; rec.style.visibility = vis > 0 ? 'visible' : 'hidden'; }
   }
+  // 02's words arrive with the reader: the pen writes the cartouche's logo, the headline is typed, the
+  // boards follow (house.css); when the reader leaves, all are made ready to arrive again
+  let recArrived = false;
+  function recArrive(on) {
+    if (!rec || on === recArrived) return;
+    recArrived = on;
+    rec.classList.toggle('typed', on);
+    typeHeadline(on);
+    const p = crestLogo ? playerOf(crestLogo) : null;
+    if (!p) return;
+    if (on) { if (REDUCE) p.settle(); else p.play(); } else p.reset();
+  }
+
   // the figures count up as their bays fill (a bay not begun shows its words only)
   const counts = recParts ? recParts.boards.map(el => ({ n: el.querySelector('.rec-n'), to: +el.dataset.to || 0, plus: el.dataset.plus || '', shown: null })) : [];
   const fmt = v => v.toLocaleString('en-GB');
@@ -667,6 +718,18 @@ void main() {
     const stP = at(Math.min(Pr, S - 1e-6));
     const fillCue = introDone && !glide && RI >= 0 && stP.i === RI && ((stP.phase === 0 && stP.m > .94) || (stP.phase === 1 && stP.k < .985)) ? 'on' : 'off';
     if (stage.dataset.fill !== fillCue) stage.dataset.fill = fillCue;
+    // 02's words: they arrive with the reader (once the camera is nearly before the record) and are made
+    // ready to arrive again when the reader walks away
+    if (rec && RI >= 0) {
+      const here = !introDone ? fromI === RI : stP.i === RI && (stP.phase > 0 || stP.m >= .9);
+      const away = !introDone ? fromI !== RI : stP.i !== RI || (stP.phase === 0 && stP.m < .75);
+      if (here) recArrive(true); else if (away) recArrive(false);
+    }
+    // the foot opens by itself at the film's end
+    if (foot) {
+      const atEnd = introDone && Pt > S - .02;
+      if (atEnd && !footBy) setFoot(true, 'end'); else if (!atEnd && footBy === 'end') setFoot(false);
+    }
     // coming back to 02: on the loader's card the figures count, bay by bay, as the house loads
     if (!introStart && !introDone && RI >= 0 && fromI === RI) { loaderK = Math.min(loadP, loaderK + dt * .55); countUp(counts.map((c, b) => clamp(loaderK * counts.length - b))); }
     if (!world || !ready) return true;

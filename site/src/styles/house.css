@@ -158,8 +158,70 @@ html.hs-from-2:not(.hs-in) .hs-rec :is(.rec-crest,.rec-frieze,.rec-board){transf
    from the same frame the film draws; its edges fade into the paper, and the words are live on it) */
 html.hs-from-2:not(.hs-done) .rec-card{display:block;position:absolute;left:var(--rc-x);top:var(--rc-y);width:calc(var(--band-w) * var(--rc-u));height:calc(var(--band-h) * var(--rc-u));background:var(--rc-img) center / 100% 100% no-repeat,linear-gradient(to bottom,transparent 0,transparent var(--cor0),#5E432B var(--cor0),#5E432B var(--cor1),#7E5D3F var(--cor1));-webkit-mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 84%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 84%,transparent);mask-composite:intersect;transition:opacity .6s ease}
 html.hs-from-2.hs-in .rec-card{opacity:0}
+/* (the card is drawn in from the left as the page opens, as the title page's logo is revealed) */
+html.hs-from-2:not(.hs-in) .rec-card{animation:hsCardIn 1.2s cubic-bezier(.3,.6,.3,1) .1s both}
+@keyframes hsCardIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media (prefers-reduced-motion:reduce){html.hs-from-2 .rec-card{animation:none}}
 html.hs-loading.hs-from-2 .rec-crest .ld-layers{display:block}
 html.hs-loading.hs-from-2 .rec-crest .ld-real{opacity:0}
+
+/* ---------- 02's words arrive, never just appear: the pen writes the cartouche's logo (film.js), the
+   frieze's headline is typed letter by letter, and the boards follow one after another ---------- */
+.hs-rec:not(.typed) .rec-hl{opacity:0}
+.rec-hl.typing .ch{opacity:0;animation:recType .16s ease forwards;animation-delay:calc(var(--i) * 34ms + .2s)}
+@keyframes recType{to{opacity:1}}
+.hs-rec:not(.typed) .rec-board{opacity:0;transition:opacity .25s ease}
+.hs-rec.typed .rec-board{opacity:1;transition:opacity .7s ease calc(1.25s + var(--b) * 170ms)}
+@media (prefers-reduced-motion:reduce){.rec-hl.typing .ch{animation:none;opacity:1}.hs-rec.typed .rec-board{transition:none}}
+
+/* ---------- the stationery's foot: a line along the bottom of the page, as the letterhead runs along
+   the top; opened (its button, or by itself at the film's end) it rises into the colophon ---------- */
+html[data-page="house"]{--foot-h:38px}
+.hs-foot{position:absolute;left:0;right:0;bottom:0;z-index:7;color:var(--hs-ink)}
+.hf-bar{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:var(--foot-h);padding:0 var(--lp-x);background:#F3EEE3;font:400 .78rem/1 var(--sans);color:rgba(19,36,79,.74)}
+.hf-bar::before{content:"";position:absolute;left:var(--lp-x);right:var(--lp-x);top:0;height:1px;background:rgba(19,36,79,.2)}
+.hf-brand{font:600 .88rem/1 var(--serif);letter-spacing:.02em;color:var(--hs-ink);text-decoration:none}
+.hf-bar a{color:inherit;text-decoration:none;transition:color .2s}
+.hf-bar a:hover{color:var(--hs-pen)}
+.hf-sep{opacity:.45}
+.hf-narrow{display:none}
+.hf-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:8px;padding:4px 0 3px;background:none;border:0;border-bottom:1.5px solid var(--hs-pen);font:italic 400 .92rem/1 var(--serif);color:var(--hs-ink);cursor:pointer}
+.hf-toggle i{width:6px;height:6px;border-left:1.5px solid currentColor;border-top:1.5px solid currentColor;transform:translateY(2px) rotate(45deg);transition:transform .4s ease}
+.hs-foot[data-open="true"] .hf-toggle i{transform:translateY(-2px) rotate(225deg)}
+.hf-close,.hs-foot[data-open="true"] .hf-open{display:none}
+.hs-foot[data-open="true"] .hf-close{display:inline}
+.hf-panel{position:absolute;left:0;right:0;bottom:var(--foot-h);z-index:1;padding:30px var(--lp-x) 20px;background:#F3EEE3;box-shadow:0 -26px 60px rgba(40,30,20,.13);transform:translateY(calc(100% + var(--foot-h)));opacity:0;transition:transform .6s cubic-bezier(.2,.7,.2,1),opacity .4s ease}
+.hs-foot[data-open="true"] .hf-panel{transform:none;opacity:1}
+.hf-cols{display:grid;grid-template-columns:1.35fr 1fr 1fr 1.1fr;gap:26px 44px;max-width:1180px;margin:0 auto}
+.hf-about img{display:block;width:200px;height:auto}
+.hf-about p{margin:14px 0 0;max-width:32ch;font:italic 400 .95rem/1.5 var(--serif);color:rgba(19,36,79,.72)}
+.hf-col h3{margin:2px 0 12px;font:500 .76rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--hs-pen)}
+.hf-col ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.hf-col a{font:400 .96rem/1.3 var(--serif);color:var(--hs-ink);text-decoration:none}
+.hf-col a:hover,.hf-col a:focus-visible{box-shadow:inset 0 -1.5px 0 var(--hs-pen);outline:0}
+.hf-col a[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.hf-col address{display:grid;margin-top:12px;font:normal 400 .84rem/1.5 var(--sans);color:rgba(19,36,79,.7)}
+.hf-colophon{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;max-width:1180px;margin:24px auto 0;padding-top:14px;border-top:1px solid rgba(19,36,79,.15);font:400 .8rem/1.4 var(--sans);color:rgba(19,36,79,.64)}
+.hf-colophon a{color:var(--hs-ink);text-decoration:none;box-shadow:inset 0 -1px 0 rgba(180,80,15,.6)}
+.hf-heart{color:#B4500F}
+html.hs-loading .hs-foot{opacity:0}
+.hs-foot{transition:opacity .9s ease .3s}
+/* phones: the line says less; the colophon is a sheet from the bottom, its sections one under another */
+@media (max-width:760px){
+  html[data-page="house"]{--foot-h:44px}
+  .hf-wide{display:none}
+  .hf-narrow{display:inline}
+  .hf-panel{max-height:min(78svh,640px);overflow:auto;padding:22px 20px 16px;border-radius:16px 16px 0 0}
+  .hf-cols{grid-template-columns:1fr;gap:22px}
+  .hf-about img{width:170px}
+}
+/* the things at the stage's foot stand above the foot's line */
+.hs-stage .hs-cue{bottom:calc(var(--foot-h) + clamp(10px,2vh,20px))}
+.hs-rec :is(.rec-note,.rec-cue){bottom:calc(var(--foot-h) + clamp(10px,1.8vh,18px))}
+.hs-caps{bottom:calc(var(--foot-h) + clamp(24px,5vh,56px))}
+html:not(.js) .hf-toggle{display:none}
+html:not(.js) .hs-foot{position:static}
+html:not(.js) .hf-panel{position:static;transform:none;opacity:1;box-shadow:none}
 
 /* ---------- the scroll cue, at the foot of the title page's frame: the words and a line with a mark
    running down it; in paper colour (the title's frame is in lamplight shade there) ---------- */

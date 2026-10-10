@@ -109,5 +109,12 @@ export function createLogoPlayer(el, { write = { rot: 46, scale: .76 }, speed = 
   }
   // shown finished at once (reduced motion, or a loader that is skipped)
   function settle() { cancelAnimationFrame(raf); if (playing && ink) { clock = T.end; renderAt(clock); } finish(); }
-  return { play, settle, ready: makeInk, measure, get playing() { return playing; }, duration: T.end / speed };
+  // back to before the drawing: the base showing, the line not yet written, the labels and the real logo
+  // hidden (a logo the film draws again each time the reader arrives)
+  function reset() {
+    cancelAnimationFrame(raf); playing = false; done = null; clock = 0; last = null;
+    el.classList.add('ld-first'); el.classList.remove('drawing');
+    if (ink) { measure(); renderAt(0); }
+  }
+  return { play, settle, reset, ready: makeInk, measure, get playing() { return playing; }, duration: T.end / speed };
 }

@@ -10,7 +10,7 @@
 // only the chapters built so far can be reached. /lamplight/ stays as it was, for comparison.
 import Base from '../../layouts/Base.astro';
 import { lamp } from '../../data/lamp';
-import { site, contact } from '../../data/site';
+import { site, contact, office } from '../../data/site';
 import { href } from '../../lib/url';
 import { osf } from '../../scripts/lamp/figures.js';
 import { LAYOUT, PX as REC_PX, CARD, CORNICE } from '../../scripts/house/record-layout.js';
@@ -186,7 +186,7 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
             <!-- (one line: the frieze centres a single run of text; the years' number in it is kept current
                  by film.js) -->
             <h2 class="rec-frieze" id="on-the-record" style={bandVars(LAYOUT.frieze)}><span class="rec-hl">{recCh.headline.startsWith(YEARS_WORD_CAP) ? <Fragment><span data-years>{YEARS_WORD_CAP}</span>{recCh.headline.slice(YEARS_WORD_CAP.length)}</Fragment> : recCh.headline}</span></h2>
-            <ol class="rec-boards">{figures.map((f, i) => <li class="rec-board" data-to={f.n} data-plus={f.plus} style={bandVars(LAYOUT.boards[i])}><b class="rec-n">{f.text}</b><span class="rec-l">{f.label}</span></li>)}</ol>
+            <ol class="rec-boards">{figures.map((f, i) => <li class="rec-board" data-to={f.n} data-plus={f.plus} style={`${bandVars(LAYOUT.boards[i])};--b:${i}`}><b class="rec-n">{f.text}</b><span class="rec-l">{f.label}</span></li>)}</ol>
             <p class="rec-note">{lamp.footnote}</p>
             <!-- while the record fills: the scroll goes on, as the title page's cue says (gone once it is full) -->
             <div class="rec-cue" aria-hidden="true"><span>Scroll to fill the shelves</span><i></i></div>
@@ -212,6 +212,49 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
 
         <!-- at the title page: the scroll goes on too, not only Begin reading (gone once the reader scrolls) -->
         <div class="hs-cue" aria-hidden="true"><span>Scroll to begin</span><i></i></div>
+
+        <!-- the stationery's foot (section 11.12): a line along the bottom, as the letterhead runs along
+             the top; opened (its button, or by itself at the film's end) it rises into the colophon. On a
+             phone the line says less and the colophon is a sheet from the bottom -->
+        <footer class="hs-foot" data-open="false" aria-label="Contact and colophon">
+          <div class="hf-bar">
+            <a class="hf-brand" href="#title-page" data-go="0">MeWriT</a>
+            <span class="hf-sep hf-wide" aria-hidden="true">·</span><a class="hf-wide" href={contact.phoneHref}>{contact.phoneDisplay}</a>
+            <span class="hf-sep hf-wide" aria-hidden="true">·</span><a class="hf-wide" href={`mailto:${contact.email}`}>{contact.email}</a>
+            <span class="hf-sep hf-narrow" aria-hidden="true">·</span><span class="hf-narrow">Contact</span>
+            <button class="hf-toggle" type="button" aria-expanded="false" aria-controls="hs-foot-panel"><span class="hf-open">Open</span><span class="hf-close">Close</span><i aria-hidden="true"></i></button>
+          </div>
+          <div class="hf-panel" id="hs-foot-panel" inert>
+            <div class="hf-cols">
+              <div class="hf-col hf-about">
+                <img src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230" loading="lazy">
+                <p>{title.line}</p>
+              </div>
+              <div class="hf-col">
+                <h3>The practices</h3>
+                <ul>{lamp.contents.map(e => { const b = BUILT.indexOf(e.go); return <li><a href={`#${e.go}`} data-go={b >= 0 ? b : undefined} aria-disabled={b < 0 ? 'true' : undefined}>{e.name}</a></li>; })}</ul>
+              </div>
+              <div class="hf-col">
+                <h3>MeWriT</h3>
+                <ul>
+                  <li><a href={href('/leadership/hetal-shah/')}>Dr Hetal Shah</a></li>
+                  <li><a href={contact.academy} target="_blank" rel="noopener">MeWriT Academy <span aria-hidden="true">↗</span></a></li>
+                  <li><a href={contact.linkedin} target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a></li>
+                </ul>
+              </div>
+              <div class="hf-col">
+                <h3>Write to us</h3>
+                <ul>
+                  <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+                  <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+                  <li><a href={contact.whatsapp} target="_blank" rel="noopener">WhatsApp <span aria-hidden="true">↗</span></a></li>
+                </ul>
+                <address>{office.map(l => <span>{l}</span>)}</address>
+              </div>
+            </div>
+            <p class="hf-colophon"><span>© <span data-year>{new Date().getFullYear()}</span> MeWriT</span><span>Made with <span class="hf-heart" role="img" aria-label="love">♥</span> by <a href="https://github.com/Git-Ansh" target="_blank" rel="noopener">Ansh Shah</a></span></p>
+          </div>
+        </footer>
 
         <!-- the other chapters' words, centred below each chapter's object -->
         <div class="hs-caps">
