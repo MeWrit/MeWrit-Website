@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import { PAL, mat, rbox, box, at, lathe, cyl, tube, group, panel, shadows, plasterTex, oakTex, boardsTex, paperTex, typeLines, roundRect, spineTex, canvasTex, rng, contact, bake, hipRoof } from './kit.js';
 import { buildOutside, GARDEN } from './outside.js';
+import { bookGeometry, bookMaterial, pickSpine } from './books.js';
 
 export const STUDY = {
   WALL: -7, FLOOR: -7.5, CEIL: 15.5,
@@ -419,6 +420,78 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     G.add(shade);
     lampAt.at = [j2[0] + dir.x * .9, j2[1] + dir.y * .9, j2[2] + dir.z * .9]; lampAt.aim = aim;
     lampAt.bulb = [j2[0] + dir.x * .62, j2[1] + dir.y * .62, j2[2] + dir.z * .62];
+  }
+
+  // ---------- right of the desk: a tall bookcase against the back wall (the wall there was bare), and a
+  // clock between it and the window ----------
+  {
+    const BX0 = 19.4, BX1 = 33.2, BD = 1.9, BTOP = 14.6, caseOak = mat('#8E6A47', { map: oakTex('#8E6A47', '#5A3F27', 33), r: .64 });
+    const mid = (BX0 + BX1) / 2, R = rng(71);
+    G.add(at(rbox(BX1 - BX0, BTOP - FLOOR, .25, .03, caseOak), mid, (FLOOR + BTOP) / 2, WALL + .125));   // the back
+    for (const x of [BX0, BX1]) G.add(at(rbox(.4, BTOP - FLOOR, BD + .1, .04, caseOak), x, (FLOOR + BTOP) / 2, WALL + (BD + .1) / 2));
+    G.add(at(rbox(BX1 - BX0 + 1, .55, BD + .5, .08, caseOak), mid, BTOP + .27, WALL + (BD + .5) / 2));   // the cornice, under the room's
+    G.add(at(rbox(BX1 - BX0, 1, BD + .05, .04, caseOak), mid, FLOOR + .5, WALL + BD / 2));   // the plinth
+    const SH = 7, pitch = (BTOP - FLOOR - 1.4) / SH, items = [];
+    for (let s = 0; s <= SH; s++) {
+      const y = FLOOR + 1 + s * pitch;
+      G.add(at(rbox(BX1 - BX0 - .4, .16, BD, .03, caseOak), mid, y, WALL + BD / 2));
+      if (s === SH) break;
+      // the row: books standing, now and then something else on the shelf (a framed photograph, a
+      // little plant, a box of cards), a short pile lying flat
+      let a = BX0 + .5;
+      const extra = s === 2 ? 'photo' : s === 4 ? 'plant' : s === 5 ? 'box' : null;
+      while (a < BX1 - .5) {
+        if (extra && a > mid - 1.5 && a < mid + .5) {
+          if (extra === 'photo') {
+            const pw = 1.5, ph = 1.9, fr = group(at(rbox(pw, ph, .14, .04, mat(PAL.navy, { r: .45 })), 0, ph / 2, 0), at(panel(pw - .3, ph - .3, mat('#C7B9A1', { r: .9 })), 0, ph / 2, .075));
+            fr.position.set(a + pw / 2, y + .08, WALL + 1.1); fr.rotation.set(-.12, -.18, 0); G.add(fr);
+            a += pw + .5;
+          } else if (extra === 'plant') {
+            const pot = lathe([[0, 0], [.42, 0], [.5, .7], [.46, .74], [0, .72]], mat('#C8622A', { r: .6 })); pot.position.set(a + .6, y + .08, WALL + 1); G.add(pot);
+            for (let k = 0; k < 5; k++) { const lf = new THREE.Mesh(new THREE.SphereGeometry(.32, 10, 8), mat('#5E7D66', { r: .8 })); lf.scale.set(1, .7, 1); lf.position.set(a + .6 + (R() - .5) * .5, y + .95 + R() * .3, WALL + 1 + (R() - .5) * .4); lf.castShadow = true; G.add(lf); }
+            a += 1.7;
+          } else {
+            G.add(at(rbox(1.6, .9, 1.3, .06, mat('#E9E2D3', { r: .85 })), a + .8, y + .08 + .45, WALL + .9), at(rbox(1.66, .14, 1.36, .04, mat('#22325A', { r: .6 })), a + .8, y + .08 + .97, WALL + .9));
+            a += 2.1;
+          }
+          continue;
+        }
+        if (R() < .07 && a < BX1 - 2.6) {
+          let yy = y + .08; const pw = 1.6 + R() * .5, n = 2 + Math.floor(R() * 3), bd = 1.2 + R() * .2;
+          for (let k = 0; k < n; k++) { const t = .22 + R() * .12; items.push({ x: a + pw / 2 + (R() - .5) * .1, y: yy + t / 2, z: WALL + .3 + bd / 2, w: pw, h: t, d: bd, flat: true, ...pickSpine(R() < .6 ? 'hardback' : 'modern', R), shade: .86 + R() * .22 }); yy += t; }
+          a += pw + .15; continue;
+        }
+        const fam = R() < .5 ? 'hardback' : R() < .4 ? 'binder' : R() < .5 ? 'journal' : 'modern';
+        const bw = fam === 'binder' ? .45 + R() * .15 : fam === 'journal' ? .2 + R() * .12 : .26 + R() * .28;
+        const bh = Math.min(pitch - .45, (fam === 'binder' ? 2.0 : 1.5) + R() * .6), bd = 1.15 + R() * .3;
+        if (a + bw > BX1 - .5) break;
+        items.push({ x: a + bw / 2, y: y + .08 + bh / 2, z: WALL + .3 + bd / 2, w: bw, h: bh, d: bd, lean: R() < .04 ? (R() - .5) * .2 : 0, ...pickSpine(fam, R), shade: .86 + R() * .22 });
+        a += bw + .015;
+      }
+    }
+    const geo = bookGeometry(items.length), books = new THREE.InstancedMesh(geo, bookMaterial(), items.length);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), p = new THREE.Vector3(), cc = new THREE.Color();
+    items.forEach((b, i) => {
+      if (b.flat) { e.set(0, 0, Math.PI / 2); sc.set(b.h, b.w, b.d); } else { e.set(0, 0, b.lean || 0); sc.set(b.w, b.h, b.d); }
+      q.setFromEuler(e); p.set(b.x, b.y, b.z); books.setMatrixAt(i, m4.compose(p, q, sc)); books.setColorAt(i, cc.set(b.col).multiplyScalar(b.shade));
+      geo.attributes.aTile.setX(i, b.tile); geo.attributes.aShade.setX(i, b.shade);
+    });
+    books.castShadow = false; books.receiveShadow = true; G.add(books);
+    G.add(contact(BX1 - BX0 + 1.4, BD + 1.4, mid, WALL + BD / 2, { y: FLOOR, k: .3 }));
+    // the clock: a brass bezel, an ivory face with its hours, navy hands at ten past ten
+    const CX = 17.5, CY = 10, CR = 1.2;
+    const face = canvasTex(256, 256, (c, w, h) => {
+      c.fillStyle = '#F6F1E6'; c.fillRect(0, 0, w, h);
+      c.strokeStyle = '#22325A'; c.lineWidth = 5; c.beginPath(); c.arc(w / 2, h / 2, w / 2 - 14, 0, Math.PI * 2); c.stroke();
+      for (let k = 0; k < 60; k++) { const a = k / 60 * Math.PI * 2, r0 = w / 2 - (k % 5 ? 26 : 34), r1 = w / 2 - 22; c.lineWidth = k % 5 ? 2 : 5; c.beginPath(); c.moveTo(w / 2 + Math.sin(a) * r0, h / 2 - Math.cos(a) * r0); c.lineTo(w / 2 + Math.sin(a) * r1, h / 2 - Math.cos(a) * r1); c.stroke(); }
+      c.fillStyle = '#22325A'; c.font = '600 30px Georgia, serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      [[12, 0], [3, 1], [6, 2], [9, 3]].forEach(([n, i]) => { const a = i * Math.PI / 2, r = w / 2 - 58; c.fillText(String(n), w / 2 + Math.sin(a) * r, h / 2 - Math.cos(a) * r); });
+    }, { aniso: 4 });
+    G.add(at(cyl(CR + .16, CR + .16, .3, mat(PAL.gold, { r: .3, m: .85 }), 48), CX, CY, WALL + .15, { x: Math.PI / 2 }));
+    const dial = new THREE.Mesh(new THREE.CircleGeometry(CR, 48), mat('#FFFFFF', { map: face, r: .5 })); dial.position.set(CX, CY, WALL + .31); dial.receiveShadow = true; G.add(dial);
+    const hand = (len, wid, ang) => { const m = at(rbox(wid, len, .04, .01, mat('#13244F', { r: .5 })), CX + Math.sin(ang) * len / 2, CY + Math.cos(ang) * len / 2, WALL + .36); m.rotation.z = -ang; return m; };
+    G.add(hand(.62, .09, (10 + 10 / 60) / 12 * Math.PI * 2), hand(.92, .06, 10 / 60 * Math.PI * 2));
+    G.add(at(cyl(.07, .07, .08, mat(PAL.gold, { r: .3, m: .85 }), 12), CX, CY, WALL + .38, { x: Math.PI / 2 }));
   }
 
   // ---------- where things meet the desk and the floor: a soft shade under each ----------

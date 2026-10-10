@@ -4,6 +4,8 @@
 // (July 2026) and Dr Hetal's CV; Dr Hetal to confirm. The two scenes whose picture or figures are
 // illustrative say so on the page (their `note` in scenes.js).
 
+import { YEARS_WORD_CAP } from './years';
+
 export type XpScene = { id: string; kicker: string; title: string; text: string; docs?: string[]; hint?: string; cta?: boolean };
 
 export const experience = {
@@ -56,7 +58,7 @@ export const experience = {
     },
     {
       id: 'ai', kicker: '05 · AI/ML advisory', title: 'Domain expertise, in the loop',
-      text: 'For teams building AI and ML for medical writing: subject-matter expertise for solution teams, human-in-the-loop review of generated content for accuracy, relevance and quality, usability testing, and expert webinars. Twenty-two years of clinical research judgement, applied to what the model writes.',
+      text: `For teams building AI and ML for medical writing: subject-matter expertise for solution teams, human-in-the-loop review of generated content for accuracy, relevance and quality, usability testing, and expert webinars. ${YEARS_WORD_CAP} years of clinical research judgement, applied to what the model writes.`,
       docs: ['SME for AI/ML solution teams', 'Expert HITL support', 'Usability and quality review', 'Expert webinars'],
     },
     {

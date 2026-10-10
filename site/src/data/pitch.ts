@@ -4,6 +4,7 @@
 // enquiry. Every figure, name and quote comes from MeWriT's own deck (July 2026) and CV (Aug 2026).
 import { contact } from './site';
 import { href } from '../lib/url';
+import { YEARS, YEARS_WORD_CAP } from './years';
 
 export type PitchLink = { label: string; href: string; external?: boolean };
 export type Practice = {
@@ -73,9 +74,9 @@ export const practices = {
 
 export const proof = {
   eyebrow: 'Experience',
-  title: 'Twenty-two years, on the record',
+  title: `${YEARS_WORD_CAP} years, on the record`,
   figures: [
-    { value: '22+', label: 'years in clinical research and medical writing' },
+    { value: `${YEARS}+`, label: 'years in clinical research and medical writing' },
     { value: '100+', label: 'essential trial documents' },
     { value: '30+', label: 'clinical study reports to ICH E3' },
     { value: '30+', label: 'CTD summaries for global submissions' },
@@ -159,7 +160,7 @@ export const acknowledged = {
 
 export const credentials = {
   eyebrow: 'Who leads the work',
-  title: 'A principal consultant with 22 years in clinical research',
+  title: `A principal consultant with ${YEARS} years in clinical research`,
   text: "MeWriT's principal consultant, Dr Hetal Shah, PhD (Pharmacology), has worked across clinical sites, CROs and medical writing since 2003, including as principal medical writer on India's landmark COVAXIN trial. She is Section Editor for Medical Writing at Perspectives in Clinical Research, a member of the ISCR Medical Writing Council (Hall of Fame 2021 to 2023), a DIA global mentor and subject-matter expert, and Scientific Programme Co-chair of DIA India's Medical Writing and Scientific Communication Conference 2026. Projects draw on an extended team of medical writers, therapeutic-area experts and biostatisticians.",
   link: { label: 'Full profile', href: href('/leadership/hetal-shah/') } as PitchLink,
   values: ['Scientific rigour', 'Participant centricity', 'Quality and excellence', 'Integrity', 'Confidentiality', 'Trust and collaboration'],

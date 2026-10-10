@@ -17,10 +17,14 @@ export const RX0 = REC.x0, RX1 = REC.x0 + REC.bays * REC.bay, RCX = (RX0 + RX1) 
 // the face the words lie on (z) and the band's extent in the hall
 export const FACE = REC.z + REC.depth + .33;
 export const BAND = { x0: RX0 - .4, x1: RX1 + .4, top: CREST[1], bottom: BOARD[0] };
-// the band's parts as rectangles in it: { x, y, w, h }
-const part = (x0, x1, y0, y1) => ({ x: x0 - BAND.x0, y: BAND.top - y1, w: x1 - x0, h: y1 - y0 });
+// the loader's card: the band, a little wall above the cartouche and the top shelf of volumes below the
+// boards, shown as a picture of the 3D itself (public/house/record-band.webp: rendered by the
+// scratchpad's band_shot.js from this same frame) with the words live on it
+export const CARD = { x0: BAND.x0 - .6, x1: BAND.x1 + .6, top: BAND.top + .5, bottom: BOARD[0] - REC.pitch - .25 };
+// the band's parts as rectangles in the card: { x, y, w, h }
+const part = (x0, x1, y0, y1) => ({ x: x0 - CARD.x0, y: CARD.top - y1, w: x1 - x0, h: y1 - y0 });
 export const LAYOUT = {
-  w: BAND.x1 - BAND.x0, h: BAND.top - BAND.bottom,
+  w: CARD.x1 - CARD.x0, h: CARD.top - CARD.bottom,
   crest: part(RCX - 6.5, RCX + 6.5, CREST[0], CREST[1]),
   frieze: part(BAND.x0, BAND.x1, FRIEZE[0], FRIEZE[1]),
   boards: Array.from({ length: REC.bays }, (_, b) => part(RX0 + b * REC.bay + .7, RX0 + (b + 1) * REC.bay - .7, BOARD[0], BOARD[1])),

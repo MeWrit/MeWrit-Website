@@ -18,7 +18,8 @@
 import * as THREE from 'three';
 import { PAL, mat, rbox, box, at, cyl, group, shadows, plasterTex, oakTex, boardsTex, canvasTex, rng, contact, hipRoof } from './kit.js';
 import { GARDEN } from './outside.js';
-import { REC, SHELF0 as R_SHELF0, BOARD as R_BOARD, FRIEZE as R_FRIEZE, CORNICE as R_CORNICE, CREST as R_CREST, FACE, BAND, LAYOUT } from './record-layout.js';
+import { REC, SHELF0 as R_SHELF0, BOARD as R_BOARD, FRIEZE as R_FRIEZE, CORNICE as R_CORNICE, CREST as R_CREST, FACE, BAND, CARD, LAYOUT } from './record-layout.js';
+import { bookGeometry, bookMaterial, pickSpine } from './books.js';
 
 export const HALL = {
   X0: -64, X1: -1, Z0: -7.5, Z1: -96, FLOOR: -7.5, TOP: 36.5, T: .6,
@@ -32,12 +33,13 @@ export const HALL = {
 };
 export const RECORD_TOP = R_CREST[1];
 
-// the bound volumes of each bay (02): their colours, and how thick and tall they run
+// the bound volumes of each bay (02): their kind (books.js: each with its own spines), and how thick and
+// tall they run (a few of another kind among them: a box file among the binders, a navy report)
 const BAYS = [
-  { cols: ['#22325A', '#1D2C53', '#2B3A5C', '#3D4E73', '#22325A', '#E9E2D3'], w: [.42, .62], h: [1.75, 2.1] },   // trial documents: navy binders
-  { cols: ['#E9E2D3', '#F1ECE1', '#E2DACB', '#1D2C53', '#E9E2D3', '#B4500F'], w: [.85, 1.25], h: [1.9, 2.12] },   // clinical study reports: deep ivory binders
-  { cols: ['#8C3B2E', '#5E7D66', '#3D4E73', '#A88B5E', '#7A8FA8', '#6B4E3A', '#C9D3E3', '#9E5A2C'], w: [.18, .34], h: [1.5, 2.0] },   // publications: journals
-  { cols: ['#B4500F', '#D2A24C', '#C8622A', '#E9E2D3', '#D9B866', '#8BA290'], w: [.2, .32], h: [1.45, 1.75] },   // professionals trained: workbooks
+  { fam: 'binder', w: [.48, .64], h: [1.96, 2.08], also: ['report', .1] },   // trial documents: binders, a report here and there
+  { fam: 'report', w: [.85, 1.2], h: [2.0, 2.12], also: ['binder', .08] },   // clinical study reports: deep ivory binders
+  { fam: 'journal', w: [.18, .32], h: [1.55, 2.0], also: ['modern', .1] },   // publications: journals, a bound proceedings or two
+  { fam: 'workbook', w: [.2, .32], h: [1.5, 1.72], also: ['modern', .08] },   // professionals trained: workbooks
 ];
 const STACKS = ['#22325A', '#2B3A5C', '#3D4E73', '#8C3B2E', '#9E5A2C', '#B4500F', '#D2A24C', '#5E7D66', '#E9E2D3', '#C9D3E3', '#6B4E3A', '#7A8FA8', '#1D2C53', '#A88B5E', '#4F6B4C', '#7C3B24'];
 
@@ -168,25 +170,38 @@ export function buildHall({ hi = true } = {}) {
     G.add(at(rbox(d1 - d0 + 2 * w, w, .16, .04, trim), (d0 + d1) / 2, top + w / 2, z));
   }
 
-  // ---------- the stacks' books: plain boxes in one instanced draw ----------
+  // ---------- the stacks' books: one instanced draw, each with its own spine (books.js) ----------
+  // (each turned so its spine faces the room; now and then a row begins with a short pile lying flat,
+  // and a book leans)
   {
     const items = [];
     for (const row of rows) {
-      for (let a = row.a0; a < row.a1;) {
-        if (R() < .04) { a += .25 + R() * .6; continue; }
-        const bw = .24 + R() * .3, bh = Math.min(row.hMax, 1.45 + R() * 1.05), bd = 1.15 + R() * .3;
+      const ry = row.along === 'x' ? (row.dir > 0 ? 0 : Math.PI) : (row.dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+      let a = row.a0;
+      if (R() < .12) {
+        const pw = 1.6 + R() * .6, n = 2 + Math.floor(R() * 3), bd = 1.2 + R() * .2;
+        let y = row.y;
+        for (let k = 0; k < n; k++) { const t = .22 + R() * .14, s = pickSpine(R() < .7 ? 'hardback' : 'modern', R); items.push({ row, a: a + pw / 2 + (R() - .5) * .12, y: y + t / 2, f: row.face + row.dir * bd / 2, w: pw, h: t, d: bd, ry, flat: true, lean: 0, ...s, shade: .85 + R() * .25 }); y += t; }
+        a += pw + .12;
+      }
+      while (a < row.a1) {
+        if (R() < .03) { a += .25 + R() * .5; continue; }
+        const fam = R() < .6 ? 'hardback' : R() < .5 ? 'journal' : 'modern';
+        const bw = fam === 'journal' ? .2 + R() * .14 : .26 + R() * .3, bh = Math.min(row.hMax, (fam === 'journal' ? 1.6 : 1.45) + R() * 1.0), bd = 1.15 + R() * .3;
         if (a + bw > row.a1) break;
-        const lean = R() < .025 ? (R() - .5) * .22 : 0;
-        items.push({ row, a: a + bw / 2, y: row.y + bh / 2, f: row.face + row.dir * bd / 2, w: bw, h: bh, d: bd, lean, col: STACKS[Math.floor(R() * STACKS.length)], k: .82 + R() * .3 });
+        items.push({ row, a: a + bw / 2, y: row.y + bh / 2, f: row.face + row.dir * bd / 2, w: bw, h: bh, d: bd, ry, lean: R() < .03 ? (R() - .5) * .22 : 0, ...pickSpine(fam, R), shade: .85 + R() * .25 });
         a += bw + .015;
       }
     }
-    const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat('#ffffff', { r: .8 }), items.length);
-    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), p = new THREE.Vector3(), cc = new THREE.Color();
+    const geo = bookGeometry(items.length), mesh = new THREE.InstancedMesh(geo, bookMaterial(), items.length);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(0, 0, 0, 'YXZ'), sc = new THREE.Vector3(), p = new THREE.Vector3(), cc = new THREE.Color();
+    const tile = geo.attributes.aTile, shadeA = geo.attributes.aShade;
     items.forEach((b, i) => {
-      if (b.row.along === 'x') { e.set(0, 0, b.lean); sc.set(b.w, b.h, b.d); p.set(b.a, b.y, b.f); }
-      else { e.set(b.lean, 0, 0); sc.set(b.d, b.h, b.w); p.set(b.f, b.y, b.a); }
-      q.setFromEuler(e); mesh.setMatrixAt(i, m4.compose(p, q, sc)); mesh.setColorAt(i, cc.set(b.col).multiplyScalar(b.k));
+      // (a book lying flat: turned a quarter about its spine's axis, its thickness upright)
+      if (b.flat) { e.set(0, b.ry, Math.PI / 2); sc.set(b.h, b.w, b.d); } else { e.set(0, b.ry, b.lean); sc.set(b.w, b.h, b.d); }
+      if (b.row.along === 'x') p.set(b.a, b.y, b.f); else p.set(b.f, b.y, b.a);
+      q.setFromEuler(e); mesh.setMatrixAt(i, m4.compose(p, q, sc)); mesh.setColorAt(i, cc.set(b.col).multiplyScalar(b.shade));
+      tile.setX(i, b.tile); shadeA.setX(i, b.shade);
     });
     mesh.castShadow = false; mesh.receiveShadow = true;
     G.add(mesh);
@@ -233,16 +248,17 @@ export function buildHall({ hi = true } = {}) {
       for (let s = REC.shelves - 1; s >= 0; s--) {
         const y = R_SHELF0 + s * REC.pitch;
         for (let a = a0; a < a1;) {
+          const other = RR() < spec.also[1], s = pickSpine(other ? spec.also[0] : spec.fam, RR);
           const bw = spec.w[0] + RR() * (spec.w[1] - spec.w[0]), bh = Math.min(REC.pitch - .45, spec.h[0] + RR() * (spec.h[1] - spec.h[0])), bd = 1.35 + RR() * .3;
           if (a + bw > a1) break;
-          items.push({ bay: b, x: a + bw / 2, y, z: back + .32 + bd / 2, w: bw, h: bh, d: bd, col: spec.cols[Math.floor(RR() * spec.cols.length)], k: .86 + RR() * .24 });
+          items.push({ bay: b, x: a + bw / 2, y, z: back + .32 + bd / 2, w: bw, h: bh, d: bd, ...s, shade: .88 + RR() * .2 });
           a += bw + .02;
         }
       }
     }
-    const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat('#ffffff', { r: .76, fresh: true }), items.length);
+    const geo = bookGeometry(items.length), mesh = new THREE.InstancedMesh(geo, bookMaterial(), items.length);
     const cc = new THREE.Color();
-    items.forEach((b, i) => mesh.setColorAt(i, cc.set(b.col).multiplyScalar(b.k)));
+    items.forEach((b, i) => { mesh.setColorAt(i, cc.set(b.col).multiplyScalar(b.shade)); geo.attributes.aTile.setX(i, b.tile); geo.attributes.aShade.setX(i, b.shade); });
     mesh.castShadow = false; mesh.receiveShadow = true; mesh.frustumCulled = false;
     mesh.userData.keep = true;
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
@@ -271,7 +287,7 @@ export function buildHall({ hi = true } = {}) {
   G.add(record.mesh);
   // where the record's words are laid (each four corners: top left, top right, bottom right, bottom
   // left), in the world: the band's parts, in its one plane
-  const quadOf = r => { const x0 = BAND.x0 + r.x, y1 = BAND.top - r.y; return [[x0, y1, FACE], [x0 + r.w, y1, FACE], [x0 + r.w, y1 - r.h, FACE], [x0, y1 - r.h, FACE]]; };
+  const quadOf = r => { const x0 = CARD.x0 + r.x, y1 = CARD.top - r.y; return [[x0, y1, FACE], [x0 + r.w, y1, FACE], [x0 + r.w, y1 - r.h, FACE], [x0, y1 - r.h, FACE]]; };
   const boards = LAYOUT.boards.map(quadOf), frieze = quadOf(LAYOUT.frieze), crest = quadOf(LAYOUT.crest);
   // the bays' lamps (their glows, for the film)
   const bayLamps = Array.from({ length: REC.bays }, (_, b) => [rx0 + (b + .5) * REC.bay, R_BOARD[0] - .7, face + .85]);
@@ -324,11 +340,18 @@ export function buildHall({ hi = true } = {}) {
       for (let i = 0; i < 9; i++) { c.beginPath(); const x = r() * w, y = 40 + r() * (h - 80), s = 30 + r() * 60; for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2, rr = s * (.6 + r() * .5); c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr * .7); } c.closePath(); c.fill(); }
       c.strokeStyle = 'rgba(90,70,40,.3)'; c.lineWidth = 1; for (let x = 0; x < w; x += 32) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); } for (let y = 0; y < h; y += 32) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
     }, { aniso: 4 });
-    const globe = new THREE.Mesh(new THREE.SphereGeometry(1.9, 32, 20), mat('#FFFFFF', { map: globeTex, r: .45 }));
-    globe.position.set(-8.5, FLOOR + 8.6, -80); globe.rotation.z = .4; globe.castShadow = globe.receiveShadow = true; G.add(globe);
-    const ringG = new THREE.Mesh(new THREE.TorusGeometry(2.2, .08, 8, 48), brass); ringG.position.copy(globe.position); ringG.rotation.set(0, Math.PI / 2, .4); ringG.castShadow = true; G.add(ringG);
-    G.add(at(cyl(.12, .2, 4.4, darkOak, 10), -8.5, FLOOR + 4.4, -80), at(cyl(1.4, 1.6, .3, darkOak, 24), -8.5, FLOOR + .15, -80));
-    G.add(contact(3.6, 3.6, -8.5, -80, { y: FLOOR, k: .24 }));
+    // the globe on its stand: a turned stand from the floor up to a brass meridian ring, upright, whose
+    // foot sits in the stand's cup; the globe turned on its tilted axis within it
+    const GX = -8.5, GZ = -80, GY = FLOOR + 8.6, GR = 1.9, RING = 2.2;
+    const globe = new THREE.Mesh(new THREE.SphereGeometry(GR, 32, 20), mat('#FFFFFF', { map: globeTex, r: .45 }));
+    globe.position.set(GX, GY, GZ); globe.rotation.z = .41; globe.castShadow = globe.receiveShadow = true; G.add(globe);
+    const ringG = new THREE.Mesh(new THREE.TorusGeometry(RING, .09, 8, 64), brass); ringG.position.set(GX, GY, GZ); ringG.rotation.y = Math.PI / 2; ringG.castShadow = true; G.add(ringG);
+    // (the axis through the poles, from the ring to the globe)
+    const axis = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, 2 * RING, 8), brass); axis.position.set(GX, GY, GZ); axis.rotation.z = .41; G.add(axis);
+    const stand = [[0, 0], [1.55, 0], [1.6, .12], [1.45, .24], [.62, .34], [.48, .52], [.36, 1.1], [.3, 1.9], [.46, 2.7], [.34, 3.5], [.22, 4.8], [.3, 5.4], [.2, 5.9], [.34, GY - RING - FLOOR - .25], [.42, GY - RING - FLOOR - .02], [.3, GY - RING - FLOOR + .04], [0, GY - RING - FLOOR + .04]];
+    const st2 = shadows(new THREE.Mesh(new THREE.LatheGeometry(stand.map(([r, y]) => new THREE.Vector2(r, y)), 24), darkOak));
+    st2.position.set(GX, FLOOR, GZ); G.add(st2);
+    G.add(contact(3.6, 3.6, GX, GZ, { y: FLOOR, k: .24 }));
   }
 
   // ---------- the pendants: globes on long rods from the beams ----------

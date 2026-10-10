@@ -3,6 +3,7 @@
 // fields ending in "Html", which may hold simple inline tags such as <em>.
 import type { IconName } from './icons';
 import { contact } from './site';
+import { YEARS } from './years';
 
 export type Cta = { label: string; href: string; style: 'primary' | 'outline' };
 
@@ -14,7 +15,7 @@ export const hero = {
     { label: 'Get in touch', href: '/#contact', style: 'primary' },
     { label: 'Explore trainings', href: '/#trainings', style: 'outline' },
   ] as Cta[],
-  founder: { name: 'Led by Dr Hetal Shah', role: 'PhD Pharmacologist · 22+ years in clinical research' },
+  founder: { name: 'Led by Dr Hetal Shah', role: `PhD Pharmacologist · ${YEARS}+ years in clinical research` },
   panelDescription: 'A technical drawing follows a medicine from molecule to manuscript: drug development, a randomised clinical trial, a systematic review, data and statistics, a survival analysis, the clinical study report, and a manuscript accepted for publication.',
   // the numbers bar at the foot of the hero (desktop)
   stats: [
@@ -37,7 +38,7 @@ export const founder = {
   eyebrow: 'Meet the founder',
   name: 'Dr Hetal Shah',
   role: 'Founder & Director',
-  bio: 'A PhD Pharmacologist and Gold (Double) Medalist with more than 22 years in clinical research and medical writing across clinical sites and CROs.',
+  bio: `A PhD Pharmacologist and Gold (Double) Medalist with more than ${YEARS} years in clinical research and medical writing across clinical sites and CROs.`,
   chips: ['Section Editor, PICR', 'ISCR life member', 'DIA Global Mentor', 'GCP trained'],
   link: { label: 'Read full profile', href: '/leadership/hetal-shah/' },
   // the honours roll on her profile; `home` marks the few named in one line on the home page.

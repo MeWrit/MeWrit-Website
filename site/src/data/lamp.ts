@@ -7,6 +7,7 @@
 import { practices, why, enquiry } from './pitch';
 import { contact, office } from './site';
 import { href } from '../lib/url';
+import { YEARS_WORD_CAP } from './years';
 
 export type LampAction = { label: string; href: string; kind?: 'scroll' | 'open' };
 export type LampCard = { k: string; t: string; live?: boolean; ai?: boolean };
@@ -20,7 +21,7 @@ export const lamp = {
     { id: 'title-page', num: '00', name: 'Title page', headline: 'Writing Science Right', line: "Specialist medical writing and scientific communication: expert judgement, with today's tools.", action: { label: 'Begin reading', href: '#contents', kind: 'scroll' },
       cards: [{ k: 'Draft 3', t: 'Saved to the cloud · just now', live: true }, { k: 'Reviewer', t: 'Checked against ICH E3 ✓' }, { k: '✦ Assistant', t: '42 of 42 references verified', ai: true }] },
     { id: 'contents', num: '01', name: 'Contents', headline: 'Five practices', line: 'Choose one, or read on.' },
-    { id: 'on-the-record', num: '02', name: 'On the record', headline: 'Twenty-two years, on the record', line: '100+ trial documents, 30+ clinical study reports, 70+ publications, 3,000+ professionals trained.', note: 1, action: { label: 'Publications', href: '#publications' },
+    { id: 'on-the-record', num: '02', name: 'On the record', headline: `${YEARS_WORD_CAP} years, on the record`, line: '100+ trial documents, 30+ clinical study reports, 70+ publications, 3,000+ professionals trained.', note: 1, action: { label: 'Publications', href: '#publications' },
       cards: [{ k: '✦ Citation map', t: '70+ publications · 25 acknowledgements', ai: true }] },
     { id: 'regulatory-writing', num: '03', name: 'Regulatory writing', headline: 'Submission-ready, to the letter', line: 'Protocols, clinical study reports, CTD modules and responses to regulators, for sponsors and CROs.', action: { label: 'Regulatory writing', href: href('/lamplight/regulatory-writing/'), kind: 'open' },
       cards: [{ k: 'eCTD · Module 2.7', t: 'Validated ✓' }, { k: 'Submission', t: 'Ready for e-submission', live: true }] },

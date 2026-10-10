@@ -8,7 +8,7 @@
    the logo's own box (its layout size, so a logo inside a scaled or tilted card draws in place). */
 import D from '../data/intro.json';
 import { clamp, easeOut, easeInOutCubic, easeInOutSine } from './shared.js';
-import { penPath, createInk } from './pen-ink.js';
+import { penPath, createInk, warmInk } from './pen-ink.js';
 
 // the timeline in ms (as version B's), and a replay's handover before 0
 export const LOGO_T = { pop: 420, liftStart: 560, travelEnd: 1320, drawStart: 1480, drawEnd: 3280, dockEnd: 3640, labelsStart: 3600, labelStep: 150, labelDur: 460, crossStart: 4320, end: 4540 };
@@ -20,6 +20,9 @@ const LIFT = 1.08;
 const mix = (a, b, u) => a + (b - a) * u;
 const easeOutBack = p => 1 + 2.5 * Math.pow(p - 1, 3) + 1.5 * Math.pow(p - 1, 2);
 const nibAt = t => atWeight(easeInOutSine(clamp((t - T.drawStart) / (T.drawEnd - T.drawStart))) * WT);
+// the ink's preparation, shared by every logo on the page: started early (while a loader shows), so no
+// logo's first drawing waits on it
+export const warmLogoInk = () => warmInk(D, P);
 
 // where the nib is (logo pixels), how the pen is posed and how much it is lifted (write: the pen's lean
 // and size while it travels and writes; version B's header leans it so it stays inside the screen)

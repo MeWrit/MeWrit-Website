@@ -32,10 +32,11 @@ const RAD = Math.PI / 180;
 
 // the tiers: how many pixels a frame may hold, the occlusion's share of the resolution (0: none) and
 // its samples, the anti-aliasing, the shadow maps' sizes (0: the lamp casts none)
-// (the sun's map covers the whole house, study and hall: the top tier draws it at 4096, so the study's
-// shadows stay as crisp as when the map covered the study alone)
+// (the sun's map is drawn over the room the camera is in: film.js sets its box for each place and widens
+// it on the way between two; 2048 everywhere: a 4096 map cost the GPU's memory 64 MB, more than a
+// laptop's browser could spare for the page's own layers)
 export const TIERS = {
-  high: { budget: 4.2e6, maxRatio: 2, ao: .5, aoSamples: 16, pdSamples: 12, smaa: true, shadow: 4096, lampShadow: 1024 },
+  high: { budget: 4.2e6, maxRatio: 2, ao: .5, aoSamples: 16, pdSamples: 12, smaa: true, shadow: 2048, lampShadow: 1024 },
   mid: { budget: 2.4e6, maxRatio: 1.5, ao: .5, aoSamples: 10, pdSamples: 8, smaa: true, shadow: 2048, lampShadow: 1024 },
   low: { budget: 1.3e6, maxRatio: 1, ao: 0, aoSamples: 8, pdSamples: 8, smaa: true, shadow: 1024, lampShadow: 0 },
 };

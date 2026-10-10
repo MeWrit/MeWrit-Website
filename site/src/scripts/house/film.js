@@ -25,10 +25,11 @@ import { splitLines } from '../lamp/text.js';
 import { createStage, TIER_ORDER } from './stage.js';
 import { buildStudy, STUDY } from './study.js';
 import { buildHall, HALL, RECORD_TOP } from './hall.js';
-import { FACE, BAND, LAYOUT, PX as REC_PX } from './record-layout.js';
+import { FACE, BAND, CARD, LAYOUT, PX as REC_PX } from './record-layout.js';
 import { route } from './route.js';
 import { bake } from './kit.js';
-import { createLogoPlayer } from '../logo-player.js';
+import { createLogoPlayer, warmLogoInk } from '../logo-player.js';
+import { yearsIn, inWords, capital } from '../../data/years';
 
 const sec = document.getElementById('hs');
 if (sec) start();
@@ -38,6 +39,9 @@ function start() {
   const track = sec.querySelector('.hs-track'), stage = sec.querySelector('.hs-stage'), canvas = sec.querySelector('.hs-canvas');
   const page = sec.querySelector('.hs-page'), veil = sec.querySelector('.hs-veil');
   // 02's words: on the record's band (the cartouche, the frieze, the four boards), and its source below
+  // (the years on the record go up each new year: the page was built with its own year's count; the
+  // reader's year decides, so the frieze turns over on the first of January without a rebuild)
+  sec.querySelectorAll('[data-years]').forEach(el => { el.textContent = capital(inWords(yearsIn(new Date().getFullYear()))); });
   const rec = sec.querySelector('.hs-rec');
   const recParts = rec ? { crest: rec.querySelector('.rec-crest'), frieze: rec.querySelector('.rec-frieze'), boards: [...rec.querySelectorAll('.rec-board')], note: rec.querySelector('.rec-note') } : null;
   const capEls = [...sec.querySelectorAll('.hs-cap')], heads = capEls.map(c => c.querySelector('.hs-hl'));
@@ -73,6 +77,24 @@ function start() {
   // the walks: from the display, left to the doorway, through it, and on and left into the hall, to the
   // record (the eyes between the two views')
   const WALKS = { door: route([[-7.55, 8.8, 3.4], [-7.55, 9, -7.25], [-13.8, 9.1, -16.5]]) };
+  // where the sun's shadows are drawn (stage.setShadowBox: a centre, half the width across the light,
+  // the reach above and below): each room's own box at rest, so its shadows are as fine as the map
+  // allows; on a walk from one room to the next the box grows to hold both and then closes on the
+  // second (the shadows are drawn again every frame of a walk anyway: the sun moves)
+  const BOXES = {
+    study: { c: [6, 0, -3], hw: 30, top: 24, bottom: -18 },
+    both: { c: [-15, 10, -32], hw: 84, top: 70, bottom: -70 },
+    hall: { c: [-32.5, 8, -51], hw: 58, top: 42, bottom: -42 },
+  };
+  const boxMix = (a, b, k) => ({ c: a.c.map((v, j) => mix(v, b.c[j], k)), hw: mix(a.hw, b.hw, k), top: mix(a.top, b.top, k), bottom: mix(a.bottom, b.bottom, k) });
+  const setBox = B => world.setShadowBox(B.c, B.hw, B.top, B.bottom);
+  // the box for where the film is: a chapter's room, or on the walk to it
+  const ROOM = { 'title-page': 'study', contents: 'study', 'on-the-record': 'hall' };
+  function boxFor(st) {
+    if (st.phase !== 0 || !CH[st.i].walk) return BOXES[ROOM[CH[st.i].id] || 'study'];
+    const a = BOXES[ROOM[CH[st.i - 1].id] || 'study'], b = BOXES[ROOM[CH[st.i].id] || 'study'];
+    return st.m < .5 ? boxMix(a, BOXES.both, sstep(0, .3, st.m)) : boxMix(BOXES.both, b, sstep(.7, 1, st.m));
+  }
 
   // ---------- the views ----------
   // The room's views look level (the picture shifted by the lens, so verticals stay upright) and are
@@ -136,7 +158,7 @@ function start() {
     const s = stage.getBoundingClientRect(), cs = getComputedStyle(root), num = n => parseFloat(cs.getPropertyValue(n)) || 0;
     const u = num('--rc-u') || 20, T = Math.tan(20 * Math.PI / 180), D = Math.max(1, H) / (2 * T * u);
     const cx = num('--rc-x') - s.left + LAYOUT.w * u / 2, cy = num('--rc-y') - s.top + LAYOUT.h * u / 2;
-    return { p: [(BAND.x0 + BAND.x1) / 2, (BAND.top + BAND.bottom) / 2, FACE + D], yaw: 0, pitch: 0, fov: 40, sx: cx / Math.max(1, W) - .5, sy: .5 - cy / Math.max(1, H) };
+    return { p: [(CARD.x0 + CARD.x1) / 2, (CARD.top + CARD.bottom) / 2, FACE + D], yaw: 0, pitch: 0, fov: 40, sx: cx / Math.max(1, W) - .5, sy: .5 - cy / Math.max(1, H) };
   }
   // the screen card shown while loading the contents: level with the display's glass, at the distance
   // where the glass fills the card exactly, the lens shifted so it sits where the card is
@@ -280,7 +302,9 @@ function start() {
   const marks = { start: Math.round(t0) };   // (start: the film's start, ms from the page's navigation)
   const mark = n => { marks[n] = Math.round(performance.now() - t0); };
   (async () => {
-    await Promise.all([fonts, logoIn]);
+    // (the pen's ink for every logo on the page, worked out once, now, while the loader shows)
+    const inked = warmLogoInk().catch(() => null);
+    await Promise.all([fonts, logoIn, inked]);
     mark('fonts');
     setP(.3);
     world = createStage(canvas, { tier: TIER_ORDER.includes(askTier) ? askTier : big ? 'high' : 'mid' });
@@ -299,9 +323,8 @@ function start() {
     mark('hall');
     world.addLamp({ at: study.lamp.at, aim: study.lamp.aim, power: 46, angle: .58 });
     world.addGlow(study.lamp.bulb, { size: 1.5, k: .85 });
-    // the sun's shadows: one box over the whole house (study and hall), so a room seen through a doorway
-    // is never lit through its own walls
-    world.setShadowBox([-15, 10, -32], 84, 70);
+    // the sun's shadows: drawn over the room the camera is in (BOXES), widened on the way between two
+    setBox(BOXES.study);
     world.setHour('early');
     addLife();
     setP(.5);
@@ -545,10 +568,13 @@ void main() {
   if (ed) { ed.style.width = `${ED_W}px`; ed.style.height = `${ED_H.toFixed(2)}px`; }
   const pq = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], edState = {}, pgState = {};
   function project4(pts) { let ok = true; pts.forEach((p, i) => { world.project(p, pq[i]); if (pq[i][2] > 1 || pq[i][2] < -1) ok = false; }); return ok ? pq.map(q => [q[0], q[1]]) : null; }
+  // (laid-on words are drawn over the 3D, never behind its walls: each room's words show only while the
+  // camera is in that room; the study's end at its back wall)
+  const inStudy = () => world.camera.position.z > STUDY.WALL - .55;
   function placeEditor() {
     if (!ed || !world) return;
     if (fromI === 1 && !introStart && !introDone) return;   // (the editor is the loader's card until its intro begins)
-    const q = project4(SCR);
+    const q = inStudy() ? project4(SCR) : null;
     const tf = q ? quad(ED_W, ED_H, q) : 'scale(0)';
     if (edState.tf !== tf) { edState.tf = tf; ed.style.transform = tf; }
     // small on the screen (a phone), the documents take their larger setting: chosen by the display's
@@ -561,7 +587,7 @@ void main() {
   // hidden only if the page is behind the camera
   function placePage() {
     if (!page || !page.classList.contains('quad')) return;
-    const q = project4(study.manuscript());
+    const q = inStudy() ? project4(study.manuscript()) : null;
     if (q) { const tf = quad(page.offsetWidth, page.offsetHeight, q); if (pgState.tf !== tf) { pgState.tf = tf; page.style.transform = tf; } }
     if (pgState.gone !== !q) { pgState.gone = !q; page.classList.toggle('far', !q); }
   }
@@ -637,6 +663,10 @@ void main() {
     // the scroll cue: at the title page only, until the reader scrolls
     const cue = introDone && Pt < .02 && !glide ? 'on' : 'off';
     if (stage.dataset.cue !== cue) stage.dataset.cue = cue;
+    // and at the record, while it fills (from the moment the camera settles before it)
+    const stP = at(Math.min(Pr, S - 1e-6));
+    const fillCue = introDone && !glide && RI >= 0 && stP.i === RI && ((stP.phase === 0 && stP.m > .94) || (stP.phase === 1 && stP.k < .985)) ? 'on' : 'off';
+    if (stage.dataset.fill !== fillCue) stage.dataset.fill = fillCue;
     // coming back to 02: on the loader's card the figures count, bay by bay, as the house loads
     if (!introStart && !introDone && RI >= 0 && fromI === RI) { loaderK = Math.min(loadP, loaderK + dt * .55); countUp(counts.map((c, b) => clamp(loaderK * counts.length - b))); }
     if (!world || !ready) return true;
@@ -667,6 +697,8 @@ void main() {
     } else { const c = CH[st.i]; cam = V[c.view]; hA = c.hour; spot = c.spot; docMix[c.doc] = 1; }
     // (a held pose for review: in its own hour if it names one, without the title page's pool)
     if (probe) { cam = { yaw: 0, pitch: 0, sx: 0, sy: 0, fov: 40, ...probe }; spot = probe.spot || 0; if (probe.hour) { hA = probe.hour; hB = probe.hourB || null; hK = probe.hourK || 0; } }
+    // the sun's shadows over the room the camera is in (or both, on the way)
+    setBox(probe && probe.box ? BOXES[probe.box] : !introDone ? BOXES[ROOM[CH[fromI].id] || 'study'] : boxFor(st));
     world.setHour(hA, hB || hA, hK);
     editorDocs(docMix, introDone && st.phase === 2 && !!CH[st.i].menu);
     // the hall: its lamps come on as the reader walks in; the record fills as it performs
@@ -700,9 +732,17 @@ void main() {
     // the loop runs only for the living things (and not at all with reduced motion)
     return glide || Pt !== Pr || moved || !introDone || motion;
   }
+  // (at most about sixty frames a second: on a faster screen, 120 Hz and up, a refresh is let go when
+  // drawing on it would come sooner than a sixtieth of a second after the last frame. The film moves as
+  // smoothly; the GPU does half the work, so a laptop runs cooler and quieter)
+  const FRAME_MS = 1000 / 60;
+  let refreshMs = FRAME_MS, lastTick = 0;
   function loop(now) {
     raf = 0;
     if (document.hidden) return;
+    if (lastTick) refreshMs = refreshMs * .9 + Math.min(50, now - lastTick) * .1;
+    lastTick = now;
+    if (last && now - last + refreshMs * .5 < FRAME_MS) { raf = requestAnimationFrame(loop); return; }
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016;
     last = now;
     let more = true;

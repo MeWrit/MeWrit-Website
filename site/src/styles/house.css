@@ -138,6 +138,15 @@ html.hs-from-1:not(.hs-done) .lp-ed{z-index:5}   /* (above the paper while it cl
 .rec-l{display:block;font:500 31px/1.1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.13em;color:rgba(19,36,79,.74)}
 .rec-note{position:absolute;left:50%;bottom:clamp(12px,2.2vh,24px);transform:translateX(-50%);margin:0;white-space:nowrap;font:italic 400 .84rem/1.4 var(--serif);color:rgba(246,241,231,.9);text-shadow:0 1px 8px rgba(20,14,8,.65);opacity:0;transition:opacity .6s ease}
 .rec-note.on{opacity:1}
+/* while the record fills, the cue in the source line's place: the title page's cue (the words, a line
+   with a mark running down it), so the reader knows to scroll on until the shelves are full */
+.rec-cue{position:absolute;left:50%;bottom:clamp(14px,2.4vh,26px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .5s ease}
+.rec-cue span{font:500 .72rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.2em;color:rgba(246,241,231,.9);text-shadow:0 1px 6px rgba(20,14,8,.55);white-space:nowrap}
+.rec-cue i{position:relative;display:block;width:1px;height:26px;background:rgba(246,241,231,.3);overflow:hidden}
+.rec-cue i::after{content:"";position:absolute;left:-1px;top:-8px;width:3px;height:8px;border-radius:2px;background:rgba(246,241,231,.95);animation:hsCue 1.8s cubic-bezier(.6,0,.4,1) infinite}
+.hs-stage[data-fill="on"] .rec-cue{opacity:1;transition:opacity .8s ease .2s}
+.hs-stage[data-fill="on"] .rec-note{opacity:0}
+@media (prefers-reduced-motion:reduce){.rec-cue i::after{animation:none;top:9px}}
 /* coming back to 02: while the house loads, the band is a card on the paper in the 3D band's own
    colours (the cartouche ivory in its brass, the frieze navy, the boards ivory, the oak behind and the
    cornice across); the pen writes the logo on the cartouche and the figures count as the house loads.
@@ -145,12 +154,10 @@ html.hs-from-1:not(.hs-done) .lp-ed{z-index:5}   /* (above the paper while it cl
    the camera draws back */
 html.hs-from-2:not(.hs-done) .hs-rec{visibility:visible;opacity:1;z-index:5}
 html.hs-from-2:not(.hs-in) .hs-rec :is(.rec-crest,.rec-frieze,.rec-board){transform:translate(calc(var(--rc-x) + var(--x) * var(--rc-u)),calc(var(--rc-y) + var(--y) * var(--rc-u))) scale(var(--rc-s))}
-html.hs-from-2:not(.hs-done) .rec-card{display:block;position:absolute;left:var(--rc-x);top:var(--rc-y);width:calc(var(--band-w) * var(--rc-u));height:calc(var(--band-h) * var(--rc-u));background:linear-gradient(to bottom,transparent 0,transparent var(--cor0),#5E432B var(--cor0),#5E432B var(--cor1),#7E5D3F var(--cor1));box-shadow:0 40px 90px rgba(40,30,20,.18);transition:opacity .5s ease}
+/* (the card is a picture of the 3D band itself, in 02's light: public/house/record-band.webp, rendered
+   from the same frame the film draws; its edges fade into the paper, and the words are live on it) */
+html.hs-from-2:not(.hs-done) .rec-card{display:block;position:absolute;left:var(--rc-x);top:var(--rc-y);width:calc(var(--band-w) * var(--rc-u));height:calc(var(--band-h) * var(--rc-u));background:var(--rc-img) center / 100% 100% no-repeat,linear-gradient(to bottom,transparent 0,transparent var(--cor0),#5E432B var(--cor0),#5E432B var(--cor1),#7E5D3F var(--cor1));-webkit-mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 84%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 84%,transparent);mask-composite:intersect;transition:opacity .6s ease}
 html.hs-from-2.hs-in .rec-card{opacity:0}
-html.hs-from-2 .hs-rec :is(.rec-crest,.rec-frieze,.rec-board){transition:background-color .5s ease,box-shadow .5s ease}
-html.hs-from-2:not(.hs-in) .rec-crest{background-color:#F4EEE2;box-shadow:0 0 0 17px #C9A452}
-html.hs-from-2:not(.hs-in) .rec-frieze{background-color:#22325A}
-html.hs-from-2:not(.hs-in) .rec-board{background-color:#F2ECDF}
 html.hs-loading.hs-from-2 .rec-crest .ld-layers{display:block}
 html.hs-loading.hs-from-2 .rec-crest .ld-real{opacity:0}
 

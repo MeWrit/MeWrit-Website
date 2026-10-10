@@ -20,6 +20,7 @@
    inside the target, [top, right, bottom, left], for labels), over (the words may stand over the
    shape, on a stronger shade). */
 import { F } from './formations.js';
+import { YEARS } from '../../data/years';
 
 const NAVY = ['#0B1A42', '#030817'], WARM = ['#1A1838', '#050817'], DEEP = ['#08122E', '#02050F'];
 
@@ -37,7 +38,7 @@ export const SCENES = [
     id: 'open', form: F.PAGE, chapter: -1,
     a: [[0, .41, 27.45], [0, 0, 0], 38, .22, -.11], b: [[1.77, .97, 27.61], [0, .2, 0], 38, .22, -.1],
     rock: [.2, .3], bg: NAVY, glow: ['#1C3472', .55],
-    readout: [['Since', '2017'], ['Experience', '22+ years'], ['Practices', '05']],
+    readout: [['Since', '2017'], ['Experience', `${YEARS}+ years`], ['Practices', '05']],
   },
   {
     // the five practices as shapes, a button above each (experience.js pins them; where they stand
