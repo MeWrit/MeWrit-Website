@@ -111,6 +111,15 @@ html.hs-from-1 .lp-ed :is(.ed-head,.ed-toc){transition:opacity .5s ease .3s}
 html.hs-from-1 .lp-ed{transition:box-shadow 1s ease}
 html.hs-from-1:not(.hs-done) .lp-ed{z-index:5}   /* (above the paper while it clears, until the intro ends) */
 .lp-ed.live{pointer-events:auto}
+
+/* the screen says in words that it can be used (and, for a practice not built yet, that it is coming) */
+.lp-ed [data-doc="contents"] .ed-foot{font-size:15px;padding:10px 20px}
+.lp-ed .ed-hint{font-weight:600;color:var(--pen,#B4500F);letter-spacing:.02em;transition:opacity .5s ease}
+.lp-ed:not(.live) .ed-hint{opacity:0}   /* (only while the screen can be used: never on the loader's card) */
+.ed-hint-touch{display:none}
+@media (pointer:coarse){.ed-hint-fine{display:none}.ed-hint-touch{display:inline}}
+.lp-ed .ed-hint.soon > span{display:none !important}
+.lp-ed .ed-hint.soon::after{content:"This practice's chapter is being built"}
 .ed-caret{display:inline-block;width:1.5px;height:1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hsCaret 1s steps(2,jump-none) infinite}
 @keyframes hsCaret{50%{opacity:0}}
 

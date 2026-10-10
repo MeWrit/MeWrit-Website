@@ -26,7 +26,6 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const RAD = Math.PI / 180;
 
@@ -189,11 +188,8 @@ export function createStage(canvas, { tier = 'high' } = {}) {
   scene.fog = new THREE.Fog('#EEF1F2', 110, 430);   // the haze of distance, outside only (the hour sets its colour)
   const fx = new THREE.Scene();   // the small living things, drawn over the finished frame
   const camera = new THREE.PerspectiveCamera(40, 1, .05, 400);
-  // a soft room's reflection for the few glossy things (the display's glass, the lamp's enamel)
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
-  scene.environmentIntensity = .22;
-  pmrem.dispose();
+  // (no environment map: its reflections on the few glossy things were barely seen, and making it cost
+  // the first visit most of a second and every pixel a little)
 
   // ---------- the lights ----------
   const sun = new THREE.DirectionalLight('#ffffff', 3);
@@ -379,7 +375,16 @@ void main() {
       return times[n >> 1];
     },
     stats() { const r = renderer.info.render; return { calls: r.calls, triangles: r.triangles, tier: tierName, ratio: +px.toFixed(3), pixels: Math.round(W * H * px * px), geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs ? renderer.info.programs.length : 0 }; },
-    async compile() { if (renderer.compileAsync) await renderer.compileAsync(scene, camera); else renderer.compile(scene, camera); },
+    // every shader the film will use, compiled in the background while the loader shows (the scene's,
+    // the passes', the living things'), so the first frames do not stall on compiling them
+    async compile() {
+      const g = new THREE.PlaneGeometry(1, 1), flat = new THREE.Scene(), lit = new THREE.Scene(), ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      [gtao.gtaoMaterial, gtao.pdMaterial, final.material, smaa._materialEdges, smaa._materialWeights, smaa._materialBlend, show.material].forEach(m => { if (m) flat.add(new THREE.Mesh(g, m)); });
+      lit.add(new THREE.Mesh(g, gbuf.material));
+      const c = (s, cam) => renderer.compileAsync ? renderer.compileAsync(s, cam) : Promise.resolve(renderer.compile(s, cam));
+      await Promise.all([c(scene, camera), c(lit, camera), c(fx, camera), c(flat, ortho)]);
+      g.dispose();
+    },
     dispose() { composer.dispose(); gbuf.dispose(); show.dispose(); renderer.dispose(); },
   };
   setTier(tier);

@@ -145,7 +145,8 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
                 {lamp.contents.map((e, i) => { const ch = lamp.chapters.find(c => c.id === e.go); return <li data-toc style={`--i:${i}`}><a href={e.href} data-chapter={e.go}><span class="n">{e.num}</span><span class="t">{e.name}<small>{ch ? ch.line : ''}</small></span><span class="d"></span><span class="p">{e.page}</span></a></li>; })}
               </ol>
             </div>
-            <div class="ed-foot"><span>Choose a practice</span><span>MeWriT</span></div>
+            <!-- (the screen says it can be used) -->
+            <div class="ed-foot"><span class="ed-hint"><span class="ed-hint-fine">Click a practice to open it</span><span class="ed-hint-touch">Tap a practice to open it</span></span><span>MeWriT</span></div>
           </div>
         </div>
 

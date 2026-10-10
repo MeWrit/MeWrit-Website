@@ -162,8 +162,17 @@ function start() {
   addEventListener('touchstart', stopGlide, { passive: true });
   addEventListener('keydown', e => { if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) stopGlide(); });
   sec.querySelectorAll('[data-go]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (introDone) glideTo(restP(+a.dataset.go)); }));
-  // the contents on the display: a practice not yet built stays where it is (the look test)
-  if (ed) ed.querySelectorAll('.ed-toc a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); }));
+  // the contents on the display: a practice not yet built stays where it is (the look test), and the
+  // screen's foot says so for a moment
+  if (ed) {
+    const hint = ed.querySelector('.ed-hint');
+    let hintT = 0;
+    ed.querySelectorAll('.ed-toc a').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      if (!hint) return;
+      hint.classList.add('soon'); clearTimeout(hintT); hintT = setTimeout(() => hint.classList.remove('soon'), 2400);
+    }));
+  }
 
   // ---------- the words ----------
   let active = -2;
@@ -267,7 +276,7 @@ function start() {
   let intro = STATIC ? 1 : 0, introStart = 0, introFrom = null, introDone = !!STATIC;
   const INTRO_MS = REDUCE ? 1 : 1900;
   function beginIntro() {
-    const wait = Math.max(0, (REDUCE ? 200 : 2400) - (performance.now() - t0));
+    const wait = Math.max(0, (REDUCE ? 200 : 2000) - (performance.now() - t0));
     // (and not before the loader's logo has been written: the camera draws back from a finished page)
     Promise.all([new Promise(r => setTimeout(r, wait)), loaderDrawn]).then(() => {
       if (STATIC) { finishIntro(); return; }
@@ -311,9 +320,9 @@ function start() {
   // In the loader, the logo the reader first sees (the title page's letterhead; the display's boot
   // screen, after which it docks as the document's letterhead) is written by the pen while the house
   // loads; the letterhead at the top writes itself once the film is in, and again every HEAD_EVERY
-  // (the drawing plays 1.8 times version B's pace here: about two and a half seconds, so the loader is
+  // (the drawing plays at twice version B's pace here: about two and a quarter seconds, so the loader is
   // not held for it)
-  const HEAD_EVERY = 20000, LOGO_SPEED = 1.8;
+  const HEAD_EVERY = 20000, LOGO_SPEED = 2;
   const sheetLogo = page && page.querySelector('.pg-logo.ld'), bootLogo = ed && ed.querySelector('.ed-logo.ld'), headLogo = sec.querySelector('.lp-lh-logo .ld');
   const players = new Map();
   const playerOf = el => { if (!el) return null; if (!players.has(el)) players.set(el, createLogoPlayer(el, { speed: LOGO_SPEED })); return players.get(el); };

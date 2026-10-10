@@ -87,8 +87,8 @@ export function createLogoPlayer(el, { write = { rot: 46, scale: .76 }, speed = 
     if (done) { const d = done; done = null; d(); }
   }
   function frame(now) {
-    // a stalled frame slows the drawing down, it never makes it jump
-    if (last !== null) { const gap = now - last; clock += (gap > 50 ? 16.7 : gap) * speed; }
+    // a stalled frame (the page busy building something) slows the drawing a little, never makes it jump
+    if (last !== null) { const gap = now - last; clock += Math.min(gap, 40) * speed; }
     last = now;
     renderAt(clock);
     if (clock >= T.end) finish(); else raf = requestAnimationFrame(frame);
