@@ -168,10 +168,12 @@ html.hs-loading.hs-from-2 .rec-crest .ld-real{opacity:0}
 /* ---------- 02's words arrive, never just appear: the pen writes the cartouche's logo (film.js), the
    frieze's headline is typed letter by letter, and the boards follow one after another ---------- */
 .hs-rec:not(.typed) .rec-hl{opacity:0}
-.rec-hl.typing .ch{opacity:0;animation:recType .16s ease forwards;animation-delay:calc(var(--i) * 34ms + .2s)}
+.rec-hl.typing .ch{opacity:0;animation:recType .12s ease forwards;animation-delay:calc(var(--i) * 16ms + 80ms)}
 @keyframes recType{to{opacity:1}}
+/* (the boards come with the reader at once, on their own: their figures count as their bays fill, never
+   held back by the headline's typing) */
 .hs-rec:not(.typed) .rec-board{opacity:0;transition:opacity .25s ease}
-.hs-rec.typed .rec-board{opacity:1;transition:opacity .7s ease calc(1.25s + var(--b) * 170ms)}
+.hs-rec.typed .rec-board{opacity:1;transition:opacity .4s ease calc(var(--b) * 60ms)}
 @media (prefers-reduced-motion:reduce){.rec-hl.typing .ch{animation:none;opacity:1}.hs-rec.typed .rec-board{transition:none}}
 
 /* ---------- the stationery's foot: a line along the bottom of the page, as the letterhead runs along

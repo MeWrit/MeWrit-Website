@@ -59,7 +59,7 @@ function start() {
     recHl.textContent = '';
     [...text].forEach((c, i) => { const s = document.createElement('span'); s.className = 'ch'; s.style.setProperty('--i', i); s.textContent = c; recHl.appendChild(s); });
     recHl.classList.add('typing');
-    typeT = setTimeout(() => { recHl.classList.remove('typing'); recHl.innerHTML = recHlHTML; }, 200 + text.length * 34 + 260);
+    typeT = setTimeout(() => { recHl.classList.remove('typing'); recHl.innerHTML = recHlHTML; }, 80 + text.length * 16 + 200);
   }
   const capEls = [...sec.querySelectorAll('.hs-cap')], heads = capEls.map(c => c.querySelector('.hs-hl'));
   const list = [...sec.querySelectorAll('.hs-list a')], lhRun = sec.querySelector('.lh-run');
@@ -211,7 +211,7 @@ function start() {
     return { i, phase: 2, m: 0, k: 1 };
   };
   // whose words show: the arriving chapter's once the camera is nearly there
-  const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < .8 ? -1 : st.i;
+  const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < (CH[st.i].record ? .45 : .8) ? -1 : st.i;
   // how full the record is: empty until the camera has arrived before it, full once it has performed
   const fillOf = st => RI < 0 ? 0 : st.i > RI ? 1 : st.i < RI ? 0 : st.phase === 0 ? 0 : st.k;
 
@@ -720,9 +720,13 @@ void main() {
     if (stage.dataset.fill !== fillCue) stage.dataset.fill = fillCue;
     // 02's words: they arrive with the reader (once the camera is nearly before the record) and are made
     // ready to arrive again when the reader walks away
+    // (they arrive as soon as they come into the frame, the camera through the doorway: the headline is
+    // typed and the logo written while the camera is still on its way; the shelves fill only once it has
+    // stopped before them)
     if (rec && RI >= 0) {
-      const here = !introDone ? fromI === RI : stP.i === RI && (stP.phase > 0 || stP.m >= .9);
-      const away = !introDone ? fromI !== RI : stP.i !== RI || (stP.phase === 0 && stP.m < .75);
+      const cz = world ? world.camera.position.z : 0;
+      const here = !introDone ? fromI === RI : stP.i === RI && (stP.phase > 0 || cz < -14);
+      const away = !introDone ? fromI !== RI : stP.i !== RI || (stP.phase === 0 && cz > -11);
       if (here) recArrive(true); else if (away) recArrive(false);
     }
     // the foot opens by itself at the film's end
@@ -763,7 +767,9 @@ void main() {
     // the sun's shadows over the room the camera is in (or both, on the way)
     setBox(probe && probe.box ? BOXES[probe.box] : !introDone ? BOXES[ROOM[CH[fromI].id] || 'study'] : boxFor(st));
     world.setHour(hA, hB || hA, hK);
-    editorDocs(docMix, introDone && st.phase === 2 && !!CH[st.i].menu);
+    // (the contents on the display can be used whenever they are what it shows, wherever the camera is,
+    // as long as the display is in view)
+    editorDocs(docMix, introDone && (docMix.contents || 0) > .5 && inStudy());
     // the hall: its lamps come on as the reader walks in; the record fills as it performs
     if (hall) {
       const ci = introDone ? st.i : fromI;
@@ -785,8 +791,9 @@ void main() {
       placeEditor();
       // (the record's words as a chapter's words come: once the camera is nearly there, and only ever
       // with it through the doorway)
-      const recVis = probe ? 1 : !introDone ? (fromI === RI ? 1 : 0) : st.i !== RI ? 0 : st.phase > 0 ? 1 : sstep(.8, .96, st.m);
-      placeRecord(recVis * sstep(-9.5, -17, cam.p[2]));
+      // (on the walk they show as the record comes into the frame, the camera through the doorway)
+      const recVis = probe ? 1 : !introDone ? (fromI === RI ? 1 : 0) : st.i !== RI ? 0 : 1;
+      placeRecord(recVis * sstep(-9.5, -15, cam.p[2]));
       show = true;
     }
     life(time, 1 - spot * .8);
