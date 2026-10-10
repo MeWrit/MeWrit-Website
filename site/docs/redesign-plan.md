@@ -504,3 +504,28 @@ What follows from them:
     - the boards follow one by one.
   - The loader's card draws in from the left, with the same typing and pen.
 - Years: counted from 2004 (the user confirmed).
+
+**Step 4 begun (11 October 2026): 03 built, and the record's words reworked (9a130e4, 3e30854).**
+- The user's words (verbatim):
+  - "yes keep it for 7 and move on to the 4th step but tell me will it be this grainy after the bake too?" (answered: no; the bake traces thousands of samples per texel offline and is denoised; the risk is blur from too little lightmap resolution, not grain)
+  - "the loading of the gilded text and the loading of the ticker below should be independent and async because as i scroll, the gilded text isnt finished being typed (make it finish faster also) and the books start being drawn and the shelf columns that are finished and full before the gilded text is finished cannot have their tickers count and the numbers just appear without the effect. ticking should be tied to the filling of the shelves not the gilded text"
+  - "and also with the monitor, whenever it is displaying the 5 practices screen, it should be clickable no matter how far or close the camer is panned/present."
+  - "also on the record, the gilded text and logo loading should happen as soon those things appear in the frame and the only the filling should happend when the cam is fully locked on the shelf"
+  - "the gilded text and the tickers+filling is not decoupled still and the gilded text and logo still dont appear and finish whenever they first enter the frame, fix this"
+  - "and in the load animation, dont have the tickers count up just have them static only play the logo draw animation."
+  - "and the side nav menu glitches when the loading animation for the record shelf is finishing up"
+- What changed at 02:
+  - The words are laid on the record as soon as it shows through the study's doorway, cut to the opening.
+  - Each part arrives on its own: the headline types (16 ms a letter) when the frieze is in sight below the letterhead; the pen writes the logo when the cartouche is; the boards are always there, their figures counting only as their bays fill.
+  - The shelves fill only once the camera has stopped.
+  - On 02's loader the figures and headline are still; only the logo is drawn.
+  - The chapter list names the arriving chapter from the start of a loader's intro (it showed the title page, then jumped).
+  - The display's contents can be clicked whenever the screen shows them and the display is in view.
+- 03, Regulatory writing (archive.js):
+  - **The turn rule:** every walk round the house turns left once (record to archive faces east; reading room; lecture room north; seminar room west; the study south again), so the camera never turns back. Routes may carry a heading at each point (route.js).
+  - **The archive:** east of the hall through its east door (the door now stands open into the archive). Rolling stacks with hand wheels down the left, plan chests under three small high south windows on the right, shelving of archive boxes ahead either side of the closed door to the reading room. The long table under two green pendants.
+  - **The performance, at night:** the dossier on the table's near end. The CSR, M2.5 and M2.7 tabs slide in with their pages, the cover closes, the pen writes the logo on its label, and the stamp ("Validated") is pressed once the logo is written. Cue: "Scroll to bind the dossier", in the place of the caption's line while it runs.
+  - **The words:** the caption below in light ink (a night chapter: data-dark), the letterhead staying paper.
+  - **Its loader:** the label on its navy cover as a card; the pen writes the logo and the stamp is pressed, then the camera draws back from the real label.
+  - **Measured:** the walk's frames take 8.2 ms typically (median), and 9.6 to 13.8 ms for 90% of them.
+- Next in step 4: the reading room (04), then the lecture room (05), the seminar room (06), the return to the study (07, 08), and the day in the windows.
