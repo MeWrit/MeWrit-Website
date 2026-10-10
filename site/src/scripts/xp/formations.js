@@ -215,7 +215,8 @@ function papers(N, R, dust) {
   let pick = null;
   for (let s = 0; s < sheets; s++) {
     const a = s * .31, y = base + s * ((top - base) / sheets), rad = 5.2 + Math.sin(s * .21) * .35;
-    const cx = Math.cos(a) * rad, cz = Math.sin(a) * rad - 3, tx = -Math.sin(a), tz = Math.cos(a);   // each sheet faces outward
+    // each sheet faces outward; the spiral stands on the axis it turns about, so its box holds as it turns
+    const cx = Math.cos(a) * rad, cz = Math.sin(a) * rad, tx = -Math.sin(a), tz = Math.cos(a);
     const W = 1.1, H = 1.45, inc = s % 12 === 7, col = inc ? PAL.ember : PAL.ice, b = inc ? 1.3 : .5 + R() * .25, k = .02 + .96 * s / sheets;
     if (inc && s > sheets * .62 && !pick) pick = [cx, y, cz];
     const at = (u, v, bb) => f.put(cx + tx * u * W, y + v * H, cz + tz * u * W, col, b * bb, k);
@@ -226,7 +227,7 @@ function papers(N, R, dust) {
       at(-.4 + R() * len, .32 - l * .13, l === 0 ? 1.1 : .55);
     }
   }
-  return f.done({ included: pick || [5, 2, -3], top: [0, top, -3], base: [0, base, -3] });
+  return f.done({ included: pick || [5, 2, 0], top: [0, top, 0], base: [0, base, 0] });
 }
 
 /* medical communications, real-world evidence: a landscape of data, peaks in orange, contour lines
@@ -661,5 +662,18 @@ export function buildFormations(N, seed = 1104, { compact = false } = {}) {
   const list = [former(N, dust).done(), molecule(N, R, dust), crowd(N, R, dust), streams(N, R, dust, sp), papers(N, R, dust),
     landscape(N, R, dust), curves(N, R, dust), dossier(N, R, dust), manuscript(N, R, dust), globe(N, R, dust), network(N, R, dust),
     page(N, R, dust), choice(N, R, dust, compact)];
+  list.forEach(fm => { fm.box = boxOf(fm); });
   return { list, stream: sp, pick: list[F.CHOICE].group };
+}
+
+// the box a formation fills, from its placed particles (key 0 or more; the dust is left out):
+// { c: centre, size: [w, h, d] }, what the experience fits each shape to the screen by
+export function boxOf(fm) {
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < fm.key.length; i++) {
+    if (fm.key[i] < 0) continue;
+    for (let c = 0; c < 3; c++) { const v = fm.pos[i * 3 + c]; if (v < lo[c]) lo[c] = v; if (v > hi[c]) hi[c] = v; }
+  }
+  if (lo[0] === Infinity) return { c: [0, 0, 0], size: [1, 1, 1] };
+  return { c: lo.map((v, c) => (v + hi[c]) / 2), size: lo.map((v, c) => Math.max(.01, hi[c] - v)) };
 }

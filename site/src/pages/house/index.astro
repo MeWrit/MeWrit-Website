@@ -1,0 +1,160 @@
+---
+// The house (site/docs/redesign-plan.md, sections 11 and 11.10): the film rebuilt in illustrated 3D,
+// one house (the study, and through its doorway the library hall), each chapter's object performing in
+// the centre. This is the look test (section 11.8, step 2): the study, the title page and the contents.
+// 00, the title page, is the manuscript itself: its words printed on the page (real text, laid on the
+// page in perspective by film.js), the lamp's light its backdrop. The same page is the loader: shown on
+// paper from the first paint, its lines written as the house loads; when the house is ready the camera
+// draws back from it and it is the manuscript on the writing slope. The full chapter list is shown;
+// only the chapters built so far can be reached. /lamplight/ stays as it was, for comparison.
+import Base from '../../layouts/Base.astro';
+import { lamp } from '../../data/lamp';
+import { site, contact } from '../../data/site';
+import { href } from '../../lib/url';
+import { osf } from '../../scripts/lamp/figures.js';
+import '../../styles/lamp.css';
+import '../../styles/house.css';
+
+// the chapters of the house, in order (How we work is removed, section 11.4); the look test builds two
+const ORDER = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory', 'correspondence'];
+const BUILT = ['title-page', 'contents'];
+const words = ORDER.map(id => {
+  const w = lamp.chapters.find(c => c.id === id);
+  if (!w) throw new Error(`house: no words for the chapter "${id}"`);
+  return w;
+});
+const built = words.filter(w => BUILT.includes(w.id));
+// the scroll each chapter takes, in screens (the way from the page out to the study and in to the
+// display takes the most)
+const SPANS: Record<string, number> = { 'title-page': .08, contents: 2.4 };
+const screens = built.reduce((t, w) => t + SPANS[w.id], 0);
+const logo = href('/brand/logo-original.png');
+const links = [
+  { label: 'Practices', go: 'contents' }, { label: 'Academy', go: 'training' }, { label: 'Publications', go: 'on-the-record' },
+  { label: 'About', go: 'title-page' }, { label: 'Contact', go: 'correspondence' },
+];
+// the title page: its headline set in two lines as even as the words allow (the 3D page draws the same)
+const title = words[0];
+const tw = title.headline.split(' ');
+let cut = 1, best = Infinity;
+for (let i = 1; i < tw.length; i++) { const d = Math.abs(tw.slice(0, i).join(' ').length - tw.slice(i).join(' ').length); if (d < best) { best = d; cut = i; } }
+const titleLines = tw.length > 1 ? [tw.slice(0, cut).join(' '), tw.slice(cut).join(' ')] : [title.headline];
+// the page's body: the widths of its typeset lines (the third is highlighted, as a reviewer marks it)
+const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
+// the contents' words are on the display (the editor's document); the chapters to come keep a caption
+const contentsCh = words[1];
+const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
+---
+<Base intro="none" theme="light" page="house" title={`${lamp.shortTitle} | ${site.name}`} description={lamp.description}>
+  <script is:inline>
+  /* before the first paint: while the house loads, the title page is a sheet on the paper veil, the
+     letterhead and the list wait, and the page does not scroll (film.js lifts these; if it never runs,
+     they lift themselves) */
+  (function () {
+    var d = document.documentElement;
+    if (/[?&]static\b/.test(location.search)) return;
+    d.classList.add('hs-loading', 'hs-lock');
+    setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
+  })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
+
+  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-spans={JSON.stringify(built.map(w => SPANS[w.id]))}>
+    <canvas class="hs-canvas" aria-hidden="true"></canvas>
+    <div class="hs-track">
+      <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">
+        <div class="hs-scrim" aria-hidden="true"></div>
+        <header class="lp-lh">
+          <a class="lp-lh-logo" href="#title-page" data-go="0"><img src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230"></a>
+          <span class="lh-run" aria-hidden="true">{words[0].name}</span>
+          <nav class="lp-lh-nav" aria-label="Main">{links.map(l => { const i = BUILT.indexOf(l.go); return <a href={`#${l.go}`} data-go={i >= 0 ? i : undefined}>{l.label}</a>; })}</nav>
+          <p class="lp-lh-contact"><a href={contact.phoneHref}>{contact.phoneDisplay}</a><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+          <a class="lp-lh-cta" href={href('/#contact')}>Start a project</a>
+          <a class="lp-lh-menu" href="#contents" data-go="1">Menu</a>
+        </header>
+
+        <!-- the chapters, down the left as Hubtown keeps its list -->
+        <nav class="hs-list" aria-label="Chapters">
+          <ol>{words.map((w, i) => { const b = BUILT.indexOf(w.id); return <li><a href={`#${w.id}`} data-go={b >= 0 ? b : undefined} aria-disabled={b < 0 ? 'true' : undefined} aria-current={i === 0 ? 'true' : undefined}><span class="n" set:html={osf(w.num)} /><span class="t">{w.name}</span></a></li>; })}</ol>
+        </nav>
+
+        <!-- the editor on the display (laid over the display's glass by film.js); the contents are its
+             menu, real links -->
+        <div class="lp-ed" aria-hidden="true">
+          <div class="ed-doc" data-doc="draft">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>Clinical study report · Draft 3</b><span class="ed-saved"><i class="live"></i>Saved · just now</span><span class="ed-av"><i>HS</i><i class="ai">✦</i></span></div>
+            <div class="ed-body">
+              <div class="ed-text">
+                <p class="ed-sec">11.4 Efficacy results</p>
+                <p>The primary endpoint was met in the per-protocol population. A total of 480 <del>subjects</del> <ins>participants</ins> were randomised 1:1 to treatment or control.</p>
+                <p><mark>Treatment reduced the risk of the primary event</mark> compared with control (HR 0.72; 95% CI 0.58 to 0.89).</p>
+                <div class="ed-fig">
+                  <svg viewBox="0 0 220 92" aria-hidden="true"><g stroke="#13244F" fill="none" stroke-width="1"><path d="M120 6 V86" stroke-dasharray="3 3" stroke-opacity=".5"/><path d="M10 86 H210" stroke-opacity=".35"/></g><g stroke="#13244F" stroke-width="1.4"><path d="M70 16 H128"/><path d="M84 32 H112"/><path d="M58 48 H122"/><path d="M90 64 H118"/></g><g fill="#13244F"><rect x="94" y="12" width="8" height="8"/><rect x="95" y="28" width="6" height="8"/><rect x="86" y="44" width="8" height="8"/><rect x="101" y="60" width="6" height="8"/></g><path d="M80 78 L98 73 L116 78 L98 83 Z" fill="#E07A1F"/></svg>
+                  <span>Figure 11.2. Hazard ratios by prespecified subgroup.</span>
+                </div>
+                <p class="ed-ghost">Suggested: add the number needed to treat for the primary endpoint.<span class="ed-caret"></span></p>
+              </div>
+              <aside class="ed-side">
+                <div class="ed-card"><b>Reviewer</b><span>Checked against ICH E3 §11.4 ✓</span></div>
+                <div class="ed-card ai"><b>✦ Assistant</b><span>3 references updated to current versions</span><em>Accepted by the reviewer</em></div>
+                <div class="ed-card"><b>References</b><span>42 of 42 verified against source</span></div>
+              </aside>
+            </div>
+            <div class="ed-foot"><span>eCTD ready · Module 5.3.5.1</span><span>Illustrative document</span></div>
+          </div>
+          <!-- 01, the contents: the chapter's words are the document's own heading, on the screen -->
+          <div class="ed-doc" data-doc="contents">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>MeWriT · Practices</b><span class="ed-saved">Five practices</span><span class="ed-av"><i>HS</i></span></div>
+            <div class="ed-body ed-contents">
+              <header class="ed-head" id="contents" aria-label={`${contentsCh.num} ${contentsCh.name}`}>
+                <p class="ed-kick">Contents</p>
+                <h2 class="ed-h">{contentsCh.headline}</h2>
+                <p class="ed-l">{contentsCh.line}</p>
+              </header>
+              <ol class="ed-toc ed-toc-full">
+                {lamp.contents.map(e => { const ch = lamp.chapters.find(c => c.id === e.go); return <li data-toc><a href={e.href} data-chapter={e.go}><span class="n">{e.num}</span><span class="t">{e.name}<small>{ch ? ch.line : ''}</small></span><span class="d"></span><span class="p">{e.page}</span></a></li>; })}
+              </ol>
+            </div>
+            <div class="ed-foot"><span>Choose a practice</span><span>MeWriT</span></div>
+          </div>
+        </div>
+
+        <!-- the paper the title page is first shown on, while the house loads -->
+        <div class="hs-veil" aria-hidden="true"></div>
+
+        <!-- 00, the title page: the manuscript's top sheet. Laid on the 3D page in perspective once the
+             house is ready; until then, a sheet of paper in the middle of the screen (the loader) -->
+        <article class="hs-page" id="title-page" data-ch="title-page" aria-label={`${title.num} ${title.name}`}>
+          <img class="pg-logo" src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230">
+          <p class="pg-doc" aria-hidden="true">Clinical study report<br>Title page · Final</p>
+          <i class="pg-rule" aria-hidden="true"></i>
+          <h1 class="pg-title">{titleLines.map(l => <span>{l}</span>)}</h1>
+          <p class="pg-sub">{title.line}</p>
+          <span class="pg-lines" aria-hidden="true">{LINES.map((w, i) => <i class={i === 2 ? 'hl' : undefined} style={`--i:${i};--w:${w}`}></i>)}</span>
+          {title.action && <a class="pg-begin" href="#contents" data-go="1">{title.action.label}<i aria-hidden="true">{'↓'}</i></a>}
+          <span class="pg-mark" aria-hidden="true">final ✓</span>
+          <p class="pg-foot" aria-hidden="true">MeWriT · Title page · 1</p>
+        </article>
+
+        <!-- at the title page: the scroll goes on too, not only Begin reading (gone once the reader scrolls) -->
+        <div class="hs-cue" aria-hidden="true"><span>Scroll to begin</span><i></i></div>
+
+        <!-- the other chapters' words, centred below each chapter's object -->
+        <div class="hs-caps">
+          {caps.map(w => (
+            <article class="hs-cap" id={w.id} data-ch={w.id} data-name={w.name} data-num={w.num} aria-label={`${w.num} ${w.name}`}>
+              <h2 class="hs-hl">{w.headline}</h2>
+              <p class="hs-line">{w.line}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/house/film.js';
+</script>

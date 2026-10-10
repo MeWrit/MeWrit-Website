@@ -268,7 +268,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   const mixColor = (out, a, b, k) => out.copy(cA.set(a)).lerp(cB.set(b), k);
 
   return {
-    N, renderer, anchors: i => list[i].anchors,
+    N, renderer, anchors: i => list[i].anchors, box: i => list[i].box,
     setPair,
     warm(i) {
       const [a, b] = pair, s = streamOf;

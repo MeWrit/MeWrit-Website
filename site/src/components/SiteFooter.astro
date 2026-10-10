@@ -1,17 +1,33 @@
 ---
-import { footerColumns } from '../data/site';
+// The footer. Light pages show the brand, three columns of links and the copyright on the deep
+// blue. A dark page (<Base theme="dark">, src/styles/theme-dark.css) shows its own columns instead,
+// in the experience's HUD language: the practices, the contact points with the office address, and
+// a foot row with the brand line. Each set is hidden on the other theme (display:none), so the
+// light footer lays out exactly as it always has. The logo is the same image, unchanged, on its
+// white plate in both.
+import { footerColumns, footerPractices, contact, office } from '../data/site';
 import { footerBlurb } from '../data/home';
 const year = new Date().getFullYear();
 import { href } from '../lib/url';
+const out = (u: string) => u.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {};
 ---
 <footer class="site-footer">
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand"><img src={href('/brand/logo-original.png')} alt="MeWriT" loading="lazy" width="194" height="40"><p>{footerBlurb}</p></div>
       {footerColumns.map(col => (
-        <div><h4>{col.title}</h4><ul>{col.links.map(l => <li><a href={href(l.href)}>{l.label}</a></li>)}</ul></div>
+        <div class="foot-lt"><h4>{col.title}</h4><ul>{col.links.map(l => <li><a href={href(l.href)}>{l.label}</a></li>)}</ul></div>
       ))}
+      <div class="foot-dk"><h4>Practices</h4><ul>{footerPractices.map(l => <li><a href={href(l.href)} {...out(l.href)}>{l.label}</a></li>)}</ul></div>
+      <div class="foot-dk"><h4>Contact</h4>
+        <ul>
+          <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+          <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+          <li><a href={contact.whatsapp} target="_blank" rel="noopener">WhatsApp</a></li>
+        </ul>
+      </div>
+      <div class="foot-dk"><h4>Office</h4><address>{office.map((l, i) => <>{i > 0 && <br />}{l}</>)}</address></div>
     </div>
-    <div class="foot-bottom"><span>© {year} MeWriT. All rights reserved.</span><span>Privacy Policy · Terms</span></div>
+    <div class="foot-bottom"><span class="foot-line">Writing Science Right</span><span>© {year} MeWriT. All rights reserved.</span><span class="foot-legal">Privacy Policy · Terms</span></div>
   </div>
 </footer>

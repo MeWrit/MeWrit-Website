@@ -115,6 +115,18 @@ export const mobileNav: NavItem[] = [
   { label: 'MeWriT Academy', href: contact.academy },
 ];
 
+// the office, as the deck (July 2026) gives it, one line each
+export const office = ['710, Santorini Square, Lane Opp. Star Bazar', 'Satellite, Ahmedabad 380015', 'Gujarat, India'];
+
+// the dark footer's practices column (src/components/SiteFooter.astro): the experience page's own
+// sections, and the Academy
+export const footerPractices: NavLink[] = [
+  { label: 'The five practices', href: '/experience/#practices' },
+  { label: 'Training', href: '/experience/#trainings' },
+  { label: 'Start a project', href: '/experience/#contact' },
+  { label: 'MeWriT Academy', href: contact.academy },
+];
+
 export const footerColumns: { title: string; links: NavLink[] }[] = [
   {
     title: 'Services', links: [

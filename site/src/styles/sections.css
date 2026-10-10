@@ -137,6 +137,7 @@
 @media (hover:hover){.site-footer li a:hover{color:#fff}}
 .site-footer ul{list-style:none;display:grid}
 .site-footer li a{display:inline-flex;align-items:center;min-height:44px;min-width:44px}
+.foot-dk,.foot-line{display:none}   /* a dark page's own columns and brand line (theme-dark.css) */
 .foot-bottom{margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);display:grid;gap:6px;font-size:.82rem;color:#9FB0D2}
 
 /* ---------------- phone action bar ---------------- */

@@ -26,6 +26,9 @@ html.xp-lock{overflow:hidden;scrollbar-gutter:stable}
 html.xp-lock .xp-canvas{z-index:150}
 html.xp-lock .xp-stage{opacity:0}
 .xp-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,23,.8) 0%,rgba(3,8,23,.44) 34%,rgba(3,8,23,0) 58%)}
+/* the close: the globe stands behind the words, so the shade is deeper and reaches further */
+.xp-shade::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .8s ease;background:linear-gradient(90deg,rgba(3,8,23,.9) 0%,rgba(3,8,23,.78) 30%,rgba(3,8,23,.36) 52%,rgba(3,8,23,0) 70%)}
+.xp-stage[data-scene="close"] .xp-shade::after{opacity:1}
 .xp-nogl{background:#030817}
 .xp-nogl .xp-canvas{display:none}
 .xp-nogl .xp-stage{background:radial-gradient(60% 55% at 64% 48%,#13244F 0%,#060E26 55%,#030817 100%)}
@@ -43,6 +46,7 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-scene.on .xp-title .c{animation:xpChar .95s calc(var(--d) * 1ms + 140ms) cubic-bezier(.2,.7,.2,1) both}
 .xp-scene.was .xp-title .c{opacity:1;filter:none;transform:none}
 @keyframes xpChar{from{opacity:0;filter:blur(10px);transform:translateY(.14em)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes xpCharLite{from{opacity:0;transform:translateY(.14em)}to{opacity:1;transform:none}}
 .xp-text{font-size:clamp(1rem,.92rem + .3vw,1.16rem);line-height:1.62;color:var(--xp-soft);max-width:42ch}
 .xp-docs{list-style:none;display:flex;flex-wrap:wrap;gap:6px 0;margin-top:22px;font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#C9D8FF}
 .xp-docs li + li::before{content:"\00B7";margin:0 12px;color:var(--accent)}
@@ -57,16 +61,33 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-pickhint{margin-top:20px;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--xp-gold)}
 .xp-pickhint::before{content:"";display:inline-block;width:20px;height:1px;margin-right:10px;vertical-align:middle;background:currentColor}
 .xp-picks{position:absolute;left:0;top:0;width:0;height:0}
-.xp-pick{position:absolute;left:0;top:0;display:grid;justify-items:center;gap:4px;width:max-content;max-width:118px;padding:7px 8px 6px;
-  font-family:var(--mono);font-size:.62rem;font-weight:600;line-height:1.3;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:var(--xp-ink);
-  border:1px solid rgba(201,216,255,.3);border-radius:3px;background:rgba(4,10,28,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  opacity:0;pointer-events:none;transition:opacity .35s ease,border-color .25s,background-color .25s;will-change:transform}
+/* each button is a pill of dark glass: the number in orange, the name in ice and an arrow, a stem
+   down to its shape. Hover and focus turn its edge gold (and light its shape, experience.js) */
+.xp-pick{position:absolute;left:0;top:0;display:grid;justify-items:center;gap:3px;width:max-content;max-width:132px;padding:8px 16px 7px;cursor:pointer;
+  font-family:var(--mono);font-size:.62rem;font-weight:600;line-height:1.3;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#DCE5FF;
+  border:1px solid rgba(201,216,255,.45);border-radius:999px;background:rgba(4,10,28,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .35s ease,border-color .25s,background-color .25s,color .25s;will-change:transform}
 .xp-pick.on{opacity:1;pointer-events:auto}
 .xp-pick .n{color:var(--accent)}
+.xp-pick .nw{white-space:nowrap}   /* the arrow stays with the last word */
+.xp-pick b{display:inline-block;margin-left:.5em;font-weight:600;color:var(--xp-gold);transition:transform .25s ease}
 .xp-pick::after{content:"";position:absolute;left:var(--stem,50%);top:100%;width:1px;height:10px;background:rgba(240,195,92,.75)}
 .xp-pick.below::after{top:auto;bottom:100%}
-@media (hover:hover){.xp-pick:hover{border-color:rgba(240,195,92,.85);background-color:rgba(12,24,58,.82)}}
-.xp-pick:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-color:rgba(240,195,92,.85)}
+.xp-pick:is(:hover,:focus-visible,.lit){border-color:var(--xp-gold);background-color:rgba(12,24,58,.88);color:#fff}
+.xp-pick:is(:hover,:focus-visible,.lit) b{transform:translateX(3px)}
+.xp-pick:focus-visible{outline:2px solid var(--xp-gold);outline-offset:3px}
+/* until the first hover, tap or focus, a hairline ring breathes out of each button, in turn */
+.xp-pick::before{content:"";position:absolute;inset:-1px;border:1px solid var(--xp-gold);border-radius:inherit;opacity:0;pointer-events:none}
+.xp-picks.idle .xp-pick.on::before{animation:xpPulse 2.4s cubic-bezier(.2,.6,.3,1) infinite}
+.xp-picks.idle .xp-pick:nth-of-type(2)::before{animation-delay:.18s}
+.xp-picks.idle .xp-pick:nth-of-type(3)::before{animation-delay:.36s}
+.xp-picks.idle .xp-pick:nth-of-type(4)::before{animation-delay:.54s}
+.xp-picks.idle .xp-pick:nth-of-type(5)::before{animation-delay:.72s}
+@keyframes xpPulse{0%{opacity:.85;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.18,1.5)}}
+/* the hit area over each shape (sized by experience.js): invisible, but the pointer finds it */
+.xp-hit{position:absolute;left:0;top:0;width:0;height:0;cursor:pointer;pointer-events:none;border-radius:12px}
+.xp-hit.on{pointer-events:auto}
+.xp-nogl .xp-hit,html:not(.js) .xp-hit{display:none}
 .xp-nogl .xp-picks{position:static;display:flex;flex-wrap:wrap;gap:8px;width:auto;height:auto;margin-top:18px}
 .xp-nogl .xp-pick{position:static;max-width:none}
 .xp-nogl .xp-pick::after{display:none}
@@ -91,10 +112,12 @@ html.xp-lock .xp-stage{opacity:0}
 /* the HUD */
 .xp-hud{position:absolute;inset:0;pointer-events:none}
 .xp-frame i{position:absolute;width:16px;height:16px;border:0 solid rgba(201,216,255,.34)}
-.xp-frame i:nth-child(1){top:calc(var(--header-h) + 24px);left:20px;border-top-width:1px;border-left-width:1px}
-.xp-frame i:nth-child(2){top:calc(var(--header-h) + 24px);right:20px;border-top-width:1px;border-right-width:1px}
-.xp-frame i:nth-child(3){bottom:20px;left:20px;border-bottom-width:1px;border-left-width:1px}
-.xp-frame i:nth-child(4){bottom:20px;right:20px;border-bottom-width:1px;border-right-width:1px}
+/* the corner marks start on the header's foot and sit on the frame's edge (theme-dark.css), so the
+   header and the HUD read as one frame */
+.xp-frame i:nth-child(1){top:var(--header-h);left:var(--dk-edge,20px);border-top-width:1px;border-left-width:1px}
+.xp-frame i:nth-child(2){top:var(--header-h);right:var(--dk-edge,20px);border-top-width:1px;border-right-width:1px}
+.xp-frame i:nth-child(3){bottom:20px;left:var(--dk-edge,20px);border-bottom-width:1px;border-left-width:1px}
+.xp-frame i:nth-child(4){bottom:20px;right:var(--dk-edge,20px);border-bottom-width:1px;border-right-width:1px}
 .xp-panel{position:absolute;top:calc(var(--header-h) + 40px);right:clamp(28px,4vw,60px);width:262px;padding:14px 16px 12px;border:1px solid rgba(201,216,255,.12);border-radius:4px;background:rgba(3,8,23,.52);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
 .xp-readout{display:grid;gap:9px}
 .xp-readout div{display:flex;justify-content:space-between;gap:20px;padding-bottom:7px;border-bottom:1px solid var(--xp-line)}
@@ -105,7 +128,7 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-hint i{width:1px;height:40px;background:linear-gradient(rgba(224,122,31,0),var(--accent));animation:xpDrip 1.9s cubic-bezier(.6,0,.3,1) infinite}
 .xp-hint.gone{opacity:0;pointer-events:none}
 @keyframes xpDrip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-.xp-railnav{position:absolute;left:clamp(24px,6vw,104px);right:clamp(104px,9vw,150px);bottom:26px;pointer-events:auto}
+.xp-railnav{position:absolute;left:clamp(24px,6vw,104px);right:clamp(24px,6vw,104px);bottom:26px;pointer-events:auto}
 .xp-rail{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .xp-rail button{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:9px;width:100%;padding:12px 0 6px;text-align:left;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(170,186,224,.55);transition:color .3s}
 .xp-rail i{grid-column:1 / -1;display:block;height:2px;background:rgba(201,216,255,.16);overflow:hidden}
@@ -135,9 +158,15 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-load-foot,.xp-load-brand{transition:opacity .5s ease,transform .6s ease}
 .xp-loader.out .xp-load-foot,.xp-loader.out .xp-load-brand{opacity:0;transform:translateY(12px)}
 
-/* phones and narrow windows: the picture in the upper part, the words at the foot, the practices
-   as a row of short bars under the capsule */
-@media (max-width:759.98px){
+/* phones, narrow windows and tall ones (a tablet held upright): the picture in the upper part, the
+   words at the foot, the practices as a row of short bars under the header (experience.js picks
+   the same layout by the same measures) */
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  .xp-shade::after{display:none}
+  /* the title's letters come in without the blur here: a filter on every letter is the costliest
+     thing on a phone's frame (measured, int_perf_probe.js) */
+  .xp-title .c{filter:none}
+  .xp-scene.on .xp-title .c{animation-name:xpCharLite}
   .xp-track{height:calc(var(--units) * 100svh + 210svh)}
   .xp-shade{background:linear-gradient(0deg,rgba(3,8,23,.94) 0%,rgba(3,8,23,.7) 36%,rgba(3,8,23,0) 62%)}
   .xp-scenes{align-items:end;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
@@ -147,7 +176,7 @@ html.xp-lock .xp-stage{opacity:0}
   .xp-text{font-size:.98rem;line-height:1.55}
   .xp-docs{margin-top:14px;font-size:.62rem}
   .xp-pickhint{margin-top:14px;font-size:.62rem}
-  .xp-pick{max-width:116px;padding:5px 7px 4px;font-size:.55rem;letter-spacing:.1em}
+  .xp-pick{max-width:100px;padding:5px 9px 4px;font-size:.52rem;letter-spacing:.06em}
   .xp-cta{margin-top:20px}
   .xp-panel,.xp-hint,.xp-frame{display:none}
   .xp-railnav{left:20px;right:20px;bottom:auto;top:calc(var(--header-h) + 8px)}
@@ -156,9 +185,19 @@ html.xp-lock .xp-stage{opacity:0}
   .xp-rail .n,.xp-rail .t{display:none}
   .xp-co span{font-size:.58rem;padding:4px 7px;letter-spacing:.1em}
 }
-@media (min-width:760px) and (max-width:1099.98px){
+@media (min-width:760px) and (max-width:1099.98px) and (min-aspect-ratio:4/5){
   .xp-scene{max-width:min(560px,58vw)}
-  .xp-panel{width:210px}
+  /* narrow computer screens: the figures panel would wrap into a tall block over the shapes' room
+     and crowd the titles, so it goes (the figures are in the words and the sections below) */
+  .xp-panel{display:none}
+}
+/* short computer screens (wider than tall, but under 1.45 to 1, like 1024 x 768): the words
+   narrower and the titles smaller, so the shape keeps a fair share of the width (experience.js
+   fits it into what is left) */
+@media (min-width:760px) and (min-aspect-ratio:4/5) and (max-aspect-ratio:29/20){
+  .xp-scene{max-width:min(460px,44vw)}
+  .xp-title{font-size:clamp(2.2rem,.8rem + 3.6vw,4.6rem)}
+  .xp-scene[data-scene="open"] .xp-title{font-size:clamp(2.6rem,1rem + 4.2vw,5.6rem)}
   .xp-rail .t{display:none}
 }
 
@@ -176,4 +215,5 @@ html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas,html:not
   .xp-scene{transform:none !important;transition:opacity .25s linear}
   .xp-hint i{animation:none}
   .xp-co span{transition:none;transform:none}
+  .xp-picks.idle .xp-pick.on::before{animation:none}
 }

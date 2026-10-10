@@ -17,7 +17,7 @@ export const experience = {
     {
       id: 'practices', kicker: 'Five practices', title: 'Choose what you need',
       text: 'Each practice stands on its own. Sponsors and CROs come for regulatory documents, clinicians for publications, medical affairs teams for communications, institutions for training, and AI teams for domain expertise. Many come for more than one.',
-      hint: 'Pick one to jump to it',
+      hint: 'Click a practice to go to it, or keep scrolling.',
     },
     {
       id: 'reg-designs', kicker: '01 · Regulatory writing', title: 'Every trial design, documented',

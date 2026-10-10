@@ -1,0 +1,36 @@
+---
+// The lamplight worlds' test bench: the engraved places the film travels through (desk, archive,
+// reading room, night sky, dawn, and the two day rooms, auditorium and workshop), one at a time over
+// its own grade, with a placeholder page at the anchor so the composition can be judged. The worlds
+// are src/scripts/lamp/worlds/; this page's script is viewer.js there (its switches: ?w= ?orbit
+// ?xfade=a,b ?q=low ?clean ?msaa ?ink, the last drawing a world as the film does by day).
+import Base from '../../layouts/Base.astro';
+
+const ids = ['desk', 'archive', 'reading', 'sky', 'dawn', 'auditorium', 'workshop'];
+---
+<Base intro="none" theme="dark" title="Worlds">
+  <section class="wl" id="wl" aria-label="The lamplight worlds">
+    <canvas class="wl-canvas" aria-hidden="true"></canvas>
+    <div class="wl-strip">
+      {ids.map(id => <button type="button" data-world={id} aria-pressed="false">{id}</button>)}
+      <button type="button" data-orbit aria-pressed="false">orbit</button>
+      <p class="wl-readout" aria-live="polite"></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  :global(body){isolation:isolate;background:#030817}
+  .wl{position:relative;height:100vh;height:100svh}
+  .wl-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#030817}
+  .wl-strip{position:fixed;left:16px;bottom:16px;right:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;z-index:5;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
+  .wl-strip button{padding:7px 11px;border:1px solid rgba(201,216,255,.22);border-radius:3px;background:rgba(3,8,23,.55);color:#C9D8FF;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
+  .wl-strip button:hover{border-color:rgba(242,184,102,.6);color:#F2B866}
+  .wl-strip button[aria-pressed="true"]{border-color:#F2B866;color:#F2B866}
+  .wl-readout{margin:0 0 0 6px;color:rgba(201,216,255,.6);text-transform:none;letter-spacing:.04em}
+  :global(html.wl-clean) .wl-strip,:global(html.wl-clean .deskdock),:global(html.wl-clean .action-bar),:global(html.wl-clean .wa-float),:global(html.wl-clean .dock){display:none}
+</style>
+
+<script>
+  import '../../scripts/lamp/worlds/viewer.js';
+</script>

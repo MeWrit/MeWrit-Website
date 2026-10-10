@@ -1,0 +1,1122 @@
+---
+// A still design board for the proposed direction, for review only: no animation, nothing linked from
+// the site. By day the drawings are ink on paper, generated in code on canvas from one perspective
+// camera, so everything stands on the desk it belongs to; by night they are the lamplight film's own
+// engraved worlds (src/scripts/lamp/worlds/), rendered here once each. A digital layer of interface
+// cards sits over both. The logo is the original file, unaltered, always on paper.
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/inter';
+import { href } from '../../lib/url';
+const logo = href('/brand/logo-original.png');
+const nav = ['Practices', 'Academy', 'Publications', 'About', 'Contact'];
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Lamplight board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F3EEE3;--sheet:#FBF8F2;--ink:#13244F;--body:#45506A;--pen:#B4500F;--orange:#E07A1F;--mustard:#E0A82E;--wash:#8E9DBA;
+    --night:#0B1735;--ivory:#EDE6D6;--gold:#E0B85A;
+    --serif:'Fraunces Variable',Georgia,serif;--sans:'Inter Variable',system-ui,sans-serif;--hand:'Caveat',cursive}
+  *{box-sizing:border-box;margin:0}
+  body{background:#33353A;color:#E9E5DC;font-family:var(--sans)}
+  .board{max-width:1320px;margin:0 auto;padding:56px 24px 120px}
+  .bd-kicker{font:600 .72rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#C9B990}
+  .board > header h1{margin-top:14px;font:400 clamp(2rem,1.4rem + 2.4vw,3.4rem)/1.05 var(--serif);letter-spacing:-.015em;color:#F6F1E6}
+  .bd-sub{margin-top:14px;max-width:74ch;font-size:1rem;line-height:1.6;color:#C8C3B8}
+  .bd-sec{margin-top:72px}
+  .bd-h{font:400 1.5rem/1.2 var(--serif);color:#F6F1E6;margin-bottom:6px}
+  .bd-note{max-width:82ch;font-size:.92rem;line-height:1.6;color:#B9B4A9;margin:0 0 18px}
+  .bd-cap{margin-top:10px;font-size:.85rem;line-height:1.5;color:#B9B4A9}
+
+  .frame{position:relative;container-type:inline-size;width:100%;aspect-ratio:16/10;border-radius:4px;overflow:hidden;background:var(--paper);box-shadow:0 34px 70px -26px rgba(0,0,0,.7)}
+  .frame.night{background:var(--night)}
+  .frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .frame svg.leads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+
+  /* the letterhead: the logo on its own paper, the links in the serif, the contacts as stationery
+     carries them, a navy rule with a fine orange one beneath; on night chapters it stays paper */
+  .lh{position:absolute;left:0;right:0;top:0;height:6.4cqw;display:flex;align-items:center;gap:3cqw;padding:0 4cqw;z-index:3}
+  .lh.paper{background:var(--paper)}
+  .lh::before{content:"";position:absolute;left:4cqw;right:4cqw;bottom:0;height:1px;background:rgba(19,36,79,.22)}
+  .lh-logo{width:var(--lw);height:auto;display:block}
+  .lh-nav{display:flex;gap:2.3cqw;margin-left:auto}
+  .lh-nav a{font:400 1.18cqw/1 var(--serif);color:var(--ink);text-decoration:none}
+  .lh-nav a:first-child{border-bottom:1px solid var(--orange);padding-bottom:.2cqw}
+  .lh-contact{display:grid;gap:.25cqw;padding-left:2.2cqw;border-left:1px solid rgba(19,36,79,.25);font:400 .82cqw/1.2 var(--sans);color:var(--body)}
+  .lh-cta{font:italic 400 1.15cqw/1 var(--serif);color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--orange);padding-bottom:.2cqw;white-space:nowrap}
+  .lh.compact{height:4.6cqw}
+  .lh.compact .lh-contact{display:none}
+  .lh.phone{height:21cqw;padding:0 5cqw}
+  .lh.phone::before{left:5cqw;right:5cqw}
+  .lh{--lw:17.5cqw}
+  .lh.compact{--lw:13cqw}
+  .lh.phone{--lw:46cqw}
+  /* by night, for now: no strip and no patch; the header turns ivory over the scene and names the
+     chapter where the logo would be, the logo keeping to the paper chapters (it is never recoloured) */
+  .night .lh-nav a{color:rgba(246,241,230,.92)}
+  .night .lh-nav a:first-child{border-color:var(--gold)}
+  .night :is(.lh-cta,.lh-menu){color:#F6F1E6;border-color:var(--gold)}
+  .night .lh::before{background:rgba(237,230,214,.16)}
+  .lh-run{font:500 1.05cqw/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:rgba(237,230,214,.78)}
+  .lh.phone .lh-run{font-size:3.6cqw}
+  .frame.band{aspect-ratio:16/3.6}
+  .lh-menu{margin-left:auto;font:400 4.4cqw/1 var(--serif);color:var(--ink);border-bottom:1.5px solid var(--orange);padding-bottom:.6cqw}
+  .strip{position:relative;container-type:inline-size;width:100%;border-radius:4px;overflow:hidden;background:var(--paper);box-shadow:0 20px 50px -24px rgba(0,0,0,.7);margin-bottom:16px}
+  .strip.desk{aspect-ratio:16/1.35}
+  .strip.desk.small{aspect-ratio:16/1.05}
+
+  /* page furniture, the book's own: a running head, a folio, figure legends */
+  .rh{position:absolute;top:8.2cqw;left:4cqw;right:4cqw;display:flex;justify-content:space-between;font:500 1cqw/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:rgba(19,36,79,.68);z-index:3}
+  .folio{position:absolute;bottom:2.4cqw;left:50%;transform:translateX(-50%);font:italic 400 1.35cqw/1 var(--serif);color:rgba(19,36,79,.6);z-index:3}
+  .legend{position:absolute;font:italic 400 1.02cqw/1.35 var(--serif);color:rgba(19,36,79,.78);z-index:3}
+  .night .rh{top:12.5cqw;color:rgba(237,230,214,.62)}
+  .night .folio{color:rgba(237,230,214,.6)}
+  .night .legend{color:rgba(237,230,214,.75)}
+
+  /* the caption: one headline, one line, one way on */
+  .cap{position:absolute;left:4.6cqw;bottom:6.6cqw;width:41cqw;z-index:3}
+  .cap::before{content:"";position:absolute;inset:-6cqw -8cqw -4cqw -8cqw;z-index:-1;background:radial-gradient(closest-side,rgba(243,238,227,.95),rgba(243,238,227,.72) 60%,rgba(243,238,227,0))}
+  .cap .k{font:500 1.05cqw/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:var(--pen);margin-bottom:1.3cqw}
+  .cap h2{font:400 4.7cqw/1.02 var(--serif);letter-spacing:-.018em;color:var(--ink)}
+  .cap p{margin-top:1.5cqw;font:400 1.3cqw/1.55 var(--sans);color:var(--body);max-width:36cqw}
+  .cap a{display:inline-block;margin-top:1.6cqw;font:italic 400 1.35cqw/1 var(--serif);color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--orange);padding-bottom:.25cqw}
+  .hl{background:linear-gradient(176deg,transparent 46%,rgba(224,168,46,.58) 47%,rgba(224,168,46,.5) 88%,transparent 89%);padding:0 .06em;margin:0 -.06em}
+  .night .cap::before{inset:-4cqw -2.6cqw -2.8cqw -2.6cqw;background:radial-gradient(closest-side,rgba(8,16,40,.55),rgba(8,16,40,.3) 60%,rgba(8,16,40,0))}
+  .night .cap .k{color:var(--gold)}
+  .night .cap h2{color:#F6F1E6}
+  .night .cap p{color:rgba(237,230,214,.84)}
+  .night .cap a{color:#F6F1E6;border-color:var(--gold)}
+  .night .hl{background:linear-gradient(180deg,transparent 88%,rgba(224,184,90,.95) 88%,rgba(224,184,90,.95) 93%,transparent 93%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .cap .btn{display:inline-flex;align-items:center;gap:.8cqw;margin-top:2cqw;padding:1.1cqw 1.9cqw;border-radius:.4cqw;background:var(--orange);color:#fff;font:600 1.15cqw/1 var(--sans);border:0;text-decoration:none}
+  .contact-row{position:absolute;left:4.6cqw;right:4.6cqw;bottom:2.4cqw;display:flex;gap:2.4cqw;font:500 .9cqw/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:rgba(237,230,214,.72);z-index:3}
+
+  /* the digital layer: crisp interface cards over the drawn world */
+  .chip{position:absolute;z-index:4;display:flex;flex-direction:column;gap:.3cqw;padding:.8cqw 1.05cqw;border-radius:.6cqw;background:rgba(253,251,247,.96);border:1px solid rgba(19,36,79,.14);box-shadow:0 .6cqw 1.8cqw rgba(19,36,79,.16);font:400 .88cqw/1.3 var(--sans);color:var(--body);white-space:nowrap}
+  .chip b{display:flex;align-items:center;gap:.45cqw;font:600 .7cqw/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink)}
+  .chip .ok{color:var(--pen);font-weight:600}
+  .chip .ai{color:var(--pen);font-size:.95cqw;letter-spacing:0}
+  .chip .live{width:.55cqw;height:.55cqw;border-radius:50%;background:var(--orange);box-shadow:0 0 0 .25cqw rgba(224,122,31,.18)}
+  .night .chip{background:rgba(10,20,48,.82);border-color:rgba(237,230,214,.22);color:rgba(237,230,214,.82);box-shadow:0 .6cqw 1.8cqw rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+  .night .chip b{color:#F6F1E6}
+  .night .chip .ok,.night .chip .ai{color:var(--gold)}
+  .night .chip .live{background:var(--gold);box-shadow:0 0 0 .25cqw rgba(224,184,90,.2)}
+
+  /* the work on screen: an editor in the site's own type and colours */
+  .ui{position:absolute;z-index:3;display:flex;flex-direction:column;background:#FDFBF6;overflow:hidden;font-family:var(--sans);color:var(--ink)}
+  .ui-bar{display:flex;align-items:center;gap:1.2cqw;padding:.85cqw 1.4cqw;border-bottom:1px solid rgba(19,36,79,.12);background:#F6F2E9;font-size:.92cqw}
+  .ui-bar .dots{display:flex;gap:.45cqw}
+  .ui-bar .dots i{width:.7cqw;height:.7cqw;border-radius:50%;background:rgba(19,36,79,.22)}
+  .ui-bar .dots i:first-child{background:rgba(224,122,31,.75)}
+  .ui-bar .dots i:nth-child(2){background:rgba(224,168,46,.75)}
+  .ui-bar b{font:600 .95cqw/1 var(--sans)}
+  .ui-saved{margin-left:auto;display:flex;align-items:center;gap:.5cqw;color:var(--body);font-size:.85cqw}
+  .ui-av{display:flex;gap:.3cqw}
+  .ui-av i{display:grid;place-items:center;width:1.9cqw;height:1.9cqw;border-radius:50%;background:var(--ink);color:#fff;font:600 .68cqw/1 var(--sans);font-style:normal}
+  .ui-av i.ai{background:#FFF6EC;color:var(--pen);border:1px solid rgba(180,80,15,.45);font-size:.9cqw}
+  .ui-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 21cqw;gap:2.2cqw;padding:2cqw 2.4cqw 1.4cqw;min-height:0}
+  .ui-doc{min-width:0}
+  .ui-doc p{font:400 1.06cqw/1.62 var(--serif);color:#26324F;margin-bottom:.95cqw}
+  .ui-doc .ui-sec{font:600 1.45cqw/1.2 var(--serif);color:var(--ink);margin-bottom:1.1cqw}
+  .ui-doc del{color:var(--pen);text-decoration-thickness:1.5px}
+  .ui-doc ins{color:var(--pen);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:.15em}
+  .ui-doc mark{background:linear-gradient(transparent 12%,rgba(224,168,46,.42) 12%,rgba(224,168,46,.42) 92%,transparent 92%);color:inherit}
+  .ui-doc .ui-ghost{color:rgba(180,80,15,.85);font-style:italic;border-left:2px solid rgba(180,80,15,.55);padding-left:1cqw}
+  .ui-fig{display:flex;gap:1.6cqw;align-items:center;margin:.4cqw 0 1cqw}
+  .ui-fig svg{width:18cqw;height:auto;flex:none}
+  .ui-fig span{font:italic 400 .9cqw/1.35 var(--serif);color:var(--body)}
+  .ui-side{display:flex;flex-direction:column;gap:.9cqw}
+  .ui-tab{width:100%;border-collapse:collapse;margin:.2cqw 0 1cqw;font:400 .86cqw/1.3 var(--sans);color:#26324F}
+  .ui-tab caption{text-align:left;font:italic 400 .9cqw/1.35 var(--serif);color:var(--body);padding-bottom:.5cqw}
+  .ui-tab th{font-weight:600;text-align:left;padding:.4cqw .6cqw;border-top:1px solid rgba(19,36,79,.5);border-bottom:1px solid rgba(19,36,79,.25)}
+  .ui-tab td{padding:.4cqw .6cqw;border-bottom:1px solid rgba(19,36,79,.12)}
+  .ui-tab tr:last-child td{border-bottom:1px solid rgba(19,36,79,.5)}
+  .ui-card{display:flex;flex-direction:column;gap:.35cqw;padding:.95cqw 1.15cqw;border-radius:.45cqw;border:1px solid rgba(19,36,79,.14);background:#fff;font-size:.9cqw;line-height:1.35;color:var(--body)}
+  .ui-card b{font:600 .72cqw/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+  .ui-card.ai{border-color:rgba(180,80,15,.35);background:#FFFAF3}
+  .ui-card.ai b{color:var(--pen)}
+  .ui-card em{font-style:normal;font-size:.8cqw;color:var(--pen)}
+  .ui-foot{display:flex;justify-content:space-between;padding:.75cqw 1.4cqw;border-top:1px solid rgba(19,36,79,.12);font-size:.8cqw;color:var(--body)}
+
+  /* the storyboard */
+  .sb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .sb .frame .n{position:absolute;left:3cqw;top:3cqw;font:italic 400 4cqw/1 var(--serif);color:rgba(19,36,79,.75);z-index:3}
+  .sb .frame.night .n{color:rgba(237,230,214,.8)}
+
+  /* palette and type */
+  .pt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+  .card{background:var(--paper);color:var(--ink);border-radius:4px;padding:26px 28px;box-shadow:0 20px 50px -24px rgba(0,0,0,.7)}
+  .card.nightcard{background:var(--night);color:var(--ivory)}
+  .card h3{font:500 .78rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px;color:#8A8577}
+  .card.nightcard h3{color:rgba(237,230,214,.6)}
+  .sw{display:grid;grid-template-columns:52px 1fr;gap:12px 14px;align-items:center}
+  .sw i{display:block;width:52px;height:38px;border-radius:3px;border:1px solid rgba(19,36,79,.15)}
+  .card.nightcard .sw i{border-color:rgba(237,230,214,.18)}
+  .sw b{display:block;font:500 .95rem/1.2 var(--serif)}
+  .sw span{font-size:.78rem;color:var(--body)}
+  .card.nightcard .sw span{color:rgba(237,230,214,.65)}
+  .ty > * + *{margin-top:16px}
+  .ty .t1{font:400 2.3rem/1 var(--serif);letter-spacing:-.015em}
+  .ty .t2{font:italic 400 1.02rem/1.4 var(--serif);color:rgba(19,36,79,.8)}
+  .ty .t3{font:500 .95rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--pen)}
+  .ty .t5{font:600 1.8rem/1 var(--hand);color:var(--pen)}
+  .ty small{display:block;font:500 .66rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8A8577;margin-bottom:6px}
+  .ty .chipdemo{position:static;display:inline-flex;font-size:.82rem;padding:9px 12px;border-radius:7px;gap:4px}
+  .ty .chipdemo b{font-size:.64rem}
+
+  /* phones */
+  .ph-row{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+  .frame.phone{width:360px;max-width:100%;aspect-ratio:390/844;border-radius:28px}
+  .frame.phone .cap{left:6cqw;right:6cqw;width:auto;bottom:11cqw}
+  .frame.phone .cap .k{font-size:3.4cqw;margin-bottom:3cqw}
+  .frame.phone .cap h2{font-size:11.5cqw}
+  .frame.phone .cap p{font-size:4cqw;max-width:none;margin-top:3.2cqw}
+  .frame.phone .cap a{font-size:4.2cqw;margin-top:4cqw}
+  .frame.phone .folio{font-size:4cqw;bottom:4cqw}
+  .frame.phone .chip{font-size:3cqw;padding:2.2cqw 2.8cqw;border-radius:1.8cqw;gap:.9cqw}
+  .frame.phone .chip b{font-size:2.4cqw;gap:1.2cqw}
+  .frame.phone .chip .ai{font-size:3cqw}
+  @media (max-width:980px){.pt{grid-template-columns:1fr}}
+  @media (max-width:820px){.sb{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="board">
+  <header>
+    <p class="bd-kicker">MeWriT website · direction preview · still frames, round two</p>
+    <h1>Day and night chapters in turn, a digital layer over both</h1>
+    <p class="bd-sub">The palette, type and letterhead as round one had them. The chapters now alternate: the study and the reading room by day, in ink on paper; the archive and the star map by night, the film's own engraved worlds; the editor by day again; the sunset to close. By night the header turns ivory over the scene, and the logo keeps to the paper chapters. A crisp digital layer runs over everything: the work as it is really done, on screen, checked, assisted, submitted. Still frames only; words are placeholders.</p>
+  </header>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">1 · The header, as a letterhead</h2>
+    <p class="bd-note">By day the letterhead is simply the top of the page: the logo on its paper, the links in the serif, the contacts as stationery carries them, one fine grey rule beneath. By night, for now, there is no strip and no patch: the header turns ivory over the scene and names the chapter where the logo would be, and the logo keeps to the paper chapters. A navy logo cannot sit on the dark without something light behind it, and every light ground drew the eye; an approved version of the logo for dark grounds would settle it.</p>
+    <div class="strip desk">
+      <div class="lh"><img class="lh-logo" src={logo} alt="MeWriT, Writing Science Right"><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><div class="lh-contact"><span>+91 97277 16506</span><span>hetal@mewrit.com</span></div><a class="lh-cta" href="#">Start a project</a></div>
+    </div>
+    <div class="strip desk small">
+      <div class="lh compact"><img class="lh-logo" src={logo} alt=""><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+    </div>
+    <div class="frame night band">
+      <canvas data-world="archive" data-crop="top"></canvas>
+      <div class="lh compact"><span class="lh-run">Regulatory writing · Chapter 2</span><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+    </div>
+    <p class="bd-cap">By night, for now: the chapter named where the logo would be, the links in ivory, one faint rule.</p>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">2 · Morning: the study</h2>
+    <p class="bd-note">One camera for the whole room, so the desk has a real top and edge and every object stands on it with its own shadow: the display with the draft open, keyboard and trackpad, a tablet with the reviewer's stylus notes, a stethoscope, reading glasses, coffee, a lamp, reference volumes, certificates on the wall. Through the doorway, the archive: the next room, and the next chapter. The paper is clean, the light is soft, and the cards name what is happening as it happens.</p>
+    <div class="frame" id="f-study">
+      <canvas data-scene="study"></canvas>
+      <div class="lh paper"><img class="lh-logo" src={logo} alt="MeWriT, Writing Science Right"><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><div class="lh-contact"><span>+91 97277 16506</span><span>hetal@mewrit.com</span></div><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="rh"><span>The study</span><span>Chapter i</span></div>
+      <svg class="leads" viewBox="0 0 1280 800" preserveAspectRatio="none" data-leads="study"></svg>
+      <div class="chip" data-at="study:draft"><b><i class="live"></i>Draft 3</b><span>Saved to the cloud · just now</span></div>
+      <div class="chip" data-at="study:rev"><b>Reviewer</b><span>Checked against ICH E3 <span class="ok">✓</span></span></div>
+      <div class="chip" data-at="study:ai"><b><span class="ai">✦</span>Assistant</b><span>42 of 42 references verified</span></div>
+      <div class="cap"><p class="k">MeWriT · Medical writing</p><h2>Writing <span class="hl">Science</span> Right</h2><p>Specialist medical writing and scientific communication: expert judgement, with today's tools.</p><a href="#">Begin reading</a></div>
+      <div class="folio">i</div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">3 · Night: regulatory writing, the archive</h2>
+    <p class="bd-note">The archive you liked, exactly as the film draws it, full bleed: the aisle of stacks in steel blue, the shaft of light with dust turning in it, the window at the far end. The page arrives as the dossier, ivory in the dark; the digital layer validates it for e-submission.</p>
+    <div class="frame night" id="f-archive">
+      <canvas data-world="archive" data-over="dossier"></canvas>
+      <div class="lh compact"><span class="lh-run">Regulatory writing · Chapter 2</span><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="chip" data-at="archive:ectd"><b>eCTD · Module 2.7</b><span>Validated <span class="ok">✓</span></span></div>
+      <div class="chip" data-at="archive:sub"><b><i class="live"></i>Submission</b><span>Ready for e-submission</span></div>
+      <div class="legend" data-at="archive:legend">Fig. 2. A dossier, bound for submission.</div>
+      <div class="cap"><p class="k">Practice one</p><h2>Submission-ready, <span class="hl">to the letter</span></h2><p>Protocols, clinical study reports, CTD modules and responses to regulators, for sponsors and CROs.</p><a href="#">Regulatory writing</a></div>
+      <div class="folio">2</div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">4 · Day: scientific publications, the reading room</h2>
+    <p class="bd-note">Back into daylight: the film's reading room, the same engraving printed in ink on the paper, its lamps unlit. The page arrives as a journal article; the digital layer carries it through review.</p>
+    <div class="frame" id="f-reading">
+      <canvas data-world="reading" data-over="article" data-ink="1"></canvas>
+      <div class="lh compact paper"><img class="lh-logo" src={logo} alt=""><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="rh"><span>Scientific publications</span><span>Chapter 3</span></div>
+      <div class="chip" data-at="reading:journal"><b><i class="live"></i>Journal</b><span>Accepted <span class="ok">✓</span></span></div>
+      <div class="chip" data-at="reading:icmje"><b><span class="ai">✦</span>ICMJE checklist</b><span>Complete · writing support acknowledged</span></div>
+      <div class="cap"><p class="k">Practice two</p><h2>From manuscript <span class="hl">to acceptance</span></h2><p>Original research, reviews, case reports, abstracts and posters, written to ICMJE and GPP.</p><a href="#">Scientific publications</a></div>
+      <div class="folio">3</div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">5 · Midnight: on the record, the star map</h2>
+    <p class="bd-note">The engraved celestial chart: the grid, the Milky Way, gold constellations, and the bright star the page becomes. The digital layer reads the record like a chart.</p>
+    <div class="frame night" id="f-sky">
+      <canvas data-world="sky" data-over="star"></canvas>
+      <div class="lh compact"><span class="lh-run">On the record · Chapter 4</span><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="chip" data-at="sky:map"><b><span class="ai">✦</span>Citation map</b><span>70+ publications · 25 acknowledgements</span></div>
+      <div class="cap"><p class="k">On the record</p><h2>Twenty-two years, <span class="hl">on the record</span></h2><p>100+ trial documents, 30+ clinical study reports, 70+ publications, 3,000+ professionals trained.</p><a href="#">Publications</a></div>
+      <div class="folio">4</div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">6 · Day: AI/ML advisory, the work on screen</h2>
+    <p class="bd-note">Daylight again, for the fifth practice: the document itself, in a modern editor set in the site's own type and colours. Tracked changes, a forest plot, a results table, the reviewer's sign-off, an assistant's suggestion accepted by a person, every reference verified. AI assisting the expert, never replacing her: human-in-the-loop review is the practice's own offer.</p>
+    <div class="frame" id="f-screen">
+      <canvas data-scene="screen"></canvas>
+      <div class="lh compact paper"><img class="lh-logo" src={logo} alt=""><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="rh"><span>AI/ML advisory</span><span>Chapter 5</span></div>
+      <div class="ui" data-at="screen:ui">
+        <div class="ui-bar"><span class="dots"><i></i><i></i><i></i></span><b>Clinical study report · Draft 3</b><span class="ui-saved"><span class="chip-live" style="width:.55cqw;height:.55cqw;border-radius:50%;background:var(--orange);display:inline-block"></span>Saved · just now</span><span class="ui-av"><i>HS</i><i class="ai">✦</i></span></div>
+        <div class="ui-body">
+          <div class="ui-doc">
+            <p class="ui-sec">11.4 Efficacy results</p>
+            <p>The primary endpoint was met in the per-protocol population. A total of 480 <del>subjects</del> <ins>participants</ins> were randomised 1:1 to treatment or control.</p>
+            <p><mark>Treatment reduced the risk of the primary event</mark> compared with control (HR 0.72; 95% CI 0.58 to 0.89).</p>
+            <div class="ui-fig">
+              <svg viewBox="0 0 220 92" aria-hidden="true"><g stroke="#13244F" fill="none" stroke-width="1"><path d="M120 6 V86" stroke-dasharray="3 3" stroke-opacity=".5"/><path d="M10 86 H210" stroke-opacity=".35"/></g><g stroke="#13244F" stroke-width="1.4"><path d="M70 16 H128"/><path d="M84 32 H112"/><path d="M58 48 H122"/><path d="M90 64 H118"/></g><g fill="#13244F"><rect x="94" y="12" width="8" height="8"/><rect x="95" y="28" width="6" height="8"/><rect x="86" y="44" width="8" height="8"/><rect x="101" y="60" width="6" height="8"/></g><path d="M80 78 L98 73 L116 78 L98 83 Z" fill="#E07A1F"/></svg>
+              <span>Figure 11.2. Hazard ratios by prespecified subgroup.</span>
+            </div>
+            <p class="ui-ghost">Suggested: add the number needed to treat for the primary endpoint.</p>
+            <table class="ui-tab"><caption>Table 11.3. Primary endpoint, per-protocol population</caption><thead><tr><th></th><th>Treatment</th><th>Control</th><th>HR (95% CI)</th></tr></thead><tbody><tr><td>Participants</td><td>240</td><td>240</td><td></td></tr><tr><td>Events</td><td>41</td><td>56</td><td>0.72 (0.58 to 0.89)</td></tr></tbody></table>
+          </div>
+          <aside class="ui-side">
+            <div class="ui-card"><b>Reviewer</b><span>Checked against ICH E3 §11.4 ✓</span></div>
+            <div class="ui-card ai"><b>✦ Assistant</b><span>3 references updated to current versions</span><em>Accepted by the reviewer</em></div>
+            <div class="ui-card"><b>References</b><span>42 of 42 verified against source</span></div>
+          </aside>
+        </div>
+        <div class="ui-foot"><span>eCTD ready · Module 5.3.5.1</span><span>ICH E3 template · 214 pages</span></div>
+      </div>
+      <div class="legend" style="left:44.6cqw;top:56.2cqw">Fig. 5. The draft, the reviewer and the assistant, in one document. Figures illustrative.</div>
+      <div class="cap"><p class="k">Practice five</p><h2>Expertise, <span class="hl">in the loop</span></h2><p>Domain expertise for AI and ML in medical writing: human-in-the-loop review of generated content for accuracy, relevance and quality.</p><a href="#">AI/ML advisory</a></div>
+      <div class="folio">5</div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">7 · Sunset: correspondence</h2>
+    <p class="bd-note">The horizon with all its hues: navy overhead into the warm glow behind the hills, towns lit along the ridges. The page settles into a letter; the last chapter carries the contacts and the way to begin.</p>
+    <div class="frame night" id="f-dawn">
+      <canvas data-world="dawn" data-over="letter"></canvas>
+      <div class="lh compact"><span class="lh-run">Correspondence · Chapter 6</span><nav class="lh-nav">{nav.map(n => <a href="#">{n}</a>)}</nav><a class="lh-cta" href="#">Start a project</a></div>
+      <div class="chip" data-at="dawn:call"><b><i class="live"></i>Online</b><span>Book a video consultation</span></div>
+      <div class="cap" style="bottom:8cqw"><p class="k">Correspondence</p><h2>Tell us what you <span class="hl">need written</span></h2><p>Trusted for operational excellence. Chosen for uncompromised scientific rigour.</p><a class="btn" href="#">Start a project</a></div>
+      <div class="contact-row"><span>hetal@mewrit.com</span><span>+91 97277 16506</span><span>Satellite, Ahmedabad, India</span><span style="margin-left:auto">Writing Science Right</span></div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">8 · Moving between rooms, from day into night and back</h2>
+    <p class="bd-note">The camera walks from room to room; each room draws itself in; dusk falls across the page, and dawn lifts it again, so day and night chapters take turns. The page never flips: its ink loosens into light and settles into its next form.</p>
+    <div class="sb">
+      <div><div class="frame"><canvas data-scene="sb1"></canvas><span class="n">a</span></div><p class="bd-cap">Morning: the camera walks to the doorway at the side of the study.</p></div>
+      <div><div class="frame" style="background:#0B1735"><canvas data-world="archive" data-over="dusk"></canvas><span class="n">b</span></div><p class="bd-cap">Through it, the archive draws itself in, in ink on paper, and dusk falls across it.</p></div>
+      <div><div class="frame night"><canvas data-world="archive" data-over="drift"></canvas><span class="n">c</span></div><p class="bd-cap">Night: the draft's ink loosens into light and drifts toward its next form.</p></div>
+      <div><div class="frame night"><canvas data-world="archive" data-over="dossier"></canvas><span class="n">d</span></div><p class="bd-cap">The archive complete, the draft bound into the dossier.</p></div>
+      <div><div class="frame night"><canvas data-world="reading" data-over="dawn"></canvas><span class="n">e</span></div><p class="bd-cap">Dawn: the night lifts from the next room, and the reading room is inked back into day.</p></div>
+      <div><div class="frame"><canvas data-world="reading" data-over="article" data-ink="1"></canvas><span class="n">f</span></div><p class="bd-cap">Day: the reading room in ink, the page set as an article.</p></div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">9 · Palette and type</h2>
+    <p class="bd-note">Round one's palette and type, kept, with their night counterparts and the digital layer's card.</p>
+    <div class="pt">
+      <div class="card"><h3>By day</h3><div class="sw">
+        <i style="background:#F3EEE3"></i><div><b>Paper</b><span>#F3EEE3</span></div>
+        <i style="background:#13244F"></i><div><b>Ink</b><span>#13244F, the logo's navy</span></div>
+        <i style="background:#B4500F"></i><div><b>Reviewer's pen</b><span>#B4500F, the logo's orange, deepened</span></div>
+        <i style="background:rgba(224,168,46,.55)"></i><div><b>Highlighter</b><span>mustard, sparingly</span></div>
+      </div></div>
+      <div class="card nightcard"><h3>By night</h3><div class="sw">
+        <i style="background:#0B1735"></i><div><b>Night</b><span>#0B1735, the logo's navy, deepened</span></div>
+        <i style="background:#A9BDF2"></i><div><b>Steel blue</b><span>the archive's engraving</span></div>
+        <i style="background:#E0B85A"></i><div><b>Gold</b><span>#E0B85A, stars, lamps, accents</span></div>
+        <i style="background:linear-gradient(180deg,#0B1A42,#3A2A3A 55%,#8A5A4A 80%,#F2B866)"></i><div><b>Sunset</b><span>navy into the warm glow</span></div>
+      </div></div>
+      <div class="card ty">
+        <div><small>Headlines · Fraunces</small><p class="t1">Writing Science Right</p></div>
+        <div><small>Figure legends · Fraunces italic</small><p class="t2">Fig. 2. A dossier, bound for submission.</p></div>
+        <div><small>Labels · small capitals</small><p class="t3">Regulatory writing · Chapter 2</p></div>
+        <div><small>The digital layer · Inter</small><div class="chip chipdemo"><b>Reviewer</b><span>Checked against ICH E3 <span class="ok">✓</span></span></div></div>
+        <div><small>Stylus notes · Caveat</small><p class="t5">refs checked ✓</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bd-sec">
+    <h2 class="bd-h">10 · On a phone</h2>
+    <p class="bd-note">The same rooms, the picture above, the words below, the letterhead slim; one card of the digital layer at a time.</p>
+    <div class="ph-row">
+      <div class="frame phone">
+        <canvas data-scene="phone" data-w="390" data-h="844"></canvas>
+        <div class="lh phone paper"><img class="lh-logo" src={logo} alt=""><span class="lh-menu">Menu</span></div>
+        <div class="chip" style="left:6cqw;top:27cqw"><b><i class="live"></i>Draft 3</b><span>Saved to the cloud · just now</span></div>
+        <div class="cap"><p class="k">MeWriT · Medical writing</p><h2>Writing <span class="hl">Science</span> Right</h2><p>Specialist medical writing and scientific communication: expert judgement, with today's tools.</p><a href="#">Begin reading</a></div>
+        <div class="folio">i</div>
+      </div>
+      <div class="frame phone night">
+        <canvas data-world="archive" data-over="dossier" data-w="390" data-layout="phone"></canvas>
+        <div class="lh phone"><span class="lh-run">Regulatory writing</span><span class="lh-menu">Menu</span></div>
+        <div class="chip" style="left:6cqw;top:124cqw"><b>eCTD · Module 2.7</b><span>Validated <span class="ok">✓</span></span></div>
+        <div class="cap"><p class="k">Practice one</p><h2>Submission-ready, <span class="hl">to the letter</span></h2><p>Protocols, clinical study reports, CTD modules and responses to regulators.</p><a href="#">Regulatory writing</a></div>
+        <div class="folio">2</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { archive as archiveWorld } from '../../scripts/lamp/worlds/archive.js';
+import { sky as skyWorld } from '../../scripts/lamp/worlds/sky.js';
+import { dawn as dawnWorld } from '../../scripts/lamp/worlds/dawn.js';
+import { reading as readingWorld } from '../../scripts/lamp/worlds/reading.js';
+
+const TAU = Math.PI * 2;
+const INK = '19,36,79', PEN = '180,80,15', SHADOW = '38,48,82';
+const PAPER = '#F3EEE3', LIGHT = '#F8F5EE', SHEET = '#FBF8F2';
+let LWF = 1;   // line weight factor: small frames draw a little heavier so thumbnails still read
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+// ---------- the pen ----------
+function kit(c, seed, o = {}) {
+  const r = rng(seed);
+  const K = {
+    r, ink: o.ink || INK, wob: o.wobble ?? .14,
+    stroke(w, a) { c.lineWidth = w * LWF; c.strokeStyle = `rgba(${K.ink},${Math.min(1, a)})`; c.lineCap = 'round'; c.lineJoin = 'round'; },
+    line(x1, y1, x2, y2, w = 1, a = .85) {
+      const L = Math.hypot(x2 - x1, y2 - y1) || 1, n = Math.max(2, Math.round(L / 22)), nx = -(y2 - y1) / L, ny = (x2 - x1) / L;
+      c.beginPath();
+      for (let i = 0; i <= n; i++) { const t = i / n, j = i && i < n ? (r() - .5) * K.wob : 0, x = x1 + (x2 - x1) * t + nx * j, y = y1 + (y2 - y1) * t + ny * j; if (i) c.lineTo(x, y); else c.moveTo(x, y); }
+      K.stroke(w, a); c.stroke();
+    },
+    poly(pts, w = 1, a = .85, close = false) { if (pts.length < 2) return; c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); if (close) c.closePath(); K.stroke(w, a); c.stroke(); },
+    smooth(pts, w = 1, a = .85, close = false) {
+      if (pts.length < 3) return K.poly(pts, w, a, close);
+      c.beginPath();
+      if (close) {
+        const m0 = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2]; c.moveTo(m0[0], m0[1]);
+        for (let i = 1; i <= pts.length; i++) { const p = pts[i % pts.length], q = pts[(i + 1) % pts.length]; c.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2); }
+      } else {
+        c.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length - 1; i++) c.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+        const l = pts[pts.length - 1]; c.lineTo(l[0], l[1]);
+      }
+      K.stroke(w, a); c.stroke();
+    },
+    path(pts) { c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); },
+    clip(pts) { K.path(pts); c.clip(); },
+    fill(pts, style) { K.path(pts); c.fillStyle = style; c.fill(); },
+    hatch(pts, ang, gap, w = .45, a = .3) {
+      c.save(); K.clip(pts);
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, R = Math.hypot(x1 - x0, y1 - y0) / 2 + 4, dx = Math.cos(ang), dy = Math.sin(ang);
+      c.beginPath();
+      for (let s = -R; s <= R; s += gap * Math.max(1, LWF * .8)) { c.moveTo(cx - dy * s - dx * R, cy + dx * s - dy * R); c.lineTo(cx - dy * s + dx * R, cy + dx * s + dy * R); }
+      K.stroke(w, a); c.stroke();
+      c.restore();
+    },
+    // light: a soft pool lighter than the paper it falls on
+    light(x, y, rx, ry, rgb, a) { c.save(); c.translate(x, y); c.scale(1, ry / rx); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(.55, `rgba(${rgb},${a * .45})`); g.addColorStop(1, `rgba(${rgb},0)`); c.fillStyle = g; c.fillRect(-rx, -rx, rx * 2, rx * 2); c.restore(); },
+    glow(x, y, rad, rgb, a) { c.save(); c.globalCompositeOperation = 'screen'; const g = c.createRadialGradient(x, y, 0, x, y, rad); g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(.45, `rgba(${rgb},${a * .3})`); g.addColorStop(1, `rgba(${rgb},0)`); c.fillStyle = g; c.fillRect(x - rad, y - rad, rad * 2, rad * 2); c.restore(); },
+    dot(x, y, rad, a, rgb) { c.fillStyle = `rgba(${rgb || K.ink},${Math.min(1, a)})`; c.beginPath(); c.arc(x, y, rad * Math.sqrt(LWF), 0, TAU); c.fill(); },
+    // a line of type in stipple: words as clusters of ink dots
+    text(x, y, len, dens = 1.4, a = .8, size = 2.6, rgb) {
+      let px = x;
+      while (px < x + len - 6) { const wl = Math.min(8 + r() * 30, x + len - px); for (let d = 0; d < wl * dens; d++) K.dot(px + r() * wl, y + (r() - .5) * size, .42 + r() * .5, a * (.55 + r() * .45), rgb); px += wl + 4 + r() * 4; }
+    },
+    // a line of type as an interface draws it: rounded bars, word by word
+    bars(x, y, len, h, a, rgb) {
+      let px = x; c.fillStyle = `rgba(${rgb || K.ink},${a})`;
+      while (px < x + len - 2) { const wl = Math.min(h * (2.4 + r() * 6), x + len - px); rr(c, px, y - h / 2, wl, h, h / 2); c.fill(); px += wl + h * 1.2; }
+    },
+  };
+  return K;
+}
+function rr(c, x, y, w, h, rad) { c.beginPath(); c.roundRect ? c.roundRect(x, y, w, h, rad) : c.rect(x, y, w, h); }
+function hull(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  up.pop(); lo.pop(); return lo.concat(up);
+}
+function paper(c, W, H, seed) {
+  const r = rng(seed);
+  c.fillStyle = PAPER; c.fillRect(0, 0, W, H);
+  for (let i = 0; i < W * H / 160; i++) { c.fillStyle = `rgba(110,90,60,${.012 + r() * .02})`; c.fillRect(r() * W, r() * H, 1, 1); }
+}
+
+// ---------- the room's camera: one eye for everything, verticals kept upright ----------
+const STUDY = { F: 880, ex: 5, ey: 9, ez: 10, cx: 640, cy: -36 };
+function room(c, K, cam) {
+  const E = [cam.ex, cam.ey, cam.ez];
+  const P = ([x, y, z]) => { const d = cam.ez - z; return [cam.cx + cam.F * (x - cam.ex) / d, cam.cy - cam.F * (y - cam.ey) / d]; };
+  const S = {
+    P, E,
+    line(a, b, w = 1, al = .85) { const A = P(a), B = P(b); K.line(A[0], A[1], B[0], B[1], w, al); },
+    poly(pts, w = 1, al = .85, close = false) { K.poly(pts.map(P), w, al, close); },
+    smooth(pts, w = 1, al = .85, close = false) { K.smooth(pts.map(P), w, al, close); },
+    fill(pts, style) { K.fill(pts.map(P), style); },
+    hatch(pts, ang, gap, w = .45, al = .3) { K.hatch(pts.map(P), ang, gap, w, al); },
+    ring(cx, y, cz, rx, rz = rx, n = 56) { return Array.from({ length: n }, (_, i) => { const t = i / n * TAU; return [cx + Math.cos(t) * rx, y, cz + Math.sin(t) * rz]; }); },
+    // a shadow on the desk: a footprint on y = 0, pushed away from the light (to the left, toward us), softened
+    shadow(pts, a = .13, blur = 5, push = [-.18, .14]) { c.save(); c.filter = `blur(${blur * LWF}px)`; K.fill(pts.map(([x, z]) => P([x + push[0], 0, z + push[1]])), `rgba(${SHADOW},${a})`); c.restore(); },
+    // an upright cylinder or cone frustum: its outline is the hull of its two rims; the left of it in shade
+    cyl(cx, cz, r0, r1, y0, y1, o = {}) {
+      const B = S.ring(cx, y0, cz, r0).map(P), T = S.ring(cx, y1, cz, r1).map(P), H = hull(B.concat(T));
+      K.fill(H, o.fill || LIGHT);
+      if (o.shade !== false) {
+        const xs = H.map(p => p[0]), ys = H.map(p => p[1]), l = Math.min(...xs), rr2 = Math.max(...xs), t = Math.min(...ys), b = Math.max(...ys), k = o.shadeK ?? .34;
+        c.save(); K.clip(H); K.hatch([[l - 2, t - 2], [l + (rr2 - l) * k, t - 2], [l + (rr2 - l) * k * .8, b + 2], [l - 2, b + 2]], o.hang ?? 1.2, o.hgap ?? 3.2, .42, o.hal ?? .32); c.restore();
+      }
+      K.poly(H, o.w ?? 1.15, .88, true);
+      if (o.top !== false) { K.fill(T, o.topFill || SHEET); K.poly(T, o.tw ?? .9, .8, true); }
+      return { T, B, H };
+    },
+    // an upright prism over a convex footprint [[x, z], ...]: the faces that look at the eye, then the top
+    prism(base, y0, y1, o = {}) {
+      const n = base.length, mx = base.reduce((s, p) => s + p[0], 0) / n, mz = base.reduce((s, p) => s + p[1], 0) / n, faces = [];
+      for (let i = 0; i < n; i++) {
+        const [ax, az] = base[i], [bx, bz] = base[(i + 1) % n], fx = (ax + bx) / 2, fz = (az + bz) / 2;
+        let nx = bz - az, nz = -(bx - ax); if (nx * (fx - mx) + nz * (fz - mz) < 0) { nx = -nx; nz = -nz; }
+        if ((E[0] - fx) * nx + (E[2] - fz) * nz > 0) faces.push({ pts: [[ax, y0, az], [bx, y0, bz], [bx, y1, bz], [ax, y1, az]], lit: (nx + nz * .25) / Math.hypot(nx, nz) });
+      }
+      faces.forEach(f => {
+        S.fill(f.pts, f.lit > .1 ? (o.side || LIGHT) : (o.dark || o.side || LIGHT));
+        if (f.lit <= .1 && o.hatch !== false) S.hatch(f.pts, o.hang ?? 1.15, o.hgap ?? 3.2, .42, o.hal ?? .34);
+        S.poly(f.pts, o.w ?? 1, .85, true);
+      });
+      const top = base.map(([x, z]) => [x, y1, z]);
+      S.fill(top, o.top || SHEET); S.poly(top, o.w ?? 1, .85, true);
+      return { top, faces };
+    },
+    // a point on a quad (a, b, c, d in order) at (u, v): u along a to b, v along a to d
+    on(q, u, v) { const a = q[0], b = q[1], d = q[3], cc = q[2]; return [0, 1, 2].map(i => a[i] * (1 - u) * (1 - v) + b[i] * u * (1 - v) + cc[i] * u * v + d[i] * (1 - u) * v); },
+  };
+  return S;
+}
+
+// ---------- morning: the study ----------
+function study(c, W, H, seed, o = {}) {
+  paper(c, W, H, seed);
+  const K = kit(c, seed + 1), S = room(c, K, STUDY), P = S.P;
+  const WALL = -7, TOPC = '#EDE4D2', EDGE = '#E2D6BF';
+
+  // the doorway to the left, and the archive through it: its far wall of shelving, its left wall
+  // running away from us, the floor, light from a high window; cooler and fainter than the study
+  const jamb = P([-2, 0, WALL])[0];
+  c.save(); K.clip([[-10, -10], [jamb, -10], [jamb, H + 10], [-10, H + 10]]);
+  {
+    const A = kit(c, seed + 2, { ink: '70,88,132', wobble: .1 }), R = room(c, A, STUDY);
+    const FZ = -30, FL = -7.5, LX = -19, TY = 13.5;
+    c.fillStyle = '#E4E9F0'; c.fillRect(0, 0, jamb, H);
+    R.fill([[LX, FL, WALL], [LX, FL, FZ], [LX, TY, FZ], [LX, TY, WALL]], '#DCE2EB');
+    R.fill([[LX, FL, WALL], [-2, FL, WALL], [-2, FL, FZ], [LX, FL, FZ]], '#E9EDF3');
+    {
+      const sh = [P([LX, 12, -12]), P([LX, 12, -15.5]), P([-5, FL, -20]), P([-8.5, FL, -12.5])];
+      const g = c.createLinearGradient(sh[0][0], sh[0][1], sh[2][0], sh[2][1]); g.addColorStop(0, 'rgba(255,255,255,.75)'); g.addColorStop(1, 'rgba(255,255,255,.2)');
+      A.fill(sh, g);
+    }
+    const shelfY = []; for (let y = FL + .5; y < TY; y += 2.3) shelfY.push(y);
+    const bays = [-19, -16.4, -13.8, -11.2, -8.6];
+    bays.forEach(x => { R.line([x, FL, FZ], [x, TY, FZ], 1, .62); R.line([x + .22, FL, FZ], [x + .22, TY, FZ], .5, .4); });
+    shelfY.forEach((y, si) => {
+      R.line([LX, y, FZ], [-6, y, FZ], .85, .58); R.line([LX, y - .2, FZ], [-6, y - .2, FZ], .45, .36);
+      if (si === shelfY.length - 1) return;
+      for (let x = LX + .3; x < -6.4;) {
+        const k = A.r(); if (k < .08) { x += .5; continue; }
+        const wd = .3 + A.r() * .22, hh = 1.3 + A.r() * .6, lean = k > .95 ? .3 : 0;
+        if (bays.some(b => x < b + .32 && x + wd > b - .04)) { x += .28; continue; }
+        R.poly([[x, y, FZ], [x + lean, y + hh, FZ], [x + wd + lean, y + hh, FZ], [x + wd, y, FZ]], .55, .46);
+        if (A.r() < .16) R.fill([[x + .06, y + hh * .56, FZ], [x + wd - .06, y + hh * .56, FZ], [x + wd - .06, y + hh * .74, FZ], [x + .06, y + hh * .74, FZ]], A.r() < .5 ? 'rgba(224,122,31,.38)' : 'rgba(224,168,46,.42)');
+        x += wd + .02;
+      }
+    });
+    [-9, -12.5, -16, -19.5, -23, -26.5, -29.8].forEach(z => R.line([LX, FL, z], [LX, TY, z], .85, .52));
+    shelfY.forEach((y, si) => {
+      R.line([LX, y, WALL], [LX, y, FZ], .75, .48);
+      if (si === shelfY.length - 1) return;
+      for (let z = WALL - 2.3; z > FZ + .3; z -= .34 + A.r() * .2) { if (A.r() < .1) continue; R.line([LX, y, z], [LX, y + 1.3 + A.r() * .55, z], .45, .34); }
+    });
+    for (let x = LX + 1.2; x < -2; x += 1.2) R.line([x, FL, WALL], [x, FL, FZ], .45, .2);
+    for (let z = WALL - 2.5; z > FZ; z -= 2.6) R.line([LX, FL, z], [-2, FL, z], .4, .12);
+    const rail = x => R.line([x, FL, FZ + 1.7], [x + 1.3, TY - 1.2, FZ + .15], 1.05, .62);
+    rail(-14.6); rail(-13.5);
+    for (let t = .07; t < 1; t += .075) R.line([-14.6 + 1.3 * t, FL + (TY - 1.2 - FL) * t, FZ + 1.7 - 1.55 * t], [-13.5 + 1.3 * t, FL + (TY - 1.2 - FL) * t, FZ + 1.7 - 1.55 * t], .6, .46);
+  }
+  c.restore();
+  // the opening's edge: a little shade on the jamb side, the way light falls off at a doorway
+  { const g = c.createLinearGradient(jamb - 40, 0, jamb, 0); g.addColorStop(0, 'rgba(70,88,132,0)'); g.addColorStop(1, 'rgba(70,88,132,.08)'); c.fillStyle = g; c.fillRect(jamb - 40, 0, 40, H); }
+  if (o.doorGlow) K.light(jamb * .5, H * .42, jamb * .9, H * .6, '255,255,255', .35 * o.doorGlow);
+  // the architrave around the opening
+  {
+    const z = WALL + .02, cas = [[-2, -8, z], [-1.25, -8, z], [-1.25, 14, z], [-2, 14, z]];
+    S.fill(cas, SHEET); S.poly(cas, 1.3, .88, true);
+    S.line([-1.92, -8, z], [-1.92, 14, z], .5, .5); S.line([-1.84, -8, z], [-1.84, 14, z], .45, .42); S.line([-1.62, -8, z], [-1.62, 14, z], .6, .45); S.line([-1.36, -8, z], [-1.36, 14, z], .45, .3);
+    c.save(); c.filter = `blur(${3 * LWF}px)`; K.fill([P([-1.25, -8, z]), P([-1.05, -8, z]), P([-1.05, 14, z]), P([-1.25, 14, z])], `rgba(${SHADOW},.08)`); c.restore();
+  }
+  // the skirting along the wall, left of the desk
+  S.line([-1.25, -6.6, WALL], [2, -6.6, WALL], .8, .5);
+
+  // two certificates in slim dark frames
+  const cert = (x0, x1, y0, y1, seal) => {
+    const z = WALL + .01, q = [[x0, y1, z], [x1, y1, z], [x1, y0, z], [x0, y0, z]];
+    c.save(); c.filter = `blur(${4 * LWF}px)`; K.fill(q.map(([x, y]) => P([x - .08, y - .12, z])), `rgba(${SHADOW},.16)`); c.restore();
+    S.fill(q, `rgba(${INK},.92)`);
+    const f = .1, m = .32, inner = [[x0 + f, y1 - f, z], [x1 - f, y1 - f, z], [x1 - f, y0 + f, z], [x0 + f, y0 + f, z]], mat = [[x0 + m, y1 - m, z], [x1 - m, y1 - m, z], [x1 - m, y0 + m, z], [x0 + m, y0 + m, z]];
+    S.fill(inner, '#FDFBF7'); S.fill(mat, SHEET); S.poly(mat, .5, .4, true);
+    const a = P([x0 + m + .25, y1 - m - .4, z]), b = P([x1 - m - .25, 0, z]);
+    K.bars(a[0] + (b[0] - a[0]) * .18, a[1], (b[0] - a[0]) * .64, 2.2, .75);
+    for (let i = 0; i < 4; i++) { const p = P([0, y1 - m - .9 - i * .32, z]); K.bars(a[0] + 2, p[1], (b[0] - a[0]) - 4 - (i === 3 ? 18 : 0), 1.1, .3); }
+    const s = P([x1 - m - .42, y0 + m + .45, z]); K.fill(Array.from({ length: 16 }, (_, i) => [s[0] + Math.cos(i / 16 * TAU) * 6.5, s[1] + Math.sin(i / 16 * TAU) * 6.5]), seal); K.poly(Array.from({ length: 16 }, (_, i) => [s[0] + Math.cos(i / 16 * TAU) * 6.5, s[1] + Math.sin(i / 16 * TAU) * 6.5]), .7, .6, true);
+  };
+  cert(-.4, 1.9, 2.4, 5.5, 'rgba(224,122,31,.55)'); cert(2.4, 4.3, 2.9, 5.2, 'rgba(224,168,46,.6)');
+
+  // the desk: its top, its front edge, the grain, a line where it meets the wall
+  const X0 = 1, X1 = 30, D0 = 0, D1 = WALL;
+  const top = [[X0, 0, D0], [X1, 0, D0], [X1, 0, D1], [X0, 0, D1]];
+  S.fill(top, TOPC);
+  for (let i = 0; i < 24; i++) { const z = -6.8 + i * .27 + K.r() * .12, x0 = X0 + K.r() * 4, x1 = x0 + 6 + K.r() * 16; S.line([x0, 0, z], [x1, 0, z + (K.r() - .5) * .06], .45, .05 + K.r() * .05); }
+  c.save(); const wg = c.createLinearGradient(0, P([0, 0, D1])[1], 0, P([0, 0, D1 + .9])[1]); wg.addColorStop(0, `rgba(${SHADOW},.1)`); wg.addColorStop(1, `rgba(${SHADOW},0)`); S.fill([[X0, 0, D1], [X1, 0, D1], [X1, 0, D1 + .9], [X0, 0, D1 + .9]], wg); c.restore();
+  const front = [[X0, 0, D0], [X1, 0, D0], [X1, -.5, D0], [X0, -.5, D0]];
+  S.fill(front, EDGE); S.hatch(front, .02, 3.6, .4, .16); S.poly(front, 1.2, .88, true);
+  S.line([X0, -.06, D0 + .002], [X1, -.06, D0 + .002], .6, .35);
+  S.line([X0, 0, D0], [X0, 0, D1], 1.2, .88);
+  S.line([X0, 0, D1], [X1, 0, D1], .9, .6);
+
+  // the lamp's pool of light on the desk
+  const pool = P([10.6, 0, -2.7]); K.light(pool[0], pool[1], 250, 96, '255,250,238', .85);
+
+  // reference volumes, standing at the back
+  const vols = [[1.7, .42, 2.45, '#F1ECE1', 0], [2.12, .52, 2.75, '#DCE1EA', 1], [2.64, .36, 2.3, '#F4EFE5', 0], [3.0, .48, 2.6, '#F1ECE1', 2], [3.48, .4, 2.2, '#E9EDF3', 0]];
+  S.shadow([[1.7, -6.95], [3.9, -6.95], [3.9, -5.35], [1.7, -5.35]], .12, 5, [-.3, .25]);
+  vols.forEach(([x, w, h, col, band]) => {
+    const z0 = -6.95, z1 = -5.4 + (K.r() - .5) * .08;
+    const b = S.prism([[x, z0], [x + w, z0], [x + w, z1], [x, z1]], 0, h, { side: col, dark: col, hgap: 3, w: .95 });
+    const sp = [[x, 0, z1], [x + w, 0, z1], [x + w, h, z1], [x, h, z1]];
+    S.line([x + .03, h - .22, z1], [x + w - .03, h - .22, z1], .6, .6); S.line([x + .03, h - .3, z1], [x + w - .03, h - .3, z1], .4, .45);
+    S.line([x + .03, .22, z1], [x + w - .03, .22, z1], .6, .6);
+    if (band) S.fill([S.on(sp, .14, .58), S.on(sp, .86, .58), S.on(sp, .86, .72), S.on(sp, .14, .72)], band === 1 ? 'rgba(224,122,31,.55)' : 'rgba(224,168,46,.6)');
+    const lb = [S.on(sp, .2, .38), S.on(sp, .8, .38), S.on(sp, .8, .5), S.on(sp, .2, .5)]; S.poly(lb, .5, .5, true);
+    for (let k = 1; k < 4; k++) S.line([x + w * k / 4, h + .001, z0 + .1], [x + w * k / 4, h + .001, z1 - .06], .35, .3);
+  });
+
+  // a snake plant in a pot, between the volumes and the display
+  S.shadow(S.ring(4.95, 0, -6.35, .4).map(([x, , z]) => [x, z]), .13, 4, [-.25, .2]);
+  S.cyl(4.95, -6.35, .3, .37, 0, .64, { hgap: 3 });
+  {
+    const base = P([4.95, .64, -6.35]);
+    [[-9, 104, -12, 9], [-3, 150, -4, 10], [4, 136, 7, 9.5], [10, 96, 15, 8.5], [-1, 82, 4, 8]].forEach(([dx, h, lean, wd], i) => {
+      const bx = base[0] + dx * .6, by = base[1] - 1, tx = bx + lean, ty = by - h * .8;
+      const at = t => [bx + (tx - bx) * t, by + (ty - by) * t], m = at(.42), q1 = at(.78);
+      c.beginPath(); c.moveTo(bx - wd * .45, by);
+      c.quadraticCurveTo(m[0] - wd * 1.05, m[1], q1[0] - wd * .35, q1[1]); c.quadraticCurveTo(tx - 1, ty + 6, tx, ty);
+      c.quadraticCurveTo(tx + 1, ty + 6, q1[0] + wd * .35, q1[1]); c.quadraticCurveTo(m[0] + wd * 1.05, m[1], bx + wd * .45, by); c.closePath();
+      c.fillStyle = i % 2 ? '#EEF0E7' : '#E5E9DE'; c.fill(); K.stroke(1, .86); c.stroke();
+      const mid = [at(.05), at(.5), at(.95)]; K.smooth(mid, .45, .32);
+      for (let t = .14; t < .8; t += .11) { const p = at(t), w2 = wd * (1 - Math.abs(t - .42) * 1.1) * .8; K.smooth([[p[0] - w2, p[1] + 1.8], [p[0], p[1] - .6], [p[0] + w2, p[1] + 1.4]], .45, .3); }
+    });
+  }
+
+  // the display, on its stand, the draft open on it
+  S.shadow([[7.75, -6.55], [9.45, -6.55], [9.45, -5.2], [7.75, -5.2]], .16, 4);
+  S.prism([[7.75, -6.55], [9.45, -6.55], [9.45, -5.2], [7.75, -5.2]], 0, .07, { hatch: false });
+  S.prism([[8.35, -6.25], [8.85, -6.25], [8.85, -5.95], [8.35, -5.95]], .07, 2.2, { hgap: 2.6 });
+  const mon = { x0: 5.55, x1: 11.65, y0: 1.3, y1: 4.9, z: -5.3 };
+  S.prism([[mon.x0, mon.z - .22], [mon.x1, mon.z - .22], [mon.x1, mon.z], [mon.x0, mon.z]], mon.y0, mon.y1, { side: `rgba(${INK},.94)`, top: '#2A3760', w: 1.1, hatch: false });
+  const sA = P([mon.x0 + .1, mon.y1 - .1, mon.z]), sB = P([mon.x1 - .1, mon.y0 + .1, mon.z]);
+  screenUI(c, K, sA[0], sA[1], sB[0] - sA[0], sB[1] - sA[1]);
+  c.save(); const sg = c.createLinearGradient(sA[0], sA[1], sB[0], sB[1]); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(.45, 'rgba(255,255,255,.0)'); sg.addColorStop(.5, 'rgba(255,255,255,.18)'); sg.addColorStop(.62, 'rgba(255,255,255,0)'); c.fillStyle = sg; c.fillRect(sA[0], sA[1], sB[0] - sA[0], sB[1] - sA[1]); c.restore();
+
+  // the lamp at the back right: a weighted base, two arms, a shade lit from inside
+  {
+    const bx = 15.0, bz = -5.6, j1 = [15.4, 3.7, -6.05], j2 = [12.95, 4.55, -4.95], aim = [10.6, 0, -2.7];
+    S.shadow(S.ring(bx, 0, bz, .72).map(([x, , z]) => [x, z]), .16, 4);
+    S.cyl(bx, bz, .66, .6, 0, .22, { hgap: 2.8 });
+    const a0 = P([bx, .22, bz]), a1 = P(j1), a2 = P(j2);
+    const rod = (p, q, off) => { const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy), nx = -dy / l * off, ny = dx / l * off; K.line(p[0] + nx, p[1] + ny, q[0] + nx, q[1] + ny, 1.3, .9); K.line(p[0] - nx, p[1] - ny, q[0] - nx, q[1] - ny, 1.3, .9); };
+    rod(a0, a1, 2.6); rod(a1, a2, 2.6);
+    for (let i = 2; i < 9; i++) { const t = i / 11, x = a0[0] + (a1[0] - a0[0]) * t, y = a0[1] + (a1[1] - a0[1]) * t; K.line(x - 5, y - 2, x + 5, y + 2, .6, .5); }
+    [a0, a1, a2].forEach(p => { K.fill(Array.from({ length: 14 }, (_, i) => [p[0] + Math.cos(i / 14 * TAU) * 4.6, p[1] + Math.sin(i / 14 * TAU) * 4.6]), SHEET); K.poly(Array.from({ length: 14 }, (_, i) => [p[0] + Math.cos(i / 14 * TAU) * 4.6, p[1] + Math.sin(i / 14 * TAU) * 4.6]), 1, .85, true); K.dot(p[0], p[1], 1.2, .8); });
+    const d = [aim[0] - j2[0], aim[1] - j2[1], aim[2] - j2[2]], dl = Math.hypot(...d), dn = d.map(v => v / dl);
+    const e1 = (() => { const t = [dn[2], 0, -dn[0]], l = Math.hypot(...t); return t.map(v => v / l); })(), e2 = [dn[1] * e1[2] - dn[2] * e1[1], dn[2] * e1[0] - dn[0] * e1[2], dn[0] * e1[1] - dn[1] * e1[0]];
+    const ringAt = (k, rad) => { const ctr = j2.map((v, i) => v + dn[i] * k); return Array.from({ length: 48 }, (_, i) => { const t = i / 48 * TAU; return P([0, 1, 2].map(j => ctr[j] + (Math.cos(t) * e1[j] + Math.sin(t) * e2[j]) * rad)); }); };
+    const neck = ringAt(.05, .16), mouth = ringAt(1.0, .62), shell = hull(neck.concat(mouth));
+    K.fill(shell, LIGHT);
+    c.save(); K.clip(shell); const xs = shell.map(p => p[0]), ys = shell.map(p => p[1]); K.hatch([[Math.min(...xs) - 2, Math.min(...ys) - 2], [Math.max(...xs) + 2, Math.min(...ys) - 2], [Math.max(...xs) + 2, Math.max(...ys) + 2], [Math.min(...xs) - 2, Math.max(...ys) + 2]], .5, 3.3, .42, .3); c.restore();
+    K.poly(shell, 1.2, .9, true);
+    K.fill(mouth, '#FCEFD2'); K.poly(mouth, 1.1, .88, true);
+    const mc = P(j2.map((v, i) => v + dn[i] * 1.0)); K.light(mc[0], mc[1], 26, 16, '255,248,226', .9);
+  }
+
+  // coffee, on its saucer
+  {
+    const cx = 12.9, cz = -4.7;
+    S.shadow(S.ring(cx, 0, cz, .86).map(([x, , z]) => [x, z]), .15, 4);
+    S.cyl(cx, cz, .78, .84, 0, .07, { shade: false, topFill: SHEET });
+    S.poly(S.ring(cx, .075, cz, .5), .5, .45, true);
+    const hd = [[cx + .38, .82, cz], [cx + .7, .76, cz + .02], [cx + .74, .44, cz + .02], [cx + .36, .3, cz]].map(P);
+    K.smooth(hd, 4.2, .88); const k0 = K.ink; K.ink = '248,245,238'; K.smooth(hd, 1.8, 1); K.ink = k0;
+    S.cyl(cx, cz, .32, .43, .08, .98, { hgap: 3 });
+    const cf = S.ring(cx, .9, cz, .37).map(P); K.fill(cf, 'rgba(150,104,66,.55)'); K.poly(cf, .5, .45, true);
+    const st = P([cx, 1.1, cz]); K.smooth([[st[0] - 5, st[1]], [st[0] - 10, st[1] - 14], [st[0] - 3, st[1] - 28], [st[0] - 9, st[1] - 42]], .7, .22); K.smooth([[st[0] + 5, st[1] - 3], [st[0] + 1, st[1] - 17], [st[0] + 8, st[1] - 31], [st[0] + 3, st[1] - 46]], .7, .18);
+  }
+
+  // keyboard and trackpad
+  {
+    const x0 = 7.0, x1 = 9.9, z0 = -3.6, z1 = -2.45, hgt = .16;
+    S.shadow([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], .16, 4, [-.12, .1]);
+    const kb = S.prism([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], 0, hgt, { side: '#E6E2DA', dark: '#E6E2DA', top: '#ECE8E0', hgap: 2.6, w: 1 });
+    const q = kb.top, rows = 5, cols = 14;
+    for (let rI = 0; rI < rows; rI++) for (let cI = 0; cI < cols; cI++) {
+      if (rI === 4 && cI > 4 && cI < 10) { if (cI !== 5) continue; }
+      const span = rI === 4 && cI === 5 ? 5 : 1, u0 = .04 + cI * .92 / cols, u1 = u0 + .92 / cols * span - .012, v0 = .08 + rI * .86 / rows, v1 = v0 + .86 / rows - .03;
+      const key = [S.on(q, u0, v0), S.on(q, u1, v0), S.on(q, u1, v1), S.on(q, u0, v1)].map(p => [p[0], hgt + .004, p[2]]);
+      S.fill(key, '#FBFAF6'); S.poly(key, .4, .4, true);
+    }
+    const tx0 = 10.35, tx1 = 11.6, tz0 = -3.65, tz1 = -2.55;
+    S.shadow([[tx0, tz0], [tx1, tz0], [tx1, tz1], [tx0, tz1]], .14, 3, [-.08, .08]);
+    S.prism([[tx0, tz0], [tx1, tz0], [tx1, tz1], [tx0, tz1]], 0, .05, { side: '#E6E2DA', top: '#F1EEE7', hatch: false, w: .95 });
+  }
+
+  // reading glasses, standing folded, lenses toward us
+  {
+    const gx = 9.25, gz = -1.7, tilt = .32, ct = Math.cos(tilt), st2 = Math.sin(tilt);
+    const G = (u, v) => [gx + u, .02 + v * ct, gz - v * st2];
+    S.shadow(S.ring(gx - .15, 0, gz - .12, .78, .3).map(([x, , z]) => [x, z]), .14, 4, [-.2, .12]);
+    const lens = uc => Array.from({ length: 40 }, (_, i) => { const t = i / 40 * TAU, cs = Math.cos(t), sn = Math.sin(t); return G(uc + .25 * Math.sign(cs) * Math.pow(Math.abs(cs), .62), .2 + .17 * Math.sign(sn) * Math.pow(Math.abs(sn), .62)); });
+    const tl = [G(-.57, .31), [gx - .5, .27, gz - .5], [gx + .45, .24, gz - .62], [gx + .55, .14, gz - .5]], tr = [G(.57, .31), [gx + .5, .29, gz - .38], [gx - .42, .27, gz - .52], [gx - .52, .16, gz - .42]];
+    S.smooth(tl, 1.5, .55); S.smooth(tr, 1.5, .5);
+    [lens(-.31), lens(.31)].forEach(L => { S.fill(L, 'rgba(218,228,242,.5)'); });
+    [lens(-.31), lens(.31)].forEach((L, i) => { const p = L.map(P); K.smooth(p, 2, .92, true); const h1 = P(G(-.31 + i * .62 - .12, .3)), h2 = P(G(-.31 + i * .62 - .02, .12)); K.ink = '255,255,255'; K.line(h1[0], h1[1], h2[0], h2[1], 1.4, .8); K.ink = INK; });
+    S.smooth([G(-.07, .3), G(0, .35), G(.07, .3)], 1.8, .9);
+    S.line(G(-.56, .31), G(-.6, .31), 2, .9); S.line(G(.56, .31), G(.6, .31), 2, .9);
+  }
+
+  // the stethoscope, coiled on the desk
+  {
+    const sx = 6.25, sz = -1.05, Y = .06, W2 = (lx, lz, y = Y) => [sx + lx, y, sz + lz];
+    const tube = [W2(.72, .4), W2(.3, .64), W2(-.4, .62), W2(-.95, .22), W2(-1.02, -.34), W2(-.6, -.78), W2(.12, -.88), W2(.74, -.64), W2(.95, -.24)];
+    const tp = tube.map(P);
+    c.save(); c.filter = `blur(${3 * LWF}px)`; K.ink = SHADOW; K.smooth(tp.map(([x, y]) => [x - 4, y + 4]), 7, .2); c.restore(); K.ink = INK;
+    const drawTube = (pts, w, inner = '247,244,237') => { K.smooth(pts, w, .9); const k0 = K.ink; K.ink = inner; K.smooth(pts, w * .5, 1); K.ink = k0; };
+    drawTube(tp, 6.4);
+    const bin = (pts) => { const pp = pts.map(P); K.smooth(pp, 3, .92); const k0 = K.ink; K.ink = '226,231,240'; K.smooth(pp, 1.1, 1); K.ink = k0; const e = pp[pp.length - 1]; K.fill(Array.from({ length: 14 }, (_, i) => [e[0] + Math.cos(i / 14 * TAU) * 4.2, e[1] + Math.sin(i / 14 * TAU) * 3.2]), `rgba(${INK},.95)`); };
+    c.save(); c.filter = `blur(${2 * LWF}px)`; K.ink = SHADOW; K.smooth([W2(.95, -.24), W2(1.35, -.08), W2(1.62, .2), W2(1.66, .4)].map(P).map(([x, y]) => [x - 3, y + 3]), 4, .2); K.smooth([W2(.95, -.24), W2(1.38, -.4), W2(1.78, -.38), W2(1.98, -.22)].map(P).map(([x, y]) => [x - 3, y + 3]), 4, .2); c.restore(); K.ink = INK;
+    bin([W2(.95, -.24, .08), W2(1.35, -.08, .07), W2(1.62, .2, .07), W2(1.66, .4, .08)]);
+    bin([W2(.95, -.24, .08), W2(1.38, -.4, .07), W2(1.78, -.38, .07), W2(1.98, -.22, .08)]);
+    const yj = P(W2(.95, -.24, .1)); K.fill(Array.from({ length: 12 }, (_, i) => [yj[0] + Math.cos(i / 12 * TAU) * 3.6, yj[1] + Math.sin(i / 12 * TAU) * 3]), `rgba(${INK},.9)`);
+    // the chest piece: the diaphragm, its rim, the stem into the tube
+    const cp = W2(1.02, .5, 0);
+    S.shadow(S.ring(cp[0], 0, cp[2], .3).map(([x, , z]) => [x, z]), .18, 3, [-.12, .1]);
+    S.cyl(cp[0], cp[2], .27, .27, 0, .11, { fill: '#E3E8F0', topFill: '#EEF2F7', hgap: 2.4 });
+    S.poly(S.ring(cp[0], .112, cp[2], .2), .6, .55, true); S.poly(S.ring(cp[0], .112, cp[2], .1), .5, .45, true);
+    const s0 = P(W2(.88, .44, .08)), s1 = P(W2(.72, .4, .07)); K.line(s0[0], s0[1], s1[0], s1[1], 4, .92); K.ink = '226,231,240'; K.line(s0[0], s0[1], s1[0], s1[1], 1.4, 1); K.ink = INK;
+  }
+
+  // the tablet with the reviewer's stylus notes, the stylus beside it
+  {
+    const cx = 11.3, cz = -1.3, yaw = -.2, hw = 1.1, hd = .78, cs = Math.cos(yaw), sn = Math.sin(yaw);
+    const at = (lx, lz) => [cx + lx * cs - lz * sn, cz + lx * sn + lz * cs];
+    const base = [at(-hw, -hd), at(hw, -hd), at(hw, hd), at(-hw, hd)];
+    {
+      const [ax, az] = at(-.98, -hd - .07), [bx, bz] = at(.98, -hd - .07), p0 = P([ax, .05, az]), p1 = P([bx, .05, bz]);
+      c.save(); c.filter = `blur(${2 * LWF}px)`; K.ink = SHADOW; K.line(p0[0] - 3, p0[1] + 3, p1[0] - 3, p1[1] + 3, 4.6, .2); c.restore(); K.ink = INK;
+      K.line(p0[0], p0[1], p1[0], p1[1], 4.6, .92); K.ink = '247,244,237'; K.line(p0[0] + 4, p0[1], p1[0] - 1, p1[1], 2.2, 1); K.ink = INK;
+      const dx = p0[0] - p1[0], dy = p0[1] - p1[1], l = Math.hypot(dx, dy), ux = dx / l, uy = dy / l;
+      K.fill([[p0[0] - uy * 2.3, p0[1] + ux * 2.3], [p0[0] + uy * 2.3, p0[1] - ux * 2.3], [p0[0] + ux * 8, p0[1] + uy * 8]], `rgba(${INK},.9)`);
+    }
+    S.shadow(base, .17, 5, [-.16, .12]);
+    S.prism(base, 0, .07, { side: '#DDD8CE', dark: '#D6D1C6', top: `rgba(${INK},.95)`, hgap: 2.4, w: 1 });
+    const scr = [at(-hw + .1, -hd + .1), at(hw - .1, -hd + .1), at(hw - .1, hd - .1), at(-hw + .1, hd - .1)].map(([x, z]) => P([x, .072, z]));
+    K.fill(scr, '#FDFBF6');
+    c.save(); K.clip(scr);
+    const a = scr[0], b = scr[1], d = scr[3];
+    c.transform((b[0] - a[0]) / 240, (b[1] - a[1]) / 240, (d[0] - a[0]) / 168, (d[1] - a[1]) / 168, a[0], a[1]);
+    c.fillStyle = '#F3EEE3'; c.fillRect(0, 0, 240, 18);
+    [[12, PEN], [24, '224,168,46'], [36, INK]].forEach(([x, col]) => { c.fillStyle = `rgba(${col},.85)`; c.beginPath(); c.arc(x, 9, 3.6, 0, TAU); c.fill(); });
+    c.fillStyle = `rgba(${INK},.8)`; rr(c, 16, 32, 120, 7, 3.5); c.fill();
+    for (let i = 0; i < 9; i++) { c.fillStyle = `rgba(${INK},.3)`; rr(c, 16, 50 + i * 11, i % 4 === 3 ? 96 : 150, 3.4, 1.7); c.fill(); }
+    c.fillStyle = 'rgba(224,168,46,.45)'; c.fillRect(14, 70, 112, 8);
+    c.strokeStyle = `rgba(${PEN},.92)`; c.lineWidth = 2; c.lineCap = 'round';
+    c.beginPath(); c.ellipse(64, 95, 52, 9, -.03, 0, TAU); c.stroke();
+    c.beginPath(); c.moveTo(118, 95); c.quadraticCurveTo(150, 92, 170, 76); c.stroke();
+    c.fillStyle = `rgba(${PEN},.95)`; c.font = '600 22px Caveat, cursive'; c.fillText('refs checked ✓', 150, 148);
+    c.font = '600 18px Caveat, cursive'; c.fillText('ICH E3 ✓', 176, 70);
+    c.restore();
+    K.poly(scr, .5, .4, true);
+  }
+}
+
+// the draft as the display shows it: an editor in miniature (section 6 shows it full size)
+function screenUI(c, K, x, y, w, h) {
+  c.save(); rr(c, x, y, w, h, 2); c.fillStyle = '#FDFBF6'; c.fill(); c.clip();
+  const bar = h * .08;
+  c.fillStyle = '#F3EEE3'; c.fillRect(x, y, w, bar); c.fillStyle = `rgba(${INK},.12)`; c.fillRect(x, y + bar, w, 1);
+  [[PEN, .8], ['224,168,46', .8], [INK, .25]].forEach(([col, a], i) => { c.fillStyle = `rgba(${col},${a})`; c.beginPath(); c.arc(x + bar * .55 + i * bar * .45, y + bar / 2, bar * .14, 0, TAU); c.fill(); });
+  K.bars(x + w * .36, y + bar / 2, w * .26, bar * .22, .55);
+  [[INK, 'HS'], [PEN, '✦']].forEach(([col], i) => { c.fillStyle = i ? '#FFF6EC' : `rgba(${INK},.9)`; c.beginPath(); c.arc(x + w - bar * (.7 + i * .7), y + bar / 2, bar * .3, 0, TAU); c.fill(); if (i) { c.strokeStyle = `rgba(${PEN},.6)`; c.lineWidth = .8; c.stroke(); } });
+  const dx = x + w * .07, dw = w * .55, lh = h * .052; let ly = y + bar + h * .1;
+  c.fillStyle = `rgba(${INK},.85)`; rr(c, dx, ly - h * .02, dw * .48, h * .04, 1.5); c.fill(); ly += lh * 1.6;
+  for (let i = 0; i < 4; i++) { if (i === 1) { c.fillStyle = 'rgba(224,168,46,.45)'; c.fillRect(dx - 2, ly - lh * .4, dw * .62, lh * .8); } K.bars(dx, ly, dw * (i === 3 ? .6 : .98), h * .014, .38); ly += lh; }
+  c.fillStyle = `rgba(${PEN},.85)`; c.fillRect(dx + dw * .32, ly - lh * 3 - h * .007, dw * .16, h * .014);
+  c.fillStyle = `rgba(${PEN},.9)`; c.fillRect(dx + dw * .52, ly - lh * 3 + h * .012, dw * .2, 1.2);
+  // a forest plot
+  const fy = ly + lh * .4, fh = h * .2, fx = dx + dw * .05, fw = dw * .6;
+  c.strokeStyle = `rgba(${INK},.4)`; c.lineWidth = 1; c.setLineDash([2, 2]); c.beginPath(); c.moveTo(fx + fw * .55, fy); c.lineTo(fx + fw * .55, fy + fh); c.stroke(); c.setLineDash([]);
+  [[.25, .62, .43], [.36, .5, .44], [.18, .58, .38], [.42, .55, .5]].forEach(([a, b, m], i) => { const yy = fy + fh * (.12 + i * .2); c.strokeStyle = `rgba(${INK},.8)`; c.lineWidth = 1.1; c.beginPath(); c.moveTo(fx + fw * a, yy); c.lineTo(fx + fw * b, yy); c.stroke(); c.fillStyle = `rgba(${INK},.9)`; c.fillRect(fx + fw * m - 2, yy - 2, 4, 4); });
+  const dy2 = fy + fh * .93; c.fillStyle = 'rgba(224,122,31,.9)'; c.beginPath(); c.moveTo(fx + fw * .3, dy2); c.lineTo(fx + fw * .4, dy2 - 3); c.lineTo(fx + fw * .5, dy2); c.lineTo(fx + fw * .4, dy2 + 3); c.closePath(); c.fill();
+  ly = fy + fh + lh * .9;
+  c.fillStyle = `rgba(${PEN},.5)`; c.fillRect(dx, ly - lh * .45, 1.2, lh * .9); K.bars(dx + 5, ly, dw * .7, h * .014, .55, PEN);
+  c.fillStyle = `rgba(${INK},.9)`; c.fillRect(dx + dw * .74, ly - lh * .4, 1.2, lh * .8);
+  // the margin: comment cards
+  const sx = x + w * .68, sw = w * .27; let cy = y + bar + h * .08;
+  [[INK, 0], [PEN, 1], [INK, 0]].forEach(([col, ai], i) => {
+    const ch = h * .17; rr(c, sx, cy, sw, ch, 3); c.fillStyle = ai ? '#FFF8EF' : '#FFFFFF'; c.fill(); c.strokeStyle = ai ? 'rgba(180,80,15,.45)' : `rgba(${INK},.18)`; c.lineWidth = 1; c.stroke();
+    c.fillStyle = `rgba(${col},${ai ? .85 : .8})`; c.beginPath(); c.arc(sx + ch * .26, cy + ch * .3, ch * .11, 0, TAU); c.fill();
+    K.bars(sx + ch * .48, cy + ch * .3, sw * .38, h * .014, .6, col); K.bars(sx + ch * .2, cy + ch * .62, sw * .72, h * .012, .3);
+    cy += ch + h * .045;
+  });
+  c.fillStyle = `rgba(${INK},.1)`; c.fillRect(x, y + h - bar * .8, w, 1);
+  c.fillStyle = 'rgba(224,122,31,.85)'; c.beginPath(); c.arc(x + w * .05, y + h - bar * .4, 2.2, 0, TAU); c.fill();
+  K.bars(x + w * .08, y + h - bar * .4, w * .22, h * .012, .4);
+  c.restore();
+}
+
+// ---------- the editor up close: a display and keyboard, straight on ----------
+function screenScene(c, W, H, seed) {
+  paper(c, W, H, seed);
+  const K = kit(c, seed + 9);
+  const dk = 600;
+  K.fill([[0, dk], [W, dk], [W, H], [0, H]], '#EDE4D2'); K.line(0, dk, W, dk, .9, .55);
+  for (let i = 0; i < 9; i++) { const y = dk + 14 + i * 20 + K.r() * 6; K.line(K.r() * 200, y, W - K.r() * 200, y, .45, .06); }
+  c.save(); c.filter = `blur(${14 * LWF}px)`; K.fill([[840, 590], [950, 590], [985, 612], [805, 612]], `rgba(${SHADOW},.2)`); c.restore();
+  const foot = [[826, 584], [954, 584], [968, 600], [812, 600]]; K.fill(foot, LIGHT); K.poly(foot, 1, .85, true);
+  const neck = [[864, 515], [916, 515], [916, 586], [864, 586]]; K.fill(neck, '#E9E5DC'); K.hatch([[864, 515], [879, 515], [879, 586], [864, 586]], 1.2, 3, .4, .3); K.poly(neck, 1, .85, true);
+  c.save(); c.shadowColor = `rgba(${SHADOW},.26)`; c.shadowBlur = 30; c.shadowOffsetY = 12; K.fill([[560, 120], [1220, 120], [1220, 515], [560, 515]], `rgba(${INK},.95)`); c.restore();
+  K.poly([[560, 120], [1220, 120], [1220, 515], [560, 515]], 1.3, .95, true);
+  K.fill([[570, 130], [1210, 130], [1210, 505], [570, 505]], '#FDFBF6');
+  const kb = [[700, 640], [1060, 640], [1086, 700], [674, 700]];
+  c.save(); c.filter = `blur(${6 * LWF}px)`; K.fill(kb.map(([x, y]) => [x - 6, y + 8]), `rgba(${SHADOW},.16)`); c.restore();
+  K.fill([[674, 700], [1086, 700], [1086, 707], [674, 707]], '#E2DED5'); K.poly([[674, 700], [1086, 700], [1086, 707], [674, 707]], .9, .8, true);
+  K.fill(kb, '#ECE8E0'); K.poly(kb, 1.1, .88, true);
+  for (let rI = 0; rI < 5; rI++) for (let cI = 0; cI < 14; cI++) {
+    if (rI === 4 && cI > 4 && cI < 10 && cI !== 5) continue;
+    const span = rI === 4 && cI === 5 ? 5 : 1, v0 = .1 + rI * .17, v1 = v0 + .14, u0 = .03 + cI * .94 / 14, u1 = u0 + .94 / 14 * span - .01;
+    const at = (u, v) => [kb[0][0] + (kb[1][0] - kb[0][0]) * u + (kb[3][0] - kb[0][0]) * v + ((kb[2][0] - kb[3][0]) - (kb[1][0] - kb[0][0])) * u * v, kb[0][1] + (kb[3][1] - kb[0][1]) * v];
+    const key = [at(u0, v0), at(u1, v0), at(u1, v1), at(u0, v1)]; K.fill(key, '#FBFAF6'); K.poly(key, .4, .4, true);
+  }
+  const tp = [[1112, 642], [1192, 642], [1206, 698], [1120, 698]];
+  c.save(); c.filter = `blur(${5 * LWF}px)`; K.fill(tp.map(([x, y]) => [x - 5, y + 7]), `rgba(${SHADOW},.14)`); c.restore();
+  K.fill(tp, '#F1EEE7'); K.poly(tp, 1, .85, true);
+}
+
+// ---------- the storyboard's first frame, and the phone's crop of the study ----------
+const scenes = {
+  study: (c, W, H) => study(c, W, H, 11),
+  screen: (c, W, H) => screenScene(c, W, H, 51),
+  sb1: (c, W, H) => { paper(c, W, H, 3); c.save(); c.translate(150, 290); c.scale(1.55, 1.55); c.translate(-150, -290); study(c, W, H, 11, { doorGlow: 1 }); c.restore(); },
+  phone: (c, W, H) => {
+    paper(c, W, H, 5);
+    const s = .62, x0 = 590, y0 = 96, top = 90;
+    c.save(); c.beginPath(); c.rect(0, top, W, 470); c.clip(); c.translate(-x0 * s, top - y0 * s); c.scale(s, s); study(c, 1280, 800, 11); c.restore();
+    const g = c.createLinearGradient(0, top + 380, 0, top + 470); g.addColorStop(0, 'rgba(243,238,227,0)'); g.addColorStop(1, 'rgba(243,238,227,1)'); c.fillStyle = g; c.fillRect(0, top + 380, W, 92);
+  },
+};
+
+// ---------- night: the film's worlds, rendered once each ----------
+const BG_VS = 'varying vec2 vUv; void main() { vUv = position.xy * .5 + .5; gl_Position = vec4(position.xy, .999, 1.); }';
+const BG_FS = 'uniform vec3 uTop, uBottom, uGlow; uniform vec2 uGlowAt, uRes; uniform float uGlowR; varying vec2 vUv; void main() { vec3 c = mix(uBottom, uTop, smoothstep(0., 1., vUv.y)); vec2 d = (vUv - uGlowAt) * vec2(uRes.x / uRes.y, 1.); c += uGlow * exp(-dot(d, d) / (uGlowR * uGlowR)); gl_FragColor = vec4(c, 1.); }';
+const TARGETS = { desk: { x: .46, y: .14, w: .5, h: .7 }, phone: { x: .06, y: .12, w: .88, h: .42 } };
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+function engine() {
+  const canvas = document.createElement('canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, stencil: false });
+  renderer.setPixelRatio(1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(40, 1, .1, 240);
+  const bgU = { uTop: { value: new THREE.Color() }, uBottom: { value: new THREE.Color() }, uGlow: { value: new THREE.Color() }, uGlowAt: { value: new THREE.Vector2(.7, .5) }, uGlowR: { value: .55 }, uRes: { value: new THREE.Vector2(1, 1) } };
+  const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ vertexShader: BG_VS, fragmentShader: BG_FS, depthTest: false, depthWrite: false, uniforms: bgU }));
+  bg.frustumCulled = false; bg.renderOrder = -10; scene.add(bg);
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(256, 256), .6, .5, .16));
+  composer.addPass(new OutputPass());
+  const makers = { archive: archiveWorld, sky: skyWorld, dawn: dawnWorld, reading: readingWorld }, worlds = {};
+  const get = id => { if (!worlds[id]) { const w = makers[id](THREE, { quality: 'high' }); scene.add(w.group); w.setWeight(0); worlds[id] = w; } return worlds[id]; };
+
+  // the stage's box fitted to its target on the frame, as the film's fit-to-frame does it
+  function fit(stage, W, H, t, yaw = 0) {
+    const aspect = W / H, c = stage.anchor, hs = stage.size.map(v => v / 2), d0 = norm(stage.dir), cyw = Math.cos(yaw), syw = Math.sin(yaw);
+    const dir = norm([d0[0] * cyw + d0[2] * syw, d0[1], -d0[0] * syw + d0[2] * cyw]);
+    const Rv = norm(cross([0, 1, 0], dir)), Uv = cross(dir, Rv);
+    const corners = Array.from({ length: 8 }, (_, i) => [c[0] + (i & 1 ? hs[0] : -hs[0]), c[1] + (i & 2 ? hs[1] : -hs[1]), c[2] + (i & 4 ? hs[2] : -hs[2])]);
+    let tn = Math.tan(stage.fov * Math.PI / 360);
+    const rect = d => {
+      const p = [c[0] + dir[0] * d, c[1] + dir[1] * d, c[2] + dir[2] * d], r = [1e9, 1e9, -1e9, -1e9];
+      corners.forEach(q => { const v = sub(q, p), z = Math.max(.3, -dot(v, dir)), x = .5 + dot(v, Rv) / (z * tn * aspect) / 2, y = .5 - dot(v, Uv) / (z * tn) / 2; r[0] = Math.min(r[0], x); r[1] = Math.min(r[1], y); r[2] = Math.max(r[2], x); r[3] = Math.max(r[3], y); });
+      return r;
+    };
+    let d = Math.max(hs[1] / tn / t.h, Math.max(hs[0], hs[2]) / (tn * aspect) / t.w) * 1.06;
+    for (let k = 0; k < 8; k++) { const r = rect(d), over = Math.max((r[2] - r[0]) / t.w, (r[3] - r[1]) / t.h); if (k >= 3 && over <= 1.005) break; d *= over; if (d > 40) { tn *= d / 40; d = 40; } }
+    const r = rect(d);
+    return { pos: [c[0] + dir[0] * d, c[1] + dir[1] * d, c[2] + dir[2] * d], at: c, fov: Math.atan(tn) * 360 / Math.PI, sx: t.x + t.w / 2 - (r[0] + r[2]) / 2, sy: (r[1] + r[3]) / 2 - (t.y + t.h / 2), glow: [t.x + t.w / 2, 1 - (t.y + t.h / 2)] };
+  }
+  const cA = new THREE.Color(), v3 = new THREE.Vector3();
+  return {
+    render(id, W, H, layout, head, opts = {}) {
+      const w = get(id), t = { ...TARGETS[layout] };
+      t.y = Math.max(t.y, head + 10 / H);
+      renderer.setSize(W, H, false); composer.setSize(W, H); bgU.uRes.value.set(W, H);
+      Object.values(worlds).forEach(x => x.setWeight(x === w ? 1 : 0));
+      const s = fit(w.stage, W, H, t);
+      camera.position.set(...s.pos); camera.fov = s.fov; camera.aspect = W / H; camera.lookAt(v3.set(...s.at));
+      camera.setViewOffset(W, H, -s.sx * W, s.sy * H, W, H); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+      bgU.uGlowAt.value.set(s.glow[0], s.glow[1]);
+      bgU.uTop.value.set(w.grade.top); bgU.uBottom.value.set(w.grade.bottom); bgU.uGlow.value.copy(cA.set(w.grade.glow[0]).multiplyScalar(w.grade.glow[1]));
+      w.update(24, .016, camera);
+      // the strokes alone: glows (.2), shafts (.5) and motes (.6) hidden, by their place in the world's draw order
+      const hidden = [];
+      if (opts.lines) w.group.traverse(o => { if (o === w.group || !o.visible) return; const sub = Math.round((((o.renderOrder + 9.5) % 1.8) + 1.8) % 1.8 * 10) / 10; if (sub === .2 || sub === .5 || sub === .6) { o.visible = false; hidden.push(o); } });
+      composer.render();
+      hidden.forEach(o => { o.visible = true; });
+      const proj = p => { v3.set(p[0], p[1], p[2]).project(camera); return [(v3.x + 1) / 2 * W, (1 - v3.y) / 2 * H]; };
+      const a = w.stage.anchor;
+      return { canvas, quad: [[-3.8, 5.3], [3.8, 5.3], [3.8, -5.3], [-3.8, -5.3]].map(([x, y]) => proj([a[0] + x, a[1] + y, a[2]])), star: proj([a[0], a[1] + 1.2, a[2] + .3]), proj };
+    },
+  };
+}
+
+// ---------- what the night frames carry: the page in its forms ----------
+function sheet(K, c, q, o = {}) {
+  const xs = q.map(p => p[0]), ys = q.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  c.save(); c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 26; c.shadowOffsetY = 8; K.fill(q, o.fill || SHEET); c.restore();
+  K.poly(q, .8, .4, true);
+  const m = w * .12; let ly = y + h * .09;
+  K.text(x + m, ly, w * .3, 1.1, .5, 2);
+  ly += h * .075; K.text(x + m, ly, w * .66, 2.6, .95, 4.2); ly += h * .055; K.text(x + m, ly, w * .46, 2.6, .95, 4.2); ly += h * .05;
+  c.fillStyle = 'rgba(224,122,31,.9)'; c.fillRect(x + m, ly, w * .2, 1.8); ly += h * .06;
+  const n = o.lines ?? 15, gap = (y + h * .93 - ly) / n;
+  for (let i = 0; i < n; i++) { if (o.hl === i) { c.fillStyle = 'rgba(224,168,46,.4)'; c.fillRect(x + m - 2, ly - 4, w * .58, 8); } K.text(x + m, ly, w * (i % 5 === 4 ? .42 : .76), 1.2, .72, 2.4); ly += gap; }
+  return { x, y, w, h };
+}
+const overlays = {
+  dossier(c, W, H, r, seed) {
+    const K = kit(c, seed), q = r.quad, xs = q.map(p => p[0]), w0 = Math.max(...xs) - Math.min(...xs);
+    for (let i = 5; i >= 1; i--) { const o = i * w0 * .028; const p = q.map(([px, py]) => [px + o, py - o * .85]); K.fill(p, '#ECE6DA'); K.poly(p, .7, .35, true); }
+    const { x, y, w, h } = sheet(K, c, q, { hl: 3 });
+    [[.16, '224,122,31', 'M2.7'], [.4, '224,168,46', 'M2.5'], [.64, '120,150,215', 'CSR']].forEach(([t, rgb, lab], i) => {
+      const ty = y + h * t, tx = x + w + 4, tb = [[tx, ty], [tx + w * .1, ty + 3], [tx + w * .1, ty + h * .12], [tx, ty + h * .12 + 3]];
+      K.fill(tb, SHEET); K.fill(tb, `rgba(${rgb},.35)`); K.poly(tb, .9, .7, true);
+      c.save(); c.translate(tx + w * .068, ty + h * .105); c.rotate(-Math.PI / 2); c.fillStyle = `rgba(${INK},.85)`; c.font = `600 ${Math.max(8, w * .045)}px "Fraunces Variable", Georgia, serif`; c.fillText(lab, 0, 0); c.restore();
+    });
+    K.ink = PEN; K.smooth([[x + w * .1, y + h * .175], [x + w * .5, y + h * .158], [x + w * .82, y + h * .18], [x + w * .5, y + h * .205], [x + w * .1, y + h * .19]], 1.4, .75); K.ink = INK;
+  },
+  star(c, W, H, r) {
+    const K = kit(c, 7), [bx, by] = r.star, s = Math.max(W, H) / 1280;
+    K.glow(bx, by, 120 * s, '250,236,200', .5); K.glow(bx, by, 40 * s, '255,246,226', .8);
+    [[0, 1], [1, 0], [0, -1], [-1, 0]].forEach(([dx, dy]) => { c.save(); c.globalCompositeOperation = 'screen'; const g = c.createLinearGradient(bx, by, bx + dx * 70 * s, by + dy * 70 * s); g.addColorStop(0, 'rgba(255,248,230,.95)'); g.addColorStop(1, 'rgba(255,248,230,0)'); c.strokeStyle = g; c.lineWidth = 2 * s * LWF; c.beginPath(); c.moveTo(bx, by); c.lineTo(bx + dx * 70 * s, by + dy * 70 * s); c.stroke(); c.restore(); });
+    K.dot(bx, by, 3.4 * s, 1, '255,252,242');
+    c.strokeStyle = 'rgba(224,184,90,.7)'; c.lineWidth = 1 * LWF; c.beginPath(); c.arc(bx, by, 16 * s, 0, TAU); c.stroke();
+  },
+  letter(c, W, H, r, seed) {
+    const K = kit(c, seed), q = r.quad;
+    const xs = q.map(p => p[0]), ys = q.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+    c.save(); c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 26; c.shadowOffsetY = 8; K.fill(q, SHEET); c.restore();
+    K.poly(q, .8, .4, true);
+    const m = w * .12; let ly = y + h * .1;
+    K.text(x + w * .56, ly, w * .3, 1.1, .5, 2); K.text(x + w * .56, ly + h * .03, w * .26, 1.1, .5, 2);
+    c.fillStyle = 'rgba(224,122,31,.9)'; c.fillRect(x + m, y + h * .17, w * .76, 1.4);
+    ly = y + h * .24; K.text(x + m, ly, w * .2, 1.6, .85, 2.6); ly += h * .06;
+    for (let i = 0; i < 12; i++) { K.text(x + m, ly, w * (i % 4 === 3 ? .5 : .76), 1.2, .72, 2.4); ly += h * .036; if (i === 5) ly += h * .025; }
+    K.ink = INK; K.smooth([[x + m, y + h * .84], [x + m + w * .05, y + h * .8], [x + m + w * .1, y + h * .845], [x + m + w * .16, y + h * .805], [x + m + w * .24, y + h * .835]], 1.3, .7);
+    const sx = x + w * .78, sy = y + h * .82, sr = w * .07;
+    K.fill(Array.from({ length: 24 }, (_, i) => { const a = i / 24 * TAU, rr2 = sr * (1 + (i % 2 ? .06 : -.03)); return [sx + Math.cos(a) * rr2, sy + Math.sin(a) * rr2]; }), 'rgba(196,92,30,.95)');
+    K.fill(Array.from({ length: 20 }, (_, i) => [sx + Math.cos(i / 20 * TAU) * sr * .62, sy + Math.sin(i / 20 * TAU) * sr * .62]), 'rgba(226,150,72,.9)');
+  },
+  article(c, W, H, r, seed) {
+    const K = kit(c, seed), q = r.quad, xs = q.map(p => p[0]), ys = q.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+    c.save(); c.shadowColor = 'rgba(60,48,28,.24)'; c.shadowBlur = 24; c.shadowOffsetY = 7; K.fill(q, SHEET); c.restore();
+    K.poly(q, .8, .35, true);
+    const m = w * .09, iw = w - 2 * m;
+    K.text(x + m, y + h * .045, w * .34, 1.1, .6, 2); K.text(x + m + iw * .72, y + h * .045, iw * .28, 1, .45, 1.8);
+    c.fillStyle = `rgba(${INK},.85)`; c.fillRect(x + m, y + h * .062, iw, 1.6);
+    K.text(x + m, y + h * .105, iw * .94, 2.7, .95, 4.6); K.text(x + m, y + h * .14, iw * .6, 2.7, .95, 4.6);
+    K.text(x + m, y + h * .177, iw * .72, 1, .55, 2);
+    c.fillStyle = 'rgba(224,168,46,.14)'; c.fillRect(x + m, y + h * .2, iw, h * .12);
+    c.fillStyle = 'rgba(224,122,31,.85)'; c.fillRect(x + m, y + h * .2, 2, h * .12);
+    for (let i = 0; i < 5; i++) K.text(x + m + 8, y + h * (.218 + i * .021), iw * (i === 4 ? .5 : .9) - 8, 1.1, .6, 2);
+    const gap = w * .05, cw = (iw - gap) / 2, top = y + h * .35;
+    [x + m, x + m + cw + gap].forEach((cx0, col) => {
+      let ly = top;
+      if (col === 1) {
+        const fh = h * .2;
+        c.strokeStyle = `rgba(${INK},.5)`; c.lineWidth = 1 * LWF; c.beginPath(); c.moveTo(cx0, ly); c.lineTo(cx0, ly + fh); c.lineTo(cx0 + cw, ly + fh); c.stroke();
+        [[.045, `rgba(${INK},.85)`], [.08, 'rgba(224,122,31,.9)']].forEach(([drop, col2]) => {
+          c.strokeStyle = col2; c.lineWidth = 1.4 * LWF; c.beginPath(); let yy = ly + 4; c.moveTo(cx0, yy);
+          for (let k = 0; k < 9; k++) { const xx = cx0 + cw * (k + 1) / 10; c.lineTo(xx, yy); yy += fh * drop * (.6 + ((k * 37) % 7) / 10); c.lineTo(xx, yy); }
+          c.lineTo(cx0 + cw, yy); c.stroke();
+        });
+        ly += fh + h * .03; K.text(cx0, ly, cw * .8, 1, .5, 1.8); ly += h * .03;
+      }
+      let i = 0;
+      while (ly < y + h * .93) { K.text(cx0, ly, cw * (i % 6 === 5 ? .6 : .98), 1.1, .68, 2.2); ly += h * .024; i++; }
+    });
+  },
+  drift(c, W, H, r, seed) {
+    const K = kit(c, seed, { ink: INK }), q = r.quad, xs = q.map(p => p[0]), ys = q.map(p => p[1]), x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+    c.save(); c.beginPath(); c.rect(x - 40, y - 40, w + 80, h * .42 + 40); c.clip(); sheet(K, c, q); c.restore();
+    for (let s = 0; s < 30; s++) {
+      let px = x + K.r() * w, py = y + h * (.42 + K.r() * .5), ang = -.6 + K.r() * 1.1; const pts = [[px, py]];
+      for (let i = 0; i < 10; i++) { ang += (K.r() - .5) * 1.3; px += (Math.cos(ang) * 16 + 7) * w / 230; py += (Math.sin(ang) * 13 - 3) * w / 230; pts.push([px, py]); }
+      K.ink = '240,232,210'; K.smooth(pts, .7 + K.r(), .25 + K.r() * .4);
+      for (let d = 0; d < 26; d++) { const p = pts[Math.floor(K.r() * pts.length)]; K.dot(p[0] + (K.r() - .5) * 18, p[1] + (K.r() - .5) * 18, .4 + K.r() * .8, .3 + K.r() * .45, '246,238,214'); }
+    }
+    K.glow(x + w * .6, y + h * .7, w * .8, '236,228,206', .1);
+  },
+};
+
+// the archive in ink on paper: the strokes of the night render, kept as ink, its glows left out
+function inked(src, W, H) {
+  const t = document.createElement('canvas'); t.width = W; t.height = H;
+  const g = t.getContext('2d', { willReadFrequently: true }); g.drawImage(src, 0, 0, W, H);
+  const img = g.getImageData(0, 0, W, H), d = img.data, N = W * H, L = new Float32Array(N), B = new Float32Array(N), T = new Float32Array(N);
+  for (let i = 0; i < N; i++) L[i] = (d[i * 4] * .2126 + d[i * 4 + 1] * .7152 + d[i * 4 + 2] * .0722) / 255;
+  const rad = Math.max(2, Math.round(W / 150));
+  const blur = (src2, dst, w, h, stride, step) => {
+    for (let line = 0; line < (step === 1 ? h : w); line++) {
+      let acc = 0; const base = step === 1 ? line * w : line, len = step === 1 ? w : h, st = step === 1 ? 1 : w;
+      for (let k = -rad; k <= rad; k++) acc += src2[base + Math.min(len - 1, Math.max(0, k)) * st];
+      for (let i = 0; i < len; i++) { dst[base + i * st] = acc / (2 * rad + 1); const add = Math.min(len - 1, i + rad + 1), rem = Math.max(0, i - rad); acc += src2[base + add * st] - src2[base + rem * st]; }
+    }
+  };
+  blur(L, T, W, H, 0, 1); blur(T, B, W, H, 0, 0);
+  for (let i = 0; i < N; i++) {
+    const k = Math.min(1, Math.max(0, (L[i] - B[i]) * 5.5 + Math.max(0, L[i] - .5) * .4));
+    d[i * 4] = 243 + (19 - 243) * k; d[i * 4 + 1] = 238 + (36 - 238) * k; d[i * 4 + 2] = 227 + (79 - 227) * k; d[i * 4 + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  return t;
+}
+
+// ---------- painting ----------
+function size(cv, W, H) {
+  const box = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (!box.width) return null;
+  cv.width = Math.round(box.width * dpr); cv.height = Math.round(box.height * dpr);
+  LWF = Math.max(1, Math.sqrt((W === 1280 ? 1280 : W * 2.2) / box.width) * .9);
+  return { box, dpr };
+}
+function paint2d(cv) {
+  const W = +(cv.dataset.w || 1280), H = +(cv.dataset.h || 800);
+  if (!size(cv, W, H)) return;
+  const c = cv.getContext('2d'); c.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+  try { scenes[cv.dataset.scene](c, W, H); } catch (e) { console.error('[board]', cv.dataset.scene, e); }
+}
+function paint3d(cv, E) {
+  const b0 = cv.getBoundingClientRect(); if (!b0.width) return;
+  const W = +(cv.dataset.w || 1280), H = Math.round(W * b0.height / b0.width);
+  const sz = size(cv, W, H); if (!sz) return;
+  const layout = cv.dataset.layout || 'desk', frame = cv.closest('.frame'), lh = frame.querySelector('.lh');
+  const lb = lh && lh.getBoundingClientRect(), head = lb ? Math.max(0, (lb.bottom - sz.box.top) / sz.box.height) : 0;
+  const crop = cv.dataset.crop, RH = crop ? Math.round(cv.width / 1.6) : cv.height, ink = !!cv.dataset.ink, over = cv.dataset.over;
+  const r = E.render(cv.dataset.world, cv.width, RH, layout, crop ? 0 : head, { lines: ink });
+  const c = cv.getContext('2d');
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  if (crop) { c.drawImage(r.canvas, 0, 0, cv.width, cv.height, 0, 0, cv.width, cv.height); return; }
+  if (ink) c.drawImage(inked(r.canvas, cv.width, cv.height), 0, 0);
+  else if (over === 'dusk' || over === 'dawn') {
+    // one room by day and by night, the one fading into the other across the frame
+    const night = document.createElement('canvas'); night.width = cv.width; night.height = cv.height; night.getContext('2d').drawImage(r.canvas, 0, 0);
+    const day = inked(E.render(cv.dataset.world, cv.width, cv.height, layout, head, { lines: true }).canvas, cv.width, cv.height);
+    const [under, top] = over === 'dusk' ? [day, night] : [night, day];
+    c.drawImage(under, 0, 0);
+    const g = top.getContext('2d'); g.globalCompositeOperation = 'destination-in';
+    const gr = over === 'dusk' ? g.createLinearGradient(top.width * .28, top.height * .1, top.width * .78, top.height * .6) : g.createLinearGradient(top.width * .3, 0, top.width * .78, 0);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,1)'); g.fillStyle = gr; g.fillRect(0, 0, top.width, top.height);
+    c.drawImage(top, 0, 0);
+  } else c.drawImage(r.canvas, 0, 0);
+  const kx = W / cv.width, ky = H / cv.height, rs = { quad: r.quad.map(([x, y]) => [x * kx, y * ky]), star: [r.star[0] * kx, r.star[1] * ky] };
+  c.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+  if (overlays[over]) { try { overlays[over](c, W, H, rs, 17); } catch (e) { console.error('[board]', over, e); } }
+  // where the frame's cards go: the page's corners and the star, in fractions of the frame
+  const fb = frame.getBoundingClientRect(), ox = (sz.box.left - fb.left) / fb.width, oy = (sz.box.top - fb.top) / fb.height, fx = sz.box.width / fb.width, fy = sz.box.height / fb.height;
+  frame.dataset.quad = JSON.stringify(rs.quad.map(([x, y]) => [ox + x / W * fx, oy + y / H * fy]));
+  frame.dataset.star = JSON.stringify([ox + rs.star[0] / W * fx, oy + rs.star[1] / H * fy]);
+}
+
+// the cards and their leads, placed from the drawings
+const PLACES = {
+  'study:draft': { left: 47.6, top: 10.2, to: [687, 212] },
+  'study:rev': { left: 64, top: 10.2, to: [916, 246] },
+  'study:ai': { left: 80, top: 10.2, to: [1002, 288], from: .14 },
+  'screen:ui': { left: 44.53, top: 10.16, width: 71.56, height: 41.36, scale: .6987 },
+};
+function place() {
+  document.querySelectorAll('[data-at]').forEach(el => {
+    const p = PLACES[el.dataset.at]; if (!p) return;
+    el.style.left = p.left + 'cqw'; el.style.top = p.top + 'cqw';
+    if (p.width) { el.style.width = p.width + 'cqw'; el.style.height = p.height + 'cqw'; }
+    if (p.scale) { el.style.transformOrigin = '0 0'; el.style.transform = `scale(${p.scale})`; }
+  });
+  const svg = document.querySelector('svg[data-leads="study"]');
+  if (svg) {
+    svg.innerHTML = Object.entries(PLACES).filter(([k, p]) => k.startsWith('study:') && p.to).map(([k, p]) => {
+      const el = document.querySelector(`[data-at="${k}"]`), fr = el.closest('.frame').getBoundingClientRect(), b = el.getBoundingClientRect();
+      const sx = 1280 / fr.width, ax = (b.left - fr.left + b.width * (p.from ?? .5)) * sx, ay = (b.bottom - fr.top) * sx;
+      const from = p.to[1] > ay ? [ax, ay] : [ax, (b.top - fr.top) * sx];
+      return `<path d="M${from[0].toFixed(1)} ${from[1].toFixed(1)} L${p.to[0]} ${p.to[1]}" stroke="#13244F" stroke-opacity=".45" stroke-width="1" fill="none"/><circle cx="${p.to[0]}" cy="${p.to[1]}" r="3.2" fill="#B4500F"/>`;
+    }).join('');
+  }
+  // night frames: the cards beside the page (or the star), the legend under it
+  document.querySelectorAll('.frame[data-quad]').forEach(fr => {
+    const q = JSON.parse(fr.dataset.quad), st = JSON.parse(fr.dataset.star || '[0,0]'), xs = q.map(p => p[0]), ys = q.map(p => p[1]), x0 = Math.min(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const b = fr.getBoundingClientRect(), ar = b.height / b.width;
+    [...fr.querySelectorAll('[data-at]')].forEach((el, i) => {
+      const k = el.dataset.at; let L, T;
+      if (k === 'sky:map') { L = st[0] * 100 + 3.5; T = st[1] * 100 * ar - 2.2; }
+      else if (k === 'archive:legend') { L = x0 * 100; T = (y1 + .035) * 100 * ar; }
+      else if (k === 'dawn:call') { L = x0 * 100 - 17; T = (y1 - .2) * 100 * ar; }
+      else { L = x0 * 100 - 10; T = (y0 + .06 + i * .27) * 100 * ar; }
+      el.style.left = L + 'cqw'; el.style.top = T + 'cqw';
+    });
+  });
+}
+
+(async () => {
+  await document.fonts.ready;
+  try { await document.fonts.load('600 22px Caveat'); } catch (e) { /* the notes fall back to the cursive face */ }
+  const two = [...document.querySelectorAll('canvas[data-scene]')], three = [...document.querySelectorAll('canvas[data-world]')];
+  let E = null;
+  const run = () => {
+    two.forEach(paint2d);
+    if (!E) { try { E = engine(); } catch (e) { console.error('[board] webgl', e); } }
+    if (E) three.forEach(cv => { try { paint3d(cv, E); } catch (e) { console.error('[board]', cv.dataset.world, e); } });
+    place();
+  };
+  run();
+  let t = 0; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 250); });
+  window.boardReady = true;
+})();
+</script>
+</body>
+</html>

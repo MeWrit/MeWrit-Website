@@ -4,8 +4,8 @@
    its own: the content floats over the night in frosted light panels with the main site's palette
    and dark text, and between them run bands of night with light text (the figures, the
    acknowledgements). The night shows in every gap. Phone first; grids from 760px and 1100px.
-   Contrast is measured on what is really behind the text. A panel over the night renders #E0E3EA
-   (#D7DAE1 at .9 with the blur), where --accent-ink (4.1:1) and --muted (4.0:1) fall short, so orange
+   Contrast is measured on what is really behind the text. A panel is .96 opaque, so the dust
+   behind it barely shows and it reads as paper, not grey (at .9 it rendered #D7DAE1), where --accent-ink (4.1:1) and --muted (4.0:1) fall short, so orange
    text in the panels is --pitch-ink (#8C4207, the site's own deeper orange: the primary button's
    hover), 5.2:1 there and 7.2:1 on white, and grey text on a panel's own ground is --body; --muted
    stays on the white cards (5.5:1). --line vanishes on that ground too, so hairlines drawn on a
@@ -24,9 +24,9 @@
    side), lit along the top edge, a deep soft shadow into the night. With a mouse a panel blurs
    what is behind it and lets a little more through, so the particles glow faintly at its edges;
    never on phones and tablets, where the blur costs too much */
-.pitch-panel{position:relative;padding:clamp(40px,6vw,88px) clamp(20px,4vw,56px);border-radius:28px;background:rgba(238,241,247,.94);color:var(--body);
+.pitch-panel{position:relative;padding:clamp(40px,6vw,88px) clamp(20px,4vw,56px);border-radius:28px;background:rgba(238,241,247,.96);color:var(--body);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 40px 90px -40px rgba(3,8,23,.75)}
-@media (hover:hover) and (pointer:fine){.pitch-panel{background:rgba(238,241,247,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}}
+@media (hover:hover) and (pointer:fine){.pitch-panel{background:rgba(238,241,247,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}}
 @media (prefers-reduced-transparency:reduce){.pitch-panel{background:var(--page);-webkit-backdrop-filter:none;backdrop-filter:none}}
 @media (max-width:599.98px){
   .pitch-light > .wrap{padding-inline:max(10px,env(safe-area-inset-left))}

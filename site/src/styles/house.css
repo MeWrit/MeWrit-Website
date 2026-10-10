@@ -1,0 +1,139 @@
+/* ---------------- the house (src/pages/house/, site/docs/redesign-plan.md sections 11 and 11.10) ----------------
+   The film in illustrated 3D. The canvas is fixed behind the page; a tall track scrolls while the
+   stage stays pinned over it. On the stage: the letterhead (lamp.css), the chapter list down the left,
+   the editor laid over the study's display (lamp.css), the title page laid over the manuscript, and
+   one caption a chapter for the others, centred below the chapter's object.
+   The title page is the loader too: paper from the first paint (on the veil), its logo revealed, its
+   lines written as the house loads; then it is laid on the manuscript in the scene (.quad: film.js sets
+   its transform), its paper turns clear and it prints on the lit page beneath (multiply). */
+/* (no scrollbar: a scroll indicator of the house's own is to come; and with none, holding the page still
+   for the loader and letting go never changes the window's width, which would resize the 3D) */
+html[data-page="house"]{--header-h:76px;--lp-x:clamp(20px,2.6vw,48px);--hs-ink:#13244F;--hs-soft:rgba(19,36,79,.8);--hs-dim:rgba(19,36,79,.56);--hs-pen:#B4500F;background:#F3EEE3;scrollbar-width:none}
+html[data-page="house"]::-webkit-scrollbar{display:none}
+html[data-page="house"] :is(.site-header,.menu-sheet,.dock,.cap-menu,.spine,.wa-float,.site-footer,.action-bar){display:none !important}
+html[data-page="house"] body{padding-bottom:0;isolation:isolate;background:#F3EEE3}
+html.hs-lock{overflow:hidden}
+
+.hs-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#E9E2D4}
+.hs{position:relative;color:var(--hs-ink)}
+.hs-track{position:relative;height:calc(var(--screens) * 100svh + 100svh)}
+.hs-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate}
+html.hs-loading .hs-stage :is(.lp-lh,.hs-list,.hs-caps){opacity:0}
+.hs-stage :is(.lp-lh,.hs-list,.hs-caps){transition:opacity .9s ease .3s}
+
+/* a soft paper light behind the captions, so they read over any part of the room */
+/* (off unless a caption is showing: never seen on load or behind the title page) */
+.hs-scrim{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 30% 15% at 50% 85%,rgba(246,241,231,.4) 0%,rgba(246,241,231,.2) 50%,rgba(246,241,231,0) 100%);opacity:0;transition:opacity .6s ease}
+.hs-stage[data-cap="on"] .hs-scrim{opacity:1}
+
+/* the captions: centred, the headline in the serif, one line */
+.hs-caps{position:absolute;z-index:3;left:50%;bottom:clamp(36px,6.5vh,72px);width:min(820px,88vw);transform:translateX(-50%);display:grid;text-align:center;pointer-events:none}
+.hs-cap{grid-area:1 / 1;align-self:end;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+.hs-cap.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .5s ease .05s}
+.hs-hl{font-family:var(--serif);font-weight:500;font-size:clamp(2.3rem,1.1rem + 2.9vw,4.2rem);line-height:1.04;letter-spacing:-.02em;color:var(--hs-ink);text-wrap:balance;text-shadow:0 0 22px rgba(246,241,231,.55),0 0 6px rgba(246,241,231,.5)}
+.hs-line{text-shadow:0 0 12px rgba(246,241,231,.7)}
+.hs-hl .lp-ln{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+.hs-hl .lp-li{display:block;transform:translateY(108%);transition:transform 0s linear .45s}
+.hs-cap.on .hs-hl .lp-li{transform:none;transition:transform .95s cubic-bezier(.2,.7,.2,1) calc(var(--i,0) * 110ms + 120ms)}
+.hs-line{margin:14px auto 0;max-width:46ch;font-size:clamp(1rem,.95rem + .2vw,1.12rem);line-height:1.6;color:var(--hs-soft);opacity:0;transform:translateY(10px);transition:opacity 0s linear .45s,transform 0s linear .45s}
+.hs-cap.on .hs-line{opacity:1;transform:none;transition:opacity .6s ease .5s,transform .8s cubic-bezier(.2,.7,.2,1) .5s}
+
+/* the chapter list, down the left, on a little paper card so it reads over any part of the room */
+.hs-list{position:absolute;z-index:3;left:var(--lp-x);top:50%;transform:translateY(-50%);padding:10px 16px 10px 12px;border-radius:10px;background:rgba(247,243,234,.74);border:1px solid rgba(19,36,79,.07);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hs-list ol{list-style:none;display:grid;gap:2px}
+.hs-list a{display:flex;align-items:baseline;gap:10px;padding:4px 0;font:500 .74rem/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.12em;color:var(--hs-dim);transition:color .3s}
+.hs-list a .n{min-width:1.4em;font-variant-caps:normal;letter-spacing:0;font-size:.84rem;opacity:.7}
+.hs-list a[aria-current="true"]{color:var(--hs-ink)}
+.hs-list a[aria-current="true"] .t{box-shadow:inset 0 -1.5px 0 var(--hs-pen)}
+.hs-list a[aria-disabled="true"]{opacity:.5;pointer-events:none}
+@media (hover:hover){.hs-list a:hover{color:var(--hs-ink)}}
+
+/* the editor on the display: its contents are the menu (lamp.css draws the editor); each practice
+   with its line beneath */
+.lp-ed{transform-origin:0 0}
+.lp-ed .ed-toc a{display:flex;align-items:baseline;gap:14px;width:100%;color:inherit;text-decoration:none}
+.lp-ed .ed-toc li{cursor:pointer}
+.lp-ed .ed-toc li:has(a:is(:hover,:focus-visible)){background:rgba(224,168,46,.2)}
+.lp-ed .ed-toc li:has(a:is(:hover,:focus-visible)) .t{color:var(--hs-pen)}
+.lp-ed .ed-contents{grid-template-columns:minmax(0,.78fr) minmax(0,1.5fr);gap:36px;align-items:center;padding:24px 34px 16px}
+.lp-ed .ed-head .ed-kick{font:500 15px/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--pen);margin:0 0 16px}
+.lp-ed .ed-head .ed-h{font:500 50px/1.02 var(--serif);letter-spacing:-.02em;color:var(--ink);margin:0 0 16px;text-wrap:balance}
+.lp-ed .ed-head .ed-l{font:italic 400 19px/1.45 var(--serif);color:var(--body);margin:0}
+.lp-ed .ed-toc-full{margin:0;max-width:none}
+.lp-ed .ed-toc-full .t{display:flex;flex-direction:column;gap:3px}
+.lp-ed .ed-toc-full .t small{font:400 14px/1.35 var(--sans);color:rgba(69,80,106,.88);letter-spacing:0;max-width:46ch}
+.lp-ed .ed-toc-full li{padding-top:8px;padding-bottom:8px}
+.lp-ed.live{pointer-events:auto}
+.ed-caret{display:inline-block;width:1.5px;height:1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hsCaret 1s steps(2,jump-none) infinite}
+@keyframes hsCaret{50%{opacity:0}}
+
+/* ---------- the scroll cue, at the foot of the title page's frame: the words and a line with a mark
+   running down it; in paper colour (the title's frame is in lamplight shade there) ---------- */
+.hs-cue{position:absolute;z-index:3;left:50%;bottom:clamp(14px,2.4vh,26px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .6s ease}
+.hs-stage[data-cue="on"] .hs-cue{opacity:1;transition:opacity 1s ease .4s}
+.hs-cue span{font:500 .72rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.2em;color:rgba(246,241,231,.86);text-shadow:0 1px 6px rgba(20,14,8,.5)}
+.hs-cue i{position:relative;display:block;width:1px;height:26px;background:rgba(246,241,231,.3);overflow:hidden}
+.hs-cue i::after{content:"";position:absolute;left:-1px;top:-8px;width:3px;height:8px;border-radius:2px;background:rgba(246,241,231,.95);animation:hsCue 1.8s cubic-bezier(.6,0,.4,1) infinite}
+@keyframes hsCue{0%{transform:translateY(0);opacity:0}25%{opacity:1}80%{opacity:1}100%{transform:translateY(34px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.hs-cue i::after{animation:none;top:9px}}
+
+/* ---------- the veil: the paper the title page is first shown on ---------- */
+.hs-veil{position:absolute;inset:0;z-index:4;background:#F3EEE3;pointer-events:none;transition:opacity 1.2s ease}
+.hs-veil.off{opacity:0;visibility:hidden;transition:opacity 1.2s ease,visibility 0s linear 1.2s}
+html.static .hs-veil{display:none}
+
+/* ---------- the title page ---------- */
+/* Its own size is the sheet's (A4, as large as the screen allows below the letterhead); laid out in
+   hundredths of its width (cqw), so the 3D page (study.js) can draw the same layout */
+@property --hs-p0{syntax:'<number>';inherits:true;initial-value:0}
+.hs-page{--pw:min(40vw,calc((100svh - 150px) * .7071));position:absolute;z-index:5;left:calc(50% - var(--pw) / 2);top:calc(50% + 38px - var(--pw) * .7071);width:var(--pw);aspect-ratio:210 / 297;container-type:inline-size;transform-origin:0 0;margin:0;
+  background-color:rgba(251,248,242,1);color:#13244F;box-shadow:0 1px 0 rgba(19,36,79,.06),0 18px 50px rgba(60,48,28,.16),0 4px 12px rgba(60,48,28,.08);transition:background-color .9s ease,box-shadow .9s ease}
+.hs-page > *{position:absolute;margin:0}
+.pg-logo{left:10cqw;top:8cqw;width:44cqw;height:auto}
+.pg-doc{right:10cqw;top:8.6cqw;font:500 1.95cqw/1.55 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:rgba(19,36,79,.55);text-align:right}
+.pg-rule{left:10cqw;right:10cqw;top:21.5cqw;height:.4cqw;background:#B4500F}
+.pg-title{left:10cqw;right:10cqw;top:29cqw;font:600 9.4cqw/1.04 var(--serif);letter-spacing:-.015em;color:#13244F}
+.pg-title span{display:block}
+.pg-sub{left:10cqw;right:16cqw;top:52cqw;font:italic 400 3.5cqw/1.5 var(--serif);color:rgba(19,36,79,.74)}
+.pg-lines{left:10cqw;right:10cqw;top:74cqw;display:grid;gap:3.1cqw}
+.pg-lines i{display:block;height:1.1cqw;width:calc(var(--w) * 100%);border-radius:1cqw;background:rgba(19,36,79,.2);transform-origin:left}
+.pg-lines i.hl{box-shadow:0 0 0 .7cqw rgba(224,168,46,.35)}
+.pg-begin{left:10cqw;top:118cqw;display:inline-flex;align-items:center;gap:1.6cqw;padding-bottom:.8cqw;font:italic 400 3.8cqw/1 var(--serif);color:#13244F;text-decoration:none;background:linear-gradient(#B4500F,#B4500F) left bottom / 100% .35cqw no-repeat}
+.pg-begin i{font-style:normal;color:#B4500F}
+.pg-begin:focus-visible{outline:2px solid #B4500F;outline-offset:4px}
+.pg-mark{right:11cqw;top:115.5cqw;font:600 5cqw/1 Caveat,cursive;color:#B4500F;transform:rotate(-5deg)}
+.pg-foot{left:10cqw;right:10cqw;top:131cqw;padding-top:1.6cqw;border-top:.2cqw solid rgba(19,36,79,.18);font:500 1.7cqw/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:rgba(19,36,79,.5);text-align:center}
+
+/* while the house loads: the logo revealed by a soft wipe, the rule drawn, the lines written as far as
+   the loading has got (--hs-p from film.js, --hs-p0 a steady start of its own) */
+html.js:not(.static) .hs-page:not(.quad){animation:hsWrite 2.6s cubic-bezier(.3,.6,.3,1) .35s forwards}
+@keyframes hsWrite{to{--hs-p0:.36}}
+html.js:not(.static) .hs-page:not(.quad) .pg-logo{clip-path:inset(0 100% 0 0);animation:hsReveal 1.2s cubic-bezier(.65,0,.35,1) .15s forwards}
+@keyframes hsReveal{to{clip-path:inset(0 0 0 0)}}
+html.js:not(.static) .hs-page:not(.quad) .pg-rule{transform-origin:left;transform:scaleX(0);animation:hsRule .9s cubic-bezier(.65,0,.35,1) .8s forwards}
+@keyframes hsRule{to{transform:scaleX(1)}}
+html.js:not(.static) .hs-page:not(.quad) .pg-lines i{transform:scaleX(clamp(0,calc(max(var(--hs-p0),var(--hs-p,0)) * 13 - var(--i) - 1),1));transition:transform .5s cubic-bezier(.3,.6,.3,1)}
+
+/* on the manuscript: the paper turns clear and the words lie on the lit page beneath; the page's own
+   drawing (rule, lines, mark, foot) is the 3D page's, so the sheet's copies fade out */
+.hs-page.quad{left:0;top:0;background-color:rgba(251,248,242,0);box-shadow:none}
+.hs-page.quad :is(.pg-rule,.pg-lines,.pg-mark,.pg-foot){opacity:0;transition:opacity .9s ease}
+/* (small on the screen, the 3D page draws the words: the markup goes in the same frame, no fade, so
+   nothing is ever seen twice or left behind) */
+.hs-page.far{opacity:0;pointer-events:none}
+
+/* without scripts: the title page as a plain page, then the words */
+html:not(.js) .hs-veil{display:none}
+html:not(.js) .hs-track{height:auto}
+html:not(.js) .hs-stage{position:static;height:auto;padding:calc(var(--header-h) + 40px) 0 40px}
+html:not(.js) .hs-page{position:relative;left:auto;top:auto;margin:0 auto 72px}
+html:not(.js) .hs-caps{position:static;transform:none;margin:0 auto;display:block}
+html:not(.js) .hs-cap{opacity:1;visibility:visible;margin-bottom:72px}
+html:not(.js) .hs-line{opacity:1;transform:none}
+html:not(.js) :is(.hs-canvas,.lp-ed,.hs-list){display:none}
+
+@media (prefers-reduced-motion:reduce){
+  html.js .hs-page:not(.quad),html.js .hs-page:not(.quad) :is(.pg-logo,.pg-rule){animation-duration:.01s}
+  .hs-hl .lp-li,.hs-cap.on .hs-hl .lp-li{transform:none;transition:none}
+}
+@media (max-width:1099.98px){.hs-list{display:none}}

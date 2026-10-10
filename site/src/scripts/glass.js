@@ -90,7 +90,8 @@ function bend(el, prop, shape, active, firstDelay = 0) {
   }).observe(el);
 }
 
-const capsuleOn = () => WIDE.matches ? root.dataset.nav === 'capsule' : root.dataset.phone === 'capsule';
+// a dark page has no capsule (its header is a plain row: src/styles/theme-dark.css), so nothing to bend
+const capsuleOn = () => root.dataset.theme !== 'dark' && (WIDE.matches ? root.dataset.nav === 'capsule' : root.dataset.phone === 'capsule');
 const capsule = document.querySelector('.site-header .wrap');
 // the capsule: a pill (its ends are half circles), its rim and bend in proportion to its height
 bend(capsule, '--lg-cap', (w, h) => ({ radius: h / 2, rim: Math.round(h * .3), depth: Math.round(h * .2) }), capsuleOn);

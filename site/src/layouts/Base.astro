@@ -37,14 +37,16 @@ import { href } from '../lib/url';
 interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
   nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners';
-  phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean; theme?: 'light' | 'dark';
+  phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean; theme?: 'light' | 'dark'; page?: string;
 }
-const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light' } = Astro.props;
+// `page` names a page that styles the shell itself (data-page on <html>), e.g. "lamp" for the
+// lamplight film, which carries its own footer
+const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com';   // previews stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme}>
+<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme} data-page={page}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

@@ -1,0 +1,171 @@
+---
+// The lamplight film (site/docs/redesign-plan.md, section 10): the home page as one document over one
+// day, in one house joined by its windows and doors. A tall track whose stage stays pinned over the
+// 3D: ten chapters in the order of the MeWriT deck (src/scripts/lamp/chapters.js), the morning in the
+// drawn study, the night in the engraved worlds, a new day, the evening; the page loosening like ink
+// between them. In the study the page is the document open on the display: an editor laid over the
+// drawing (film.js places it), its document changing with the chapter (illustrative, as on the design
+// board). The letterhead across the top follows the light (by night it names the chapter); the
+// furniture is a running head by day and a folio; one caption a chapter, its words from
+// src/data/lamp.ts, and its cards (the digital layer) beside the page. The last chapter is the footer.
+// The words are real page content and read in order without the 3D or without scripts.
+import Base from '../../layouts/Base.astro';
+import { lamp } from '../../data/lamp';
+import { CHAPTERS } from '../../scripts/lamp/chapters.js';
+import { osf } from '../../scripts/lamp/figures.js';
+import { site, contact } from '../../data/site';
+import { href } from '../../lib/url';
+import '../../styles/lamp.css';
+
+// the words, in the chapters' order (a chapter without words fails the build)
+const words = CHAPTERS.map(c => {
+  const w = lamp.chapters.find(x => x.id === c.id);
+  if (!w) throw new Error(`lamplight: no words for the chapter "${c.id}"`);
+  return w;
+});
+const screens = CHAPTERS.reduce((t, c) => t + c.span, 0);
+const chapterOf = (id?: string) => id ? CHAPTERS.findIndex(c => c.id === id) : -1;
+const year = new Date().getFullYear();
+const corners = ['tl', 'tr', 'bl', 'br'];
+const logo = href('/brand/logo-original.png');
+// the letterhead's links: the practices (the contents), the Academy (training), publications (the
+// record), about (the title page, for now) and contact (the last chapter)
+const links = [
+  { label: 'Practices', go: 'contents' }, { label: 'Academy', go: 'training' }, { label: 'Publications', go: 'on-the-record' },
+  { label: 'About', go: 'title-page' }, { label: 'Contact', go: 'correspondence' },
+];
+---
+<Base intro="none" theme="dark" page="lamp" title={`${lamp.title} | ${site.name}`} description={lamp.description}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
+  <div class="lp-loader" id="lpLoader" aria-hidden="true">
+    {corners.map(c => <i class="lp-crop" data-c={c}><b></b></i>)}
+    <p class="lp-load-head"><span>MeWriT · Preparing the page</span><span>{lamp.shortTitle}</span><span class="lp-load-rule"><i></i></span></p>
+    <p class="lp-load-folio"><b set:html={osf('0')} /></p>
+  </div>
+
+  <section class="lp" id="lp" aria-label={lamp.title} style={`--screens:${screens}`}>
+    <canvas class="lp-canvas" aria-hidden="true"></canvas>
+    <div class="lp-track">
+      <div class="lp-stage" data-ch={words[0].id} data-light="day">
+        <div class="lp-shade" aria-hidden="true"></div>
+        <header class="lp-lh">
+          <a class="lp-lh-logo" href="#title-page" data-go="0"><img src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230"></a>
+          <span class="lh-run" aria-hidden="true">{words[0].name}</span>
+          <nav class="lp-lh-nav" aria-label="Main">{links.map((l, i) => <a href={`#${l.go}`} data-go={chapterOf(l.go)} aria-current={i === 0 ? 'true' : undefined}>{l.label}</a>)}</nav>
+          <p class="lp-lh-contact"><a href={contact.phoneHref}>{contact.phoneDisplay}</a><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+          <a class="lp-lh-cta" href={href('/#contact')}>Start a project</a>
+          <a class="lp-lh-menu" href="#contents" data-go={chapterOf('contents')}>Menu</a>
+        </header>
+        <div class="lp-ed" aria-hidden="true">
+          <div class="ed-doc" data-doc="draft">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>Clinical study report · Draft 3</b><span class="ed-saved"><i class="live"></i>Saved · just now</span><span class="ed-av"><i>HS</i><i class="ai">✦</i></span></div>
+            <div class="ed-body">
+              <div class="ed-text">
+                <p class="ed-sec">11.4 Efficacy results</p>
+                <p>The primary endpoint was met in the per-protocol population. A total of 480 <del>subjects</del> <ins>participants</ins> were randomised 1:1 to treatment or control.</p>
+                <p><mark>Treatment reduced the risk of the primary event</mark> compared with control (HR 0.72; 95% CI 0.58 to 0.89).</p>
+                <div class="ed-fig">
+                  <svg viewBox="0 0 220 92" aria-hidden="true"><g stroke="#13244F" fill="none" stroke-width="1"><path d="M120 6 V86" stroke-dasharray="3 3" stroke-opacity=".5"/><path d="M10 86 H210" stroke-opacity=".35"/></g><g stroke="#13244F" stroke-width="1.4"><path d="M70 16 H128"/><path d="M84 32 H112"/><path d="M58 48 H122"/><path d="M90 64 H118"/></g><g fill="#13244F"><rect x="94" y="12" width="8" height="8"/><rect x="95" y="28" width="6" height="8"/><rect x="86" y="44" width="8" height="8"/><rect x="101" y="60" width="6" height="8"/></g><path d="M80 78 L98 73 L116 78 L98 83 Z" fill="#E07A1F"/></svg>
+                  <span>Figure 11.2. Hazard ratios by prespecified subgroup.</span>
+                </div>
+                <p class="ed-ghost">Suggested: add the number needed to treat for the primary endpoint.</p>
+              </div>
+              <aside class="ed-side">
+                <div class="ed-card"><b>Reviewer</b><span>Checked against ICH E3 §11.4 ✓</span></div>
+                <div class="ed-card ai"><b>✦ Assistant</b><span>3 references updated to current versions</span><em>Accepted by the reviewer</em></div>
+                <div class="ed-card"><b>References</b><span>42 of 42 verified against source</span></div>
+              </aside>
+            </div>
+            <div class="ed-foot"><span>eCTD ready · Module 5.3.5.1</span><span>Illustrative document</span></div>
+          </div>
+          <div class="ed-doc" data-doc="contents">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>MeWriT · Practices</b><span class="ed-saved">Five sections</span><span class="ed-av"><i>HS</i></span></div>
+            <div class="ed-body ed-one">
+              <div class="ed-text">
+                <p class="ed-sec">Contents</p>
+                <ol class="ed-toc">
+                  {lamp.contents.map(e => <li data-toc><span class="n">{e.num}</span><span class="t">{e.name}</span><span class="d"></span><span class="p">{e.page}</span></li>)}
+                </ol>
+              </div>
+            </div>
+            <div class="ed-foot"><span>Five practices, each its own</span><span>MeWriT</span></div>
+          </div>
+          <div class="ed-doc" data-doc="ai">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>Clinical study report · Draft 4</b><span class="ed-saved"><i class="live"></i>Reviewing generated text</span><span class="ed-av"><i>HS</i><i class="ai">✦</i></span></div>
+            <div class="ed-body">
+              <div class="ed-text">
+                <p class="ed-sec">11.5 Safety results</p>
+                <p>Adverse events were reported in a similar proportion of participants in each group; most were mild or moderate.</p>
+                <p class="ed-ghost">✦ Generated: “Treatment was well tolerated.”</p>
+                <p class="ed-call no">Not accepted by the reviewer: the claim goes beyond Table 11.7.</p>
+                <p>Serious adverse events were infrequent and balanced between groups <ins>(Table 11.7)</ins>.</p>
+                <p class="ed-call yes">✦ Suggested citation accepted by the reviewer.</p>
+                <table class="ed-tab"><caption>Table 11.7. Serious adverse events, safety population</caption><thead><tr><th></th><th>Treatment</th><th>Control</th></tr></thead><tbody><tr><td>Participants</td><td>240</td><td>240</td></tr><tr><td>Any serious event</td><td>4</td><td>5</td></tr></tbody></table>
+              </div>
+              <aside class="ed-side">
+                <div class="ed-card ai"><b>✦ Generated draft</b><span>Reviewed line by line</span><em>2 suggestions checked</em></div>
+                <div class="ed-card"><b>Expert sign-off</b><span>Accuracy, relevance, quality ✓</span></div>
+                <div class="ed-card"><b>Sources</b><span>Every statement traced to its table</span></div>
+              </aside>
+            </div>
+            <div class="ed-foot"><span>Human in the loop</span><span>Illustrative document</span></div>
+          </div>
+          <div class="ed-doc" data-doc="terms">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>Proposal · Ways of working</b><span class="ed-saved"><i class="live"></i>Ready to send</span><span class="ed-av"><i>HS</i></span></div>
+            <div class="ed-body ed-one">
+              <div class="ed-text">
+                <p class="ed-sec">Two ways to work together</p>
+                <div class="ed-terms">
+                  <div><b>Fixed fee</b><span>For each project, agreed up front.</span></div>
+                  <div><b>Advisory</b><span>Hourly consulting, as you need it.</span></div>
+                </div>
+                <p>Training, tailored in topics and duration.</p>
+              </div>
+            </div>
+            <div class="ed-foot"><span>MeWriT</span><span>Writing Science Right</span></div>
+          </div>
+        </div>
+        <div class="lp-cardlayer" aria-hidden="true">
+          {words.map(w => w.cards && <div class="lp-cards" data-ch={w.id}>
+            {w.cards.map(cd => <div class="lp-card"><b>{cd.live && <i class="live"></i>}{cd.ai && <span class="ai">✦</span>}{cd.k.replace('✦ ', '')}</b><span>{cd.t}</span></div>)}
+          </div>)}
+        </div>
+        <div class="lp-furn" aria-hidden="true">
+          <p class="lp-rh"><span class="l">{words[0].name}</span><span class="r">{lamp.shortTitle}</span></p>
+          <p class="lp-folio"><b set:html={osf(words[0].num)} /></p>
+        </div>
+        <div class="lp-caps">
+          {words.map((w, i) => {
+            const Tag = i === 0 ? 'h1' : 'h2';
+            return (
+              <article class="lp-cap" id={w.id} data-ch={w.id} data-name={w.name} data-num={w.num} aria-label={`${w.num} ${w.name}`}>
+                <Tag class="lp-hl">{w.headline}</Tag>
+                <p class="lp-line">{w.line}{w.note && <sup>{w.note}</sup>}</p>
+                {w.id === 'contents' && <ol class="lp-toc">
+                  {lamp.contents.map(e => {
+                    const go = chapterOf(e.go);
+                    return <li><a href={e.href} data-go={go >= 0 ? go : undefined}><span class="n">{e.num}</span><span class="t">{e.name}</span><span class="d" aria-hidden="true"></span><span class="p" aria-label={`page ${e.page}`} set:html={osf(e.page)} /></a></li>;
+                  })}
+                </ol>}
+                {w.action && <a class="lp-act" href={w.action.href} data-kind={w.action.kind} data-go={w.action.kind === 'scroll' ? i + 1 : undefined}>{w.action.label}<i aria-hidden="true">{'→'}</i></a>}
+                {w.id === 'correspondence' && <p class="lp-reach">{lamp.reach.map(r => <a href={r.href} {...(r.external ? { target: '_blank', rel: 'noopener' } : {})}>{r.label}</a>)}</p>}
+              </article>
+            );
+          })}
+        </div>
+        <p class="lp-fn" data-for="on-the-record"><sup>1</sup>{lamp.footnote}</p>
+        <footer class="lp-colophon" data-for="correspondence">
+          <div class="office"><h3>Office</h3><address>{lamp.office.join(', ')}</address></div>
+          <div><h3>Pages</h3><ul>{lamp.pages.map(p => { const go = chapterOf(p.go); return <li><a href={p.href} data-go={go >= 0 ? go : undefined}>{p.label}</a></li>; })}</ul></div>
+          <div><h3>MeWriT</h3><p><span class="brand">{lamp.shortTitle}</span><br />© {year} MeWriT. All rights reserved.<br />{lamp.legal}</p></div>
+        </footer>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/lamp/film.js';
+</script>

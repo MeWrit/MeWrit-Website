@@ -9,7 +9,9 @@ html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h) + 16p
   @view-transition{navigation:auto}
   ::view-transition-old(root){animation:.26s ease both vtOut}
   ::view-transition-new(root){animation:.42s cubic-bezier(.2,.7,.2,1) both vtIn}
-  .site-header{view-transition-name:capsule}
+  /* named only while a transition runs: a named element is a backdrop root, so a permanent name
+     kept the capsule's glass from blurring the page behind it */
+  html:active-view-transition .site-header{view-transition-name:capsule}
   .founder-photo,.profile-photo{view-transition-name:founder-photo}
 }
 @keyframes vtOut{to{opacity:0}}

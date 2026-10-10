@@ -140,4 +140,4 @@ export const enquiry = {
   note: 'Sample form for design review: nothing is sent.',
 };
 
-export const footerBlurb = 'Lorem ipsum dolor sit amet, consectetur.';
+export const footerBlurb = 'Specialist medical writing and scientific communication for the clinical research and healthcare sector. Ahmedabad, India.';

@@ -1,0 +1,397 @@
+/* ---------------- the lamplight look test (src/pages/lamplight/) ----------------
+   A document read at night. The film (index.astro, data-page="lamp") is a tall track whose stage
+   stays pinned over the 3D canvas, which is fixed behind the whole page (z-index -1, the body
+   isolated so it paints over the page's background). On the stage: page furniture instead of a HUD
+   (crop marks at the corners, a running head under the header, a folio at the foot, a contents rail
+   on the left on wide screens, a footnote where a chapter has a sourced figure, notes pinned to the
+   page), and one caption a chapter at the lower left (at the foot on phones). The last chapter is
+   the footer, so the site's footer and the phone's contact bar are not shown on the film. The inner
+   page (regulatory-writing.astro, data-page="lamp-inner") opens on the same night and then raises a
+   sheet of ivory paper over it, typeset like a document. Fraunces for statements, IBM Plex Mono for
+   labels, Inter for the few lines of body; navy night, ivory paper, orange ink, gold for highlights. */
+html[data-page="lamp"],html[data-page="lamp-inner"]{--lp-ink:#F2F5FC;--lp-soft:rgba(214,224,246,.86);--lp-dim:rgba(176,192,228,.72);--lp-faint:rgba(170,186,224,.5);--lp-line:rgba(201,216,255,.2);--lp-mark:rgba(201,216,255,.42);--lp-gold:#F0C35C;--lp-orange:#E07A1F;
+  --lp-x:calc(var(--dk-edge) + clamp(16px,2.4vw,48px));--lp-top:calc(var(--header-h) + 12px);--lp-foot:20px}
+html[data-page="lamp"] body,html[data-page="lamp-inner"] body{isolation:isolate}
+html[data-page="lamp"] body{padding-bottom:0}
+html[data-page="lamp"] .site-footer,html[data-page="lamp"] .action-bar{display:none}
+html.lp-lock{overflow:hidden;scrollbar-gutter:stable}
+
+/* the canvas: behind everything, as tall as the screen can get (lvh) so a phone's bars never resize it */
+.lp-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#030817}
+html.lp-lock .lp-canvas{z-index:150}
+
+/* ---------- the film ---------- */
+.lp{position:relative;color:var(--lp-ink)}
+.lp-track{position:relative;height:calc(var(--screens) * 100svh + 100svh)}
+.lp-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate;transition:opacity .8s ease .15s}
+html.lp-lock .lp-stage{opacity:0}
+/* a shade where the words stand, so they read over any world */
+.lp-shade{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 44% 56% at 16% 80%,rgba(3,8,23,.8) 0%,rgba(3,8,23,.56) 50%,rgba(3,8,23,0) 100%),linear-gradient(90deg,rgba(3,8,23,.52) 0%,rgba(3,8,23,.24) 30%,rgba(3,8,23,0) 50%)}
+.lp-nogl .lp-canvas{display:none}
+.lp-nogl .lp-stage{background:radial-gradient(60% 55% at 66% 46%,#13244F 0%,#060E26 55%,#030817 100%)}
+
+/* crop marks: a thin L at each corner of the frame, a small registration ring inside it */
+.lp-crop{position:absolute;width:20px;height:20px;pointer-events:none}
+.lp-crop::before,.lp-crop::after{content:"";position:absolute;background:var(--lp-mark)}
+.lp-crop::before{width:20px;height:1px}
+.lp-crop::after{width:1px;height:20px}
+.lp-crop b{position:absolute;width:6px;height:6px;border:1px solid var(--lp-mark);border-radius:50%}
+.lp-crop[data-c="tl"]{top:var(--lp-top);left:var(--dk-edge)}
+.lp-crop[data-c="tr"]{top:var(--lp-top);right:var(--dk-edge)}
+.lp-crop[data-c="bl"]{bottom:var(--lp-foot);left:var(--dk-edge)}
+.lp-crop[data-c="br"]{bottom:var(--lp-foot);right:var(--dk-edge)}
+.lp-crop[data-c^="t"]::before,.lp-crop[data-c^="t"]::after{top:0}
+.lp-crop[data-c^="b"]::before,.lp-crop[data-c^="b"]::after{bottom:0}
+.lp-crop[data-c$="l"]::before,.lp-crop[data-c$="l"]::after{left:0}
+.lp-crop[data-c$="r"]::before,.lp-crop[data-c$="r"]::after{right:0}
+.lp-crop[data-c^="t"] b{top:6px}
+.lp-crop[data-c^="b"] b{bottom:6px}
+.lp-crop[data-c$="l"] b{left:6px}
+.lp-crop[data-c$="r"] b{right:6px}
+
+/* the running head: the chapter's name in small monospace capitals, the document's short title
+   opposite, over a hairline */
+.lp-rh{position:absolute;top:calc(var(--lp-top) + 4px);left:var(--lp-x);right:var(--lp-x);display:flex;justify-content:space-between;gap:24px;padding-bottom:8px;border-bottom:1px solid var(--lp-line);
+  font-family:var(--mono);font-size:.62rem;font-weight:600;line-height:1.3;letter-spacing:.2em;text-transform:uppercase;color:var(--lp-dim);white-space:nowrap}
+.lp-rh .l{color:var(--lp-ink);min-height:1.3em}
+.typing::after{content:"";display:inline-block;width:.55em;height:1px;margin-left:2px;vertical-align:-.12em;background:currentColor;animation:lpCaret .7s steps(2,jump-none) infinite}
+@keyframes lpCaret{50%{opacity:0}}
+/* old-style figures, set by hand (src/scripts/lamp/figures.js: the font's build has none): 0 1 2 at
+   x-height, 3 4 5 7 9 at x-height and below the line, 6 8 at full height; a touch heavier where
+   smaller, so the strokes match */
+.osf-x,.osf-d{display:inline-block;font-size:.78em;font-weight:560;line-height:1}
+.osf-d{transform:translateY(.26em)}
+/* the folio: the chapter's number in Fraunces' old-style figures, between two short rules */
+.lp-folio{position:absolute;left:50%;bottom:calc(var(--lp-foot) - 4px);transform:translateX(-50%);display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:1.12rem;line-height:1;color:var(--lp-soft)}
+.lp-folio::before,.lp-folio::after{content:"";width:24px;height:1px;background:var(--lp-line)}
+.lp-folio b{font-weight:400;min-width:1.2em;text-align:center}
+/* the footnote, at the foot left, where a chapter has a sourced figure */
+.lp-fn{position:absolute;left:var(--lp-x);bottom:var(--lp-foot);max-width:calc(50% - var(--lp-x) - 40px);font-family:var(--mono);font-size:.6rem;font-weight:500;line-height:1.5;letter-spacing:.12em;text-transform:uppercase;color:var(--lp-faint);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+.lp-fn.on{opacity:1;visibility:visible;transition:opacity .45s ease .2s}
+.lp-fn sup,.lp-line sup{font-family:var(--serif);font-size:.8em;letter-spacing:0;color:var(--lp-gold);margin-right:.35em;vertical-align:.45em;line-height:0}
+.lp-line sup{margin:0 0 0 .1em}
+
+/* the captions, stacked in one place at the lower left; the one being read is .on. Its headline
+   rises line by line (text.js cuts it into lines), then its line and its action */
+.lp-caps{position:absolute;z-index:3;left:var(--lp-x);bottom:calc(var(--lp-foot) + 56px);width:min(600px,44vw);display:grid;align-items:end;pointer-events:none}
+.lp-cap{grid-area:1 / 1;opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
+.lp-cap.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .4s ease .05s}
+.lp-hl{font-family:var(--serif);font-weight:500;font-size:clamp(2.3rem,1rem + 3.1vw,4.3rem);line-height:1.02;letter-spacing:-.02em;color:var(--lp-ink);text-wrap:balance}
+.lp-ln{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+.lp-li{display:block;transform:translateY(108%);transition:transform 0s linear .4s}
+.lp-cap.on .lp-li{transform:none;transition:transform .95s cubic-bezier(.2,.7,.2,1) calc(var(--i,0) * 110ms + 120ms)}
+.lp-line{margin-top:20px;max-width:44ch;font-size:clamp(1rem,.94rem + .22vw,1.12rem);line-height:1.6;color:var(--lp-soft);opacity:0;transform:translateY(10px);transition:opacity 0s linear .4s,transform 0s linear .4s}
+.lp-cap.on .lp-line,.lp-cap.on .lp-act,.lp-cap.on .lp-toc,.lp-cap.on .lp-reach{opacity:1;transform:none;transition:opacity .6s ease .5s,transform .8s cubic-bezier(.2,.7,.2,1) .5s}
+.lp-cap.on .lp-act,.lp-cap.on .lp-reach{transition-delay:.68s}
+/* the action: a text link with an arrow, its underline drawn on hover */
+.lp-act{display:inline-flex;align-items:center;gap:10px;margin-top:24px;padding:6px 0 7px;font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--lp-ink);
+  background:linear-gradient(var(--lp-gold),var(--lp-gold)) left bottom / 0 1px no-repeat;opacity:0;transform:translateY(10px);transition:opacity 0s linear .4s,transform 0s linear .4s,background-size .45s cubic-bezier(.2,.7,.2,1),color .25s}
+.lp-act i{font-style:normal;color:var(--lp-gold);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.lp-act[data-kind="scroll"] i{transform:rotate(90deg)}
+.lp-cap.on .lp-act{transition:opacity .6s ease .68s,transform .8s cubic-bezier(.2,.7,.2,1) .68s,background-size .45s cubic-bezier(.2,.7,.2,1),color .25s}
+.lp-act:is(:hover,:focus-visible){background-size:100% 1px;color:#fff}
+.lp-act:is(:hover,:focus-visible) i{transform:translateX(4px)}
+.lp-act[data-kind="scroll"]:is(:hover,:focus-visible) i{transform:rotate(90deg) translateX(3px)}
+.lp-act:focus-visible{outline:0}
+
+/* the contents chapter: a real table of contents, five numbered entries with dotted leaders and page
+   numbers; pointing at one turns it gold (and lights its line on the page, film.js) */
+.lp-toc{list-style:none;margin-top:18px;max-width:480px;opacity:0;transform:translateY(10px);transition:opacity 0s linear .4s,transform 0s linear .4s}
+.lp-toc a{display:flex;align-items:baseline;gap:12px;padding:6px 0;color:var(--lp-soft);transition:color .25s}
+.lp-toc .n{flex:none;width:1.9em;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.1em;color:var(--lp-orange)}
+.lp-toc .t{font-family:var(--serif);font-size:clamp(1.08rem,.9rem + .5vw,1.34rem);font-weight:400;letter-spacing:-.005em;color:var(--lp-ink);transition:color .25s}
+.lp-toc .d{flex:1;min-width:16px;align-self:end;margin-bottom:.5em;border-bottom:1px dotted rgba(201,216,255,.42);transition:border-color .25s}
+.lp-toc .p{font-family:var(--serif);font-size:1.1rem;color:var(--lp-dim);transition:color .25s}
+.lp-toc a:is(:hover,:focus-visible) :is(.t,.p){color:var(--lp-gold)}
+.lp-toc a:is(:hover,:focus-visible) .d{border-color:rgba(240,195,92,.7)}
+.lp-toc a:focus-visible{outline:0}
+
+/* the last chapter: the ways to write under its action, and the colophon along the foot (the
+   office, the pages, the legal line), above the folio; the caption stands above the colophon */
+.lp-reach{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px;font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--lp-soft);opacity:0;transform:translateY(10px);transition:opacity 0s linear .4s,transform 0s linear .4s}
+.lp-reach a{padding:4px 0;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
+.lp-reach a:is(:hover,:focus-visible){color:var(--lp-gold);border-color:rgba(240,195,92,.6)}
+.lp-cap[data-ch="correspondence"]{transform:translateY(calc(-1 * var(--lp-colo-h,0px) - 18px))}
+.lp-colophon{position:absolute;left:var(--lp-x);right:var(--lp-x);bottom:calc(var(--lp-foot) + 34px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr);gap:14px 32px;padding-top:12px;border-top:1px solid var(--lp-line);
+  font-family:var(--mono);font-size:.6rem;font-weight:500;line-height:1.7;letter-spacing:.12em;text-transform:uppercase;color:var(--lp-dim);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+.lp-colophon.on{opacity:1;visibility:visible;transition:opacity .6s ease .45s}
+.lp-colophon h3{margin-bottom:4px;font-family:var(--mono);font-size:.56rem;font-weight:600;letter-spacing:.2em;color:var(--lp-faint)}
+.lp-colophon address{font-style:normal}
+.lp-colophon ul{list-style:none;display:flex;flex-wrap:wrap;gap:0 18px}
+.lp-colophon a{color:var(--lp-soft);transition:color .25s}
+.lp-colophon a:is(:hover,:focus-visible){color:var(--lp-gold)}
+.lp-colophon .brand{color:var(--lp-gold);font-weight:600;letter-spacing:.16em}
+
+html.lp-leaving :is(.lp-caps,.lp-furn,.lp-fn,.lp-colophon,.lp-cardlayer){opacity:0;transition:opacity .3s ease}
+
+/* the loading screen, in the furniture: the crop marks, a running head whose rule fills as it loads,
+   and the counter as a folio, on the morning's paper; once the study is drawn it shows through */
+.lp-loader{--lp-ink:#13244F;--lp-dim:rgba(19,36,79,.62);--lp-line:rgba(19,36,79,.18);--lp-mark:rgba(19,36,79,.3);--lp-gold:#B4500F;
+  position:fixed;inset:0;z-index:200;pointer-events:none;color:var(--lp-dim);transition:opacity .9s ease .3s,visibility 0s linear 1.3s}
+.lp-loader::before{content:"";position:absolute;inset:0;background:#F3EEE3;transition:opacity .9s ease}
+.lp-loader.lit::before{opacity:0}
+.lp-loader.out{opacity:0;visibility:hidden}
+.lp-loader[hidden]{display:none}
+.lp-loader .lp-crop{z-index:1}
+.lp-load-head{position:absolute;top:calc(var(--lp-top) + 4px);left:var(--lp-x);right:var(--lp-x);display:flex;justify-content:space-between;gap:24px;padding-bottom:8px;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
+.lp-load-head span:first-child{color:var(--lp-ink)}
+.lp-load-rule{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--lp-line);overflow:hidden}
+.lp-load-rule i{display:block;height:100%;background:var(--lp-gold);transform-origin:left center;transform:scaleX(0)}
+.lp-load-folio{position:absolute;left:50%;bottom:calc(var(--lp-foot) - 4px);transform:translateX(-50%);display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:1.12rem;line-height:1;color:var(--lp-ink)}
+.lp-load-folio::before,.lp-load-folio::after{content:"";width:24px;height:1px;background:var(--lp-line)}
+.lp-load-folio b{font-weight:400;min-width:1.6em;text-align:center}
+.lp-loader.out :is(.lp-load-head,.lp-load-folio){opacity:0;transition:opacity .5s ease}
+
+/* short computer screens (wider than tall, but under 1.45 to 1, like 1024 x 768): the words narrower,
+   the headlines smaller, so the page keeps a fair share of the width */
+@media (min-width:760px) and (min-aspect-ratio:4/5) and (max-aspect-ratio:29/20){
+  .lp-caps{width:min(470px,45vw)}
+  .lp-hl{font-size:clamp(2.1rem,.8rem + 3vw,3.7rem)}
+}
+/* phones, and windows taller than wide (a tablet held upright): the page above, the words at the
+   foot, the furniture reduced to the crop marks, the running head and the folio */
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  html[data-page="lamp"],html[data-page="lamp-inner"]{--lp-x:20px;--lp-top:calc(var(--header-h) + 8px);--lp-foot:14px}
+  .lp-shade{background:linear-gradient(0deg,rgba(3,8,23,.9) 0%,rgba(3,8,23,.62) 34%,rgba(3,8,23,0) 58%)}
+  .lp-crop{width:10px;height:10px}
+  .lp-crop::before{width:10px}
+  .lp-crop::after{height:10px}
+  .lp-crop b{display:none}
+  .lp-crop[data-c$="l"]{left:8px}
+  .lp-crop[data-c$="r"]{right:8px}
+  .lp-rh{font-size:.56rem;letter-spacing:.16em;padding-bottom:6px}
+  .lp-rh .r{overflow:hidden;text-overflow:ellipsis}
+  .lp-caps{left:20px;right:20px;width:auto;bottom:calc(var(--lp-foot) + 34px + env(safe-area-inset-bottom))}
+  .lp-hl{font-size:clamp(2rem,1.2rem + 4.4vw,2.9rem)}
+  .lp-line{margin-top:12px;font-size:.98rem;line-height:1.55}
+  .lp-act{margin-top:14px}
+  .lp-toc{margin-top:10px}
+  .lp-toc a{padding:5px 0}
+  .lp-folio,.lp-load-folio{bottom:calc(var(--lp-foot) + env(safe-area-inset-bottom) - 2px);font-size:1rem}
+  .lp-fn{left:20px;right:20px;max-width:none;bottom:calc(var(--lp-foot) + 22px + env(safe-area-inset-bottom));font-size:.54rem}
+  .lp-cap[data-ch="on-the-record"]{padding-bottom:16px}
+  .lp-colophon{left:20px;right:20px;bottom:calc(var(--lp-foot) + 26px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 18px;font-size:.54rem;line-height:1.6;padding-top:8px}
+  .lp-colophon .office{grid-column:1 / -1}
+  .lp-load-head{font-size:.56rem;letter-spacing:.16em}
+  .lp-load-head span:nth-child(2){display:none}
+}
+
+/* without scripts: the words in order, as a plain page */
+html:not(.js) .lp-track{height:auto}
+html:not(.js) .lp-stage{position:static;height:auto;padding:calc(var(--header-h) + 40px) 0 40px}
+html:not(.js) .lp-caps{position:static;display:block;width:auto;padding:0 var(--lp-x)}
+html:not(.js) .lp-cap{opacity:1;visibility:visible;margin-bottom:72px;transform:none}
+html:not(.js) :is(.lp-li,.lp-line,.lp-act,.lp-toc,.lp-reach){opacity:1;transform:none}
+html:not(.js) .lp-colophon{position:static;opacity:1;visibility:visible;margin:0 var(--lp-x)}
+html:not(.js) :is(.lp-loader,.lp-canvas,.lp-furn,.lp-fn,.lp-ed,.lp-cardlayer){display:none}
+
+@media (prefers-reduced-motion:reduce){
+  .lp-li,.lp-cap.on .lp-li{transform:none;transition:none}
+  .lp-cap.on :is(.lp-line,.lp-act,.lp-toc,.lp-reach){transition:opacity .3s linear}
+  .lp-line,.lp-act,.lp-toc,.lp-reach{transform:none}
+  .typing::after{animation:none}
+}
+
+/* ---------- the inner page: night, then paper ---------- */
+/* the night behind the sheet dims as the sheet rises over it (inner.js sets --veil) */
+.lpi-veil{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#030817;opacity:var(--veil,0)}
+.lpi-open{position:relative;height:100svh;min-height:520px;color:var(--lp-ink)}
+.lpi-open .lp-shade{z-index:0}
+.lpi-cap{position:absolute;left:var(--lp-x);bottom:calc(var(--lp-foot) + 56px);width:min(600px,44vw)}
+.lpi-cap .lp-line,.lpi-cap .lp-act{opacity:1;transform:none}
+.lpi-cap .lp-li{transform:none}
+html.lpi-enter .lpi-cap .lp-li{transform:translateY(108%)}
+html.lpi-enter .lpi-cap :is(.lp-line,.lp-act){opacity:0;transform:translateY(10px)}
+html.lpi-in .lpi-cap .lp-li{transform:none;transition:transform .95s cubic-bezier(.2,.7,.2,1) calc(var(--i,0) * 110ms + 250ms)}
+html.lpi-in .lpi-cap :is(.lp-line,.lp-act){opacity:1;transform:none;transition:opacity .6s ease .7s,transform .8s cubic-bezier(.2,.7,.2,1) .7s,background-size .45s cubic-bezier(.2,.7,.2,1),color .25s}
+.lpi-cap .lp-act i{transform:rotate(90deg)}
+.lpi-cap .lp-act:is(:hover,:focus-visible) i{transform:rotate(90deg) translateX(3px)}
+
+/* the sheet: ivory paper, navy ink, a fine edge and a soft shadow, laid lines barely there; typeset
+   like a document, with its own running head and folio, numbered sections and margin notes */
+.lpi-sheet{--ink:#13244F;--body:#45506A;--rule:rgba(19,36,79,.14);position:relative;width:min(860px,calc(100% - 32px));margin:0 auto;padding:clamp(26px,4.4vw,60px) clamp(20px,6vw,78px) clamp(30px,4.4vw,52px);border-radius:2px;
+  background:repeating-linear-gradient(0deg,rgba(19,36,79,.014) 0 1px,transparent 1px 5px),#F4F1EA;color:var(--body);
+  box-shadow:inset 0 0 0 1px rgba(19,36,79,.08),inset 0 1px 0 #fff,0 34px 90px rgba(0,0,0,.55),0 6px 18px rgba(0,0,0,.35);
+  transform:translateY(var(--rise,0px));opacity:var(--paper,1)}
+.lpi-head{display:flex;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:1px solid rgba(19,36,79,.22);font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(19,36,79,.64)}
+.lpi-head span:first-child{color:var(--ink)}
+.lpi-sec{display:grid;grid-template-columns:minmax(0,1fr) 168px;column-gap:44px;padding-top:clamp(34px,4.4vw,52px)}
+.lpi-sec > *{grid-column:1}
+.lpi-sec h2{display:flex;align-items:baseline;gap:14px;font-family:var(--serif);font-weight:500;font-size:clamp(1.5rem,1.2rem + 1vw,2rem);line-height:1.15;letter-spacing:-.012em;color:var(--ink)}
+.lpi-sec h2 .n{color:#A34D09;min-width:.9em}
+.lpi-note{grid-column:2;grid-row:1 / span 4;align-self:start;margin-top:8px;padding-top:9px;border-top:1px solid rgba(163,77,9,.5);font-family:var(--mono);font-size:.6rem;font-weight:500;line-height:1.7;letter-spacing:.12em;text-transform:uppercase;color:rgba(19,36,79,.62)}
+.lpi-list{list-style:none;margin-top:16px}
+.lpi-list li{display:flex;align-items:baseline;gap:16px;padding:10px 0;border-top:1px solid var(--rule);color:var(--ink);font-size:1rem;line-height:1.5}
+.lpi-list li:last-child{border-bottom:1px solid var(--rule)}
+.lpi-list .i{flex:none;width:2.2em;font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.08em;color:rgba(19,36,79,.48)}
+.lpi-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.lpi-two h3{margin-top:18px;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(19,36,79,.6)}
+.lpi-two .lpi-list{margin-top:8px}
+.lpi-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.lpi-figs div{padding:16px 14px 16px 0}
+.lpi-figs div + div{padding-left:14px;border-left:1px solid var(--rule)}
+.lpi-figs b{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(1.7rem,1.3rem + 1.2vw,2.4rem);line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.lpi-figs span{display:block;margin-top:8px;font-size:.86rem;line-height:1.4}
+.lpi-fn{margin-top:10px;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(19,36,79,.55)}
+.lpi-fn sup{font-family:var(--serif);font-size:.85em;letter-spacing:0;color:#A34D09;margin-right:.35em}
+.lpi-figs sup{font-family:var(--serif);font-size:.4em;color:#A34D09;vertical-align:1.2em;margin-left:.1em}
+.lpi-steps{list-style:none;margin-top:16px;counter-reset:s}
+.lpi-steps li{display:grid;grid-template-columns:2.2em minmax(0,1fr);column-gap:16px;padding:14px 0;border-top:1px solid var(--rule)}
+.lpi-steps li:last-child{border-bottom:1px solid var(--rule)}
+.lpi-steps .n{grid-row:1 / span 2;font-family:var(--serif);font-size:1.5rem;line-height:1;color:#A34D09}
+.lpi-steps strong{font-weight:600;color:var(--ink)}
+.lpi-steps p{margin-top:4px;font-size:.96rem;line-height:1.6}
+.lpi-links{list-style:none;margin-top:16px}
+.lpi-links a{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-top:1px solid var(--rule);font-family:var(--serif);font-size:1.18rem;color:var(--ink);transition:color .2s}
+.lpi-links li:last-child a{border-bottom:1px solid var(--rule)}
+.lpi-links a i{font-style:normal;font-family:var(--mono);font-size:.8rem;color:#A34D09;transition:transform .25s}
+.lpi-links a:is(:hover,:focus-visible){color:#A34D09}
+.lpi-links a:is(:hover,:focus-visible) i{transform:translateX(4px)}
+.lpi-start p{margin-top:12px;max-width:52ch;font-size:1.02rem;line-height:1.6}
+.lpi-start .btn{margin-top:20px}
+.lpi-folio{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:clamp(40px,5vw,60px);font-family:var(--serif);font-size:1.1rem;color:rgba(19,36,79,.7)}
+.lpi-folio::before,.lpi-folio::after{content:"";width:24px;height:1px;background:rgba(19,36,79,.25)}
+.lpi-sheet :focus-visible{outline-color:#A34D09}
+html[data-page="lamp-inner"] .site-footer{margin-top:clamp(56px,8vw,110px)}
+@media (max-width:759.98px){
+  .lpi-sheet{width:calc(100% - 20px);padding:24px 18px 30px}
+  .lpi-sec{grid-template-columns:minmax(0,1fr)}
+  .lpi-note{grid-column:1;grid-row:auto;order:2;margin-top:12px}
+  .lpi-sec h2{order:1}
+  .lpi-sec > :not(h2):not(.lpi-note){order:3}
+  .lpi-two{grid-template-columns:minmax(0,1fr)}
+  .lpi-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lpi-figs div:nth-child(3){padding-left:0;border-left:0}
+  .lpi-figs div:nth-child(n+3){border-top:1px solid var(--rule)}
+  .lpi-cap{left:20px;right:20px;width:auto;bottom:calc(var(--lp-foot) + 34px + env(safe-area-inset-bottom))}
+}
+@media (max-aspect-ratio:4/5) and (min-width:760px){
+  .lpi-cap{left:var(--lp-x);right:var(--lp-x);width:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  html.lpi-enter .lpi-cap .lp-li,html.lpi-enter .lpi-cap :is(.lp-line,.lp-act){transform:none;opacity:1}
+  .lpi-sheet{transform:none}
+}
+
+/* ================= the film over one day (site/docs/redesign-plan.md, section 10) =================
+   By day the stage is paper and ink, by night the engraved worlds; film.js sets data-light on the
+   stage. The letterhead replaces the site's header on the film. */
+html[data-page="lamp"]{--header-h:76px}
+html[data-page="lamp"] :is(.site-header,.menu-sheet,.dock,.cap-menu,.spine,.wa-float){display:none !important}
+.lp-stage{--lh-paper:#F3EEE3;--lh-rule:rgba(19,36,79,.22);--lh-ink:#13244F;--lh-soft:#45506A;--lh-accent:#E07A1F}
+.lp-stage[data-light="night"]{--lh-paper:rgba(243,238,227,0);--lh-rule:rgba(237,230,214,.16);--lh-ink:#F6F1E6;--lh-soft:rgba(237,230,214,.75);--lh-accent:#E0B85A}
+.lp-stage[data-light="day"]{--lp-ink:#13244F;--lp-soft:rgba(19,36,79,.84);--lp-dim:rgba(19,36,79,.62);--lp-faint:rgba(19,36,79,.46);--lp-line:rgba(19,36,79,.18);--lp-mark:rgba(19,36,79,.3);--lp-gold:#B4500F;--lp-orange:#B4500F}
+.lp-stage :is(.lp-hl,.lp-line,.lp-folio,.lp-toc .t,.lp-toc .p,.lp-act,.lp-fn,.lp-colophon){transition:color .8s ease}
+/* the running head is the day's: by night the letterhead names the chapter */
+.lp-rh{transition:color .8s ease,opacity .5s ease,visibility 0s linear 0s}
+.lp-stage[data-light="night"] .lp-rh{opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
+.lp-stage[data-light="day"] .lp-shade{background:radial-gradient(ellipse 46% 58% at 16% 80%,rgba(243,238,227,.95) 0%,rgba(243,238,227,.72) 50%,rgba(243,238,227,0) 100%)}
+/* the shade is there for a caption: while the camera moves between chapters (no caption) it lifts */
+.lp-shade{transition:opacity .5s ease}
+.lp-stage[data-cap="off"] .lp-shade{opacity:0}
+.lp-stage[data-light="day"] .lp-toc .d{border-bottom-color:rgba(19,36,79,.3)}
+
+/* the letterhead: the logo on its paper, the links in the serif, the contacts as stationery carries
+   them, Start a project, one fine rule. By night (for now) the chapter's name stands where the logo
+   was, the links turn ivory, the rule fades: the logo is never set on the dark */
+.lp-lh{position:absolute;left:0;right:0;top:0;height:var(--header-h);z-index:6;display:flex;align-items:center;gap:clamp(18px,2.2vw,38px);padding:0 var(--lp-x);background:var(--lh-paper);transition:background-color .8s ease}
+.lp-lh::after{content:"";position:absolute;left:var(--lp-x);right:var(--lp-x);bottom:0;height:1px;background:var(--lh-rule);transition:background-color .8s ease}
+.lp-lh-logo{display:block;flex:none;transition:opacity .5s ease,visibility 0s linear 0s}
+.lp-lh-logo img{display:block;height:calc(var(--header-h) * .5);width:auto}
+.lh-run{position:absolute;left:var(--lp-x);top:50%;transform:translateY(-50%);font:500 .8rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--lh-soft);opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s linear .5s}
+.lp-stage[data-light="night"] .lp-lh-logo{opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s linear .5s}
+.lp-stage[data-light="night"] .lh-run{opacity:1;visibility:visible;transition:opacity .6s ease .2s}
+.lp-lh-nav{display:flex;gap:clamp(16px,1.9vw,30px);margin-left:auto}
+.lp-lh-nav a{font:400 clamp(.92rem,.8rem + .3vw,1.06rem)/1 var(--serif);color:var(--lh-ink);padding:4px 0;border-bottom:1px solid transparent;transition:color .8s ease,border-color .3s}
+.lp-lh-nav a[aria-current="true"]{border-bottom-color:var(--lh-accent)}
+.lp-lh-nav a:is(:hover,:focus-visible){border-bottom-color:var(--lh-accent);outline:0}
+.lp-lh-contact{display:grid;gap:3px;padding-left:clamp(14px,1.6vw,26px);border-left:1px solid var(--lh-rule);font:400 .7rem/1.25 var(--sans);color:var(--lh-soft)}
+.lp-lh-contact a{color:inherit}
+.lp-lh-cta{font:italic 400 clamp(.9rem,.8rem + .3vw,1.04rem)/1 var(--serif);color:var(--lh-ink);white-space:nowrap;padding-bottom:3px;border-bottom:1.5px solid var(--lh-accent);transition:color .8s ease}
+.lp-lh-menu{display:none;margin-left:auto;font:400 1.05rem/1 var(--serif);color:var(--lh-ink);padding-bottom:3px;border-bottom:1.5px solid var(--lh-accent)}
+@media (max-width:1180px){.lp-lh-contact{display:none}}
+@media (max-width:900px){.lp-lh-nav,.lp-lh-cta{display:none}.lp-lh-menu{display:block}}
+/* the furniture in the board's type: the running head in small capitals of the serif, the actions
+   as italic serif links underlined in the accent */
+html[data-page="lamp"] .lp-rh{top:calc(var(--header-h) + 14px);font:500 .78rem/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;text-transform:none;border-bottom:0}
+html[data-page="lamp"] .lp-act{font:italic 400 clamp(1.02rem,.94rem + .3vw,1.16rem)/1 var(--serif);letter-spacing:0;text-transform:none;padding:4px 0 6px;background:linear-gradient(var(--lp-gold),var(--lp-gold)) left bottom / 100% 1.5px no-repeat}
+html[data-page="lamp"] .lp-act:is(:hover,:focus-visible){color:var(--lp-ink)}
+html[data-page="lamp"] .lp-toc .n{font:500 .78rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.08em}
+html[data-page="lamp"] :is(.lp-fn,.lp-colophon){font-family:var(--serif);font-variant-caps:all-small-caps;text-transform:none;letter-spacing:.12em}
+
+/* the digital layer: crisp interface cards beside the page, naming what is happening to the work */
+.lp-cardlayer{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.lp-cards{position:absolute;left:0;top:0;display:grid;justify-items:end;gap:10px;opacity:0;transition:opacity .45s ease;will-change:transform}
+.lp-cards.on{opacity:1;transition:opacity .7s ease .35s}
+.lp-card{display:flex;flex-direction:column;gap:5px;padding:10px 13px;border-radius:8px;background:rgba(253,251,247,.96);border:1px solid rgba(19,36,79,.14);box-shadow:0 8px 22px rgba(19,36,79,.14);font:400 .78rem/1.3 var(--sans);color:#45506A;white-space:nowrap;transition:background-color .8s ease,border-color .8s ease,color .8s ease}
+.lp-card b{display:flex;align-items:center;gap:6px;font:600 .62rem/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#13244F;transition:color .8s ease}
+.lp-card .live{width:7px;height:7px;border-radius:50%;background:#E07A1F;box-shadow:0 0 0 3px rgba(224,122,31,.18)}
+.lp-card .ai{color:#B4500F;font-size:.8rem;letter-spacing:0}
+.lp-stage[data-light="night"] .lp-card{background:rgba(10,20,48,.82);border-color:rgba(237,230,214,.22);color:rgba(237,230,214,.84);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.lp-stage[data-light="night"] .lp-card b{color:#F6F1E6}
+.lp-stage[data-light="night"] .lp-card :is(.ai){color:#E0B85A}
+.lp-stage[data-light="night"] .lp-card .live{background:#E0B85A;box-shadow:0 0 0 3px rgba(224,184,90,.2)}
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  html[data-page="lamp"]{--header-h:64px}
+  .lp-card{padding:8px 11px;font-size:.72rem}
+  .lp-cards .lp-card:nth-child(n+2){display:none}
+}
+
+/* the editor on the study's display: the design board's editor, in the site's type and colours,
+   set 1000 px wide and laid over the drawing's screen by film.js (which also sizes it and fades its
+   documents); illustrative documents, not real ones */
+.lp-ed{--ink:#13244F;--body:#45506A;--pen:#B4500F;position:absolute;left:0;top:0;z-index:1;transform-origin:0 0;visibility:hidden;pointer-events:none;border-radius:3px;overflow:hidden;background:#FDFBF6;color:var(--ink);font-family:var(--sans);will-change:transform,opacity}
+.ed-doc{position:absolute;inset:0;display:flex;flex-direction:column;background:#FDFBF6;opacity:0;visibility:hidden}
+.ed-bar{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid rgba(19,36,79,.12);background:#F6F2E9;font-size:11px;color:var(--body)}
+.ed-bar .dots{display:flex;gap:5px}
+.ed-bar .dots i{width:8px;height:8px;border-radius:50%;background:rgba(19,36,79,.22)}
+.ed-bar .dots i:first-child{background:rgba(224,122,31,.75)}
+.ed-bar .dots i:nth-child(2){background:rgba(224,168,46,.75)}
+.ed-bar b{font:600 11.5px/1 var(--sans);color:var(--ink)}
+.ed-saved{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ed-saved .live{width:7px;height:7px;border-radius:50%;background:#E07A1F;box-shadow:0 0 0 3px rgba(224,122,31,.18)}
+.ed-av{display:flex;gap:4px}
+.ed-av i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font:600 8.5px/1 var(--sans);font-style:normal}
+.ed-av i.ai{background:#FFF6EC;color:var(--pen);border:1px solid rgba(180,80,15,.45);font-size:11px}
+.ed-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:26px;padding:24px 28px 14px;min-height:0;overflow:hidden}
+.ed-body.ed-one{grid-template-columns:minmax(0,1fr)}
+.ed-text{min-width:0}
+.ed-text p{font:400 12.5px/1.6 var(--serif);color:#26324F;margin-bottom:11px}
+.ed-text .ed-sec{font:600 17px/1.2 var(--serif);color:var(--ink);margin-bottom:13px}
+.ed-text del{color:var(--pen);text-decoration-thickness:1.5px}
+.ed-text ins{color:var(--pen);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:.15em}
+.ed-text mark{background:linear-gradient(transparent 12%,rgba(224,168,46,.42) 12%,rgba(224,168,46,.42) 92%,transparent 92%);color:inherit}
+.ed-text .ed-ghost{color:rgba(180,80,15,.88);font-style:italic;border-left:2px solid rgba(180,80,15,.55);padding-left:12px}
+.ed-text .ed-call{margin:-5px 0 13px 14px;font:600 9.5px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.ed-call.no{color:#8A3A0B}
+.ed-call.yes{color:#2F6B4A}
+.ed-fig{display:flex;gap:18px;align-items:center;margin:4px 0 12px}
+.ed-fig svg{width:210px;height:auto;flex:none}
+.ed-fig span{font:italic 400 11px/1.35 var(--serif);color:var(--body)}
+.ed-side{display:flex;flex-direction:column;gap:11px}
+.ed-card{display:flex;flex-direction:column;gap:4px;padding:11px 13px;border-radius:5px;border:1px solid rgba(19,36,79,.14);background:#fff;font-size:11px;line-height:1.35;color:var(--body)}
+.ed-card b{font:600 9px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.ed-card.ai{border-color:rgba(180,80,15,.35);background:#FFFAF3}
+.ed-card.ai b{color:var(--pen)}
+.ed-card em{font-style:normal;font-size:10px;color:var(--pen)}
+.ed-tab{width:100%;border-collapse:collapse;margin:2px 0 10px;font:400 10.5px/1.3 var(--sans);color:#26324F}
+.ed-tab caption{text-align:left;font:italic 400 11px/1.35 var(--serif);color:var(--body);padding-bottom:6px}
+.ed-tab th{font-weight:600;text-align:left;padding:5px 7px;border-top:1px solid rgba(19,36,79,.5);border-bottom:1px solid rgba(19,36,79,.25)}
+.ed-tab td{padding:5px 7px;border-bottom:1px solid rgba(19,36,79,.12)}
+.ed-tab tr:last-child td{border-bottom:1px solid rgba(19,36,79,.5)}
+.ed-foot{display:flex;justify-content:space-between;padding:9px 16px;border-top:1px solid rgba(19,36,79,.12);font-size:10px;color:var(--body)}
+/* the contents as a document: the practices numbered, with dotted leaders and their pages; the one
+   pointed at in the caption lights up here */
+.ed-toc{list-style:none;margin-top:4px;max-width:600px}
+.ed-toc li{display:flex;align-items:baseline;gap:14px;padding:9px 8px;border-radius:3px;transition:background-color .25s}
+.ed-toc .n{flex:none;width:2em;font:500 14px/1 var(--serif);font-variant-caps:all-small-caps;color:var(--pen)}
+.ed-toc .t{font:400 22px/1.2 var(--serif);color:var(--ink);transition:color .25s}
+.ed-toc .d{flex:1;align-self:end;margin-bottom:.45em;border-bottom:1px dotted rgba(19,36,79,.35)}
+.ed-toc .p{font:400 19px/1 var(--serif);color:var(--body)}
+.ed-toc li.on{background:rgba(224,168,46,.2)}
+.ed-toc li.on .t{color:var(--pen)}
+/* the ways of working, side by side */
+.ed-terms{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:6px 0 16px;max-width:640px}
+.ed-terms div{display:flex;flex-direction:column;gap:6px;padding:16px 18px;border:1px solid rgba(19,36,79,.16);border-radius:5px;background:#fff}
+.ed-terms b{font:600 20px/1.15 var(--serif);color:var(--ink)}
+.ed-terms span{font:400 13px/1.45 var(--serif);color:var(--body)}

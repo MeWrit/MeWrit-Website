@@ -66,14 +66,23 @@ particles take a shape for each of eleven scenes as you scroll:
 | `close` | (none) | a globe with arcs from Ahmedabad, and the calls to action |
 
 Past the close comes a tail: the globe dissolves into drifting dust, the words and the figures
-fade out, and the dust stays, behind the rest of the page, for as long as you read on.
+fade out, and the dust stays, behind the rest of the page, for as long as you read on. Over it
+follow the pitch sections (`src/components/pitch/PitchSections.astro`, copy in
+`src/data/pitch.ts`, styles in `src/styles/pitch.css`): the five practices (`#practices`), the
+experience in numbers, why MeWriT and how we work, where we work (`#areas`), training and the
+Academy (`#trainings`), the acknowledgements in print, who leads the work and the enquiry
+(`#contact`), as frosted light panels (.96 opaque) and bands of night where the dust shows. The
+close's "See the five practices" scrolls to `#practices`; the header's Trainings and Contact links
+stay on the page (`src/scripts/page.js`).
 
 Each shape reveals itself as you scroll (the opening's page writes itself on time instead), labels
 pin to its parts and figures sit in the corner. The practices along the foot (01 to 05) jump to
-each practice; the one on screen fills as its scenes go by and empties as you move on. In the
-practices scene a click on a shape's button jumps to that practice, and hovering or focusing a
-button brightens its shape and dims the others. On computers the pointer parts the particles
-anywhere on the page.
+each practice; the one on screen fills as its scenes go by and empties as you move on. The
+practices scene reads as a menu: each shape has a pill button (number, name, arrow) and an
+invisible hit area over the shape itself, so clicking either jumps to that practice; hovering or
+focusing one brightens its shape and dims the others, and until the first hover, tap or focus a
+hairline ring pulses out of the buttons. Tab reaches the five buttons in order. On computers the
+pointer parts the particles anywhere on the page.
 
 - The words: `src/data/experience.ts`, one entry per scene (copy and figures from the MeWriT deck,
   July 2026, and Dr Hetal's CV; for Dr Hetal to confirm). The practices, the scenes' shapes,
@@ -92,15 +101,27 @@ anywhere on the page.
   its own for that to hold (html and body both paint a background; see `xp.css`). It draws while
   the page is in view, every other frame on phones once only the dust is left, and pauses in a
   hidden tab.
-- Framing: scenes are framed for a 1440 x 900 window, the shape right of the words and below the
-  figures. Other computer screens scale and move the picture into the room they have (measured from
-  their own words and panel); phones put it above the words, with their own shots where a scene's
-  camera stands far back, and set the practices' five shapes in two rows. Where the five buttons
-  would crowd each other (narrower computer screens), every other one hangs below its shape.
+- Framing (the fit system, `fitShot` in `experience.js`): every formation has a box worked out
+  from its particles when it is built (`formations.js`); a scene keeps only the direction and field
+  of view of its two shots (`scenes.js`). On every screen each shape is fitted to its target, a
+  rectangle on the stage: right of the words on computers (`{ x: .52, y: .16, w: .44, h: .62 }`
+  of the stage; `{ x: .5, y: .16, w: .47, h: .58 }` on screens under 1.45 to 1, where the words
+  are narrower and the titles smaller), above the words on phones and tall windows
+  (`{ x: .06, y: .15, w: .88, h: .40 }`). The rectangle is cut back wherever the scene's words, its
+  figures panel (measured for each scene), the rail, the hint or the header stand in it; the
+  camera stands as far back as the box needs, then the picture shifts onto the rectangle. Scenes
+  may override the box, the target and a padding (the practices keep room for their buttons, the
+  rivers fit their first stretch, the close's globe stands behind its words on a deeper shade).
+  The labels pinned to a shape go to whichever side of their point is clear of other labels, the
+  words, the panel, the rail and the header, or wait hidden. Phones set the practices' five shapes
+  in two rows; on computers, where the buttons would crowd, every other one hangs below its shape.
+  Below 1100 px wide the figures panel is left out.
 - Code: the page `src/pages/experience.astro`, styles `src/styles/xp.css`, and in `src/scripts/xp/`
-  the shapes (`formations.js`), the scenes, their camera shots and the tail's look (`scenes.js`),
-  the renderer (`world.js`) and what ties them to the scroll (`experience.js`).
-- Review switch: `?static` skips the loading screen (the opening's page appears written).
+  the shapes and their boxes (`formations.js`), the scenes, their directions and the tail's look
+  (`scenes.js`), the renderer (`world.js`) and what ties them to the scroll (`experience.js`).
+- Review switches: `?static` skips the loading screen (the opening's page appears written);
+  `?logoloop=6` replays the header logo's drawing every 6 seconds instead of 30. Test hook:
+  `window.mewritXp` (scenes, `scrollFor`, `settle()`, `layout`, `targets`, `shapeRect()`).
 
 ## Small touches
 
@@ -108,7 +129,9 @@ anywhere on the page.
   time they come into view (`src/scripts/decode.js`); screen readers get them as they are.
 - Moving between pages, the page fades across, the capsule stays put and Dr Hetal's photo moves
   from the home page to her profile (view transitions, in `src/styles/base.css`; browsers without
-  them simply change page).
+  them simply change page). The header is named for the transition only while one runs
+  (`:active-view-transition`): a permanent name made it a backdrop root, which kept the capsule's
+  glass from blurring the page behind it.
 
 ## Profiles
 
@@ -138,12 +161,20 @@ hero animations.
 ## Dark pages
 
 `<Base theme="dark">` dresses the page chrome for a dark, immersive page
-(`src/styles/theme-dark.css`): the capsule, its panels, the phone capsule and its card turn to
-dark navy glass with ice text and gold highlights, and the quick contact goes dark (WhatsApp
-stays green). The page itself gets a dark background (#030817), light text and headings and a
-gold focus ring, unless its own sections set them. The logo is never recoloured or redrawn: it
-is a registered trade mark, so on a dark page it sits unchanged on a plate of frosted white glass
-inside the capsule (as it does on the footer's white plate), and so does its drawing.
+(`src/styles/theme-dark.css`) in the experience's HUD language: monospace labels, hairlines, ice
+on night, gold and orange accents. The header has no capsule: it is one row across the full width,
+from the frame's edge to the frame's edge, its foot on the line where the experience's corner marks
+begin; a scrim always sits behind it, and once the page is scrolled a band of dark glass with a
+hairline. The links are monospace labels with a gold hairline gliding under the one you point at
+(the capsule's lens, restyled); the call to action and the phone's MENU are ghost pills that turn
+gold. The dropdown panels and the phone card stay dark glass. The footer becomes a band of night
+under a hairline: the practices, the contact points with the office address, and the brand line
+(its own columns, hidden on light pages). The floating WhatsApp button is left out; the phone's
+Call, WhatsApp and Enquire bar stays, dark. The logo is never recoloured or redrawn: it is a
+registered trade mark, so on a dark page it sits unchanged on a plate of frosted white glass (as it
+does on the footer's white plate), and so does its drawing. The drawing replays every 30 seconds on
+every page (`src/scripts/header-logo.js`, `window.mewritLogo.replay()`); on the dark plate the
+plate grows upward while it plays, so the pen's cap never shows above it.
 
 ## Nav lab
 
@@ -180,6 +211,8 @@ index and "you are here" in the four corners). Code: `src/styles/nav-experiments
 | Founder photo | `src/assets/` (resized and converted to WebP at build time) |
 | Logo, logo without its line, pen | `public/brand/` (served exactly as they are) |
 | Logo intro data: the pen's path and the logo's line pixels | `src/data/intro.json` |
+| The experience and its sections | `src/pages/experience.astro`, `src/scripts/xp/`, `src/components/pitch/`, `src/data/experience.ts`, `src/data/pitch.ts` |
+| Identity and pitch (draft for Dr Shah) | `docs/positioning.md` |
 
 ## Notes
 

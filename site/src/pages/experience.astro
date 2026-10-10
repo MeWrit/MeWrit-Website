@@ -5,9 +5,11 @@
 // shape for each scene as you scroll: the opening, the five practices as shapes to pick from, two
 // scenes for each practice, the close, and past it the dust that drifts behind the rest of the page
 // (the scenes in src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in
-// src/scripts/xp/world.js). The canvas is the whole page's backdrop. The words are real page
-// content: they read in order without the 3D.
+// src/scripts/xp/world.js). The canvas is the whole page's backdrop: past the close, the pitch
+// sections (src/components/pitch/PitchSections.astro) float over its dust as light panels and bands
+// of night. The words are real page content: they read in order without the 3D.
 import Base from '../layouts/Base.astro';
+import PitchSections from '../components/pitch/PitchSections.astro';
 import { experience } from '../data/experience';
 import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
 import { F } from '../scripts/xp/formations.js';
@@ -54,8 +56,9 @@ const pad = (j: number) => String(j + 1).padStart(2, '0');
                 <p class="xp-text">{w.text}</p>
                 {w.hint && <p class="xp-pickhint">{w.hint}</p>}
                 {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
-                {s.form === F.CHOICE && <div class="xp-picks">
-                  {CHAPTERS.map((c, j) => <button class="xp-pick" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="t">{c}</span></button>)}
+                {s.form === F.CHOICE && <div class="xp-picks idle">
+                  {CHAPTERS.map((_, j) => <i class="xp-hit" data-practice={j} aria-hidden="true"></i>)}
+                  {CHAPTERS.map((c, j) => <button class="xp-pick" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="t">{c.split(' ').slice(0, -1).join(' ')} <span class="nw">{c.split(' ').pop()}<b aria-hidden="true">{'→'}</b></span></span></button>)}
                 </div>}
                 {w.cta && <div class="btn-row xp-cta">
                   <a class="btn btn-primary" href={href('/#contact')}>Start a project</a>
@@ -81,7 +84,7 @@ const pad = (j: number) => String(j + 1).padStart(2, '0');
       </div>
     </div>
   </section>
-  {/* the pitch sections (src/components/pitch/PitchSections.astro) are added here by the integration step */}
+  <PitchSections />
 </Base>
 
 <script>

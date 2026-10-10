@@ -9,6 +9,8 @@
 html[data-theme="dark"]{
   --dk-page:#030817; --dk-text:#F2F5FC; --dk-ice:#DCE5FF; --dk-ice-hi:#EAF0FF; --dk-muted:#A9B7D9; --dk-gold:#F0C35C;
   --dk-line:rgba(201,216,255,.18); --dk-line-soft:rgba(201,216,255,.1); --dk-plate:rgba(255,255,255,.92);
+  /* the frame's edge: the header's row starts and ends here, and so do the experience's corner marks */
+  --dk-edge:clamp(16px,2.4vw,40px);
   /* the liquid glass, dark: a navy tint over the same blur, a cool light along the rim. The tints
      keep ice text at 4.5:1 or more even over something white passing under the glass, blur or no
      blur (the panels get no blur while the header carries a view-transition-name: see README) */
@@ -30,33 +32,58 @@ html[data-theme="dark"]{
 :where(html[data-theme="dark"]) :focus-visible{outline-color:var(--dk-gold)}
 :where(html[data-theme="dark"]) .skip{color:var(--ink)}
 
-/* the capsule's glass (the tokens above); the light the pointer catches is cool, not white. The
-   rim still bends what is behind it on computers (src/scripts/glass.js does not mind the tint). */
-html[data-theme="dark"] .site-header .wrap::before{background-image:radial-gradient(260px circle at var(--mx,50%) var(--my,-100%),rgba(201,216,255,calc(.14 * var(--sheen))),rgba(201,216,255,0) 70%)}
+/* the header, in the HUD's language: no capsule. One row across the full width, from the frame's
+   edge to the frame's edge, its foot on the line where the experience's corner marks begin. A
+   scrim always sits behind it (so the links read over bright particles); once the page is
+   scrolled (page.js sets .is-solid) a band of dark glass with a hairline under it. Both are the
+   header's own pseudo-elements, so the header itself carries no filter and its dropdown panels
+   still frost what is behind them. The capsule's glass layers are switched off. */
+html[data-theme="dark"] .site-header,html[data-theme="dark"] .site-header.is-solid{top:0;pointer-events:auto;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent}
+html[data-theme="dark"] .site-header::before{content:"";position:absolute;left:0;right:0;top:0;height:140px;z-index:-2;pointer-events:none;background:linear-gradient(rgba(3,8,23,.82),rgba(3,8,23,0))}
+html[data-theme="dark"] .site-header::after{content:"";position:absolute;left:0;right:0;top:0;height:var(--header-h);z-index:-1;pointer-events:none;opacity:0;transition:opacity .35s ease;
+  background:rgba(3,8,23,.72);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);box-shadow:0 1px 0 rgba(201,216,255,.16)}
+html[data-theme="dark"] .site-header.is-solid::after{opacity:1}
+html[data-theme="dark"] .site-header .wrap,html[data-theme="dark"] .site-header.is-solid .wrap{width:100%;max-width:none;height:var(--header-h);margin:0;padding:0 var(--dk-edge) 0 calc(var(--dk-edge) + var(--plate-l));border-radius:0;position:relative;isolation:isolate}
+html[data-theme="dark"] .site-header .wrap::before,html[data-theme="dark"] .site-header .wrap::after{content:none}
 
-/* the logo, exactly as it is, on a plate of frosted white glass: the capsule's blur, a little
-   padding, its round ends concentric with the capsule's. The drawing's layers sit on it too. */
+/* the logo, exactly as it is, on a plate of frosted white glass, a little padding around it. The
+   drawing's layers sit on it too. While the drawing replays (.logo-replay) the plate grows upward,
+   so the pen's cap stays on white at the heartbeat's peak, and settles back when it is done.
+   --plate-l is the plate's reach left of the logo: the header's row starts that far in, so the
+   plate's own edge is on the frame's edge. */
+html[data-theme="dark"]{--plate-t:-5px;--plate-r:-10px;--plate-l:9px;--plate-grow:8px}
+@media (min-width:900px){html[data-theme="dark"]{--plate-r:-14px;--plate-l:19px;--plate-grow:12px}}
+@media (min-width:900px) and (max-width:1099.98px){html[data-theme="dark"]{--plate-r:-12px;--plate-l:10px}}
 html[data-theme="dark"] .site-header .logo{min-height:0}
-html[data-theme="dark"] .site-header .logo::before{content:"";position:absolute;inset:-5px -10px -5px -9px;z-index:-1;border-radius:999px;
+html[data-theme="dark"] .site-header .logo::before{content:"";position:absolute;top:var(--plate-t);right:var(--plate-r);bottom:-5px;left:calc(var(--plate-l) * -1);z-index:-1;border-radius:999px;
   background:var(--dk-plate);-webkit-backdrop-filter:var(--glass-frost);backdrop-filter:var(--glass-frost);
-  box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(20,33,61,.08),0 0 0 .5px rgba(201,216,255,.3),0 2px 10px rgba(0,0,0,.3)}
+  box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(20,33,61,.08),0 0 0 .5px rgba(201,216,255,.3),0 2px 10px rgba(0,0,0,.3);transition:top .45s cubic-bezier(.2,.7,.2,1)}
+html[data-theme="dark"].logo-replay .site-header .logo::before{top:calc(var(--plate-t) - var(--plate-grow))}
 html[data-theme="dark"] .site-header .logo:focus-visible{outline:0}
 html[data-theme="dark"] .site-header .logo:focus-visible::before{box-shadow:0 0 0 3px var(--dk-gold)}
-@media (min-width:900px){html[data-theme="dark"] .site-header .logo::before{inset:-5px -14px -5px -19px}}
-@media (min-width:900px) and (max-width:1099.98px){html[data-theme="dark"][data-nav="capsule"] .site-header .logo::before{inset:-5px -12px -5px -10px}}
+@media (prefers-reduced-motion:reduce){html[data-theme="dark"] .site-header .logo::before{transition:none}}
 
-/* the desktop capsule: ice links (a dark halo keeps them clear over bright things passing under
-   the glass), a gold drop of glass under the one you point at, dark glass panels */
+/* the links in the monospace, like the HUD's labels: ice, a dark halo to keep them clear over
+   bright particles. The lens (src/scripts/nav-variants.js still moves it) is a gold hairline that
+   glides under the link you point at, along the foot of the row; the word turns white */
 @media (min-width:900px){
-  html[data-theme="dark"][data-nav="capsule"] .nav-desktop > ul > li > :is(a,button){color:var(--dk-ice);text-shadow:0 0 10px rgba(3,8,23,.7)}
-  /* the lens: the gold over a little navy, so it stays dark enough over bright things; the word
-     under it turns white */
-  html[data-theme="dark"][data-nav="capsule"] .cap-lens{background:linear-gradient(rgba(240,195,92,.28),rgba(240,195,92,.28)) rgba(8,18,48,.35);box-shadow:inset 0 1px 0 rgba(255,236,190,.35),inset 0 0 0 1px rgba(240,195,92,.6),0 4px 14px rgba(0,0,0,.3)}
+  html[data-theme="dark"][data-nav="capsule"] .nav-desktop > ul{gap:4px}
+  html[data-theme="dark"][data-nav="capsule"] .nav-desktop > ul > li > :is(a,button){min-height:36px;padding:0 12px;font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dk-ice);text-shadow:0 0 10px rgba(3,8,23,.7)}
+  html[data-theme="dark"][data-nav="capsule"] .nav-desktop button::after{width:6px;height:6px;border-width:0 1.4px 1.4px 0}
+  html[data-theme="dark"][data-nav="capsule"] .cap-lens{top:50%;left:calc(var(--l,0px) + 12px);right:calc(var(--r,100%) + 12px);height:1px;margin-top:17px;border-radius:0;background:var(--dk-gold);box-shadow:0 0 8px rgba(240,195,92,.45)}
   html[data-theme="dark"][data-nav="capsule"] .nav-desktop > ul > li:is(:hover,:focus-within) > :is(a,button){color:#fff}
+  /* the call to action: a ghost pill in the same labels, gold on hover; no orange fill here */
+  html[data-theme="dark"][data-nav="capsule"] .header-cta,html[data-theme="dark"][data-nav="capsule"] .site-header.is-solid .header-cta{min-height:40px;padding:0 18px;border:1px solid rgba(201,216,255,.55);background:none;box-shadow:none;color:var(--dk-ice);
+    font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;transition:border-color .2s,color .2s}
+  html[data-theme="dark"][data-nav="capsule"] .header-cta:focus-visible{border-color:var(--dk-gold);color:var(--dk-gold)}
   html[data-theme="dark"][data-nav="capsule"] .dd{box-shadow:var(--glass-light),0 0 0 .5px var(--dk-line),0 24px 60px rgba(0,0,0,.5)}
   html[data-theme="dark"][data-nav="capsule"] .dd strong{color:var(--dk-ice-hi)}
   html[data-theme="dark"][data-nav="capsule"] .dd a > span:last-child{color:var(--dk-muted)}
   html[data-theme="dark"][data-nav="capsule"] .dd a:is(:hover,:focus-visible){background:rgba(240,195,92,.12);box-shadow:inset 0 0 0 1px rgba(240,195,92,.35)}
+}
+
+@media (min-width:900px) and (hover:hover){
+  html[data-theme="dark"][data-nav="capsule"] .header-cta:hover{border-color:var(--dk-gold);color:var(--dk-gold);background:none;transform:none}
 }
 
 /* the small document cards (desktop panels and the phone card): ice strokes, the orange kept */
@@ -70,17 +97,24 @@ html[data-theme="dark"] .dd-art[data-art="person"] i:nth-child(1),html[data-them
 html[data-theme="dark"] .dd-art[data-art="chips"] i{background:rgba(201,216,255,.12);border-color:rgba(201,216,255,.32)}
 html[data-theme="dark"] .dd-art[data-art="chips"] i:nth-child(1){background:rgba(224,122,31,.22);border-color:rgba(240,150,70,.7)}
 
-/* the phone capsule and its card: dark glass, ice text, the Menu button in ice, gold marks */
+/* phones: the same row (shorter, and still slipping away while you read on down), the Menu button
+   a ghost pill reading MENU; its card in dark glass, ice text, gold marks */
 @media (max-width:899.98px){
-  html[data-theme="dark"][data-phone="capsule"] .site-header .wrap::before{box-shadow:var(--glass-light),0 0 0 .5px var(--dk-line),0 2px 6px rgba(0,0,0,.25),0 8px 16px rgba(0,0,0,.3)}
-  html[data-theme="dark"][data-phone="capsule"] .site-header .menu-btn{background:var(--dk-ice-hi);color:#0A1633;box-shadow:inset 0 1px 0 #fff,0 4px 12px rgba(0,0,0,.35)}
+  html[data-theme="dark"][data-phone="capsule"]{--header-h:64px}
+  html[data-theme="dark"][data-phone="capsule"] .site-header{padding-top:env(safe-area-inset-top)}
+  html[data-theme="dark"] .site-header::before{height:112px}
+  html[data-theme="dark"][data-phone="capsule"] .site-header .menu-btn{height:36px;padding:0 16px;border:1px solid rgba(201,216,255,.55);background:none;box-shadow:none;color:var(--dk-ice);
+    font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+  html[data-theme="dark"][data-phone="capsule"] .site-header .menu-btn svg{display:none}
+  html[data-theme="dark"][data-phone="capsule"] .site-header .menu-btn:active{border-color:var(--dk-gold);color:var(--dk-gold)}
   html[data-theme="dark"] .cap-menu[open]{color:var(--dk-text);box-shadow:var(--glass-light),0 0 0 .5px var(--dk-line),0 24px 60px rgba(0,0,0,.55)}
   html[data-theme="dark"] .cap-menu::backdrop{background:rgba(1,4,12,.55)}
   /* the card's logo on the same plate, where the capsule's was (the card opens over the capsule) */
   html[data-theme="dark"] .cap-top{position:relative;isolation:isolate}
   html[data-theme="dark"] .cap-top::before{content:"";position:absolute;z-index:-1;left:7px;top:50%;width:calc(var(--cap-logo,34px) * 1112 / 230 + 19px);height:calc(var(--cap-logo,34px) + 10px);transform:translateY(-50%);border-radius:999px;
     background:var(--dk-plate);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(201,216,255,.3),0 2px 10px rgba(0,0,0,.3)}
-  html[data-theme="dark"] .cap-close{background:rgba(201,216,255,.1);color:var(--dk-ice-hi)}
+  html[data-theme="dark"] .cap-close{height:36px;padding:0 14px 0 16px;border:1px solid rgba(201,216,255,.55);background:none;color:var(--dk-ice);font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+  html[data-theme="dark"] .cap-close svg{width:14px;height:14px}
   html[data-theme="dark"] :is(.cap-body,.cap-foot){border-top-color:var(--dk-line-soft)}
   html[data-theme="dark"] :is(.cap-group summary,.cap-link){color:var(--dk-ice-hi);border-bottom-color:var(--dk-line-soft)}
   html[data-theme="dark"] .cap-group summary::after{border-color:var(--dk-muted)}
@@ -97,4 +131,34 @@ html[data-theme="dark"] .dd-art[data-art="chips"] i:nth-child(1){background:rgba
 html[data-theme="dark"] .action-bar{background:rgba(6,14,36,.94);border-top-color:var(--dk-line)}
 html[data-theme="dark"] .action-bar a{background:rgba(201,216,255,.08);color:var(--dk-ice-hi);border-color:rgba(201,216,255,.2)}
 html[data-theme="dark"] .action-bar a.go{background:var(--accent-ink);color:#fff;border-color:var(--accent-ink)}
-html[data-theme="dark"] .wa-float{box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12)}
+/* no floating WhatsApp button on a dark page: WhatsApp is in the footer and the phone bar */
+html[data-theme="dark"] .wa-float{display:none}
+
+/* the footer, in the HUD's language: a band of night under a hairline (the dust still glows
+   faintly through it), the logo unchanged on its white plate, the columns headed by monospace
+   labels over a hairline that starts in orange, and a foot row with the brand line. Its own
+   columns (.foot-dk) replace the light footer's (.foot-lt) */
+html[data-theme="dark"] .site-footer{margin-top:clamp(64px,9vw,128px);padding-block:clamp(44px,5vw,64px) 28px;background:rgba(3,8,23,.84);box-shadow:none;border-top:1px solid rgba(201,216,255,.16);color:rgba(214,224,246,.84)}
+html[data-theme="dark"] .foot-lt{display:none}
+html[data-theme="dark"] .foot-dk{display:block}
+html[data-theme="dark"] .foot-grid{gap:36px 24px}
+html[data-theme="dark"] .foot-brand p{max-width:34ch;font-size:.92rem;line-height:1.6}
+html[data-theme="dark"] .site-footer h4{position:relative;margin-bottom:10px;padding-top:14px;border-top:1px solid rgba(201,216,255,.16);font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#9DAED6}
+html[data-theme="dark"] .site-footer h4::before{content:"";position:absolute;left:0;top:-1px;width:24px;height:1px;background:var(--accent)}
+html[data-theme="dark"] .site-footer li a{min-height:40px;color:var(--dk-ice)}
+@media (hover:hover){html[data-theme="dark"] .site-footer li a:hover{color:var(--dk-gold)}}
+html[data-theme="dark"] .site-footer address{font-style:normal;font-size:.92rem;line-height:1.75;padding-top:8px}
+html[data-theme="dark"] .foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 28px;margin-top:40px;border-top-color:rgba(201,216,255,.16);font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#9DAED6}
+html[data-theme="dark"] .foot-line{display:inline;color:var(--dk-gold);font-weight:600;letter-spacing:.16em}
+html[data-theme="dark"] .foot-legal{margin-left:auto}
+@media (max-width:599.98px){
+  html[data-theme="dark"] .foot-dk:last-child{grid-column:1 / -1}
+  html[data-theme="dark"] .foot-legal{margin-left:0}
+}
+@media (min-width:600px) and (max-width:899.98px){
+  html[data-theme="dark"] .foot-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  html[data-theme="dark"] .foot-brand{grid-column:1 / -1}
+}
+@media (min-width:900px){
+  html[data-theme="dark"] .foot-grid{grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:40px}
+}

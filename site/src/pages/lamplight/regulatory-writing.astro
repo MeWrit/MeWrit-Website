@@ -1,0 +1,83 @@
+---
+// The lamplight look test's inner page (site/docs/redesign-plan.md, sections 4 and 5): night, then
+// paper. It opens on the film's chapter 02, the archive and the dossier, with the page's name, one
+// line and a cue; scrolling on raises a sheet of ivory paper over the night, typeset like a document
+// (its own running head and folio, numbered sections, margin notes for standards and sources, lists
+// with hairlines). The site's dark footer follows. The 3D is src/scripts/lamp/inner.js; the words are
+// src/data/lamp.ts. No institution, company or client names.
+import Base from '../../layouts/Base.astro';
+import { regulatory as r, lamp } from '../../data/lamp';
+import { osf } from '../../scripts/lamp/figures.js';
+import { site } from '../../data/site';
+import '../../styles/lamp.css';
+
+const corners = ['tl', 'tr', 'bl', 'br'];
+const two = (j: number) => String(j + 1).padStart(2, '0');
+---
+<Base intro="none" theme="dark" page="lamp-inner" title={`${r.title} | ${site.name}`} description={r.line}>
+  <canvas class="lp-canvas" aria-hidden="true"></canvas>
+  <div class="lpi-veil" aria-hidden="true"></div>
+
+  <section class="lpi-open" aria-labelledby="lpiTitle">
+    <div class="lp-shade" aria-hidden="true"></div>
+    <div class="lp-furn" aria-hidden="true">
+      {corners.map(c => <i class="lp-crop" data-c={c}><b></b></i>)}
+      <p class="lp-rh"><span class="l">{r.title}</span><span class="r">{lamp.shortTitle}</span></p>
+      <p class="lp-folio"><b set:html={osf('02')} /></p>
+    </div>
+    <div class="lpi-cap">
+      <h1 class="lp-hl" id="lpiTitle">{r.title}</h1>
+      <p class="lp-line">{r.line}</p>
+      <a class="lp-act" href="#sheet">Read the page<i aria-hidden="true">{'→'}</i></a>
+    </div>
+  </section>
+
+  <article class="lpi-sheet" id="sheet" aria-label={`${r.title}, in full`}>
+    <header class="lpi-head"><span>MeWriT · {r.runningHead}</span><span>{r.title}</span></header>
+
+    <section class="lpi-sec" aria-labelledby="s1">
+      <h2 id="s1"><span class="n" set:html={osf(1)} />{r.write.title}</h2>
+      <p class="lpi-note">{r.write.note}</p>
+      <ul class="lpi-list">{r.write.items.map((it, j) => <li><span class="i">{two(j)}</span><span>{it}</span></li>)}</ul>
+    </section>
+
+    <section class="lpi-sec" aria-labelledby="s2">
+      <h2 id="s2"><span class="n" set:html={osf(2)} />{r.standards.title}</h2>
+      <p class="lpi-note">{r.standards.note}</p>
+      <div class="lpi-two">
+        <div><h3>Standards</h3><ul class="lpi-list">{r.standards.standards.map(s => <li><span>{s}</span></li>)}</ul></div>
+        <div><h3>Regulators</h3><ul class="lpi-list">{r.standards.regulators.map(s => <li><span>{s}</span></li>)}</ul></div>
+      </div>
+    </section>
+
+    <section class="lpi-sec" aria-labelledby="s3">
+      <h2 id="s3"><span class="n" set:html={osf(3)} />{r.experience.title}</h2>
+      <p class="lpi-note">Source: MeWriT records, July 2026</p>
+      <div class="lpi-figs">{r.experience.figures.map(fg => <div><b>{fg.value}<sup>1</sup></b><span>{fg.label}</span></div>)}</div>
+      <p class="lpi-fn"><sup>1</sup>{r.experience.note}</p>
+    </section>
+
+    <section class="lpi-sec" aria-labelledby="s4">
+      <h2 id="s4"><span class="n" set:html={osf(4)} />{r.how.title}</h2>
+      <p class="lpi-note">{r.how.note}</p>
+      <ol class="lpi-steps">{r.how.steps.map((s, j) => <li><span class="n" set:html={osf(j + 1)} /><strong>{s.title}</strong><p>{s.text}</p></li>)}</ol>
+    </section>
+
+    <section class="lpi-sec" aria-labelledby="s5">
+      <h2 id="s5"><span class="n" set:html={osf(5)} />{r.related.title}</h2>
+      <ul class="lpi-links">{r.related.links.map(l => <li><a href={l.href}>{l.label}<i aria-hidden="true">{'→'}</i></a></li>)}</ul>
+    </section>
+
+    <section class="lpi-sec lpi-start" aria-labelledby="s6">
+      <h2 id="s6"><span class="n" set:html={osf(6)} />{r.start.title}</h2>
+      <p>{r.start.text}</p>
+      <div class="btn-row"><a class="btn btn-primary" href={r.start.button.href}>{r.start.button.label}</a></div>
+    </section>
+
+    <p class="lpi-folio" aria-hidden="true"><b set:html={osf('02')} /></p>
+  </article>
+</Base>
+
+<script>
+  import '../../scripts/lamp/inner.js';
+</script>

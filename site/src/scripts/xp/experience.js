@@ -61,44 +61,125 @@ function start() {
   const writeOf = now => !loaderOut ? shown / 100 * OUTLINE : !outAt || !motion ? 1.12 : OUTLINE + (1.12 - OUTLINE) * clamp((now - outAt - 250) / WRITE);
   const revAt = (i, P, now) => i === OPEN ? writeOf(now) : revealOf(i, P);
 
-  // ---------- the camera: a smooth path through every scene's two shots ----------
-  let keys = [], small = false;
-  const panel = sec.querySelector('.xp-panel');
+  // ---------- the camera: every shape fitted to its frame, on a smooth path through the scenes ----------
+  // A scene keeps only the direction of its two shots (scenes.js: from the point looked at to the
+  // camera) and their fields of view. For the screen at hand each shape is fitted to its TARGET, a
+  // rectangle on the stage in fractions (right of the words on computers, narrower words and a
+  // taller box on short screens; above the words on phones), cut back wherever the scene's words,
+  // the figures panel, the rail or the hint stand in it: the camera stands as far back along the
+  // direction as the shape's box needs to fill the rectangle, and the picture shifts so the box's
+  // centre is the rectangle's. The move from one shot to the other is the scene's slow drift, kept
+  // small (DRIFT of the turn between them, about their middle); between scenes the camera flies
+  // along a Catmull-Rom path through every fitted shot. Recomputed on every resize.
+  const TARGET = { desk: { x: .52, y: .16, w: .44, h: .62 }, short: { x: .5, y: .16, w: .47, h: .58 }, phone: { x: .06, y: .15, w: .88, h: .40 } };
+  const DRIFT = .6, DMAX = 36;   // DMAX: the farthest the camera stands from a shape's centre (particles fade from 45 away)
+  let keys = [], small = false, layout = 'desk', headPx = 80, targets = [];
+  const avoid = [];
+  const panel = sec.querySelector('.xp-panel'), railEl = sec.querySelector('.xp-railnav');
   const cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return .5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
-  // the practices' shapes are laid out once, in two rows on phones (scenes.js's phone shots frame those)
+  // the practices' shapes are laid out once, in two rows on phones (and tall narrow windows)
   const compact = stage.clientWidth < 760 || stage.clientWidth / Math.max(1, stage.clientHeight) < .8;
-  // computer screens: the scenes are framed for a 1440 x 900 stage, where the picture has ROOM (right
-  // of the words, below the figures panel, above the foot); any other screen scales the picture (by
-  // the field of view) and moves it into the room it has, measured from its own words and panel, next
-  // to the words. Phones put the picture above the words, standing further back the narrower they are
-  const ROOM = [690, 300, 1390, 810];
-  function buildKeys(w, h) {
-    const aspect = w / h, phone = w < 760 || aspect < .8;
-    let adapt;
-    if (phone) {
-      const fit = Math.pow(Math.max(1, 1.6 / aspect), .62);
-      adapt = ([p, t, fov]) => [t[0] + (p[0] - t[0]) * fit, t[1] + (p[1] - t[1]) * fit, t[2] + (p[2] - t[2]) * fit, t[0], t[1], t[2], fov + 4, 0, .16];
-      small = true;
-    } else {
-      const left = stage.getBoundingClientRect().left, k = h / 900;
-      // where the words end: each scene's column, or further where a title's long word runs past it
-      const words = Math.max(...articles.map(a => { if (!a) return 0; const t = a.querySelector('.xp-title'); return Math.max(a.getBoundingClientRect().right, t && t.scrollWidth > t.clientWidth + 1 ? t.getBoundingClientRect().left + t.scrollWidth + 30 : 0) - left; }));
-      const room = [Math.max(words - 16, w * .3), (panel ? panel.offsetTop : 120) + 180, w - 50, h - 90];
-      const s = Math.max(.35, Math.min(1, (room[2] - room[0]) / ((ROOM[2] - ROOM[0]) * k), (room[3] - room[1]) / ((ROOM[3] - ROOM[1]) * k)));
-      const cx = room[0] + (ROOM[2] - ROOM[0]) * k * s / 2, cy = (room[1] + room[3]) / 2;
-      adapt = ([p, t, fov, sx, sy]) => {
-        const ox = (ROOM[0] + ROOM[2]) / 2 - (.5 + sx) * 1440, oy = (ROOM[1] + ROOM[3]) / 2 - (.5 - sy) * 900;   // the room's centre from the point looked at, as framed
-        return [...p, ...t, 2 * Math.atan(Math.tan(fov * Math.PI / 360) / s) * 180 / Math.PI, (cx - ox * k * s) / w - .5, .5 - (cy - oy * k * s) / h];
-      };
-      small = k * s < .75;   // drawn much smaller than framed: the labels kept off phones stay off here too
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  // each scene's two directions, drawn in toward their middle
+  const dirs = SCENES.map(s => {
+    const da = norm(sub(s.a[0], s.a[1])), db = norm(sub(s.b[0], s.b[1])), m = norm([da[0] + db[0], da[1] + db[1], da[2] + db[2]]);
+    const toward = d => norm(m.map((v, j) => v + (d[j] - v) * DRIFT));
+    return [toward(da), toward(db)];
+  });
+  // a shot that fits `box` into the target t, looking along -dir: [camera, the point looked at, fov, shift right, shift up]
+  function fitShot(box, dir, fov, t, aspect) {
+    const c = box.c, hs = box.size.map(v => v / 2), R = norm(cross([0, 1, 0], dir)), U = cross(dir, R);
+    const corners = Array.from({ length: 8 }, (_, i) => [c[0] + (i & 1 ? hs[0] : -hs[0]), c[1] + (i & 2 ? hs[1] : -hs[1]), c[2] + (i & 4 ? hs[2] : -hs[2])]);
+    let tn = Math.tan(fov * Math.PI / 360);
+    // where the box's corners land on the stage (fractions), from d away
+    const rect = d => {
+      const p = [c[0] + dir[0] * d, c[1] + dir[1] * d, c[2] + dir[2] * d], r = [1e9, 1e9, -1e9, -1e9];
+      corners.forEach(q => {
+        const v = sub(q, p), z = Math.max(.3, -dot(v, dir)), x = .5 + dot(v, R) / (z * tn * aspect) / 2, y = .5 - dot(v, U) / (z * tn) / 2;
+        r[0] = Math.min(r[0], x); r[1] = Math.min(r[1], y); r[2] = Math.max(r[2], x); r[3] = Math.max(r[3], y);
+      });
+      return r;
+    };
+    // a first guess from the box's height and width against the target's, then three rounds (and a
+    // few more if still over) of measuring the projected box and standing back by the overflow
+    let d = Math.max(hs[1] / tn / t.h, Math.max(hs[0], hs[2]) / (tn * aspect) / t.w) * 1.06;
+    for (let k = 0; k < 8; k++) {
+      const r = rect(d), over = Math.max((r[2] - r[0]) / t.w, (r[3] - r[1]) / t.h);
+      if (k >= 3 && over <= 1.005) break;
+      d *= over;
+      if (d > DMAX) { tn *= d / DMAX; d = DMAX; }   // so far back the particles would fade: widen the view instead
     }
-    // phones take a scene's own shots for them where it has them (pa, pb): a desktop shot that stands
-    // well back, to leave the words room, would put a phone, which stands further back still, past the
-    // depth where the particles fade out (the practices' phone shots frame their two rows, so they
-    // hold only where the shapes were laid out that way)
-    const own = s => phone && s.pa && (s.form !== F.CHOICE || compact);
-    keys = [];
-    SCENES.forEach((s, i) => { keys.push({ P: i + (i ? W : 0), v: adapt(own(s) ? s.pa : s.a) }, { P: i + 1 - (i < S - 1 ? W : 0), v: adapt(own(s) ? s.pb : s.b) }); });
+    const r = rect(d);
+    return [c[0] + dir[0] * d, c[1] + dir[1] * d, c[2] + dir[2] * d, c[0], c[1], c[2], Math.atan(tn) * 360 / Math.PI, t.x + t.w / 2 - (r[0] + r[2]) / 2, (r[1] + r[3]) / 2 - (t.y + t.h / 2)];
+  }
+  // what stands on the stage, in px from its corner: an element's box, null if it is not shown
+  const pxBox = (el, sr) => {
+    if (!el || !el.getClientRects().length) return null;
+    const q = el.getBoundingClientRect();
+    return q.width ? [q.left - sr.left, q.top - sr.top, q.right - sr.left, q.bottom - sr.top] : null;
+  };
+  // the figures panel's box for every scene: its rows (and note) differ, and a long value wraps, so
+  // a hidden copy is filled with each scene's figures (as they end) and measured
+  function panelBoxes(sr) {
+    if (!panel || !panel.getClientRects().length) return SCENES.map(() => null);
+    const g = panel.cloneNode(true), dl = g.querySelector('.xp-readout'), nt = g.querySelector('.xp-note');
+    g.style.visibility = 'hidden'; panel.parentNode.append(g);
+    const out = SCENES.map(s => {
+      dl.replaceChildren(...(s.readout || []).map(([l, v, alt]) => {
+        const row = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = l; dd.textContent = alt || (typeof v === 'object' ? fmt(v.to) : v); row.append(dt, dd); return row;
+      }));
+      nt.textContent = s.note || ''; nt.hidden = !s.note;
+      return pxBox(g, sr);
+    });
+    g.remove();
+    return out;
+  }
+  // a scene's target on this screen: its rectangle, cut back by what stands in it (ob: the scene's
+  // words, its panel, the rail and the hint, in px)
+  function targetOf(s, i, w, h, box, ob) {
+    const phone = layout === 'phone', base = (phone ? s.targetPhone : s.target) || TARGET[layout];
+    const frac = q => q && [q[0] / w, q[1] / h, q[2] / w, q[3] / h];
+    let x0 = base.x, y0 = Math.max(base.y, (headPx + 10) / h), x1 = base.x + base.w, y1 = base.y + base.h;
+    const rail = frac(ob.rail), pnl = frac(ob.panel), hn = i === 0 ? frac(ob.hint) : null, words = frac(ob.words);
+    if (phone) {
+      if (rail) y0 = Math.max(y0, rail[3] + 14 / h);
+      if (words) y1 = Math.min(y1, words[1] - 26 / h);
+    } else {
+      if (rail) y1 = Math.min(y1, rail[1] - 16 / h);
+      if (hn && hn[0] < x1 && hn[2] > x0) y1 = Math.min(y1, hn[1] - 12 / h);
+      if (words && !s.over) x0 = Math.max(x0, words[2] + 28 / w);
+      // the figures panel in the corner: the shape goes below it or left of it, whichever lets it be bigger
+      if (pnl && pnl[0] < x1 && pnl[3] > y0) {
+        const below = [x0, Math.max(y0, pnl[3] + 16 / h), x1, y1], left = [x0, y0, Math.min(x1, pnl[0] - 20 / w), y1];
+        const size = r => { const sh = fitShot(box, dirs[i][0], s.a[2], { x: r[0], y: r[1], w: Math.max(.05, r[2] - r[0]), h: Math.max(.05, r[3] - r[1]) }, w / h); return 1 / (Math.hypot(sh[0] - sh[3], sh[1] - sh[4], sh[2] - sh[5]) * Math.tan(sh[6] * Math.PI / 360)); };
+        [x0, y0, x1, y1] = size(below) >= size(left) ? below : left;
+      }
+    }
+    const pad = s.pad || [0, 0, 0, 0];
+    x0 += pad[3] / w; y0 += pad[0] / h; x1 -= pad[1] / w; y1 -= pad[2] / h;
+    return { x: x0, y: y0, w: Math.max(.08, x1 - x0), h: Math.max(.08, y1 - y0) };
+  }
+  function buildKeys(w, h) {
+    if (!world || !w || !h) return;
+    const aspect = w / h;
+    layout = w < 760 || aspect < .8 ? 'phone' : aspect < 1.45 ? 'short' : 'desk';
+    small = layout === 'phone' || w < 1100;   // the labels kept off phones stay off on narrow computer screens too
+    headPx = parseFloat(getComputedStyle(root).getPropertyValue('--header-h')) || 80;
+    keys = []; targets = [];
+    const sr = stage.getBoundingClientRect(), panels = panelBoxes(sr), rail = pxBox(railEl, sr), hn = pxBox(hint, sr);
+    SCENES.forEach((s, i) => {
+      const art = articles[i], words = pxBox(art, sr), tt = art && art.querySelector('.xp-title');
+      // a title's long word can run past its column
+      if (words && tt && tt.scrollWidth > tt.clientWidth + 1) words[2] = Math.max(words[2], tt.getBoundingClientRect().left - sr.left + tt.scrollWidth);
+      const ob = { words, panel: panels[i], rail, hint: hn };
+      avoid[i] = [words, panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
+      const box = s.box || world.box(s.form), t = targetOf(s, i, w, h, box, ob);
+      targets.push(t);
+      keys.push({ P: i + (i ? W : 0), v: fitShot(box, dirs[i][0], s.a[2], t, aspect) }, { P: i + 1 - (i < S - 1 ? W : 0), v: fitShot(box, dirs[i][1], s.b[2], t, aspect) });
+    });
   }
   function camAt(P) {
     let i = 0;
@@ -116,6 +197,7 @@ function start() {
     if (i === active) return;
     const prev = active; active = i;
     articles.forEach((el, j) => { if (!el) return; el.classList.toggle('on', j === i); el.classList.toggle('was', j === prev); });
+    stage.dataset.scene = SCENES[i].id;   // the close's words stand over its globe, on a stronger shade (xp.css)
     decodeAt = performance.now();
     const ch = chapterOf(i);
     rail.forEach((b, j) => b.setAttribute('aria-current', j === ch ? 'true' : 'false'));
@@ -167,17 +249,27 @@ function start() {
   }));
   const spinY = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return [c * p[0] + s * p[2], p[1], -s * p[0] + c * p[2]]; };
 
-  // the practices' buttons, one above each of their shapes: a click goes to the practice, the
-  // pointer or the focus on one brightens its shape and dims the others
+  // the practices' buttons, one above each of their shapes, and an invisible hit area over each
+  // shape itself: a click on either goes to the practice, the pointer or the focus on one
+  // brightens its shape and dims the others. Until the first of these, a slow ring pulses out of
+  // the buttons (.idle, xp.css), to say they can be clicked
   const pickLayer = sec.querySelector('.xp-picks');
-  const picks = [...sec.querySelectorAll('.xp-pick')].map(el => ({ el, g: +el.dataset.practice, on: false, want: false, below: false, w: 0, h: 0, stem: '' }));
-  let hovered = -1, focused = -1;
+  const hits = [...sec.querySelectorAll('.xp-hit')];
+  const picks = [...sec.querySelectorAll('.xp-pick')].map(el => ({ el, g: +el.dataset.practice, hit: hits.find(h => +h.dataset.practice === +el.dataset.practice), on: false, want: false, below: false, w: 0, h: 0, stem: '', hs: '', sz: '' }));
+  let hovered = -1, focused = -1, pickAt = null;
+  const woke = () => { if (pickLayer && pickLayer.classList.contains('idle')) pickLayer.classList.remove('idle'); };
   picks.forEach(p => {
-    p.el.addEventListener('click', () => goTo(SCENES.findIndex(s => s.chapter === p.g)));
-    p.el.addEventListener('pointerenter', () => { hovered = p.g; });
-    p.el.addEventListener('pointerleave', () => { if (hovered === p.g) hovered = -1; });
+    const go = () => { woke(); goTo(SCENES.findIndex(s => s.chapter === p.g)); };
+    [p.el, p.hit].forEach(el => {
+      if (!el) return;
+      el.addEventListener('click', go);
+      el.addEventListener('pointerenter', () => { hovered = p.g; woke(); });
+      el.addEventListener('pointerleave', () => { if (hovered === p.g) hovered = -1; });
+    });
+    if (p.hit) p.hit.addEventListener('pointerenter', () => p.el.classList.add('lit'));
+    if (p.hit) p.hit.addEventListener('pointerleave', () => p.el.classList.remove('lit'));
     p.el.addEventListener('focus', () => {
-      focused = p.g;
+      focused = p.g; woke();
       // reached from the keyboard: bring the scene in with its shapes lit, so every button shows
       if (active !== PICK || revealOf(PICK, Math.min(S, Pr)) < .95) window.scrollTo({ top: scrollFor(PICK + .74), behavior: REDUCE ? 'auto' : 'smooth' });
     });
@@ -195,7 +287,8 @@ function start() {
     buildKeys(W2, H2);
     // the labels' and buttons' sizes, measured together now rather than one by one as each first
     // shows, which would force a layout in the middle of a frame
-    callouts.forEach(c => { c.w = c.el.lastChild.offsetWidth + (c.dx || 16) + 14; });
+    callouts.forEach(c => { c.sw = c.el.lastChild.offsetWidth; c.sh = c.el.lastChild.offsetHeight; });
+    pickAt = null;
     picks.forEach(p => { p.w = p.el.offsetWidth; p.h = p.el.offsetHeight; });
     if (world) world.resize(CW, CH);
   }
@@ -212,6 +305,7 @@ function start() {
     setProgress(55);
     world = createWorld(canvas, { N, dpr: Math.min(devicePixelRatio || 1, big ? 2 : 1.75), bloomScale: big ? 1 : .5, trails: big && !!motion, compact });
     world.resize(CW, CH);
+    buildKeys(W2, H2);   // the shapes' boxes come with the world
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); world = null; sec.classList.add('xp-nogl'); });
     setProgress(70);
     requestAnimationFrame(() => {   // compile the shaders and draw once while the loading screen still covers the page
@@ -340,8 +434,12 @@ function start() {
     world.set(st8);
     world.render();
 
-    // the labels: the scene's own, once its shape is settled and revealed far enough
-    const settled = m === 0 && tail === 0 && gather >= 1;
+    // the labels: the scene's own, once its shape is settled and revealed far enough. Each goes to
+    // the side of its point it asks for, or the other side if that one would land on a label
+    // already placed, the words, the figures panel, the rail or the header; if neither has room it
+    // waits hidden
+    const settled = m === 0 && tail === 0 && gather >= 1, placed = [];
+    const clash = (q, list, mg) => list.some(o => q[0] < o[2] + mg && q[2] > o[0] - mg && q[1] < o[3] + mg && q[3] > o[1] - mg);
     callouts.forEach(c => {
       let on = settled && c.i === k && rev >= c.min && !(small && c.phone === false);
       if (on || c.on) {
@@ -350,13 +448,16 @@ function start() {
           const p = spinY(anchor, spinOf(c.i));
           if (c.facing && !world.facing(p)) on = false;
           world.project(p, pt);
-          if (pt[2] > 1 || pt[0] < 24 || pt[0] > W2 - 24 || pt[1] < 96 || pt[1] > H2 - 70) on = false;   // off the stage, or under the capsule or the practices
-          c.el.style.transform = `translate3d(${pt[0].toFixed(1)}px,${pt[1].toFixed(1)}px,0)`;
-          // the label goes to whichever side of its point has room
+          if (pt[2] > 1 || pt[0] < 24 || pt[0] > W2 - 24 || pt[1] < headPx + 16 || pt[1] > H2 - 70) on = false;   // off the stage, or under the header or the practices
+          const tf = `translate3d(${Math.round(pt[0])}px,${Math.round(pt[1])}px,0)`;
+          if (tf !== c.tf) { c.tf = tf; c.el.style.transform = tf; }   // written only when it moves a whole pixel
           if (on) {
-            if (!c.w) c.w = c.el.lastChild.offsetWidth + (c.dx || 16) + 14;
-            const side = pt[0] + c.w > W2 - 10 ? 'l' : pt[0] - c.w < 10 ? 'r' : c.side || 'r';
-            if (c.el.dataset.side !== side) c.el.dataset.side = side;
+            if (!c.sw) { c.sw = c.el.lastChild.offsetWidth; c.sh = c.el.lastChild.offsetHeight; }
+            const dx = c.dx || 16, dy = c.dy || 12, pref = c.side || 'r';
+            const at = sd => { const x0 = sd === 'l' ? pt[0] - dx - c.sw : pt[0] + dx; return [x0, pt[1] - dy - c.sh, x0 + c.sw, pt[1] - dy]; };
+            const side = [pref, pref === 'r' ? 'l' : 'r'].find(sd => { const q = at(sd); return q[0] >= 10 && q[2] <= W2 - 10 && !clash(q, placed, 6) && !clash(q, avoid[c.i] || [], 4); });
+            if (!side) on = false;
+            else { placed.push(at(side)); if (c.el.dataset.side !== side) c.el.dataset.side = side; }
           }
         } else on = false;
       }
@@ -369,23 +470,40 @@ function start() {
     let any = false;
     picks.forEach(p => { p.want = pickOn && k === PICK && (rev >= .2 + .18 * p.g || focused === p.g); any = any || p.want || p.on; });
     if (any && pickLayer) {
-      const o = pickLayer.getBoundingClientRect(), anchors = world.anchors(F.CHOICE), spin = spinOf(PICK);
+      // where the buttons' layer is: read while its words are still settling in (they rise into place
+      // over .8 s), then kept, so most frames do not ask for a layout after this frame's style writes
+      if (!pickAt || now - decodeAt < 1200) pickAt = pickLayer.getBoundingClientRect();
+      const o = pickAt, anchors = world.anchors(F.CHOICE), spin = spinOf(PICK);
       const tops = picks.map(p => { world.project(spinY(anchors['pick' + p.g], spin), pt); return [pt[0], pt[1], pt[2]]; });
+      const bases = picks.map(p => { world.project(spinY(anchors['pickBase' + p.g], spin), pt); return [pt[0], pt[1], pt[2]]; });
       picks.forEach(p => { if (!p.w) { p.w = p.el.offsetWidth; p.h = p.el.offsetHeight; } });
       let pitch = 1e9;
       for (let g = 1; g < tops.length; g++) if (Math.abs(tops[g][1] - tops[g - 1][1]) < 40) pitch = Math.min(pitch, Math.abs(tops[g][0] - tops[g - 1][0]));
-      const stagger = pitch < Math.max(...picks.map(p => p.w)) + 12;
+      // (never in the phones' two rows, where a button hung below would sit on the second row: there
+      // the buttons are narrow enough to stand side by side, xp.css)
+      const stagger = !compact && pitch < Math.max(...picks.map(p => p.w)) + 12;
       picks.forEach((p, g) => {
         let on = p.want;
         const below = stagger && g % 2 === 1;
         if (below) world.project(spinY(anchors['pickBase' + p.g], spin), pt); else [pt[0], pt[1], pt[2]] = tops[g];
         if (pt[2] > 1 || pt[0] < 0 || pt[0] > W2 || pt[1] < 60 || pt[1] > H2) on = false;
         const x = Math.max(8, Math.min(W2 - 8 - p.w, pt[0] - p.w / 2)), y = below ? pt[1] + 10 : pt[1] - p.h - 10;
-        p.el.style.transform = `translate3d(${(x - o.left).toFixed(1)}px,${(y - o.top).toFixed(1)}px,0)`;
+        const tf = `translate3d(${Math.round(x - o.left)}px,${Math.round(y - o.top)}px,0)`;
+        if (tf !== p.tf) { p.tf = tf; p.el.style.transform = tf; }
         const stem = `${(pt[0] - x - .5).toFixed(1)}px`;
         if (stem !== p.stem) { p.stem = stem; p.el.style.setProperty('--stem', stem); }
         if (below !== p.below) { p.below = below; p.el.classList.toggle('below', below); }
-        if (on !== p.on) { p.on = on; p.el.classList.toggle('on', on); }
+        // the hit area: the shape's projected box (its anchors run from its top to its foot; the
+        // shapes are about as wide as they are tall), padded, in steps of 4 px so a slow drift of
+        // the camera does not resize it every frame
+        if (p.hit) {
+          const t = tops[g], f = bases[g], hgt = Math.abs(f[1] - t[1]), q = v => Math.round(v / 4) * 4;
+          const w = q(hgt * .95 + 20), hh = q(hgt + 20), cx = (t[0] + f[0]) / 2, cy = (t[1] + f[1]) / 2;
+          const hs = `translate3d(${q(cx - w / 2 - o.left)}px,${q(cy - hh / 2 - o.top)}px,0)`, sz = w + 'x' + hh;
+          if (hs !== p.hs) { p.hs = hs; p.hit.style.transform = hs; }
+          if (sz !== p.sz) { p.sz = sz; p.hit.style.width = w + 'px'; p.hit.style.height = hh + 'px'; }
+        }
+        if (on !== p.on) { p.on = on; p.el.classList.toggle('on', on); if (p.hit) p.hit.classList.toggle('on', on); }
       });
     }
   }
@@ -409,7 +527,18 @@ function start() {
   // review and test hook
   window.mewritXp = {
     get P() { return Pr; }, get scene() { return SCENES[active] && SCENES[active].id; }, get ready() { return !!world && loaderOut; },
-    get tail() { return tailNow; }, get warmed() { return WARM_N - warmQ.length; }, get pick() { return hovered >= 0 ? hovered : focused; }, get outAt() { return outAt; },
+    get tail() { return tailNow; }, get warmed() { return WARM_N - warmQ.length; }, get layout() { return layout; }, get targets() { return targets; }, get pick() { return hovered >= 0 ? hovered : focused; }, get outAt() { return outAt; },
     settle() { Pr = targetP(); }, scrollFor, scenes: SCENES.map(s => s.id), N,
+    // the active shape's box as it projects on the stage now, [left, top, right, bottom] in px
+    shapeRect() {
+      if (!world || active < 0) return null;
+      const s = SCENES[active], b = s.box || world.box(s.form), r = [1e9, 1e9, -1e9, -1e9], q = [0, 0, 0];
+      for (let i = 0; i < 8; i++) {
+        const c = [b.c[0] + (i & 1 ? .5 : -.5) * b.size[0], b.c[1] + (i & 2 ? .5 : -.5) * b.size[1], b.c[2] + (i & 4 ? .5 : -.5) * b.size[2]];
+        world.project(c, q);   // unturned, as fitted (the shapes that turn are centred on their axis)
+        r[0] = Math.min(r[0], q[0]); r[1] = Math.min(r[1], q[1]); r[2] = Math.max(r[2], q[0]); r[3] = Math.max(r[3], q[1]);
+      }
+      return r;
+    },
   };
 }
