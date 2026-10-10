@@ -48,6 +48,10 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     s.holes.push(hole(DOOR.x0, FLOOR, DOOR.x1, DOOR.top), hole(WIN.x0, WIN.y0, WIN.x1, WIN.y1));
     const g = new THREE.ExtrudeGeometry(s, { depth: T, bevelEnabled: false });
     g.translate(0, 0, WALL - T);
+    // (an extrusion's texture coordinates come out in the shape's own units, so the plaster would
+    // repeat every third of a unit: brought to 0..1 across the wall, like the side walls, its soft
+    // unevenness spreads in broad patches)
+    { const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) - X0) / (X1 - X0), (uv.getY(i) - FLOOR) / (CEIL - FLOOR)); }
     const wall = shadows(new THREE.Mesh(g, wallMat));
     G.add(wall);
     // the skirting and a picture rail, in runs that stop at the doorway's architrave and the window's

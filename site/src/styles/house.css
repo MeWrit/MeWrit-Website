@@ -63,6 +63,19 @@ html.hs-loading .hs-stage :is(.lp-lh,.hs-list,.hs-caps){opacity:0}
 .lp-ed .ed-toc-full .t{display:flex;flex-direction:column;gap:3px}
 .lp-ed .ed-toc-full .t small{font:400 14px/1.35 var(--sans);color:rgba(69,80,106,.88);letter-spacing:0;max-width:46ch}
 .lp-ed .ed-toc-full li{padding-top:8px;padding-bottom:8px}
+/* small on the screen (a phone): the same document in larger type, the practices without their lines,
+   so each reads and can be tapped */
+.lp-ed.compact .ed-contents{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:30px;padding:26px 36px 16px}
+.lp-ed.compact .ed-head .ed-kick{font-size:26px;margin-bottom:18px}
+.lp-ed.compact .ed-head .ed-h{font-size:76px;line-height:1}
+.lp-ed.compact .ed-head .ed-l{font-size:30px}
+.lp-ed.compact .ed-toc-full li{padding-top:9px;padding-bottom:9px}
+.lp-ed.compact .ed-toc .n{font-size:26px}
+.lp-ed.compact .ed-toc .t{font-size:42px;line-height:1.1}
+.lp-ed.compact .ed-toc-full .t small{display:none}
+.lp-ed.compact .ed-toc .p{font-size:34px}
+.lp-ed.compact :is(.ed-bar,.ed-foot){font-size:18px}
+.lp-ed.compact .ed-bar b{font-size:19px}
 .lp-ed.live{pointer-events:auto}
 .ed-caret{display:inline-block;width:1.5px;height:1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hsCaret 1s steps(2,jump-none) infinite}
 @keyframes hsCaret{50%{opacity:0}}
@@ -88,6 +101,8 @@ html.static .hs-veil{display:none}
 @property --hs-p0{syntax:'<number>';inherits:true;initial-value:0}
 .hs-page{--pw:min(40vw,calc((100svh - 150px) * .7071));position:absolute;z-index:5;left:calc(50% - var(--pw) / 2);top:calc(50% + 38px - var(--pw) * .7071);width:var(--pw);aspect-ratio:210 / 297;container-type:inline-size;transform-origin:0 0;margin:0;
   background-color:rgba(251,248,242,1);color:#13244F;box-shadow:0 1px 0 rgba(19,36,79,.06),0 18px 50px rgba(60,48,28,.16),0 4px 12px rgba(60,48,28,.08);transition:background-color .9s ease,box-shadow .9s ease}
+/* (a tall, narrow screen: the sheet takes the width) */
+@media (max-aspect-ratio:4/5){.hs-page{--pw:min(86vw,calc((100svh - 170px) * .7071))}}
 .hs-page > *{position:absolute;margin:0}
 .pg-logo{left:10cqw;top:8cqw;width:44cqw;height:auto}
 .pg-doc{right:10cqw;top:8.6cqw;font:500 1.95cqw/1.55 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.14em;color:rgba(19,36,79,.55);text-align:right}
@@ -118,9 +133,12 @@ html.js:not(.static) .hs-page:not(.quad) .pg-lines i{transform:scaleX(clamp(0,ca
    drawing (rule, lines, mark, foot) is the 3D page's, so the sheet's copies fade out */
 .hs-page.quad{left:0;top:0;background-color:rgba(251,248,242,0);box-shadow:none}
 .hs-page.quad :is(.pg-rule,.pg-lines,.pg-mark,.pg-foot){opacity:0;transition:opacity .9s ease}
-/* (small on the screen, the 3D page draws the words: the markup goes in the same frame, no fade, so
-   nothing is ever seen twice or left behind) */
+/* (behind the camera, the page's words are hidden) */
 .hs-page.far{opacity:0;pointer-events:none}
+/* returning to a place in the film (a refresh, a link to a chapter): the sheet lifts away as the veil
+   clears on the view the reader left, and the words come back on the manuscript after */
+.hs-page.leaving{opacity:0;transition:opacity .45s ease}
+.hs-page.arriving{transition:opacity .6s ease}
 
 /* without scripts: the title page as a plain page, then the words */
 html:not(.js) .hs-veil{display:none}

@@ -115,6 +115,22 @@ function start() {
   // whose words show: the arriving chapter's once the camera is nearly there
   const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < .8 ? -1 : st.i;
 
+  // ---------- where the reader comes back to ----------
+  // A refresh returns to the place in the film the reader left (kept for half an hour in this tab); a
+  // link to a chapter (#contents) opens on that chapter. The camera then stands there from the start:
+  // the loader's sheet lifts away as the veil clears on that view, with no run from the title page
+  const KEY = 'mewrit-house-place';
+  let startP = 0;
+  if (!STATIC) {
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { /* storage off */ }
+    const hashI = CH.findIndex(c => location.hash === `#${c.id}`);
+    if (saved && saved.P > .02 && Date.now() - saved.t < 30 * 60 * 1000) startP = Math.min(S - 1e-3, saved.P);
+    else if (hashI > 0) startP = restP(hashI);
+  }
+  const restoring = startP > .02;
+  addEventListener('pagehide', () => { try { sessionStorage.setItem(KEY, JSON.stringify({ P: introDone ? Pr : startP, t: Date.now() })); } catch (e) { /* storage off */ } });
+
   // going to a chapter: a glide of the scroll (asked for by a link; never on its own), unhurried, so the
   // camera's way reads as a walk: about four seconds from the title page to the display, eased at both
   // ends, moving from the moment of the click
@@ -148,6 +164,8 @@ function start() {
     CH.forEach((ch, j) => { if (ch.cap) ch.cap.classList.toggle('on', j === c); });
     if (c >= 0) {
       stage.dataset.ch = CH[c].id;
+      // the address names the chapter (shared, it opens there); the title page keeps the plain address
+      try { history.replaceState(null, '', c > 0 ? `#${CH[c].id}` : location.pathname + location.search); } catch (e) { /* sandboxed */ }
       if (lhRun) lhRun.textContent = (CH[c].cap && CH[c].cap.dataset.name) || '';
       list.forEach(a => { if (a.getAttribute('href') === `#${CH[c].id}`) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     }
@@ -213,6 +231,8 @@ function start() {
       }
     }
     setP(.9);
+    // back to the reader's place, under the veil, before anything is shown
+    if (restoring) { window.scrollTo({ top: Math.round(scrollFor(startP)), behavior: 'instant' }); Pr = startP; }
     await nextFrame();
     ready = true; setP(1);
     lastKey = '';
@@ -226,6 +246,20 @@ function start() {
     const wait = Math.max(0, (REDUCE ? 200 : 2400) - (performance.now() - t0));
     setTimeout(() => {
       if (STATIC) { finishIntro(); return; }
+      if (restoring) {
+        // the camera already stands where the reader left: the sheet lifts away, the veil clears, and
+        // the title page's words come back on the manuscript (wherever it is in this view)
+        page.classList.add('leaving');
+        root.classList.add('hs-in'); root.classList.remove('hs-loading');
+        if (veil) veil.classList.add('off');
+        setTimeout(() => {
+          page.classList.add('quad'); lastKey = ''; wake();
+          setTimeout(() => { page.classList.add('arriving'); page.classList.remove('leaving'); setTimeout(() => page.classList.remove('arriving'), 700); }, 760);
+        }, 470);
+        setTimeout(finishIntro, 1250);
+        wake();
+        return;
+      }
       introFrom = sheetPose();
       introStart = performance.now();
       // the page laid on the manuscript where the sheet already is (no jump), before it turns clear
@@ -344,6 +378,9 @@ void main() {
     const q = project4(SCR);
     const tf = q ? quad(ED_W, ED_H, q) : 'scale(0)';
     if (edState.tf !== tf) { edState.tf = tf; ed.style.transform = tf; }
+    // small on the screen (a phone), the documents take their larger setting
+    const compact = !!q && Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]) / ED_W < .55;
+    if (edState.compact !== compact) { edState.compact = compact; ed.classList.toggle('compact', compact); }
     if (!edState.shown) { edState.shown = true; ed.style.visibility = 'visible'; ed.style.opacity = '1'; }
   }
   // the title page: its words are always the markup, laid exactly on the 3D page at every size (the 3D
@@ -384,14 +421,16 @@ void main() {
   }
 
   // ---------- every frame ----------
-  let Pr = 0, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null;
+  let Pr = startP, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null;
   function frame(dt, now) {
     if (glide) {
       const t = clamp((now - glide.t0) / glide.dur);
       window.scrollTo({ top: glide.from + (glide.to - glide.from) * easeSine(t), behavior: 'instant' });
       if (t >= 1) glide = null;
     }
-    const Pt = introDone ? targetP() : 0;
+    // (before the house is ready the film holds still; returning to a place, it follows the scroll from
+    // the start; otherwise the title page holds until its intro is done)
+    const Pt = !ready ? Pr : introDone || restoring ? targetP() : 0;
     Pr = motion ? Pr + (Pt - Pr) * (1 - Math.exp(-dt * 7)) : Pt;   // a light smoothing that never overshoots
     if (Math.abs(Pt - Pr) < 1e-4) Pr = Pt;
     time += dt;
@@ -409,7 +448,7 @@ void main() {
     const V = views();
     let cam, hA, hB = null, hK = 0, spot = 0;
     const docMix = {};
-    if (!introDone) {
+    if (!introDone && !restoring) {
       cam = introStart ? lerpPose(introFrom, V.page, easeIO(intro)) : V.page;
       hA = 'early'; spot = 1; docMix.draft = 1;
     } else if (st.phase === 0) {

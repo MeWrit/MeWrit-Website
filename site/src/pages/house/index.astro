@@ -52,6 +52,9 @@ const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
      they lift themselves) */
   (function () {
     var d = document.documentElement;
+    // (the film puts the reader back where they were itself, once the house is ready: the browser's
+    // own restoring would move the page under the loader)
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
     if (/[?&]static\b/.test(location.search)) return;
     d.classList.add('hs-loading', 'hs-lock');
     setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
