@@ -279,6 +279,9 @@ function start() {
     let hintT = 0;
     ed.querySelectorAll('.ed-toc a').forEach(a => a.addEventListener('click', e => {
       e.preventDefault();
+      // (a practice whose chapter is built: the camera goes there)
+      const to = CH.findIndex(c => c.id === a.dataset.chapter);
+      if (to >= 0) { if (introDone) glideTo(restP(to)); return; }
       if (!hint) return;
       hint.classList.add('soon'); clearTimeout(hintT); hintT = setTimeout(() => hint.classList.remove('soon'), 2400);
     }));
