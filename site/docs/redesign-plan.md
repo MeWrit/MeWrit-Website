@@ -455,3 +455,27 @@ What follows from them:
   - the rests at 1440x900, 1920x1080, 1280x720, 1243x1148 and 390x844;
   - errors: none.
   On square windows the record's view keeps its lettering clear of the chapter list.
+
+**After step 3 was shown (10 October 2026, late), the user's notes (verbatim) and what was done (cf6f962):**
+- "globe stem is broken": the stem floated above its base. It is now one turned stand from the floor up into an upright brass ring.
+- "the books are too low res and lack complexity/richness, make them have more detail.": every book now has a real spine from one painted atlas (books.js):
+  - binders with label windows and finger holes;
+  - clinical study reports with bands and volume labels;
+  - journals with mastheads, printed titles and logos;
+  - workbooks with title bands;
+  - leather hardbacks with raised gilt bands and title panels;
+  - modern books.
+  The pages show on top, piles lie flat here and there, and the odd book leans.
+- "some way to let the user know that they need to scroll untill the shelves are fully filled would be nice, but one that doesnt break the vibe.": while the record fills, the title page's cue in the source line's place: "Scroll to fill the shelves", a mark running down a line. Gone once the shelves are full.
+- "study window view is fine but this wall feels empty" (right of the window): a tall oak bookcase (real spines, a framed photograph, a little plant, a box of cards) and a brass wall clock at ten past ten. They are outside the approved frames at standard window sizes.
+- "doorway frame is fine as well".
+- "the loading animation is too flat compared to what it opens to": a return to 02 now loads on a picture of the record's band rendered from the 3D in 02's own light (public/house/record-band.webp, 36 KB; the scratchpad's band_shot.js and band_crop.py remake it after any change to the record). Its edges fade into the paper; the logo is written by the pen, and the headline and the counting figures are live on it. The 3D takes its place without a jump.
+- "btw the twenty two years text should count up +1 year every new year automatically": src/data/years.ts counts from 2004 (twenty-two in 2026, the deck's figure). Every page that says how many years uses it. The house also rewrites the frieze's number from the reader's own year, so it turns over on 1 January without a rebuild. To confirm with the user: the pitch copy says Dr Hetal has worked "since 2003", which would make it 23.
+- "the monitor is glitching" (the editor on the display partly blank, while moving and at rest, on the user's laptop; not seen here at 100% or 150%). Done, in case it is the GPU's memory or load:
+  - the sun's shadow map back to 2048 (a 4096 map took 64 MB), drawn over the room the camera is in, widened on a walk;
+  - at most 60 frames a second on faster screens;
+  - the pen's ink worked out once per page (it froze the main thread for 600 ms the first time a logo drew);
+  - shaders compiled for their real targets (stalls of up to 220 ms in the move from the title page).
+  The user was asked to try ?tier=low and to give the laptop's GPU and display scale.
+- The laptop's electric noise while scrolling: coil whine from the GPU's power stage under load, harmless. The 60 frame cap halves the work on fast screens; the rest is the laptop's own settings.
+- Asked in passing (no work): could ray tracing or path tracing make the light more realistic and consistent at no cost to speed? Answer given: bake path-traced light into the textures, which is the step 7 plan.
