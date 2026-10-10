@@ -12,7 +12,9 @@ import { lamp } from '../../data/lamp';
 import { site, contact } from '../../data/site';
 import { href } from '../../lib/url';
 import { osf } from '../../scripts/lamp/figures.js';
+import LogoDraw from '../../components/LogoDraw.astro';
 import '../../styles/lamp.css';
+import '../../styles/logo-draw.css';
 import '../../styles/house.css';
 
 // the chapters of the house, in order (How we work is removed, section 11.4); the look test builds two
@@ -90,7 +92,7 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
       <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">
         <div class="hs-scrim" aria-hidden="true"></div>
         <header class="lp-lh">
-          <a class="lp-lh-logo" href="#title-page" data-go="0"><img src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230"></a>
+          <a class="lp-lh-logo" href="#title-page" data-go="0"><LogoDraw /></a>
           <span class="lh-run" aria-hidden="true">{words[0].name}</span>
           <nav class="lp-lh-nav" aria-label="Main">{links.map(l => { const i = BUILT.indexOf(l.go); return <a href={`#${l.go}`} data-go={i >= 0 ? i : undefined}>{l.label}</a>; })}</nav>
           <p class="lp-lh-contact"><a href={contact.phoneHref}>{contact.phoneDisplay}</a><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
@@ -131,8 +133,8 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
           <div class="ed-doc" data-doc="contents">
             <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>MeWriT · Practices</b><span class="ed-saved">Five practices</span><span class="ed-av"><i>HS</i></span></div>
             <!-- the document's letterhead (the original logo, unaltered); in the contents' loader the screen
-                 boots with it at its middle, and it docks here -->
-            <img class="ed-logo" src={logo} alt="" aria-hidden="true" width="1112" height="230">
+                 boots with it at its middle, where the pen writes its line, and it docks here -->
+            <LogoDraw class="ed-logo" />
             <div class="ed-body ed-contents">
               <header class="ed-head" id="contents" aria-label={`${contentsCh.num} ${contentsCh.name}`}>
                 <p class="ed-kick">Contents</p>
@@ -153,7 +155,7 @@ const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d);
         <!-- 00, the title page: the manuscript's top sheet. Laid on the 3D page in perspective once the
              house is ready; until then, a sheet of paper in the middle of the screen (the loader) -->
         <article class="hs-page" id="title-page" data-ch="title-page" aria-label={`${title.num} ${title.name}`}>
-          <img class="pg-logo" src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230">
+          <LogoDraw class="pg-logo" />
           <p class="pg-doc" aria-hidden="true">Clinical study report<br>Title page · Final</p>
           <i class="pg-rule" aria-hidden="true"></i>
           <h1 class="pg-title">{titleLines.map(l => <span>{l}</span>)}</h1>

@@ -1,0 +1,19 @@
+/* ---------------- the logo that draws itself (src/components/LogoDraw.astro) ----------------
+   The layers sit exactly over the real logo image and show only while a drawing plays (.drawing),
+   or from the first paint where a page asks for it (.ld-first: the base is there, the line not yet
+   drawn, so a loader shows the logo being written from its first frame). Clip boxes are the logo's
+   parts, in logo pixels of 1112 x 230 (as in header-logo.css). */
+.ld{position:relative;display:inline-block;line-height:0;vertical-align:top}
+.ld-real{display:block;width:100%;height:auto}
+.ld-layers{position:absolute;inset:0;display:none;pointer-events:none}
+.ld.drawing .ld-layers,.ld.ld-first .ld-layers{display:block}
+.ld.ld-first .ld-real{opacity:0}
+.ld-part{position:absolute;left:0;top:0;width:100%;height:100%}
+.ld-base{clip-path:inset(0 42.986% 0 0)}                      /* wordmark, registered mark, tagline: x 0 to 634 */
+.ld-l1{clip-path:inset(16.957% 12.410% 70.435% 58.993%)}      /* MEDICAL WRITING */
+.ld-l2{clip-path:inset(42.174% 25.629% 44.783% 58.993%)}      /* TRAINING */
+.ld-l3{clip-path:inset(67.826% 0 19.565% 59.083%)}            /* HEALTHCARE CONSULTING */
+.ld-label{opacity:0}
+.ld-pen{position:absolute;left:0;top:0;width:5.036%;height:auto;opacity:0;transform-origin:0 0}   /* 56 of 1112 */
+.ld-glow{position:absolute;left:0;top:0;width:10%;aspect-ratio:1;margin:-5% 0 0 -5%;border-radius:50%;opacity:0;background:radial-gradient(closest-side,rgba(231,120,23,.32),rgba(231,120,23,0))}
+@media (prefers-reduced-motion:reduce){.ld.ld-first .ld-real{opacity:1}.ld.ld-first .ld-layers{display:none}}

@@ -19,6 +19,7 @@ import { clamp, REDUCE, STATIC } from '../shared.js';
 import { splitLines } from '../lamp/text.js';
 import { createStage, TIER_ORDER } from './stage.js';
 import { buildStudy, STUDY } from './study.js';
+import { createLogoPlayer } from '../logo-player.js';
 
 const sec = document.getElementById('hs');
 if (sec) start();
@@ -216,13 +217,19 @@ function start() {
     lines: JSON.parse(sec.dataset.lines || '[]'),
   });
   setP(.1);
+  // how long each part of the loading took (ms from the film's start; window.mewritHouse.marks)
+  const marks = { start: Math.round(t0) };   // (start: the film's start, ms from the page's navigation)
+  const mark = n => { marks[n] = Math.round(performance.now() - t0); };
   (async () => {
     await Promise.all([fonts, logoIn]);
+    mark('fonts');
     setP(.3);
     world = createStage(canvas, { tier: TIER_ORDER.includes(askTier) ? askTier : big ? 'high' : 'mid' });
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); console.warn('[house] the 3D context was lost'); });
     world.resize(canvas.clientWidth || W, canvas.clientHeight || H);
+    mark('stage');
     study = buildStudy({ logo, quality: big ? 'high' : 'low', page: pageWords() });
+    mark('study');
     pc = study.pageCentre; pn = study.pageNormal; pSize = study.pageSize;
     world.scene.add(study.group);
     world.addLamp({ at: study.lamp.at, aim: study.lamp.aim, power: 46, angle: .58 });
@@ -233,11 +240,13 @@ function start() {
     setP(.5);
     await nextFrame();
     await world.compile();
+    mark('compile');
     setP(.7);
     await nextFrame();
     world.aim(views().page);
     // the machine's measure: a full frame at this tier; too slow, and the tier steps down (unless asked for)
     benchMs = world.bench(4);
+    mark('bench');
     if (!TIER_ORDER.includes(askTier)) {
       while (world.tier !== 'low' && benchMs > (world.tier === 'high' ? 11 : 15)) {
         world.setTier(TIER_ORDER[TIER_ORDER.indexOf(world.tier) + 1]);
@@ -249,6 +258,7 @@ function start() {
     if (restoring) { window.scrollTo({ top: Math.round(scrollFor(startP)), behavior: 'instant' }); Pr = startP; }
     await nextFrame();
     ready = true; setP(1);
+    mark('ready');
     lastKey = '';
     beginIntro();
   })().catch(err => { console.warn('[house] no 3D:', err); sec.classList.add('hs-nogl'); finishIntro(); });
@@ -258,8 +268,10 @@ function start() {
   const INTRO_MS = REDUCE ? 1 : 1900;
   function beginIntro() {
     const wait = Math.max(0, (REDUCE ? 200 : 2400) - (performance.now() - t0));
-    setTimeout(() => {
+    // (and not before the loader's logo has been written: the camera draws back from a finished page)
+    Promise.all([new Promise(r => setTimeout(r, wait)), loaderDrawn]).then(() => {
       if (STATIC) { finishIntro(); return; }
+      mark('intro');
       if (fromI === 1) {
         // the contents: the camera stands where the 3D screen fills the card, the editor is laid on the
         // screen where the card already is (no jump), the paper clears, and the camera draws back
@@ -283,14 +295,43 @@ function start() {
       root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
       if (veil) veil.classList.add('off');
       wake();
-    }, wait);
+    });
   }
   function finishIntro() {
+    const first = !introDone;
     intro = 1; introDone = true;
     if (page) page.classList.add('quad');
     if (veil) veil.classList.add('off');
     root.classList.add('hs-in', 'hs-done'); root.classList.remove('hs-loading', 'hs-lock');
     wake();
+    if (first) headerDrawing();
+  }
+
+  // ---------- the logo writing itself (version B's pen: src/scripts/logo-player.js) ----------
+  // In the loader, the logo the reader first sees (the title page's letterhead; the display's boot
+  // screen, after which it docks as the document's letterhead) is written by the pen while the house
+  // loads; the letterhead at the top writes itself once the film is in, and again every HEAD_EVERY
+  // (the drawing plays 1.8 times version B's pace here: about two and a half seconds, so the loader is
+  // not held for it)
+  const HEAD_EVERY = 20000, LOGO_SPEED = 1.8;
+  const sheetLogo = page && page.querySelector('.pg-logo.ld'), bootLogo = ed && ed.querySelector('.ed-logo.ld'), headLogo = sec.querySelector('.lp-lh-logo .ld');
+  const players = new Map();
+  const playerOf = el => { if (!el) return null; if (!players.has(el)) players.set(el, createLogoPlayer(el, { speed: LOGO_SPEED })); return players.get(el); };
+  let loaderDrawn = Promise.resolve();
+  if (!STATIC && !REDUCE) {
+    if (fromI === 0 && sheetLogo) loaderDrawn = playerOf(sheetLogo).play();
+    else if (fromI === 1 && bootLogo) loaderDrawn = playerOf(bootLogo).play().then(() => { ed.classList.add('docked'); return new Promise(r => setTimeout(r, 750)); });
+  }
+  let headTimer = 0;
+  function headerDrawing() {
+    if (STATIC || REDUCE || !headLogo) return;
+    clearTimeout(headTimer);
+    const go = () => {
+      // not while the tab is hidden or the letterhead is gone (the night chapters hide the logo)
+      if (document.hidden || getComputedStyle(headLogo.parentElement).opacity === '0') { headTimer = setTimeout(go, HEAD_EVERY); return; }
+      playerOf(headLogo).play({ replay: true }).then(() => { headTimer = setTimeout(go, HEAD_EVERY); });
+    };
+    headTimer = setTimeout(go, 700);   // (once the letterhead has faded in)
   }
 
   // ---------- life at rest, drawn over the kept frame: dust in the window's light, the coffee's steam ----------
@@ -513,7 +554,7 @@ void main() {
 
   window.mewritHouse = {
     get ready() { return ready && introDone; }, get P() { return Pr; }, settle() { Pr = targetP(); lastKey = ''; wake(); }, get stage() { return world; },
-    restP, scrollFor, chapters: CH.map(c => c.id), A: CH[S - 1].A, get bench() { return benchMs; },
+    restP, scrollFor, chapters: CH.map(c => c.id), A: CH[S - 1].A, get bench() { return benchMs; }, marks,
     // review: hold the camera at a pose ({ p, yaw, pitch, fov, sx, sy }), or null to give it back
     probe(p) { probe = p; lastKey = ''; wake(); },
     views, VIEWS,

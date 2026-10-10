@@ -1,0 +1,25 @@
+---
+// The logo, with the layers that let it draw itself (src/scripts/logo-player.js, the drawing of
+// version B's header): the pen pops in, glides to the start of the heartbeat line and writes it, docks
+// back into the logo, and MEDICAL WRITING, TRAINING and HEALTHCARE CONSULTING appear one after
+// another. The layers are the logo's own images, unchanged (the base clipped to its parts, the line's
+// own pixels revealed in the order the pen passes them, the pen cut from the logo); the real logo
+// image is shown whenever no drawing plays.
+import { href } from '../lib/url';
+
+interface Props { class?: string; alt?: string }
+const { class: cls = '', alt = 'MeWriT, Writing Science Right' } = Astro.props;
+const base = href('/brand/logo-base.png');
+---
+<span class={`ld ${cls}`}>
+  <img class="ld-real" src={href('/brand/logo-original.png')} alt={alt} width="1112" height="230">
+  <span class="ld-layers" aria-hidden="true">
+    <img class="ld-part ld-base" src={base} alt="">
+    <img class="ld-part ld-label ld-l1" src={base} alt="">
+    <img class="ld-part ld-label ld-l2" src={base} alt="">
+    <img class="ld-part ld-label ld-l3" src={base} alt="">
+    <canvas class="ld-part ld-ink" width="1112" height="230"></canvas>
+    <span class="ld-glow"></span>
+    <img class="ld-pen" src={href('/brand/pen-cutout.png')} alt="">
+  </span>
+</span>
