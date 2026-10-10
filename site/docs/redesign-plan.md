@@ -334,6 +334,18 @@ What the user said, verbatim, in order:
   - 01, the contents: the display's screen as a card with its navy bezel (in the 3D bezel's proportion). It boots with the original logo at its middle (revealed by the title page's soft wipe), and the logo docks at the document's head as its letterhead. The heading and the five practices follow, written in as the house loads. Then the camera stands where the 3D screen fills the card and draws back to the display.
   - Chapters to come: each loader is that chapter's object, with the logo where it naturally belongs (the dossier's label, the cover letter's head, the letter's head).
 - **The editor's compact setting** (phones) is chosen per window from the display's resting size, so it never changes while the camera moves.
+- **Measured (10 October 2026, production build served locally, 1440x900, the DevTools presets the user pointed to):**
+  - This PC's GPU: first paint 0.24 s, ready 4.9 s; frames while the camera moves: median 7 ms, 90th percentile 7.5 ms.
+  - Mid-tier CPU (3.4x): ready 5.3 s; median 7 ms, 90th percentile 14 ms (smooth).
+  - Low-tier CPU (10.5x): first paint 1.6 s, ready 14.8 s; 90th percentile 55 ms, worst 208 ms. The CPU is the limit: building the room in the browser, and about 26 ms of JavaScript a frame.
+  - Weak GPU (software rendering, SwiftShader): ready 16.6 s; about one frame a second. The bench misjudged it as fast, so the tier stayed high.
+  - Slow 4G with mid-tier CPU: first paint 1.1 s, ready 8.7 s. 3G with mid-tier CPU: first paint 2.7 s, ready 17.2 s. Frames smooth in both.
+  - Hubtown, the user's reference (its public page, loaded as a browser does):
+    - live WebGL2 at the full pixel ratio;
+    - Draco-compressed models (12.4 MB) and KTX2/Basis textures (5.6 MB);
+    - ambient occlusion baked into textures, matcap materials (lighting faked by a texture, no live lights), point clouds and Houdini height fields precomputed;
+    - no video.
+    It is cheap per pixel because everything costly is computed beforehand.
 - **Next, then:** the performance study the user asked for ("we also need to optimze this exteremly well for low performance without losing quality, this is not useful if it cant work on majority of the devices, i have seen heavier sites run smoothly on low performing devices, figure out how they do it and how we can implement it on our site."): how such sites stay smooth, measured against ours under the DevTools presets (CPU 3.4x and 10.5x; Slow 4G, 3G) and a software GPU; then a plan, agreed before building; then step 3, the library hall at night and the walk through the doorway.
 
 What follows from them:

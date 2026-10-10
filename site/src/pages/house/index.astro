@@ -24,10 +24,11 @@ const words = ORDER.map(id => {
   return w;
 });
 const built = words.filter(w => BUILT.includes(w.id));
-// the scroll each chapter takes, in screens (the way from the page out to the study and in to the
-// display takes the most)
-const SPANS: Record<string, number> = { 'title-page': .08, contents: 2.4 };
-const screens = built.reduce((t, w) => t + SPANS[w.id], 0);
+// the scroll each chapter takes, in screens: the move that brings the camera to it, then a short dwell
+// where the camera holds still for reading (long enough to stop on, short enough that scrolling on
+// moves the camera again at once)
+const SCROLL: Record<string, [number, number]> = { 'title-page': [0, .08], contents: [1.6, .35] };
+const screens = built.reduce((t, w) => t + SCROLL[w.id][0] + SCROLL[w.id][1], 0);
 const logo = href('/brand/logo-original.png');
 const links = [
   { label: 'Practices', go: 'contents' }, { label: 'Academy', go: 'training' }, { label: 'Publications', go: 'on-the-record' },
@@ -44,8 +45,8 @@ const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
 // the contents' words are on the display (the editor's document); the chapters to come keep a caption
 const contentsCh = words[1];
 const caps = built.filter(w => !['title-page', 'contents'].includes(w.id));
-// the share of a chapter's scroll its arrival takes (film.js reads it from the section)
-const ARRIVE = .62;
+// each chapter's share of its scroll that is the move (film.js reads the moves and dwells from the section)
+const ARRIVE = built.map(w => { const [m, d] = SCROLL[w.id]; return m / (m + d); });
 ---
 <Base intro="none" theme="light" page="house" title={`${lamp.shortTitle} | ${site.name}`} description={lamp.description}>
   <script is:inline define:vars={{ ids: BUILT, A: ARRIVE, key: 'mewrit-house-place' }}>
@@ -63,7 +64,7 @@ const ARRIVE = .62;
     d.classList.add('hs-loading', 'hs-lock');
     var at = 0, s = null;
     try { s = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
-    if (s && s.P > .02 && Date.now() - s.t < 1800000) { var i = Math.floor(s.P), u = s.P - i; at = i > 0 && u < A / 2 ? i - 1 : i; }
+    if (s && s.P > .02 && Date.now() - s.t < 1800000) { var i = Math.floor(s.P), u = s.P - i; at = i > 0 && u < (A[i] || 0) / 2 ? i - 1 : i; }
     else { var h = ids.indexOf(location.hash.slice(1)); if (h > 0) at = h; }
     at = Math.max(0, Math.min(ids.length - 1, at));
     d.classList.add('hs-from-' + at);
@@ -83,7 +84,7 @@ const ARRIVE = .62;
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
 
-  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-spans={JSON.stringify(built.map(w => SPANS[w.id]))} data-arrive={ARRIVE}>
+  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-scroll={JSON.stringify(built.map(w => SCROLL[w.id]))}>
     <canvas class="hs-canvas" aria-hidden="true"></canvas>
     <div class="hs-track">
       <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">

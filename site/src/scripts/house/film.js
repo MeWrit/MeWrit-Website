@@ -41,12 +41,14 @@ function start() {
 
   // ---------- the chapters built so far ----------
   // view: where the camera rests; via: a view the way passes through (split: the share of the way to
-  // it); hour: the light at rest; spot: the lamp's pool round the page; doc: the editor's document
-  const spans = JSON.parse(sec.dataset.spans || '[.6,2.4]');
+  // it); hour: the light at rest; spot: the lamp's pool round the page; doc: the editor's document.
+  // Each chapter's scroll (screens, from the page): the move that brings the camera to it, then a short
+  // dwell where it holds still; A is the move's share
+  const scroll = JSON.parse(sec.dataset.scroll || '[[0,.08],[1.6,.35]]');
   const CH = [
     { id: 'title-page', view: 'page', hour: 'early', spot: 1, doc: 'draft' },
     { id: 'contents', view: 'display', via: 'wide', split: .46, hour: 'morning', spot: 0, doc: 'contents', menu: true },
-  ].map((c, i) => ({ ...c, span: spans[i] || 1, cap: capEls.find(el => el.dataset.ch === c.id) || null }));
+  ].map((c, i) => { const [move, dwell] = scroll[i] || [1, .3]; return { ...c, span: move + dwell, A: move / (move + dwell), cap: capEls.find(el => el.dataset.ch === c.id) || null }; });
   const S = CH.length;
 
   // ---------- the views ----------
@@ -107,8 +109,8 @@ function start() {
   const lerpPose = (a, b, k) => ({ p: a.p.map((v, j) => mix(v, b.p[j], k)), yaw: mix(a.yaw, b.yaw, k), pitch: mix(a.pitch, b.pitch, k), fov: mix(a.fov, b.fov, k), sx: mix(a.sx, b.sx, k), sy: mix(a.sy, b.sy, k) });
   const poseKey = c => `${c.p[0].toFixed(4)},${c.p[1].toFixed(4)},${c.p[2].toFixed(4)},${c.yaw.toFixed(3)},${c.pitch.toFixed(3)},${c.fov.toFixed(3)},${c.sx.toFixed(4)},${c.sy.toFixed(4)}`;
 
-  // ---------- the scroll: chapter i runs from P = i to i + 1, over its span of screens ----------
-  const A = +sec.dataset.arrive || .62;   // the share of a chapter's scroll its arrival takes
+  // ---------- the scroll: chapter i runs from P = i to i + 1, over its span of screens: its move (the
+  // first A of it), then its dwell ----------
   const starts = [];
   CH.reduce((a, c, i) => { starts[i] = a; return a + c.span; }, 0);
   const total = CH.reduce((a, c) => a + c.span, 0);
@@ -117,10 +119,12 @@ function start() {
   const XofP = P => { const i = Math.min(S - 1, Math.max(0, Math.floor(P))); return starts[i] + (P - i) * CH[i].span; };
   const targetP = () => { const [r, len] = span(); return len <= 0 ? 0 : PofX(clamp(-r.top / len) * total); };
   const scrollFor = P => { const [r, len] = span(); return scrollY + r.top + len * XofP(P) / total; };
-  const restP = i => i === 0 ? 0 : i + (A + 1) / 2;
+  // a chapter's resting place: just into its dwell (a stray touch does not move the camera, and
+  // scrolling back moves it again almost at once)
+  const restP = i => i === 0 ? 0 : i + CH[i].A + (1 - CH[i].A) * .12;
   const at = P => {
-    const i = Math.min(S - 1, Math.max(0, Math.floor(P))), u = Math.min(1, P - i);
-    return i > 0 && u < A ? { i, phase: 0, m: u / A } : { i, phase: 2, m: 0 };
+    const i = Math.min(S - 1, Math.max(0, Math.floor(P))), u = Math.min(1, P - i), a = CH[i].A;
+    return i > 0 && u < a ? { i, phase: 0, m: u / a } : { i, phase: 2, m: 0 };
   };
   // whose words show: the arriving chapter's once the camera is nearly there
   const capOf = st => st.phase !== 0 ? st.i : st.m < .06 ? st.i - 1 : st.m < .8 ? -1 : st.i;
@@ -264,7 +268,7 @@ function start() {
         world.aim(introFrom);
         placeEditor();
         page.classList.add('quad');   // (the title page, on the manuscript below the frame)
-        root.classList.add('hs-in'); root.classList.remove('hs-loading');
+        root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
         if (veil) veil.classList.add('off');
         wake();
         return;
@@ -276,7 +280,7 @@ function start() {
       const q = project4(study.manuscript());
       if (q) page.style.transform = quad(page.offsetWidth, page.offsetHeight, q);
       page.classList.add('quad');
-      root.classList.add('hs-in'); root.classList.remove('hs-loading');
+      root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
       if (veil) veil.classList.add('off');
       wake();
     }, wait);
@@ -439,7 +443,9 @@ void main() {
     }
     // (before the house is ready the film holds still; returning to a place, it follows the scroll from
     // the start; otherwise the title page holds until its intro is done)
-    const Pt = !ready ? Pr : introDone || restoring ? targetP() : 0;
+    // (the page can be scrolled from the moment the camera starts drawing back; the film holds its
+    // place until the intro is done, then follows the scroll smoothly)
+    const Pt = !ready || !introDone ? (restoring ? startP : 0) : targetP();
     Pr = motion ? Pr + (Pt - Pr) * (1 - Math.exp(-dt * 7)) : Pt;   // a light smoothing that never overshoots
     if (Math.abs(Pt - Pr) < 1e-4) Pr = Pt;
     time += dt;
@@ -507,7 +513,7 @@ void main() {
 
   window.mewritHouse = {
     get ready() { return ready && introDone; }, get P() { return Pr; }, settle() { Pr = targetP(); lastKey = ''; wake(); }, get stage() { return world; },
-    restP, scrollFor, chapters: CH.map(c => c.id), A, get bench() { return benchMs; },
+    restP, scrollFor, chapters: CH.map(c => c.id), A: CH[S - 1].A, get bench() { return benchMs; },
     // review: hold the camera at a pose ({ p, yaw, pitch, fov, sx, sy }), or null to give it back
     probe(p) { probe = p; lastKey = ''; wake(); },
     views, VIEWS,
