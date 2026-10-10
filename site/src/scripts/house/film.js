@@ -423,7 +423,7 @@ function start() {
         introStart = performance.now();
         world.aim(introFrom);
         placeLabel();
-        page.classList.add('quad');
+        page.classList.add('quad'); placePage();   // (the title page placed, or hidden, before the paper clears)
         root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
         if (veil) veil.classList.add('off');
         wake();
@@ -436,7 +436,7 @@ function start() {
         introStart = performance.now();
         world.aim(introFrom);
         placeRecord(1);
-        page.classList.add('quad');
+        page.classList.add('quad'); placePage();   // (the title page placed, or hidden, before the paper clears)
         root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
         if (veil) veil.classList.add('off');
         wake();
@@ -449,7 +449,7 @@ function start() {
         introStart = performance.now();
         world.aim(introFrom);
         placeEditor();
-        page.classList.add('quad');   // (the title page, on the manuscript below the frame)
+        page.classList.add('quad'); placePage();   // (the title page, on the manuscript below the frame)
         root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
         if (veil) veil.classList.add('off');
         wake();
