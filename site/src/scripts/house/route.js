@@ -25,13 +25,17 @@ function monotone(t, v) {
   };
 }
 
-// points: the eyes the way passes through, between the two views' own
+// points: the eyes the way passes through, between the two views' own; a point may carry a fourth
+// number, the way the camera faces there (yaw, degrees): the turn then follows the path through those
+// headings (monotone too, so a turn never swings back), instead of going evenly from view to view
 export function route(points, ease = t => .5 - .5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t)))) {
   let key = '', curve = null;
-  function build(a, b) {
+  const turns = points.every(p => p.length > 3);
+  function build(a, b, ya, yb) {
     const P = [a, ...points, b], t = [0];
     for (let i = 1; i < P.length; i++) t.push(t[i - 1] + Math.max(1e-3, Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1], P[i][2] - P[i - 1][2])));
     const f = Array.from({ length: AXES }, (_, j) => monotone(t, P.map(p => p[j])));
+    const yaw = turns ? monotone(t, [ya, ...points.map(p => p[3]), yb]) : null;
     const at = x => f.map(g => g(x));
     // the length along the curve, sampled, so the camera can go at an even pace along it
     const T = t[t.length - 1], ts = [], ls = [0];
@@ -42,19 +46,19 @@ export function route(points, ease = t => .5 - .5 * Math.cos(Math.PI * Math.min(
       if (i) ls.push(ls[i - 1] + Math.hypot(q[0] - prev[0], q[1] - prev[1], q[2] - prev[2]));
       prev = q;
     }
-    curve = { at, ts, ls, L: ls[SAMPLES] };
+    curve = { at, ts, ls, L: ls[SAMPLES], yaw };
   }
   return {
     // the pose a share m (0 to 1) of the way from view a to view b
     pose(a, b, m) {
-      const k = `${a.p.join()}|${b.p.join()}`;
-      if (k !== key) { key = k; build(a.p, b.p); }
+      const k = `${a.p.join()}|${b.p.join()}|${a.yaw || 0}|${b.yaw || 0}`;
+      if (k !== key) { key = k; build(a.p, b.p, a.yaw || 0, b.yaw || 0); }
       const e = ease(m), s = e * curve.L, { ts, ls } = curve;
       let lo = 0, hi = SAMPLES;
       while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (ls[mid] < s) lo = mid; else hi = mid; }
       const x = ts[lo] + (ts[hi] - ts[lo]) * ((s - ls[lo]) / Math.max(1e-9, ls[hi] - ls[lo]));
       const mix = (u, v) => u + (v - u) * e;
-      return { p: curve.at(x), yaw: mix(a.yaw || 0, b.yaw || 0), pitch: mix(a.pitch || 0, b.pitch || 0), fov: mix(a.fov, b.fov), sx: mix(a.sx || 0, b.sx || 0), sy: mix(a.sy || 0, b.sy || 0) };
+      return { p: curve.at(x), yaw: curve.yaw ? curve.yaw(x) : mix(a.yaw || 0, b.yaw || 0), pitch: mix(a.pitch || 0, b.pitch || 0), fov: mix(a.fov, b.fov), sx: mix(a.sx || 0, b.sx || 0), sy: mix(a.sy || 0, b.sy || 0) };
     },
     // where the eye is a share m of the way (for tests: the path's own points)
     length() { return curve ? curve.L : 0; },

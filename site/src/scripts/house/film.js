@@ -25,6 +25,7 @@ import { splitLines } from '../lamp/text.js';
 import { createStage, TIER_ORDER } from './stage.js';
 import { buildStudy, STUDY } from './study.js';
 import { buildHall, HALL, RECORD_TOP } from './hall.js';
+import { buildArchive, ARCHIVE } from './archive.js';
 import { FACE, BAND, CARD, LAYOUT, PX as REC_PX } from './record-layout.js';
 import { route } from './route.js';
 import { bake } from './kit.js';
@@ -85,15 +86,21 @@ function start() {
     { id: 'title-page', view: 'page', hour: 'early', spot: 1, doc: 'draft' },
     { id: 'contents', view: 'display', via: 'wide', split: .46, hour: 'morning', spot: 0, doc: 'contents', menu: true },
     { id: 'on-the-record', view: 'record', walk: 'door', hour: 'evening', spot: 0, doc: 'contents', record: true },
+    { id: 'regulatory-writing', view: 'archive', walk: 'archive', hour: 'night', spot: 0, doc: 'contents', dossier: true, pair: 'hallArchive' },
   ].slice(0, scroll.length).map((c, i) => {
     const [move, dwell, perform = 0] = scroll[i] || [1, .3], span = move + perform + dwell;
     // (02's words are on the record itself; its caption is the source line beneath)
     return { ...c, span, A: move / span, B: (move + perform) / span, cap: capEls.find(el => el.dataset.ch === c.id) || (c.record && recParts ? recParts.note : null) };
   });
-  const S = CH.length, RI = CH.findIndex(c => c.record);
+  const S = CH.length, RI = CH.findIndex(c => c.record), AI = CH.findIndex(c => c.dossier);
   // the walks: from the display, left to the doorway, through it, and on and left into the hall, to the
-  // record (the eyes between the two views')
-  const WALKS = { door: route([[-7.55, 8.8, 3.4], [-7.55, 9, -7.25], [-13.8, 9.1, -16.5]]) };
+  // record (the eyes between the two views'). From the record, turning left (east) toward the door in
+  // the hall's east wall, through it into the archive, to stand looking down the archive's table (each
+  // point's fourth number: the way the camera faces there; every walk round the house turns left once)
+  const WALKS = {
+    door: route([[-7.55, 8.8, 3.4], [-7.55, 9, -7.25], [-13.8, 9.1, -16.5]]),
+    archive: route([[-41, 9.05, -38.5, -22], [-55, 8.7, -48.5, -62], [-64.3, 8.1, -52, -84]]),
+  };
   // where the sun's shadows are drawn (stage.setShadowBox: a centre, half the width across the light,
   // the reach above and below): each room's own box at rest, so its shadows are as fine as the map
   // allows; on a walk from one room to the next the box grows to hold both and then closes on the
@@ -102,15 +109,17 @@ function start() {
     study: { c: [6, 0, -3], hw: 30, top: 24, bottom: -18 },
     both: { c: [-15, 10, -32], hw: 84, top: 70, bottom: -70 },
     hall: { c: [-32.5, 8, -51], hw: 58, top: 42, bottom: -42 },
+    hallArchive: { c: [-58, 6, -52], hw: 70, top: 56, bottom: -56 },
+    archive: { c: [-85, 4, -48], hw: 34, top: 28, bottom: -28 },
   };
   const boxMix = (a, b, k) => ({ c: a.c.map((v, j) => mix(v, b.c[j], k)), hw: mix(a.hw, b.hw, k), top: mix(a.top, b.top, k), bottom: mix(a.bottom, b.bottom, k) });
   const setBox = B => world.setShadowBox(B.c, B.hw, B.top, B.bottom);
   // the box for where the film is: a chapter's room, or on the walk to it
-  const ROOM = { 'title-page': 'study', contents: 'study', 'on-the-record': 'hall' };
+  const ROOM = { 'title-page': 'study', contents: 'study', 'on-the-record': 'hall', 'regulatory-writing': 'archive' };
   function boxFor(st) {
     if (st.phase !== 0 || !CH[st.i].walk) return BOXES[ROOM[CH[st.i].id] || 'study'];
-    const a = BOXES[ROOM[CH[st.i - 1].id] || 'study'], b = BOXES[ROOM[CH[st.i].id] || 'study'];
-    return st.m < .5 ? boxMix(a, BOXES.both, sstep(0, .3, st.m)) : boxMix(BOXES.both, b, sstep(.7, 1, st.m));
+    const a = BOXES[ROOM[CH[st.i - 1].id] || 'study'], b = BOXES[ROOM[CH[st.i].id] || 'study'], both = BOXES[CH[st.i].pair || 'both'];
+    return st.m < .5 ? boxMix(a, both, sstep(0, .3, st.m)) : boxMix(both, b, sstep(.7, 1, st.m));
   }
 
   // ---------- the views ----------
@@ -131,10 +140,17 @@ function start() {
     // plinth, its ends inside the frame
     // (its lettering kept clear of the chapter list down the left, where the list shows: clearList)
     record: { p: [-32.5, 9.2, -32], fov: 40, gap: .035, top: [[-32.5, RECORD_TOP + .5, FACE]], foot: [-32.5, HALL.FLOOR, FACE + .6], safe: [[BAND.x0 - 1.4, 4, FACE], [BAND.x1 + 1.4, 4, FACE]], clearList: true },
+    // 03: in the archive, facing east down its table, the dossier before the camera: from its cover
+    // standing up as it closes to its near edge, the binder open across its width
+    archive: { p: [-66.6, 8.6, ARCHIVE.DOSSIER.z], yaw: -90, fov: 52, gap: .03, top: [[ARCHIVE.DOSSIER.x, 4.4, ARCHIVE.DOSSIER.z]], foot: [ARCHIVE.DOSSIER.x + 2.1, ARCHIVE.TABLE.top, ARCHIVE.DOSSIER.z], safe: [[ARCHIVE.DOSSIER.x, 0, ARCHIVE.DOSSIER.z + 6], [ARCHIVE.DOSSIER.x, 0, ARCHIVE.DOSSIER.z - 3.4]], clearList: true },
   };
   const headRow = () => (76 + 18) / Math.max(1, H);   // the letterhead's foot, and a little air
   function compose(v, capTop) {
-    const [cx, cy, cz] = v.p, tn = q => (cy - q[1]) / (cz - q[2]);
+    // (a view faces south unless it says otherwise: yaw, degrees from -z toward +x; its points are
+    // measured along the way it faces (depth) and across it)
+    const [cx, cy, cz] = v.p, yw = (v.yaw || 0) * Math.PI / 180, fx = Math.sin(yw), fz = -Math.cos(yw);
+    const depth = q => (q[0] - cx) * fx + (q[2] - cz) * fz, across = q => (q[0] - cx) * -fz + (q[2] - cz) * fx;
+    const tn = q => (cy - q[1]) / depth(q);
     // (the view's foot stays above the chapter's words and above the stationery's foot line)
     const topRow = headRow(), footRow = Math.min(capTop, footTop) - v.gap, tTop = Math.min(...v.top.map(tn)), tFoot = tn(v.foot);
     let T = Math.tan(v.fov * Math.PI / 360);
@@ -142,9 +158,9 @@ function start() {
     // (the share of the frame's width the view may use either side of its middle: all of it, or what
     // the chapter list leaves)
     const room = v.clearList && listRight > 0 ? Math.max(.4, 1 - 2 * (listRight + 18) / Math.max(1, W)) : 1;
-    for (const q of v.safe) T = Math.max(T, Math.abs(q[0] - cx) / (cz - q[2]) / aspect * 1.04 / room);
+    for (const q of v.safe) T = Math.max(T, Math.abs(across(q)) / depth(q) / aspect * 1.04 / room);
     T = Math.min(T, Math.tan(35 * Math.PI / 180));
-    return { p: v.p, yaw: 0, pitch: 0, fov: 2 * Math.atan(T) * R2D, sx: 0, sy: .5 + tFoot / (2 * T) - footRow };
+    return { p: v.p, yaw: v.yaw || 0, pitch: 0, fov: 2 * Math.atan(T) * R2D, sx: 0, sy: .5 + tFoot / (2 * T) - footRow };
   }
   // squarely at the page: its height a share of the frame (fill), its centre on a row of the frame
   let pc = null, pn = null, pSize = [2.1, 2.97];
@@ -162,6 +178,7 @@ function start() {
       wide: compose(VIEWS.wide, VIEWS.wide.cap),
       display: compose(VIEWS.display, capTops[1] || .8),
       record: compose(VIEWS.record, capTops[2] || .94),
+      archive: compose(VIEWS.archive, capTops[3] || .8),
     };
   }
   // the sheet the page is shown as while loading: the same squared view, the page filling the sheet
@@ -177,6 +194,14 @@ function start() {
     const u = num('--rc-u') || 20, T = Math.tan(20 * Math.PI / 180), D = Math.max(1, H) / (2 * T * u);
     const cx = num('--rc-x') - s.left + LAYOUT.w * u / 2, cy = num('--rc-y') - s.top + LAYOUT.h * u / 2;
     return { p: [(CARD.x0 + CARD.x1) / 2, (CARD.top + CARD.bottom) / 2, FACE + D], yaw: 0, pitch: 0, fov: 40, sx: cx / Math.max(1, W) - .5, sy: .5 - cy / Math.max(1, H) };
+  }
+  // the label card shown while loading 03: straight above the dossier's label (looking down, its head
+  // away), at the distance where the label's width is the card's, the lens shifted to where the card is
+  function labelCardPose() {
+    const s = stage.getBoundingClientRect(), r = dosLabel.getBoundingClientRect(), L = archive.dossier.label, T = Math.tan(20 * Math.PI / 180);
+    const c = [0, 1, 2].map(j => L.reduce((a, q) => a + q[j], 0) / 4), across = Math.abs(L[0][2] - L[1][2]);
+    const D = across * Math.max(1, H) / (2 * T * Math.max(1, r.width));
+    return { p: [c[0], c[1] + D, c[2]], yaw: -90, pitch: -89.5, fov: 40, sx: (r.left - s.left + r.width / 2) / Math.max(1, W) - .5, sy: .5 - (r.top - s.top + r.height / 2) / Math.max(1, H) };
   }
   // the screen card shown while loading the contents: level with the display's glass, at the distance
   // where the glass fills the card exactly, the lens shifted so it sits where the card is
@@ -270,6 +295,8 @@ function start() {
     CH.forEach((ch, j) => { if (ch.cap) ch.cap.classList.toggle('on', j === c); });
     if (c >= 0) {
       stage.dataset.ch = CH[c].id;
+      // (a chapter at night sets its words in light ink over the dark room; the letterhead stays paper)
+      stage.dataset.dark = CH[c].hour === 'night' ? 'on' : 'off';
       // the address names the chapter (shared, it opens there); the title page keeps the plain address
       try { history.replaceState(null, '', c > 0 ? `#${CH[c].id}` : location.pathname + location.search); } catch (e) { /* sandboxed */ }
       if (lhRun) lhRun.textContent = (CH[c].cap && CH[c].cap.dataset.name) || '';
@@ -278,7 +305,7 @@ function start() {
   }
 
   // ---------- the 3D ----------
-  let world = null, study = null, hall = null, ready = false, benchMs = 0;
+  let world = null, study = null, hall = null, archive = null, ready = false, benchMs = 0;
   const logo = new Image();
   logo.src = sec.dataset.logo;
   // (how far the loading has got, for whichever loader shows: set on the page's root, inherited)
@@ -341,6 +368,12 @@ function start() {
     world.scene.add(hall.group);
     addHallLights();
     mark('hall');
+    // the archive, through the hall's east door (03)
+    archive = buildArchive({ hi: big });
+    bake(archive.group);
+    world.scene.add(archive.group);
+    addArchiveLights();
+    mark('archive');
     world.addLamp({ at: study.lamp.at, aim: study.lamp.aim, power: 46, angle: .58 });
     world.addGlow(study.lamp.bulb, { size: 1.5, k: .85 });
     // the sun's shadows: drawn over the room the camera is in (BOXES), widened on the way between two
@@ -382,6 +415,20 @@ function start() {
     Promise.all([new Promise(r => setTimeout(r, wait)), loaderDrawn]).then(() => {
       if (STATIC) { finishIntro(); return; }
       mark('intro');
+      if (fromI === AI && AI >= 0) {
+        // the archive: the camera stands over the dossier, square above its label, where the 3D label
+        // fills the card (the label is laid on it where the card already is), the paper clears, and the
+        // camera draws back and up to the archive's view
+        introFrom = labelCardPose();
+        introStart = performance.now();
+        world.aim(introFrom);
+        placeLabel();
+        page.classList.add('quad');
+        root.classList.add('hs-in'); root.classList.remove('hs-loading', 'hs-lock');
+        if (veil) veil.classList.add('off');
+        wake();
+        return;
+      }
       if (fromI === RI) {
         // the record: the camera stands where the 3D band fills the card, its words are laid on the band
         // where the card already is (no jump), the paper and the card clear, and the camera draws back
@@ -439,6 +486,8 @@ function start() {
   const HEAD_EVERY = 20000, LOGO_SPEED = 2;
   const sheetLogo = page && page.querySelector('.pg-logo.ld'), bootLogo = ed && ed.querySelector('.ed-logo.ld'), headLogo = sec.querySelector('.lp-lh-logo .ld');
   const crestLogo = recParts && recParts.crest ? recParts.crest.querySelector('.ld') : null;
+  // 03's label (laid on the dossier's cover; on 03's loader, the card)
+  const dos = sec.querySelector('.hs-dos'), dosLabel = dos && dos.querySelector('.dos-label'), dosLogo = dosLabel && dosLabel.querySelector('.ld');
   const players = new Map();
   const playerOf = el => { if (!el) return null; if (!players.has(el)) players.set(el, createLogoPlayer(el, { speed: LOGO_SPEED })); return players.get(el); };
   let loaderDrawn = Promise.resolve();
@@ -446,11 +495,18 @@ function start() {
     if (fromI === 0 && sheetLogo) loaderDrawn = playerOf(sheetLogo).play();
     else if (fromI === 1 && bootLogo) loaderDrawn = playerOf(bootLogo).play().then(() => { ed.classList.add('docked'); return new Promise(r => setTimeout(r, 750)); });
     else if (fromI === RI && crestLogo) loaderDrawn = playerOf(crestLogo).play();
+    else if (fromI === AI && AI >= 0 && dosLogo) loaderDrawn = playerOf(dosLogo).play().then(() => { dos.classList.add('stamped'); return new Promise(r => setTimeout(r, 650)); });
   }
+  // (03's label waits with its logo not yet written, unless its own loader is writing it now; there the
+  // stamp is pressed once the logo is written: house.css)
+  if (dosLogo && !(fromI === AI && !STATIC)) dosLogo.classList.add('ld-first');
+  if (dos && fromI === AI && AI >= 0 && !STATIC) dos.classList.add('on');
   // (02's cartouche waits with its logo not yet written, unless its own loader is writing it now; on the
   // loader's card the headline is typed and the boards follow at once)
   if (crestLogo && !(fromI === RI && !STATIC)) crestLogo.classList.add('ld-first');
-  if (fromI === RI && !STATIC) setTimeout(() => recArrive(true), 260);
+  // (on 02's own loader the words are still: the headline whole, the figures at their full counts; only
+  // the logo is drawn)
+  if (fromI === RI && !STATIC && rec) setTimeout(() => { recArrived = crestArrived = true; rec.classList.add('typed'); }, 0);
 
   // ---------- the stationery's foot: its button opens and closes it; at the film's end it opens by itself
   // (and closes again when the reader scrolls back, unless the reader opened it) ----------
@@ -511,6 +567,28 @@ function start() {
     hallGlows.forEach(g => { g.s.material.opacity = g.k * on; });
     pools.forEach(p => { p.material.opacity = .42 * on; });
     bayGlows.forEach((s, b) => { s.material.opacity = .85 * on * Math.min(1, (shares ? shares[b] : fill) * 3); });
+    world.dirty = true;
+  }
+
+  // ---------- the archive's lamps: the two pendants over its table (the first lights the dossier, with its
+  // shadows), their glows, a warm light for the room; on as the reader walks in ----------
+  let arcLights = [], arcRoom = null;
+  const arcGlows = [];
+  function addArchiveLights() {
+    arcLights = archive.lamps.map(([x, y, z], i) => world.addLamp({ at: [x, y - .2, z], aim: [i === 0 ? ARCHIVE.DOSSIER.x : x, ARCHIVE.TABLE.top, z], power: i === 0 ? 46 : 34, angle: 1.0, penumbra: .75, decay: 1.25, shadow: i === 0, color: '#FFD6A0' }));
+    arcLights.forEach(l => world.setLampK(l, 0));
+    arcRoom = new THREE.PointLight('#FFCF98', 0, 90, 1);
+    arcRoom.position.set(-84, 15, -46);
+    world.scene.add(arcRoom);
+    archive.pendants.forEach(p => arcGlows.push(world.addGlow(p, { size: 4.2, k: 0, color: '#FFE0B0' })));
+  }
+  const arcState = { on: -1 };
+  function archiveLamps(on) {
+    if (!archive || Math.abs(on - arcState.on) < 1e-4) return;
+    arcState.on = on;
+    arcLights.forEach(l => world.setLampK(l, on));
+    arcRoom.intensity = 40 * on;
+    arcGlows.forEach(s => { s.material.opacity = .85 * on; });
     world.dirty = true;
   }
 
@@ -638,26 +716,72 @@ void main() {
   // set out at REC_PX to a unit); shown once the camera is through the doorway, so they are never drawn
   // over the study's wall
   if (recParts) [recParts.crest, recParts.frieze, ...recParts.boards].forEach((el, j) => { const r = j === 0 ? LAYOUT.crest : j === 1 ? LAYOUT.frieze : LAYOUT.boards[j - 2]; if (el) { el.style.width = `${r.w * REC_PX}px`; el.style.height = `${r.h * REC_PX}px`; } });
-  const recState = { tf: [], vis: '' };
+  // (seen from the study the record shows through the doorway: its words are laid on it from then on,
+  // cut to the doorway's opening, so they are never drawn over the study's wall; recSeen: whether the
+  // frieze is in the frame and in sight, for its words' arrival)
+  const recState = { tf: [], vis: '', clip: '' };
+  let recSeen = false, crestSeen = false;
+  const D0 = STUDY.DOOR, DZ = STUDY.WALL - .25, doorPts = [[D0.x0, D0.top, DZ], [D0.x1, D0.top, DZ], [D0.x1, STUDY.FLOOR, DZ], [D0.x0, STUDY.FLOOR, DZ]];
+  const inside = (pt, poly) => { let s = 0; for (let i = 0; i < poly.length; i++) { const a = poly[i], b = poly[(i + 1) % poly.length], c = (b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0]); if (c !== 0) { if (s && Math.sign(c) !== s) return false; s = Math.sign(c); } } return true; };
   function placeRecord(vis) {
     if (!recParts || !hall) return;
     if (fromI === RI && !introStart && !introDone) return;   // (the words are the loader's card until its intro begins)
+    let clip = 'none', d = null;
+    if (vis > 0 && inStudy()) {
+      d = project4(doorPts);
+      if (d) clip = `polygon(${d.map(p => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(',')})`; else vis = 0;
+    }
+    // (in sight: its middle inside the frame below the letterhead and above the foot line, and through
+    // the doorway when the camera is in the study)
+    const top = headRow() * H, foot = footTop * H;
+    const sighted = qs => { if (vis <= 0) return false; const q = project4(qs); if (!q) return false; const c = [(q[0][0] + q[2][0]) / 2, (q[0][1] + q[2][1]) / 2]; return c[0] > 0 && c[0] < W && c[1] > top && c[1] < foot && (!d || inside(c, d)); };
+    recSeen = sighted(hall.frieze); crestSeen = sighted(hall.crest);
+    if (recState.clip !== clip) { recState.clip = clip; rec.style.clipPath = clip; }
     const els = [recParts.crest, recParts.frieze, ...recParts.boards], quads = [hall.crest, hall.frieze, ...hall.boards];
     if (vis > 0) els.forEach((el, j) => { if (!el) return; const q = project4(quads[j]); const tf = q ? quad(el.offsetWidth, el.offsetHeight, q) : 'scale(0)'; if (recState.tf[j] !== tf) { recState.tf[j] = tf; el.style.transform = tf; } });
     const v = vis.toFixed(3);
     if (recState.vis !== v) { recState.vis = v; rec.style.opacity = v; rec.style.visibility = vis > 0 ? 'visible' : 'hidden'; }
   }
-  // 02's words arrive with the reader: the pen writes the cartouche's logo, the headline is typed, the
-  // boards follow (house.css); when the reader leaves, all are made ready to arrive again
-  let recArrived = false;
+  // 02's words arrive each on its own, as it comes into sight: the headline is typed when the frieze
+  // does, the pen writes the cartouche's logo when the cartouche does (the boards need neither: their
+  // figures count as their bays fill); when the reader leaves, each is made ready to arrive again
+  let recArrived = false, crestArrived = false;
   function recArrive(on) {
     if (!rec || on === recArrived) return;
     recArrived = on;
     rec.classList.toggle('typed', on);
     typeHeadline(on);
+  }
+  function crestArrive(on) {
+    if (!rec || on === crestArrived) return;
+    crestArrived = on;
     const p = crestLogo ? playerOf(crestLogo) : null;
     if (!p) return;
     if (on) { if (REDUCE) p.settle(); else p.play(); } else p.reset();
+  }
+
+  // 03: the dossier's label, laid on its closed cover once the cover has closed (the pen writes the logo,
+  // the stamp is pressed: house.css); shown only while the camera is in the archive
+  // (on 03's own loader the label is already on, its logo written: the intro does not write it again)
+  const dosState = { tf: '', on: fromI === AI && !STATIC, vis: '' };
+  function placeLabel() {
+    if (!dos || !archive) return;
+    if (fromI === AI && !introStart && !introDone) return;   // (the label is the loader's card until its intro begins)
+    const here = world.camera.position.x < ARCHIVE.X1 - .5, closed = dosK >= archive.dossier.closeAt - .005;
+    const q = here && closed ? project4(archive.dossier.label) : null;
+    if (q) { const tf = quad(dosLabel.offsetWidth, dosLabel.offsetHeight, q); if (dosState.tf !== tf) { dosState.tf = tf; dosLabel.style.transform = tf; } }
+    const vis = q ? 'visible' : 'hidden';
+    if (dosState.vis !== vis) { dosState.vis = vis; dosLabel.style.visibility = vis; }
+    const on = !!q;
+    if (on !== dosState.on) {
+      dosState.on = on;
+      dos.classList.toggle('on', on);
+      const p = dosLogo ? playerOf(dosLogo) : null;
+      // (the stamp is pressed once the logo is written)
+      if (!on) { dos.classList.remove('stamped'); if (p) p.reset(); }
+      else if (!p || REDUCE) { if (p) p.settle(); dos.classList.add('stamped'); }
+      else p.play().then(() => { if (dosState.on) dos.classList.add('stamped'); });
+    }
   }
 
   // the figures count up as their bays fill (a bay not begun shows its words only)
@@ -694,7 +818,7 @@ void main() {
   }
 
   // ---------- every frame ----------
-  let Pr = startP, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null, recShares = null;
+  let Pr = startP, time = 0, last = 0, raf = 0, lastKey = '', lastShow = 0, probe = null, recShares = null, dosK = 0;
   function frame(dt, now) {
     if (glide) {
       const t = clamp((now - glide.t0) / glide.dur);
@@ -710,13 +834,16 @@ void main() {
     if (Math.abs(Pt - Pr) < 1e-4) Pr = Pt;
     time += dt;
     const st = at(Math.min(Pr, S - 1e-6));
-    if (introDone) activate(capOf(st));
+    // (while a chapter's loader plays and the camera draws back, the list already names that chapter)
+    if (introDone) activate(capOf(st)); else if (introStart) activate(fromI);
     // the scroll cue: at the title page only, until the reader scrolls
     const cue = introDone && Pt < .02 && !glide ? 'on' : 'off';
     if (stage.dataset.cue !== cue) stage.dataset.cue = cue;
     // and at the record, while it fills (from the moment the camera settles before it)
     const stP = at(Math.min(Pr, S - 1e-6));
-    const fillCue = introDone && !glide && RI >= 0 && stP.i === RI && ((stP.phase === 0 && stP.m > .94) || (stP.phase === 1 && stP.k < .985)) ? 'on' : 'off';
+    // (and at the archive while the dossier is made: each chapter that performs says so in its own words)
+    const performing = introDone && !glide && (stP.i === RI || stP.i === AI) && ((stP.phase === 0 && stP.m > .94) || (stP.phase === 1 && stP.k < .985));
+    const fillCue = !performing ? 'off' : stP.i === RI ? 'on' : 'dos';
     if (stage.dataset.fill !== fillCue) stage.dataset.fill = fillCue;
     // 02's words: they arrive with the reader (once the camera is nearly before the record) and are made
     // ready to arrive again when the reader walks away
@@ -724,10 +851,13 @@ void main() {
     // typed and the logo written while the camera is still on its way; the shelves fill only once it has
     // stopped before them)
     if (rec && RI >= 0) {
-      const cz = world ? world.camera.position.z : 0;
-      const here = !introDone ? fromI === RI : stP.i === RI && (stP.phase > 0 || cz < -14);
-      const away = !introDone ? fromI !== RI : stP.i !== RI || (stP.phase === 0 && cz > -11);
+      // (walking on from the record, its words stay on it while it is in view: neither here nor away)
+      const leaving = stP.i === RI + 1 && stP.phase === 0;
+      const here = !introDone ? fromI === RI : (stP.i === RI && (stP.phase > 0 || recSeen)) || leaving;
+      const away = !introDone ? fromI !== RI : !leaving && (stP.i !== RI || (stP.phase === 0 && !recSeen && stP.m < .3));
       if (here) recArrive(true); else if (away) recArrive(false);
+      const crestHere = !introDone ? fromI === RI : (stP.i === RI && (stP.phase > 0 || crestSeen)) || leaving;
+      if (crestHere) crestArrive(true); else if (away) crestArrive(false);
     }
     // the foot opens by itself at the film's end
     if (foot) {
@@ -735,7 +865,7 @@ void main() {
       if (atEnd && !footBy) setFoot(true, 'end'); else if (!atEnd && footBy === 'end') setFoot(false);
     }
     // coming back to 02: on the loader's card the figures count, bay by bay, as the house loads
-    if (!introStart && !introDone && RI >= 0 && fromI === RI) { loaderK = Math.min(loadP, loaderK + dt * .55); countUp(counts.map((c, b) => clamp(loaderK * counts.length - b))); }
+    if (!introStart && !introDone && RI >= 0 && fromI === RI) countUp(counts.map(() => 1));
     if (!world || !ready) return true;
     // the intro: from the sheet back to the title page
     if (!introDone && introStart) {
@@ -780,6 +910,16 @@ void main() {
       hallLamps(on, fill, recShares);
       countUp(recShares);
     }
+    // the archive: its lamps come on as the reader walks in; the dossier is made as 03 performs
+    if (archive && AI >= 0) {
+      const ci = introDone ? st.i : fromI;
+      const on = probe && probe.lamps !== undefined ? probe.lamps : ci > AI ? 1 : ci < AI ? 0 : !introDone || st.phase > 0 ? 1 : sstep(.4, .85, st.m);
+      archiveLamps(on);
+      const dk = probe && probe.dossier !== undefined ? probe.dossier : !introDone ? (fromI >= AI ? 1 : 0) : ci > AI ? 1 : ci < AI || st.phase === 0 ? 0 : st.k;
+      // (its pieces cast the lamp's shadows: drawn again as they move)
+      if (archive.dossier.set(dk)) world.shadowsDirty();
+      dosK = dk;
+    }
     const key = `${poseKey(cam)}|${spot.toFixed(4)}`, moved = key !== lastKey;
     watch(dt * 1000, moved);   // (before drawing: a change of tier is drawn in this same frame)
     let show = false;
@@ -792,8 +932,10 @@ void main() {
       // (the record's words as a chapter's words come: once the camera is nearly there, and only ever
       // with it through the doorway)
       // (on the walk they show as the record comes into the frame, the camera through the doorway)
-      const recVis = probe ? 1 : !introDone ? (fromI === RI ? 1 : 0) : st.i !== RI ? 0 : 1;
-      placeRecord(recVis * sstep(-9.5, -15, cam.p[2]));
+      // (and walking on to the archive they stay on the record until the camera is through the door)
+      const recVis = probe ? 1 : !introDone ? (fromI === RI ? 1 : 0) : st.i === RI || (st.i === RI + 1 && st.phase === 0) ? 1 : 0;
+      placeRecord(recVis * sstep(ARCHIVE.X1 + .2, ARCHIVE.X1 + 2.5, cam.p[0]));
+      placeLabel();
       show = true;
     }
     life(time, 1 - spot * .8);

@@ -23,7 +23,7 @@ import '../../styles/house.css';
 // the chapters of the house, in order (How we work is removed, section 11.4); built so far: the title
 // page and the contents (step 2), on the record (step 3: the walk into the hall)
 const ORDER = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory', 'correspondence'];
-const BUILT = ['title-page', 'contents', 'on-the-record'];
+const BUILT = ['title-page', 'contents', 'on-the-record', 'regulatory-writing'];
 const words = ORDER.map(id => {
   const w = lamp.chapters.find(c => c.id === id);
   if (!w) throw new Error(`house: no words for the chapter "${id}"`);
@@ -33,7 +33,7 @@ const built = words.filter(w => BUILT.includes(w.id));
 // the scroll each chapter takes, in screens: the move that brings the camera to it, then a short dwell
 // where the camera holds still for reading (long enough to stop on, short enough that scrolling on
 // moves the camera again at once), and for 02 between the two the record's filling, the camera still
-const SCROLL: Record<string, number[]> = { 'title-page': [0, .08], contents: [1.6, .35], 'on-the-record': [2.2, .3, .85] };
+const SCROLL: Record<string, number[]> = { 'title-page': [0, .08], contents: [1.6, .35], 'on-the-record': [2.2, .3, .85], 'regulatory-writing': [2.0, .3, .9] };
 const screens = built.reduce((t, w) => t + SCROLL[w.id].reduce((a, v) => a + v, 0), 0);
 // 02's figures, from its line ("100+ trial documents, 30+ clinical study reports, ..."): each a number,
 // its "+", its words
@@ -104,6 +104,14 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
       d.style.setProperty('--rc-s', u / band[2]);
       d.style.setProperty('--rc-x', ((W2 - band[0] * u) / 2) + 'px');
       d.style.setProperty('--rc-y', ((H2 + 76 - band[1] * u) / 2) + 'px');
+    }
+    if (at === 3) {
+      // the dossier's label on its navy cover as a card on the paper (the label set out 460 by 300 px,
+      // the cover round it 600 by 680, the label 70 px in and 100 px down), as large as the window allows
+      var W3 = innerWidth, H3 = innerHeight, s3 = Math.min(W3 * .62 / 600, (H3 - 230) / 680);
+      d.style.setProperty('--dl-s', s3);
+      d.style.setProperty('--dl-x', (W3 / 2 - 230 * s3) + 'px');
+      d.style.setProperty('--dl-y', ((H3 + 76) / 2 - 240 * s3) + 'px');
     }
     setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
   })();
@@ -190,6 +198,19 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
             <p class="rec-note">{lamp.footnote}</p>
             <!-- while the record fills: the scroll goes on, as the title page's cue says (gone once it is full) -->
             <div class="rec-cue" aria-hidden="true"><span>Scroll to fill the shelves</span><i></i></div>
+          </div>
+        )}
+
+        <!-- 03, regulatory writing: the dossier's label, laid on its closed cover by film.js (the logo, the
+             module, the stamp); and while the dossier is made, the cue to scroll on -->
+        {BUILT.includes('regulatory-writing') && (
+          <div class="hs-dos" aria-hidden="true">
+            <div class="dos-label">
+              <LogoDraw class="dos-logo" />
+              <p class="dos-mod">Module 2.7<span>Clinical summary</span></p>
+              <p class="dos-stamp">Validated <b>✓</b></p>
+            </div>
+            <div class="rec-cue dos-cue"><span>Scroll to bind the dossier</span><i></i></div>
           </div>
         )}
 

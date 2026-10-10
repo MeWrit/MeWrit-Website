@@ -90,7 +90,13 @@ export function buildHall({ hi = true } = {}) {
     G.add(shadows(new THREE.Mesh(g, wallMat)));
   }
   // east, south, north (beside the study, and above it); the study's own back wall closes the rest
-  G.add(shadows(at(box(T, TOP - FLOOR, D + 2 * T, wallMat), X0 - T / 2, (FLOOR + TOP) / 2, (Z0 + Z1) / 2)));
+  // (east: open where the door to the archive stands: the wall in three pieces round it)
+  {
+    const DR = HALL.DOOR, zN = DR.z + DR.w / 2, zS = DR.z - DR.w / 2, zA = Z0 + T, zB = Z1 - T;
+    G.add(shadows(at(box(T, TOP - FLOOR, zA - zN, wallMat), X0 - T / 2, (FLOOR + TOP) / 2, (zA + zN) / 2)));
+    G.add(shadows(at(box(T, TOP - FLOOR, zS - zB, wallMat), X0 - T / 2, (FLOOR + TOP) / 2, (zS + zB) / 2)));
+    G.add(shadows(at(box(T, TOP - DR.top, DR.w, wallMat), X0 - T / 2, (DR.top + TOP) / 2, DR.z)));
+  }
   G.add(shadows(at(box(W + 2 * T, TOP - FLOOR, T, wallMat), (X0 + X1) / 2, (FLOOR + TOP) / 2, Z1 - T / 2)));
   G.add(shadows(at(box(-26.5 - (X0 - T), 15.5 - FLOOR, .5, wallMat), (X0 - T - 26.5) / 2, (FLOOR + 15.5) / 2, Z0 + .25)));
   G.add(shadows(at(box(W + 2 * T, TOP - 15.5, .5, wallMat), (X0 + X1) / 2, (15.5 + TOP) / 2, Z0 + .25)));
@@ -154,14 +160,16 @@ export function buildHall({ hi = true } = {}) {
     const { w } = HALL.WIN, edges = [Z0 - .4, ...HALL.WINS.flatMap(c => [c + w / 2 + 1.1, c - w / 2 - 1.1]), Z1 + 2.6];
     for (let i = 0; i + 1 < edges.length; i += 2) { const a1 = edges[i], a0 = edges[i + 1]; if (a1 - a0 > 4) bookcase({ along: 'z', a0, a1, face: X1, dir: -1, height: 28, shelves: 9, depth: 1.6 }); }
   }
-  // the door to the archive (closed for now: the archive is the next room to be built), its architrave
+  // the doorway to the archive (its door stands open on the archive's side: archive.js), its architrave
+  // and the reveal's lining through the wall
   {
-    const z = DR.z, w = .6, panelMat = mat('#E1D8C6', { r: .72 });
+    const z = DR.z, w = .6;
     G.add(at(rbox(.16, DR.top - FLOOR + w, w, .04, trim), X0 + .08, (FLOOR + DR.top + w) / 2, z - DR.w / 2 - w / 2), at(rbox(.16, DR.top - FLOOR + w, w, .04, trim), X0 + .08, (FLOOR + DR.top + w) / 2, z + DR.w / 2 + w / 2));
     G.add(at(rbox(.16, w, DR.w + 2 * w, .04, trim), X0 + .08, DR.top + w / 2, z));
-    G.add(at(rbox(.3, DR.top - FLOOR, DR.w, .05, mat('#E8E0D0', { r: .7 })), X0 + .15, (FLOOR + DR.top) / 2, z));
-    for (const [fy, fh] of [[.68, .5], [.22, .3]]) for (const dz of [-DR.w / 4, DR.w / 4]) G.add(at(rbox(.06, (DR.top - FLOOR) * fh * .85, DR.w * .36, .03, panelMat), X0 + .32, FLOOR + (DR.top - FLOOR) * fy, z + dz));
-    for (const dz of [-.5, .5]) G.add(at(cyl(.13, .13, .45, brass, 14), X0 + .45, FLOOR + 9.5, z + dz, { z: Math.PI / 2 }));
+    for (const dz of [-1, 1]) G.add(at(box(T + .1, DR.top - FLOOR, .08, trim), X0 - T / 2, (FLOOR + DR.top) / 2, z + dz * (DR.w / 2 - .04)));
+    G.add(at(box(T + .1, .08, DR.w, trim), X0 - T / 2, DR.top - .04, z));
+    // the threshold
+    G.add(at(rbox(T + .6, .12, DR.w, .03, darkOak), X0 - T / 2, FLOOR + .06, z));
   }
   // the doorway from the study: its architrave on this side
   {
