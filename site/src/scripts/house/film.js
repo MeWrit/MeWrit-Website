@@ -126,6 +126,9 @@ function start() {
     // from the reading stand: a turn to the left (north), across to the north door, through it into the lecture
     // room, and on to the back of its seats, looking up the room to the stage
     lecture: route([[-147.5, 8.6, -45, -150], [-151.4, 8.8, -34, -180], [-151.4, 9.6, -25, -182], [-138, 12, -24.2, -180]]),
+    // (on a phone, its narrow screen: turned to the door sooner, so the doorway leads the way and the bookcases
+    // beside it pass at the screen's edges, never across it)
+    lecturePhone: route([[-147.2, 8.7, -45.5, -170], [-151.4, 8.8, -35, -180], [-151.4, 9.6, -25, -182], [-138, 12, -24.2, -180]]),
   };
   // where the sun's shadows are drawn (stage.setShadowBox: a centre, half the width across the light,
   // the reach above and below): each room's own box at rest, so its shadows are as fine as the map
@@ -479,11 +482,15 @@ function start() {
       const a = CH[st.i - 1], b = CH[st.i];
       if (b.walk) {
         // a walk: one continuous way through its points (route.js), the day going as it goes
-        cam = WALKS[b.walk].pose(V[restView(a)], V[b.view], st.m); hA = a.hour; hB = b.hour; hK = easeSine(st.m); spot = 0;
+        cam = ((tall() && WALKS[b.walk + 'Phone']) || WALKS[b.walk]).pose(V[restView(a)], V[b.view], st.m); hA = a.hour; hB = b.hour; hK = easeSine(st.m); spot = 0;
       } else if (b.via) {
         if (st.m < b.split) { const k = easeSine(st.m / b.split); cam = lerpPose(V[restView(a)], V[b.via], k); hA = a.hour; hB = b.hour; hK = k; spot = a.spot * (1 - k); }
         else { const k = easeSine((st.m - b.split) / (1 - b.split)); cam = lerpPose(V[b.via], V[b.view], k); hA = b.hour; spot = 0; }
       } else { const k = easeSine(st.m); cam = lerpPose(V[restView(a)], V[b.view], k); hA = a.hour; hB = b.hour; hK = k; spot = mix(a.spot, b.spot, k); }
+      // (on a phone the views at either end are close, narrow lenses: walked with, the room's bookcases and doors
+      // passed on the way filled the screen and looked walked through. On the way the lens opens to a walker's
+      // own width, 72 degrees, and closes again as the camera arrives)
+      if (tall() && cam.fov < 72) cam = { ...cam, fov: cam.fov + (72 - cam.fov) * Math.sin(Math.PI * st.m) };
       // (the display's document changes on the way, unless both chapters keep the same one)
       const d = sstep(.55, .85, st.m); docMix[a.doc] = 1 - d; docMix[b.doc] = (docMix[b.doc] || 0) + d;
     } else {
