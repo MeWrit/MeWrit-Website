@@ -129,6 +129,8 @@ function start() {
     // (on a phone, its narrow screen: turned to the door sooner, so the doorway leads the way and the bookcases
     // beside it pass at the screen's edges, never across it)
     lecturePhone: route([[-147.2, 8.7, -45.5, -170], [-151.4, 8.8, -35, -180], [-151.4, 9.6, -25, -182], [-138, 12, -24.2, -180]]),
+    // (and from 03's desk, where a phone's view stands close and low: rising over the desk first)
+    readingPhone: route([[-85, 9.6, -52, -90], [-104, 8.4, -52, -90], [-112, 8.3, -52, -90]]),
   };
   // where the sun's shadows are drawn (stage.setShadowBox: a centre, half the width across the light,
   // the reach above and below): each room's own box at rest, so its shadows are as fine as the map
@@ -691,6 +693,13 @@ function start() {
     for (let i = 1; i < pts.length; i++) pts[i].yaw = pts[i - 1].yaw + ((((pts[i].yaw - pts[i - 1].yaw) % 360) + 540) % 360 - 180);
     const arc = list => { const s = [0]; for (let i = 1; i < list.length; i++) { const a = list[i - 1], b = list[i]; s.push(s[i - 1] + Math.hypot(a.p[0] - b.p[0], a.p[1] - b.p[1], a.p[2] - b.p[2]) + Math.hypot(a.yaw - b.yaw, a.pitch - b.pitch) / 3.6); } return s; };   // (a turn counts as distance: 90 degrees as 25 units, so the camera never spins)
     const s0 = arc(pts), L0 = s0[s0.length - 1];
+    // (one lens through the flight: the views it passes have lenses of their own, close and wide in turn, and the
+    // picture seemed to breathe in and out as it flew. The lens goes from where it starts to a steady one, holds
+    // it, and goes to the landing's own over the flight's last stretch; the picture's shift likewise to none)
+    {
+      const FL = tall() ? 64 : 58;
+      pts.forEach((q, i) => { const u = L0 > 0 ? s0[i] / L0 : 0, k = Math.min(sstep(0, .14, u), 1 - sstep(.86, 1, u)); q.fov += (FL - q.fov) * k; q.sx *= 1 - k; q.sy *= 1 - k; });
+    }
     // (each sample against its neighbours within three widths only, outward from it: quick even for a
     // long flight, so the flight starts at once)
     const smooth = (get, sig) => pts.map((_, i) => {
