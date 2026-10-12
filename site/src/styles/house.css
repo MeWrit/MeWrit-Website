@@ -133,7 +133,7 @@ html.hs-loading .hs-index{display:none}
   .hs-stage .lh-run .n{margin-right:6px;font-size:.92rem}
   .lh-idx{flex:none;padding:9px 10px;border-color:rgba(19,36,79,.18)}
   .lh-idx span{display:none}
-  .hs-bar{height:14px}
+  .hs-bar{height:24px}
   .hs-bar ol{gap:4px}
   .hs-bar .sg{bottom:2px;height:3px}
   .hs-index{z-index:9;inset:0;top:0;right:0;width:auto;max-height:none;border:0;border-radius:0;background:#F6F2EA;box-shadow:none;transform:translateY(12px)}
