@@ -66,8 +66,6 @@ const tw = title.headline.split(' ');
 let cut = 1, best = Infinity;
 for (let i = 1; i < tw.length; i++) { const d = Math.abs(tw.slice(0, i).join(' ').length - tw.slice(i).join(' ').length); if (d < best) { best = d; cut = i; } }
 const titleLines = tw.length > 1 ? [tw.slice(0, cut).join(' '), tw.slice(cut).join(' ')] : [title.headline];
-// the page's body: the widths of its typeset lines (the third is highlighted, as a reviewer marks it)
-const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
 // the contents' words are on the display (the editor's document); the chapters to come keep a caption
 const contentsCh = words[1];
 const caps = built.filter(w => !['title-page', 'contents', 'on-the-record'].includes(w.id));
@@ -154,7 +152,7 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
 
-  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-scroll={JSON.stringify(built.map(w => SCROLL[w.id]))}>
+  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-scroll={JSON.stringify(built.map(w => SCROLL[w.id]))}>
     <canvas class="hs-canvas" aria-hidden="true"></canvas>
     <div class="hs-track">
       <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">
@@ -428,7 +426,9 @@ const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / L
           <i class="pg-rule" aria-hidden="true"></i>
           <h1 class="pg-title">{titleLines.map(l => <span>{l}</span>)}</h1>
           <p class="pg-sub">{title.line}</p>
-          <span class="pg-lines" aria-hidden="true">{LINES.map((w, i) => <i class={i === 2 ? 'hl' : undefined} style={`--i:${i};--w:${w}`}></i>)}</span>
+          <!-- (the page's body: what MeWriT writes, in the practices' own lines, the reviewer's highlight on what
+               holds it together; set as the page's type, revealed as the house loads: plan 11.21) -->
+          <p class="pg-body">Protocols, clinical study reports, CTD modules and responses to regulators. Original research, reviews and posters, written to ICMJE and GPP. Consensus documents and expert statements. Hands-on workshops, basic to advanced. <mark>Every claim checked against its source.</mark></p>
           {title.action && <a class="pg-begin" href="#contents" data-go="1">{title.action.label}<i aria-hidden="true">{'↓'}</i></a>}
           <span class="pg-mark" aria-hidden="true">final ✓</span>
           <p class="pg-foot" aria-hidden="true">MeWriT · Title page · 1</p>

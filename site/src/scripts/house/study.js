@@ -291,11 +291,6 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     const u = w / 100;
     c.textBaseline = 'top';
     c.fillStyle = '#B4500F'; c.fillRect(10 * u, 21.5 * u, 80 * u, .4 * u);
-    (page.lines || []).forEach((lw, i) => {
-      const y = 74 * u + i * 4.2 * u;
-      if (i === 2) { c.fillStyle = 'rgba(224,168,46,.35)'; roundRect(c, 9.3 * u, y - .7 * u, 80 * u * lw + 1.4 * u, 2.5 * u, 1.2 * u); c.fill(); }
-      c.fillStyle = 'rgba(19,36,79,.2)'; roundRect(c, 10 * u, y, 80 * u * lw, 1.1 * u, .55 * u); c.fill();
-    });
     c.save(); c.translate(89 * u, 115.5 * u); c.rotate(-5 * Math.PI / 180); c.font = `600 ${5 * u}px Caveat, cursive`; c.fillStyle = '#B4500F'; c.textAlign = 'right'; c.fillText('final ✓', 0, 0); c.restore();
     c.fillStyle = 'rgba(19,36,79,.18)'; c.fillRect(10 * u, 131 * u, 80 * u, .2 * u);
     c.font = `500 ${1.45 * u}px ${SERIF}`; c.fillStyle = 'rgba(19,36,79,.5)'; c.textAlign = 'center'; if ('letterSpacing' in c) c.letterSpacing = `${.3 * u}px`; c.fillText((page.foot || '').toUpperCase(), 50 * u, 133 * u);
@@ -311,6 +306,20 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     let line = '', y = 52.9 * u;
     for (const word of (page.sub || '').split(' ')) { const t = line ? `${line} ${word}` : word; if (c.measureText(t).width > 74 * u && line) { c.fillText(line, 10 * u, y); y += 5.25 * u; line = word; } else line = t; }
     if (line) c.fillText(line, 10 * u, y);
+    // the body: what MeWriT writes, set in the page's type, the reviewer's highlight behind its last words
+    if (page.body) {
+      c.font = `400 ${2.7 * u}px ${SERIF}`;
+      const words = page.body.text.split(/\s+/), markAt = page.body.mark ? page.body.text.indexOf(page.body.mark) : -1;
+      let x = 10 * u, yy = 72.4 * u, pos = 0;
+      for (const word of words) {
+        const ww = c.measureText(word).width, sp = c.measureText(' ').width;
+        if (x > 10 * u && x + ww > 90 * u) { x = 10 * u; yy += 4.37 * u; }
+        const at = page.body.text.indexOf(word, pos); pos = at + word.length;
+        if (markAt >= 0 && at >= markAt) { c.fillStyle = 'rgba(224,168,46,.42)'; c.fillRect(x - .2 * u, yy + .35 * u, ww + sp, 3.05 * u); }
+        c.fillStyle = 'rgba(19,36,79,.82)'; c.fillText(word, x, yy);
+        x += ww + sp;
+      }
+    }
     if (page.begin) {
       c.font = `italic 400 ${3.8 * u}px ${SERIF}`; c.fillStyle = '#13244F'; c.fillText(page.begin, 10 * u, 118 * u);
       const bw = c.measureText(page.begin).width; c.fillStyle = '#B4500F'; c.font = `400 ${3.8 * u}px ${SERIF}`; c.fillText('↓', 10 * u + bw + 1.6 * u, 118 * u);

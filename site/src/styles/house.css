@@ -620,10 +620,24 @@ html.static .hs-veil{display:none}
 .pg-title{left:10cqw;right:10cqw;top:29cqw;font:600 9.4cqw/1.04 var(--serif);letter-spacing:-.015em;color:#13244F}
 .pg-title span{display:block}
 .pg-sub{left:10cqw;right:16cqw;top:52cqw;font:italic 400 3.5cqw/1.5 var(--serif);color:rgba(19,36,79,.74)}
-.pg-lines{left:10cqw;right:10cqw;top:74cqw;display:grid;gap:3.1cqw}
-.pg-lines i{display:block;height:1.1cqw;width:calc(var(--w) * 100%);border-radius:1cqw;background:rgba(19,36,79,.2);transform-origin:left}
-.pg-lines i.hl{box-shadow:0 0 0 .7cqw rgba(224,168,46,.35)}
+/* the page's body: what MeWriT writes, set in the page's own type (never grey bars), the reviewer's highlight on
+   its last words; while the house loads it is revealed from the top, as the loading goes (plan 11.21) */
+.pg-body{left:10cqw;right:10cqw;top:72cqw;font:400 2.7cqw/1.62 var(--serif);color:rgba(19,36,79,.82);text-wrap:pretty}
+.pg-body mark{padding:0 .2cqw;background:linear-gradient(transparent 12%,rgba(224,168,46,.42) 12%,rgba(224,168,46,.42) 92%,transparent 92%);color:inherit}
+html.js:not(.static) .hs-page:not(.quad) .pg-body{--rv:clamp(0,calc(max(var(--hs-p0),var(--hs-p,0)) * 1.3),1);-webkit-mask-image:linear-gradient(to bottom,#000 calc(var(--rv) * 115% - 15%),transparent calc(var(--rv) * 115%));mask-image:linear-gradient(to bottom,#000 calc(var(--rv) * 115% - 15%),transparent calc(var(--rv) * 115%))}
 .pg-begin{left:10cqw;top:118cqw;display:inline-flex;align-items:center;gap:1.6cqw;padding-bottom:.8cqw;font:italic 400 3.8cqw/1 var(--serif);color:#13244F;text-decoration:none;background:linear-gradient(#B4500F,#B4500F) left bottom / 100% .35cqw no-repeat}
+/* (once the page has settled, the reviewer's highlighter goes across its last words, across both lines as a hand
+   would, drawing the eye to what holds the rest together) */
+html.hs-in:not(.hs-from-1):not(.hs-from-2):not(.hs-from-3):not(.hs-from-4):not(.hs-from-5) .pg-body mark{background-repeat:no-repeat;animation:hsMark 1.1s cubic-bezier(.45,.05,.3,1) 1.9s both}
+@keyframes hsMark{from{background-size:0 100%}to{background-size:100% 100%}}
+@media (prefers-reduced-motion:reduce){.pg-body mark{animation:none !important}}
+/* (on a phone, a button a thumb finds at once: the page's ink, its arrow in gold; the page's words a size larger) */
+@media (max-width:760px){
+  .pg-sub{right:10cqw;font-size:4.1cqw}
+  .pg-body{top:75cqw;font-size:3.55cqw;line-height:1.55}
+  .pg-begin{top:112cqw;padding:2.6cqw 5cqw 2.8cqw;border-radius:999px;background:#13244F;color:#F6F1E7;font-size:4.8cqw;box-shadow:0 1.2cqw 3cqw rgba(19,36,79,.22)}
+  .pg-begin i{color:#E0B85A}
+}
 .pg-begin i{font-style:normal;color:#B4500F}
 .pg-begin:focus-visible{outline:2px solid #B4500F;outline-offset:4px}
 .pg-mark{right:11cqw;top:115.5cqw;font:600 5cqw/1 Caveat,cursive;color:#B4500F;transform:rotate(-5deg)}
@@ -640,12 +654,11 @@ html.hs-loading.hs-from-0 .pg-logo .ld-real{opacity:0}
 @keyframes hsReveal{to{clip-path:inset(0 0 0 0)}}
 html.js:not(.static) .hs-page:not(.quad) .pg-rule{transform-origin:left;transform:scaleX(0);animation:hsRule .9s cubic-bezier(.65,0,.35,1) .8s forwards}
 @keyframes hsRule{to{transform:scaleX(1)}}
-html.js:not(.static) .hs-page:not(.quad) .pg-lines i{transform:scaleX(clamp(0,calc(max(var(--hs-p0),var(--hs-p,0)) * 13 - var(--i) - 1),1));transition:transform .5s cubic-bezier(.3,.6,.3,1)}
 
 /* on the manuscript: the paper turns clear and the words lie on the lit page beneath; the page's own
    drawing (rule, lines, mark, foot) is the 3D page's, so the sheet's copies fade out */
 .hs-page.quad{left:0;top:0;background-color:rgba(251,248,242,0);box-shadow:none}
-.hs-page.quad :is(.pg-rule,.pg-lines,.pg-mark,.pg-foot){opacity:0;transition:opacity .9s ease}
+.hs-page.quad :is(.pg-rule,.pg-mark,.pg-foot){opacity:0;transition:opacity .9s ease}
 /* (behind the camera, the page's words are hidden) */
 .hs-page.far{opacity:0;pointer-events:none}
 

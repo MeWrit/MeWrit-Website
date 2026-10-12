@@ -858,7 +858,7 @@ function start() {
     begin: page && page.querySelector('.pg-begin') ? page.querySelector('.pg-begin').firstChild.textContent : '',
     doc: page && page.querySelector('.pg-doc') ? page.querySelector('.pg-doc').innerHTML.split(/<br\s*\/?>/i).map(s => s.replace(/<[^>]+>/g, '').trim()) : [],
     foot: page && page.querySelector('.pg-foot') ? page.querySelector('.pg-foot').textContent : '',
-    lines: JSON.parse(sec.dataset.lines || '[]'),
+    body: page && page.querySelector('.pg-body') ? { text: page.querySelector('.pg-body').textContent.trim(), mark: (page.querySelector('.pg-body mark') || {}).textContent || '' } : null,
   });
   setP(.1);
   // how long each part of the loading took (ms from the film's start; window.mewritHouse.marks)
