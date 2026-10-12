@@ -172,5 +172,26 @@ export function buildOutside({ hi = true } = {}) {
       made++;
     }
   }
+  // (at night the land is dimmed, OUTSIDE_K set with the hour by the stage: the moon lights it far less than
+  // the sun, while the rooms keep their own lamps. Each of its materials is used through a copy that
+  // multiplies its colour by the dimming, shared by every mesh that used the original, so the land still
+  // merges into as few draws)
+  const dimmed = new Map();
+  O.traverse(o => {
+    if (!o.isMesh) return;
+    const m = o.material;
+    if (!dimmed.has(m)) {
+      const d = m.clone();
+      d.onBeforeCompile = sh => {
+        sh.uniforms.uOutsideK = OUTSIDE_K;
+        sh.fragmentShader = 'uniform float uOutsideK;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n\tgl_FragColor.rgb *= uOutsideK;');
+      };
+      d.customProgramCacheKey = () => 'house-outside-k';
+      dimmed.set(m, d);
+    }
+    o.material = dimmed.get(m);
+  });
   return O;
 }
+// how bright the land is (1 by day; the hour sets it, stage.js)
+export const OUTSIDE_K = { value: 1 };

@@ -27,8 +27,10 @@ function monotone(t, v) {
 
 // points: the eyes the way passes through, between the two views' own; a point may carry a fourth
 // number, the way the camera faces there (yaw, degrees): the turn then follows the path through those
-// headings (monotone too, so a turn never swings back), instead of going evenly from view to view
-export function route(points, ease = t => .5 - .5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t)))) {
+// headings (monotone too, so a turn never swings back), instead of going evenly from view to view.
+// look: how the tilt and the lens go from the first view's to the last's over the way (evenly, unless
+// it says otherwise: the camera can keep its head up until it is nearly there)
+export function route(points, ease = t => .5 - .5 * Math.cos(Math.PI * Math.min(1, Math.max(0, t))), look = e => e) {
   let key = '', curve = null;
   const turns = points.every(p => p.length > 3);
   function build(a, b, ya, yb) {
@@ -57,8 +59,8 @@ export function route(points, ease = t => .5 - .5 * Math.cos(Math.PI * Math.min(
       let lo = 0, hi = SAMPLES;
       while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (ls[mid] < s) lo = mid; else hi = mid; }
       const x = ts[lo] + (ts[hi] - ts[lo]) * ((s - ls[lo]) / Math.max(1e-9, ls[hi] - ls[lo]));
-      const mix = (u, v) => u + (v - u) * e;
-      return { p: curve.at(x), yaw: curve.yaw ? curve.yaw(x) : mix(a.yaw || 0, b.yaw || 0), pitch: mix(a.pitch || 0, b.pitch || 0), fov: mix(a.fov, b.fov), sx: mix(a.sx || 0, b.sx || 0), sy: mix(a.sy || 0, b.sy || 0) };
+      const mix = (u, v) => u + (v - u) * e, l = look(e), lens = (u, v) => u + (v - u) * l;
+      return { p: curve.at(x), yaw: curve.yaw ? curve.yaw(x) : mix(a.yaw || 0, b.yaw || 0), pitch: lens(a.pitch || 0, b.pitch || 0), fov: lens(a.fov, b.fov), sx: lens(a.sx || 0, b.sx || 0), sy: lens(a.sy || 0, b.sy || 0) };
     },
     // where the eye is a share m of the way (for tests: the path's own points)
     length() { return curve ? curve.L : 0; },

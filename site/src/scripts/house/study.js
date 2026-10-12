@@ -36,6 +36,7 @@ export const STUDY = {
 // page: the title page's words for the 3D page's own drawing ({ title: [lines], sub, begin, doc:
 // [lines], foot, lines: [widths of the typeset lines] }, read from the page's markup by film.js)
 export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
+  let screenGlass = null;
   const hi = quality !== 'low';
   const G = new THREE.Group();
   const { WALL, FLOOR, CEIL, DOOR, WIN, DESK } = STUDY;
@@ -215,7 +216,9 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
     const [a, b] = [STUDY.SCREEN[0], STUDY.SCREEN[2]], cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2, w = b[0] - a[0] + .26, h = a[1] - b[1] + .26;
     G.add(at(rbox(w, h, .3, .07, mat(PAL.navy, { r: .35, m: .2 })), cx, cy, a[2] - .16));
     const glass = panel(b[0] - a[0], a[1] - b[1], new THREE.MeshStandardMaterial({ color: '#FDFBF6', emissive: '#FBF9F3', emissiveIntensity: .82, roughness: .25 }));
-    glass.position.set(cx, cy, a[2]); G.add(glass);
+    // (kept apart from the merged meshes: the film paints the contents' page on it, a copy under the laid-on
+    // words, so any part of them the browser fails to draw shows the same page, never a blank glass)
+    glass.position.set(cx, cy, a[2]); glass.userData.keep = true; G.add(glass); screenGlass = glass;
     // the stand: a neck behind the screen, down to a weighted foot on the desk
     const steel = mat(PAL.steel, { r: .35, m: .7 });
     G.add(at(rbox(.58, cy - .05, .3, .08, steel), cx, (cy - .05) / 2 + .04, a[2] - .52));
@@ -511,6 +514,6 @@ export function buildStudy({ logo = null, quality = 'high', page = {} } = {}) {
   msGroup.updateMatrixWorld(true);
   const pageCentre = topSheet.getWorldPosition(new THREE.Vector3()), pageNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(msGroup.quaternion);
   return {
-    group: G, lamp: lampAt, screen: STUDY.SCREEN, manuscript: msCorners, ms: msGroup, baked, pageCentre, pageNormal, pageSize: [PW, PH],
+    group: G, lamp: lampAt, screen: STUDY.SCREEN, manuscript: msCorners, ms: msGroup, baked, pageCentre, pageNormal, pageSize: [PW, PH], glass: screenGlass,
   };
 }

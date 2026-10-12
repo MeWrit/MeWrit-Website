@@ -1,0 +1,499 @@
+---
+// The house (site/docs/redesign-plan.md, sections 11 and 11.10): the film rebuilt in illustrated 3D,
+// one house (the study, and through its doorway the library hall), each chapter's object performing in
+// the centre. Built so far: the study, the title page and the contents (step 2), and the walk into the
+// library hall to the record (step 3, section 11.12).
+// 00, the title page, is the manuscript itself: its words printed on the page (real text, laid on the
+// page in perspective by film.js), the lamp's light its backdrop. The same page is the loader: shown on
+// paper from the first paint, its lines written as the house loads; when the house is ready the camera
+// draws back from it and it is the manuscript on the writing slope. The full chapter list is shown;
+// only the chapters built so far can be reached. /lamplight/ stays as it was, for comparison.
+import Base from '../../layouts/Base.astro';
+import { lamp } from '../../data/lamp';
+import { site, contact, office } from '../../data/site';
+import { href } from '../../lib/url';
+import { osf } from '../../scripts/lamp/figures.js';
+import { LAYOUT, PX as REC_PX, CARD, CORNICE } from '../../scripts/house/record-layout.js';
+import { YEARS_WORD_CAP } from '../../data/years';
+import LogoDraw from '../../components/LogoDraw.astro';
+import '../../styles/lamp.css';
+import '../../styles/logo-draw.css';
+import '../../styles/house.css';
+
+// the chapters of the house, in order (How we work is removed, section 11.4); built so far: the title
+// page and the contents (step 2), on the record (step 3: the walk into the hall)
+const ORDER = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory', 'correspondence'];
+// (a chapter being built is listed in the WIP spread below and shown only on /house-wip/ (dev) until the user has seen it: work in progress never
+// reaches the reader's view)
+const { wip = false } = Astro.props;
+const WIP = !!wip && import.meta.env.DEV;
+const BUILT = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', ...(WIP ? [] : [])];
+// (each numbered by its place: How we work, 08 in the old order, is gone, so the chapters run 00 to 08)
+const words = ORDER.map((id, i) => {
+  const w = lamp.chapters.find(c => c.id === id);
+  if (!w) throw new Error(`house: no words for the chapter "${id}"`);
+  return { ...w, num: String(i).padStart(2, '0') };
+});
+const built = words.filter(w => BUILT.includes(w.id));
+// the scroll each chapter takes, in screens: the move that brings the camera to it, then a short dwell
+// where the camera holds still for reading (long enough to stop on, short enough that scrolling on
+// moves the camera again at once), and for 02 between the two the record's filling, the camera still
+// (plan 11.21: about half as much scroll again for each chapter's work, a little more for each move: people
+// scroll fast, and a chapter's beats must have the time to be read)
+const SCROLL: Record<string, number[]> = { 'title-page': [0, .08], contents: [2.0, .35], 'on-the-record': [2.6, .3, 1.3], 'regulatory-writing': [2.4, .3, 5.7], 'scientific-publications': [2.0, .3, 5.1], 'medical-communications': [2.2, .3, 6.0] };
+const screens = built.reduce((t, w) => t + SCROLL[w.id].reduce((a, v) => a + v, 0), 0);
+// 02's figures, from its line ("100+ trial documents, 30+ clinical study reports, ..."): each a number,
+// its "+", its words
+const recCh = words.find(w => w.id === 'on-the-record');
+const figures = recCh ? recCh.line.replace(/\.$/, '').split(/,\s+(?=\d)/).map(s => {
+  const m = /^([\d,]+)(\+?)\s+(.+)$/.exec(s.trim());
+  if (!m) throw new Error(`house: cannot read the figure "${s}"`);
+  return { text: m[1] + m[2], n: +m[1].replace(/,/g, ''), plus: m[2], label: m[3] };
+}) : [];
+if (recCh && figures.length !== LAYOUT.boards.length) throw new Error(`house: ${figures.length} figures for ${LAYOUT.boards.length} bays`);
+const logo = href('/brand/logo-original.png');
+// the site's sections beyond the house (plan 11.21): the house is the home and the practices (the logo);
+// About and Showcase come later (shown, marked as coming, their parts those of the live site's menus); the
+// Academy is its own site
+const sections = [
+  { label: 'About', parts: ['Our leadership', 'Therapeutic areas', 'Publications'] },
+  { label: 'Showcase', parts: ['Testimonials', 'Gallery', 'Events'] },
+  { label: 'Academy', note: 'Online courses', href: contact.academy },
+];
+// the title page: its headline set in two lines as even as the words allow (the 3D page draws the same)
+const title = words[0];
+const tw = title.headline.split(' ');
+let cut = 1, best = Infinity;
+for (let i = 1; i < tw.length; i++) { const d = Math.abs(tw.slice(0, i).join(' ').length - tw.slice(i).join(' ').length); if (d < best) { best = d; cut = i; } }
+const titleLines = tw.length > 1 ? [tw.slice(0, cut).join(' '), tw.slice(cut).join(' ')] : [title.headline];
+// the page's body: the widths of its typeset lines (the third is highlighted, as a reviewer marks it)
+const LINES = [.94, .99, .88, .97, .62, .96, .99, .9, .58];
+// the contents' words are on the display (the editor's document); the chapters to come keep a caption
+const contentsCh = words[1];
+const caps = built.filter(w => !['title-page', 'contents', 'on-the-record'].includes(w.id));
+// each chapter's share of its scroll that is the move (film.js reads the moves and dwells from the section)
+const ARRIVE = built.map(w => SCROLL[w.id][0] / SCROLL[w.id].reduce((a, v) => a + v, 0));
+// 02's band (record-layout.js): where each of its parts sits in it, in units, for the loader's card
+const bandVars = (r: { x: number; y: number; w: number; h: number }) => `--x:${r.x.toFixed(3)};--y:${r.y.toFixed(3)};width:${(r.w * REC_PX).toFixed(1)}px;height:${(r.h * REC_PX).toFixed(1)}px`;
+// (the cornice's place down the band, for the card's drawing of it)
+const cornice = [(CARD.top - CORNICE[1]) / LAYOUT.h, (CARD.top - CORNICE[0]) / LAYOUT.h].map(v => `${(v * 100).toFixed(2)}%`);
+---
+<Base intro="none" theme="light" page="house" title={`${lamp.shortTitle} | ${site.name}`} description={lamp.description}>
+  <script is:inline define:vars={{ ids: BUILT, A: ARRIVE, key: 'mewrit-house-place', band: [LAYOUT.w, LAYOUT.h, REC_PX] }}>
+  /* before the first paint: while the house loads, the chapter the reader is coming to shows its own
+     object flat on the paper veil (the title page's sheet; the display's screen), the letterhead and
+     the list wait, and the page does not scroll (film.js lifts these; if it never runs, they lift
+     themselves). The chapter: the place a refresh left (kept for half an hour in this tab, to the
+     nearer chapter), else the one the address names (#contents), else the title page */
+  (function () {
+    var d = document.documentElement;
+    // (the film puts the reader back where they were itself, once the house is ready: the browser's
+    // own restoring would move the page under the loader)
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
+    // (a phone held upright, or any window much taller than wide: the study's display stands in portrait, as a
+    // pivoting monitor does, and the film frames each view for the tall screen; decided once, here, for the
+    // loader's card and for film.js alike: plan 11.21)
+    var tall = innerWidth / innerHeight < .8;
+    if (tall) d.classList.add('hs-tall');
+    if (/[?&]static\b/.test(location.search)) return;
+    d.classList.add('hs-loading', 'hs-lock');
+    var at = 0, s = null;
+    try { s = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
+    if (s && s.P > .02 && Date.now() - s.t < 1800000) { var i = Math.floor(s.P), u = s.P - i; at = i > 0 && u < (A[i] || 0) / 2 ? i - 1 : i; }
+    else { var h = ids.indexOf(location.hash.slice(1)); if (h > 0) at = h; }
+    at = Math.max(0, Math.min(ids.length - 1, at));
+    d.classList.add('hs-from-' + at);
+    if (at === 1) {
+      // the display's screen as a card on the paper, as large as the window allows below the letterhead
+      // (its proportions are the screen's, 5.9 by 3.4, the editor laid out 1000 px wide; standing in portrait on a
+      // phone, 3.4 by 5.9, the editor 440 px wide)
+      var gw = tall ? 3.4 : 5.9, gh = tall ? 5.9 : 3.4, W = innerWidth, H = innerHeight, cw = Math.min(W * .84, (H - 210) * gw / gh), sc = cw / (tall ? 440 : 1000);
+      d.style.setProperty('--hs-card-s', sc);
+      d.style.setProperty('--hs-card-x', ((W - cw) / 2) + 'px');
+      d.style.setProperty('--hs-card-y', ((H + 76 - cw * gh / gw) / 2) + 'px');
+      if (sc < .55) d.classList.add('hs-card-compact');
+    }
+    if (at === 2) {
+      // the record's lettered band as a card on the paper, as wide as the window allows below the
+      // letterhead (its parts are set out at band[2] px to a unit: --rc-u is a unit on the screen)
+      var W2 = innerWidth, H2 = innerHeight, u = Math.min(W2 * .88 / band[0], (H2 - 230) / band[1]);
+      d.style.setProperty('--rc-u', u + 'px');
+      d.style.setProperty('--rc-s', u / band[2]);
+      d.style.setProperty('--rc-x', ((W2 - band[0] * u) / 2) + 'px');
+      d.style.setProperty('--rc-y', ((H2 + 76 - band[1] * u) / 2) + 'px');
+    }
+    if (at === 3) {
+      // the writer's screen in the archive as a card on the paper, its closing card on it, as large as
+      // the window allows below the letterhead (its proportions are the glass's, 3.4 by 2.2; its
+      // workspace is laid out 1000 px wide; its bezel, 0.09 of 3.4, drawn round it)
+      var W3 = innerWidth, H3 = innerHeight, cw3 = Math.min(W3 * .84, (H3 - 230) * 3.4 / 2.2, 1000), s3 = cw3 / 1000;
+      d.style.setProperty('--dl-s', s3);
+      d.style.setProperty('--dl-x', ((W3 - cw3) / 2) + 'px');
+      d.style.setProperty('--dl-y', ((H3 + 76 - cw3 * 2.2 / 3.4) / 2) + 'px');
+    }
+    if (at === 4) {
+      // MeWriT's slip from the journal on the reading stand as a card on the paper, as tall as the window
+      // allows below the letterhead (its proportions the slip's: 284 by 400 px)
+      var W4 = innerWidth, H4 = innerHeight, ch4 = Math.min((H4 - 230) * .82, W4 * .8 * 400 / 284), s4 = ch4 / 400;
+      d.style.setProperty('--sl-s', s4);
+      d.style.setProperty('--sl-x', ((W4 - 284 * s4) / 2) + 'px');
+      d.style.setProperty('--sl-y', ((H4 + 76 - ch4) / 2) + 'px');
+    }
+    if (at === 5) {
+      // the slide on the lecture room's screen as a card on the paper, as large as the window allows below
+      // the letterhead (its proportions the slide's, 16 by 9; it is laid out 960 px wide)
+      var W5 = innerWidth, H5 = innerHeight, cw5 = Math.min(W5 * .84, (H5 - 230) * 16 / 9, 1100), s5 = cw5 / 960;
+      d.style.setProperty('--cm-s', s5);
+      d.style.setProperty('--cm-x', ((W5 - cw5) / 2) + 'px');
+      d.style.setProperty('--cm-y', ((H5 + 76 - cw5 * 9 / 16) / 2) + 'px');
+    }
+    setTimeout(function () { if (!d.classList.contains('hs-in')) d.classList.remove('hs-loading', 'hs-lock'); }, 15000);
+  })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap">
+
+  <section class="hs" id="hs" aria-label={lamp.title} style={`--screens:${screens}`} data-logo={logo} data-lines={JSON.stringify(LINES)} data-scroll={JSON.stringify(built.map(w => SCROLL[w.id]))}>
+    <canvas class="hs-canvas" aria-hidden="true"></canvas>
+    <div class="hs-track">
+      <div class="lp-stage hs-stage" data-light="day" data-ch="title-page">
+        <div class="hs-scrim" aria-hidden="true"></div>
+        <!-- the letterhead is the one navigation (plan 11.21): the logo (the house's start), the running head
+             (the chapter the reader is in), the site's sections, the full list, the call to action; its rule is
+             the chapter bar: a segment for each chapter, filling as it is seen (film.js meters), a click flies
+             there -->
+        <header class="lp-lh">
+          <a class="lp-lh-logo" href="#title-page" data-go="0" aria-label="MeWriT, the title page"><LogoDraw /></a>
+          <p class="lh-run" aria-hidden="true"><span class="n" set:html={osf(words[0].num)} /><span class="t">{words[0].name}</span></p>
+          <nav class="lh-sec" aria-label="Sections">
+            {sections.map(s => s.href
+              ? <a href={s.href} target="_blank" rel="noopener">{s.label}<span class="ext" aria-hidden="true">↗</span></a>
+              : <span class="soon" title="Coming soon" aria-disabled="true">{s.label}</span>)}
+          </nav>
+          <button class="lh-idx" type="button" aria-expanded="false" aria-controls="hs-index" aria-label="Chapters"><i aria-hidden="true"></i><span>Chapters</span></button>
+          <a class="lp-lh-cta" href={href('/#contact')}>Start a project</a>
+          <nav class="hs-bar" aria-label="Chapters">
+            <ol>{words.map((w, i) => {
+              const b = BUILT.indexOf(w.id);
+              const label = <span class="lb"><span class="n" set:html={osf(w.num)} /><span class="t">{w.name}</span>{b < 0 && <em>soon</em>}</span>;
+              return <li>{b >= 0
+                ? <a href={`#${w.id}`} data-go={b} aria-current={i === 0 ? 'true' : undefined}><i class="sg" aria-hidden="true"><b></b></i>{label}</a>
+                : <span class="off" aria-disabled="true"><i class="sg" aria-hidden="true"></i>{label}</span>}</li>;
+            })}</ol>
+          </nav>
+          <!-- (one label, under the segment the pointer is on: film.js) -->
+          <span class="hs-tip" aria-hidden="true"></span>
+        </header>
+
+        <!-- the full list, from the letterhead's Chapters (on a phone, the whole screen): every chapter with how
+             much of it has been seen, the site's sections, and the ways to write to MeWriT -->
+        <div class="hs-index" id="hs-index" data-open="false" inert>
+          <div class="hx-sheet" role="dialog" aria-label="Chapters and sections">
+            <div class="hx-top"><LogoDraw class="hx-logo" /><button class="hx-close" type="button" aria-label="Close"><i aria-hidden="true"></i></button></div>
+            <p class="hx-h">Chapters</p>
+            <ol class="hx-list">{words.map((w, i) => {
+              const b = BUILT.indexOf(w.id);
+              return <li>{b >= 0
+                ? <a href={`#${w.id}`} data-go={b} aria-current={i === 0 ? 'true' : undefined}><span class="n" set:html={osf(w.num)} /><span class="t">{w.name}</span><i class="mt" aria-hidden="true"><b></b></i></a>
+                : <span class="off" aria-disabled="true"><span class="n" set:html={osf(w.num)} /><span class="t">{w.name}</span><em>Coming soon</em></span>}</li>;
+            })}</ol>
+            <div class="hx-secs">
+              {sections.map(s => s.href
+                ? <a class="hx-sec" href={s.href} target="_blank" rel="noopener"><b>MeWriT {s.label}<span aria-hidden="true"> ↗</span></b><span>{s.note}</span></a>
+                : <div class="hx-sec soon"><b>{s.label}</b><span>{s.parts.join(' · ')}</span><em>Coming soon</em></div>)}
+            </div>
+            <div class="hx-foot">
+              <a class="hx-cta" href={href('/#contact')}>Start a project</a>
+              <a href={contact.phoneHref}>{contact.phoneDisplay}</a>
+              <a href={`mailto:${contact.email}`}>{contact.email}</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- the editor on the display (laid over the display's glass by film.js); the contents are its
+             menu, real links -->
+        <div class="lp-ed" aria-hidden="true">
+          <div class="ed-doc" data-doc="draft">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>Clinical study report · Draft 3</b><span class="ed-saved"><i class="live"></i>Saved · just now</span><span class="ed-av"><i>HS</i><i class="ai">✦</i></span></div>
+            <div class="ed-body">
+              <div class="ed-text">
+                <p class="ed-sec">11.4 Efficacy results</p>
+                <p>The primary endpoint was met in the per-protocol population. A total of 480 <del>subjects</del> <ins>participants</ins> were randomised 1:1 to treatment or control.</p>
+                <p><mark>Treatment reduced the risk of the primary event</mark> compared with control (HR 0.72; 95% CI 0.58 to 0.89).</p>
+                <div class="ed-fig">
+                  <svg viewBox="0 0 220 92" aria-hidden="true"><g stroke="#13244F" fill="none" stroke-width="1"><path d="M120 6 V86" stroke-dasharray="3 3" stroke-opacity=".5"/><path d="M10 86 H210" stroke-opacity=".35"/></g><g stroke="#13244F" stroke-width="1.4"><path d="M70 16 H128"/><path d="M84 32 H112"/><path d="M58 48 H122"/><path d="M90 64 H118"/></g><g fill="#13244F"><rect x="94" y="12" width="8" height="8"/><rect x="95" y="28" width="6" height="8"/><rect x="86" y="44" width="8" height="8"/><rect x="101" y="60" width="6" height="8"/></g><path d="M80 78 L98 73 L116 78 L98 83 Z" fill="#E07A1F"/></svg>
+                  <span>Figure 11.2. Hazard ratios by prespecified subgroup.</span>
+                </div>
+                <p class="ed-ghost">Suggested: add the number needed to treat for the primary endpoint.<span class="ed-caret"></span></p>
+              </div>
+              <aside class="ed-side">
+                <div class="ed-card"><b>Reviewer</b><span>Checked against ICH E3 §11.4 ✓</span></div>
+                <div class="ed-card ai"><b>✦ Assistant</b><span>3 references updated to current versions</span><em>Accepted by the reviewer</em></div>
+                <div class="ed-card"><b>References</b><span>42 of 42 verified against source</span></div>
+              </aside>
+            </div>
+            <div class="ed-foot"><span>eCTD ready · Module 5.3.5.1</span><span>Illustrative document</span></div>
+          </div>
+          <!-- 01, the contents: the chapter's words are the document's own heading, on the screen -->
+          <div class="ed-doc" data-doc="contents">
+            <div class="ed-bar"><span class="dots"><i></i><i></i><i></i></span><b>MeWriT · Practices</b><span class="ed-saved">Five practices</span><span class="ed-av"><i>HS</i></span></div>
+            <!-- the document's letterhead (the original logo, unaltered); in the contents' loader the screen
+                 boots with it at its middle, where the pen writes its line, and it docks here -->
+            <LogoDraw class="ed-logo" />
+            <div class="ed-body ed-contents">
+              <header class="ed-head" id="contents" aria-label={`${contentsCh.num} ${contentsCh.name}`}>
+                <p class="ed-kick">Contents</p>
+                <h2 class="ed-h">{contentsCh.headline}</h2>
+                <p class="ed-l">{contentsCh.line}</p>
+              </header>
+              <ol class="ed-toc ed-toc-full">
+                {lamp.contents.map((e, i) => { const ch = lamp.chapters.find(c => c.id === e.go); return <li data-toc style={`--i:${i}`}><a href={e.href} data-chapter={e.go}><span class="n">{e.num}</span><span class="t">{e.name}<small>{ch ? ch.line : ''}</small></span><span class="d"></span><span class="p">{e.page}</span></a></li>; })}
+              </ol>
+            </div>
+            <!-- (the screen says it can be used) -->
+            <div class="ed-foot"><span class="ed-hint"><span class="ed-hint-fine">Click a practice to open it</span><span class="ed-hint-touch">Tap a practice to open it</span></span><span>MeWriT</span></div>
+          </div>
+        </div>
+
+        <!-- 02, on the record: its words are on the record (laid on its band by film.js): the cartouche
+             with the logo, the frieze with the headline, a board for each figure over its bay; the
+             source beneath. While the house loads after a return to 02, the band is a card on the paper -->
+        {recCh && (
+          <div class="hs-rec" aria-label={`${recCh.num} ${recCh.name}`} style={`--band-w:${LAYOUT.w};--band-h:${LAYOUT.h};--cor0:${cornice[0]};--cor1:${cornice[1]};--rc-img:url(${href('/house/record-band.webp')})`}>
+            <i class="rec-card" aria-hidden="true"></i>
+            <div class="rec-crest" aria-hidden="true" style={bandVars(LAYOUT.crest)}><LogoDraw class="rec-logo" /></div>
+            <!-- (one line: the frieze centres a single run of text; the years' number in it is kept current
+                 by film.js) -->
+            <h2 class="rec-frieze" id="on-the-record" style={bandVars(LAYOUT.frieze)}><span class="rec-hl">{recCh.headline.startsWith(YEARS_WORD_CAP) ? <Fragment><span data-years>{YEARS_WORD_CAP}</span>{recCh.headline.slice(YEARS_WORD_CAP.length)}</Fragment> : recCh.headline}</span></h2>
+            <ol class="rec-boards">{figures.map((f, i) => <li class="rec-board" data-to={f.n} data-plus={f.plus} style={`${bandVars(LAYOUT.boards[i])};--b:${i}`}><b class="rec-n">{f.text}</b><span class="rec-l">{f.label}</span></li>)}</ol>
+            <p class="rec-note">{lamp.footnote}</p>
+            <!-- while the record fills: the scroll goes on, as the title page's cue says (gone once it is full) -->
+            <div class="rec-cue" aria-hidden="true"><span>Scroll to fill the shelves</span><i></i></div>
+          </div>
+        )}
+
+        <!-- 03, regulatory writing, the dossier proven (plan 11.13 and 11.14; dossier.js): the writer's
+             screen before the bound volumes, its workspace laid on the glass by film.js (the study's
+             editor, in larger type). One pane for each step, its parts shown as the work reaches them
+             (data-mark: dossier.js's MARKS); the last pane is the closing card (on 03's loader, the
+             screen on the paper). While the work goes on, the step in the caption's place. Illustrative -->
+        {BUILT.includes('regulatory-writing') && (
+          <div class="hs-dos" aria-hidden="true">
+            <div class="ds-wrap"><div class="dos-screen">
+              <div class="ds-bar"><span class="dots"><i></i><i></i><i></i></span><b>Dossier · eCTD sequence <span class="sq0">0000</span><span class="sq1">0001</span></b><span class="ds-state"><i></i><span class="ds-st">Validated</span></span><span class="ds-av"><i>HS</i><i class="ai">✦</i></span></div>
+              <div class="ds-panes">
+                <section class="ds-pane" data-s="0">
+                  <p class="ds-kick">Structure</p>
+                  <h3 class="ds-h">The common technical document</h3>
+                  <ul class="ds-mods">
+                    <li data-mark="m1"><code>m1</code>Regional<b>✓</b></li>
+                    <li data-mark="m2"><code>m2</code>Summaries<b>✓</b></li>
+                    <li data-mark="m3"><code>m3</code>Quality<b>✓</b></li>
+                    <li data-mark="m4"><code>m4</code>Nonclinical<b>✓</b></li>
+                    <li data-mark="m5"><code>m5</code>Clinical<b>✓</b></li>
+                  </ul>
+                  <p class="ds-tags"><span>CTD · ICH M4</span><span>eCTD · ICH M8</span></p>
+                </section>
+                <section class="ds-pane" data-s="1">
+                  <p class="ds-kick">Authorship</p>
+                  <h3 class="ds-h">Written by MeWriT</h3>
+                  <ul class="ds-list">
+                    <li data-mark="o24"><code>2.4</code>Nonclinical overview</li>
+                    <li data-mark="o25"><code>2.5</code>Clinical overview</li>
+                    <li data-mark="o26"><code>2.6</code>Nonclinical summaries</li>
+                    <li data-mark="o27"><code>2.7</code>Clinical summary</li>
+                    <li data-mark="o4"><code>m4</code>Nonclinical study reports</li>
+                    <li data-mark="o5"><code>m5</code>Clinical study reports</li>
+                  </ul>
+                </section>
+                <section class="ds-pane" data-s="2">
+                  <p class="ds-kick">Traceability</p>
+                  <h3 class="ds-h">Every claim, checked at its source</h3>
+                  <div class="ds-doc">
+                    <p class="ds-sec">2.7.3 Summary of clinical efficacy</p>
+                    <p class="ds-txt">Treatment reduced the risk of the primary event (<mark>HR 0.72; 95% CI 0.58 to 0.89</mark>).</p>
+                    <p class="ds-links"><span data-mark="l3">CSR Table 14.2.1</span><em data-mark="l3">matches the report</em></p>
+                  </div>
+                </section>
+                <section class="ds-pane" data-s="3">
+                  <p class="ds-kick">Consistency check</p>
+                  <h3 class="ds-h">One figure, the same everywhere</h3>
+                  <table class="ds-tab">
+                    <caption>Participants randomised</caption>
+                    <tr data-mark="c5"><td>CSR · Table 14.2.1</td><td>480</td><td><b>✓</b></td></tr>
+                    <tr data-mark="c27"><td>2.7.3 Clinical summary</td><td>480</td><td><b>✓</b></td></tr>
+                    <tr data-mark="c25" class="ds-qc"><td>2.5 Clinical overview</td><td><s>408</s><ins>480</ins></td><td><b class="x">✗</b><b class="v">✓</b></td></tr>
+                  </table>
+                  <p class="ds-result" data-mark="zero"><b>✓</b>0 inconsistencies<span>corrected at expert QC</span></p>
+                </section>
+                <section class="ds-pane" data-s="4">
+                  <p class="ds-kick">Regional Module 1</p>
+                  <h3 class="ds-h">One core, four markets</h3>
+                  <ul class="ds-mkts">
+                    <li data-mark="fda"><span>United States</span>FDA<b>✓</b></li>
+                    <li data-mark="ema"><span>European Union</span>EMA<b>✓</b></li>
+                    <li data-mark="asean"><span>South-East Asia</span>ASEAN<b>✓</b></li>
+                    <li data-mark="cdsco"><span>India</span>CDSCO<b>✓</b></li>
+                  </ul>
+                  <p class="ds-note">Modules 2 to 5: one core, unchanged</p>
+                </section>
+                <section class="ds-pane" data-s="5">
+                  <p class="ds-kick">Agency query</p>
+                  <h3 class="ds-h">Question 3<span data-mark="ok">, answered</span></h3>
+                  <p class="ds-q" data-mark="q"><span>Question</span>Justify the efficacy claim in 2.7.3 against the primary analysis.</p>
+                  <p class="ds-a" data-mark="a"><span>Response</span>It restates the primary analysis, CSR Table 14.2.1: HR 0.72 (95% CI 0.58 to 0.89) in the 480 randomised.</p>
+                  <p class="ds-tags" data-mark="ok"><span><b>✓</b>Traced to source</span><span><b>✓</b>Signed off</span></p>
+                </section>
+                <section class="ds-pane ds-end" data-s="6">
+                  <LogoDraw class="dos-logo" />
+                  <ul class="ds-checks">
+                    <li style="--r:0"><b>✓</b>Validated</li>
+                    <li style="--r:1"><b>✓</b>0 inconsistencies</li>
+                    <li style="--r:2"><b>✓</b>Query answered</li>
+                  </ul>
+                  <p class="ds-markets">FDA · EMA · ASEAN · CDSCO</p>
+                </section>
+              </div>
+              <div class="ds-foot"><span class="ds-n">Step 7 of 7</span><span>Illustrative</span></div>
+            </div></div>
+            <!-- (the papers in the room, the expert's pad, the agency's letter and the study report, carry
+                 their words themselves: dossier.js and archive.js, paper.js) -->
+            <div class="dos-steps">
+              <ol>
+                <li><span>The problem</span>No medicine reaches patients until a regulator approves it, judged on its dossier: study reports of hundreds of pages each.<small>Clinical study reports: median 644 pages, BMJ Open 2013</small></li>
+                <li><span>What we do</span>We write what the regulator reads first, and check every claim against its source.<small>ICH M4 · eCTD · ICH E3</small></li>
+                <li><span>The result</span>Consistent to the last figure, and every question answered.<small>For FDA, EMA, ASEAN and CDSCO · illustrative</small></li>
+              </ol>
+              <i></i>
+            </div>
+          </div>
+        )}
+
+        <!-- 04, scientific publications (plan 11.16; publication.js): no screen. The work is a pop-up
+             manuscript at the reading room's south table and the room around it; each step said in the
+             caption's place while the work goes on. Illustrative -->
+        {BUILT.includes('scientific-publications') && (
+          <div class="hs-pub" aria-hidden="true">
+            <!-- MeWriT's compliments slip in the journal on the reading stand: the original logo, laid on the
+                 3D slip by film.js and written by the pen when the journal opens at the article (the slip's
+                 rule and note are printed on it in the 3D); on 04's loader, the whole slip is the card -->
+            <div class="pub-slip"><i class="sl-band"></i><LogoDraw class="slip-logo" /><span class="sl-note">with compliments</span></div>
+            <div class="pub-steps">
+              <ol>
+                <li><span>The problem</span>A trial's full report runs to hundreds of pages. The journal will print five figures and an abstract of 250 words.<small>Report length: median 644 pages, BMJ Open 2013 · limits as in NEJM's instructions for authors</small></li>
+                <li><span>What we do</span>We write it: the trial told plainly, every figure true to the report, every rule of the journal met.<small>CONSORT 2025 · ICMJE · GPP 2022</small></li>
+                <li><span>The result</span>Published, and read by doctors everywhere.<small>Writing support acknowledged on the page · illustrative</small></li>
+              </ol>
+              <i></i>
+            </div>
+          </div>
+        )}
+
+        <!-- 05, medical communications (plan 11.18; lecture.js, comms.js): the slide on the lecture room's
+             screen. The 3D screen's picture is traced from this element (film.js traceEl), so they are the
+             same; on 05's loader it is the card. Each beat said in the caption's place. Illustrative -->
+        {BUILT.includes('medical-communications') && (
+          <div class="hs-comms" aria-hidden="true">
+            <div class="cm-slide">
+              <p class="cm-kick">Expert consensus · 2026</p>
+              <h3 class="cm-h">28% fewer major events</h3>
+              <p class="cm-sub">Once-daily treatment for adults at high risk</p>
+              <div class="cm-chart">
+                <div class="cm-bar"><span class="cm-v">100</span><i style="--h:1"></i><b>Placebo</b></div>
+                <div class="cm-bar ok"><span class="cm-v">72</span><i style="--h:.72"></i><b>Treatment</b></div>
+                <p class="cm-note"><span>Major events, relative</span>HR 0.72 (95% CI 0.58 to 0.89)<br>480 randomised</p>
+              </div>
+              <div class="cm-foot"><img class="cm-logo" src={logo} alt="" width="1112" height="230"><span>Recommendation 3 · strong</span><span>Illustrative</span></div>
+            </div>
+            <div class="cm-steps">
+              <ol>
+                <li><span>The problem</span>The evidence is in. But a specialist, a family doctor and a patient each need it told differently.<small>Trials, registries and the literature, as the panel weighs them</small></li>
+                <li><span>What we do</span>We write the consensus, then carry the same evidence to every audience: slides, booklets, leaflets, the press.<small>Consensus documents · position papers · RWE · slide decks · patient leaflets</small></li>
+                <li><span>The result</span>One message, true to the evidence, in every form its audience reads.<small>Every figure the same in all of them · illustrative</small></li>
+              </ol>
+              <i></i>
+            </div>
+          </div>
+        )}
+
+        <!-- the paper the title page is first shown on, while the house loads -->
+        <div class="hs-veil" aria-hidden="true"></div>
+
+        <!-- 00, the title page: the manuscript's top sheet. Laid on the 3D page in perspective once the
+             house is ready; until then, a sheet of paper in the middle of the screen (the loader) -->
+        <article class="hs-page" id="title-page" data-ch="title-page" aria-label={`${title.num} ${title.name}`}>
+          <LogoDraw class="pg-logo" />
+          <p class="pg-doc" aria-hidden="true">Clinical study report<br>Title page · Final</p>
+          <i class="pg-rule" aria-hidden="true"></i>
+          <h1 class="pg-title">{titleLines.map(l => <span>{l}</span>)}</h1>
+          <p class="pg-sub">{title.line}</p>
+          <span class="pg-lines" aria-hidden="true">{LINES.map((w, i) => <i class={i === 2 ? 'hl' : undefined} style={`--i:${i};--w:${w}`}></i>)}</span>
+          {title.action && <a class="pg-begin" href="#contents" data-go="1">{title.action.label}<i aria-hidden="true">{'↓'}</i></a>}
+          <span class="pg-mark" aria-hidden="true">final ✓</span>
+          <p class="pg-foot" aria-hidden="true">MeWriT · Title page · 1</p>
+        </article>
+
+        <!-- at the title page: the scroll goes on too, not only Begin reading (gone once the reader scrolls) -->
+        <div class="hs-cue" aria-hidden="true"><span>Scroll to begin</span><i></i></div>
+
+        <!-- the stationery's foot (section 11.12): a line along the bottom, as the letterhead runs along
+             the top; opened (its button, or by itself at the film's end) it rises into the colophon. On a
+             phone the line says less and the colophon is a sheet from the bottom -->
+        <footer class="hs-foot" data-open="false" aria-label="Contact and colophon">
+          <div class="hf-bar">
+            <a class="hf-brand" href="#title-page" data-go="0">MeWriT</a>
+            <span class="hf-sep hf-wide" aria-hidden="true">·</span><a class="hf-wide" href={contact.phoneHref}>{contact.phoneDisplay}</a>
+            <span class="hf-sep hf-wide" aria-hidden="true">·</span><a class="hf-wide" href={`mailto:${contact.email}`}>{contact.email}</a>
+            <span class="hf-sep hf-narrow" aria-hidden="true">·</span><span class="hf-narrow">Contact</span>
+            <button class="hf-toggle" type="button" aria-expanded="false" aria-controls="hs-foot-panel"><span class="hf-open">Open</span><span class="hf-close">Close</span><i aria-hidden="true"></i></button>
+          </div>
+          <div class="hf-panel" id="hs-foot-panel" inert>
+            <div class="hf-cols">
+              <div class="hf-col hf-about">
+                <img src={logo} alt="MeWriT, Writing Science Right" width="1112" height="230" loading="lazy">
+                <p>{title.line}</p>
+              </div>
+              <div class="hf-col">
+                <h3>The practices</h3>
+                <ul>{lamp.contents.map(e => { const b = BUILT.indexOf(e.go); return <li><a href={`#${e.go}`} data-go={b >= 0 ? b : undefined} aria-disabled={b < 0 ? 'true' : undefined}>{e.name}</a></li>; })}</ul>
+              </div>
+              <div class="hf-col">
+                <h3>MeWriT</h3>
+                <ul>
+                  <li><a href={href('/leadership/hetal-shah/')}>Dr Hetal Shah</a></li>
+                  <li><a href={contact.academy} target="_blank" rel="noopener">MeWriT Academy <span aria-hidden="true">↗</span></a></li>
+                  <li><a href={contact.linkedin} target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a></li>
+                </ul>
+              </div>
+              <div class="hf-col">
+                <h3>Write to us</h3>
+                <ul>
+                  <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+                  <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+                  <li><a href={contact.whatsapp} target="_blank" rel="noopener">WhatsApp <span aria-hidden="true">↗</span></a></li>
+                </ul>
+                <address>{office.map(l => <span>{l}</span>)}</address>
+              </div>
+            </div>
+            <p class="hf-colophon"><span>© <span data-year>{new Date().getFullYear()}</span> MeWriT</span><span>Made with <span class="hf-heart" role="img" aria-label="love">♥</span> by <a href="https://github.com/Git-Ansh" target="_blank" rel="noopener">Ansh Shah</a></span></p>
+          </div>
+        </footer>
+
+        <!-- the other chapters' words, centred below each chapter's object -->
+        <div class="hs-caps">
+          {caps.map(w => (
+            <article class="hs-cap" id={w.id} data-ch={w.id} data-name={w.name} data-num={w.num} aria-label={`${w.num} ${w.name}`}>
+              <h2 class="hs-hl">{w.headline}</h2>
+              <p class="hs-line">{w.line}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/house/film.js';
+</script>

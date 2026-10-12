@@ -36,7 +36,11 @@ export function shadows(obj, cast = true, take = true) { obj.traverse(o => { if 
 export function at(obj, x, y, z, r = {}) { obj.position.set(x, y, z); if (r.y) obj.rotation.y = r.y; if (r.x) obj.rotation.x = r.x; if (r.z) obj.rotation.z = r.z; return obj; }
 // a box with softened edges (w, h, d; the edge's radius; seg, the rounding's steps: two read as round
 // at any distance the camera comes to)
+// (a size below nought is always a slip in the sum that made it: three's rounded box would take it for
+// a corner's radius and swell into a blob metres across, so it is measured as it was meant and named in
+// the console)
 export function rbox(w, h, d, radius, material, seg = 2) {
+  if (w < 0 || h < 0 || d < 0) { console.warn('[house] rbox with a negative size', w, h, d); w = Math.abs(w); h = Math.abs(h); d = Math.abs(d); }
   const r = Math.max(.001, Math.min(radius, w / 2 - .001, h / 2 - .001, d / 2 - .001));
   return shadows(new THREE.Mesh(new RoundedBoxGeometry(w, h, d, seg, r), material));
 }
@@ -138,6 +142,47 @@ export function shade(hex, k) { const v = parseInt(hex.slice(1), 16), f = x => M
 // the surface at y), so everything sits down even where the occlusion is not drawn (the low tier)
 let blob = null;
 const blobMats = new Map();
+// a bound volume lying flat, as a hardback is made: two boards that overhang the page block a little at
+// its head, tail and fore-edge (the pages recessed under them, seen as paper), a solid spine joining the
+// boards, its label (a texture) on it. w along the spine, th its thickness, d from the spine to the
+// fore-edge; the spine faces -z (toward a reader at -z); its middle at the origin
+export function boundVolume({ w, th, d, cloth, spine = null, pages = null }) {
+  const g = new THREE.Group(), b = .055, o = .07;
+  const page = pages || mat('#EFE8DA', { r: .9 });
+  g.add(at(rbox(w, b, d, .02, cloth), 0, th / 2 - b / 2, 0), at(rbox(w, b, d, .02, cloth), 0, -th / 2 + b / 2, 0));
+  // (the page block: short of the boards by o at the head, tail and fore-edge, against the spine)
+  g.add(at(rbox(w - 2 * o, th - 2 * b + .01, d - o - .06, .01, page), 0, 0, -d / 2 + .06 + (d - o - .06) / 2));
+  g.add(at(rbox(w, th, .12, .04, cloth), 0, 0, -d / 2 + .06));
+  if (spine) { const p = new THREE.Mesh(new THREE.PlaneGeometry(w - .06, th - .05), new THREE.MeshStandardMaterial({ map: spine, roughness: .85 })); p.rotation.y = Math.PI; p.position.z = -d / 2 - .002; g.add(p); }
+  g.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
+  return g;
+}
+
+// a cup of tea on its saucer, in glazed white porcelain with gold rims (turned: a curved bowl on a foot
+// ring, a rolled lip, a loop handle; the saucer's well and raised rim), the tea in it. Its foot at the
+// origin; the cup's mouth .43 up. For the writers' places in 03 and 04 (the film steams it)
+export function teacup() {
+  const g = new THREE.Group();
+  const china = new THREE.MeshStandardMaterial({ color: '#FBF9F4', roughness: .16, metalness: 0, emissive: '#FFF6E8', emissiveIntensity: .16 });   // (porcelain lets a little light through: never grey in shade)
+  const gold = new THREE.MeshStandardMaterial({ color: '#D2AE5E', roughness: .25, metalness: .9 });
+  const lathe = (pts, m, seg = 56) => { const ge = new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg); ge.computeVertexNormals(); const mesh = new THREE.Mesh(ge, m); mesh.castShadow = mesh.receiveShadow = true; return mesh; };
+  // the saucer: its foot, its well, its rim rising, back over its top to the middle
+  g.add(lathe([[0, 0], [.15, 0], [.165, .014], [.2, .028], [.36, .046], [.455, .072], [.472, .086], [.462, .094], [.35, .066], [.21, .05], [.19, .044], [0, .044]], china));
+  const ring = (r, y, t) => { const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 8, 64), gold); m.rotation.x = Math.PI / 2; m.position.y = y; return m; };
+  g.add(ring(.465, .091, .005));
+  // the cup: a foot ring, the bowl swelling up to a lip that turns out a little; inside, down to its floor
+  const cup = new THREE.Group(); cup.position.y = .044; g.add(cup);
+  cup.add(lathe([[0, 0], [.12, 0], [.13, .012], [.118, .03], [.15, .05], [.2, .11], [.245, .2], [.27, .3], [.282, .38], [.29, .405], [.284, .412], [.27, .4], [.258, .32], [.232, .2], [.18, .11], [.1, .066], [0, .06]], china));
+  cup.add(ring(.287, .408, .006));
+  // the tea, a little below the lip, darker at its edge
+  const tea = new THREE.Mesh(new THREE.CircleGeometry(.262, 48), new THREE.MeshStandardMaterial({ color: '#5A3218', roughness: .08, metalness: .1 }));
+  tea.rotation.x = -Math.PI / 2; tea.position.y = .355; cup.add(tea);
+  // the handle: a loop out from the bowl's side, thicker where it meets the cup
+  const path = new THREE.CatmullRomCurve3([[.255, .33, 0], [.34, .345, 0], [.405, .3, 0], [.4, .21, 0], [.33, .16, 0], [.235, .15, 0]].map(p => new THREE.Vector3(...p)));
+  const handle = new THREE.Mesh(new THREE.TubeGeometry(path, 32, .027, 10, false), china); handle.castShadow = true; cup.add(handle);
+  return g;
+}
+
 export function contact(w, d, x, z, { y = 0, k = .34, ry = 0, color = '#2E2216' } = {}) {
   // (an alpha map is read from the green channel: white at the heart to black at the rim, opaque)
   if (!blob) blob = canvasTex(128, 128, (c, W, H) => { c.fillStyle = '#000'; c.fillRect(0, 0, W, H); const g = c.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W / 2); g.addColorStop(0, '#fff'); g.addColorStop(.45, '#8c8c8c'); g.addColorStop(1, '#000'); c.fillStyle = g; c.fillRect(0, 0, W, H); }, { srgb: false, aniso: 1 });

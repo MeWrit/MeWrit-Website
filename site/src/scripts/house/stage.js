@@ -27,6 +27,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { OUTSIDE_K } from './outside.js';
 
 const RAD = Math.PI / 180;
 
@@ -165,7 +166,7 @@ export const HOURS = {
   morning: { sun: '#FFE7C7', sunK: 3.1, sunDir: [-.55, -.42, .72], fillSky: '#EAF0F8', fillGround: '#B8A388', fillK: 1.05, zenith: '#9FB8DA', horizon: '#EEF1F2', ground: '#C9C2B4', cloudLit: '#FFFFFF', cloudShade: '#C8D0E0', clouds: .9, disc: 1, lamp: .55, exposure: 1 },
   day: { sun: '#FFF4E2', sunK: 3.4, sunDir: [-.4, -.62, .68], fillSky: '#EEF3F9', fillGround: '#BCA98F', fillK: 1.1, zenith: '#8DAAD6', horizon: '#EDF1F4', ground: '#CBC4B6', cloudLit: '#FFFFFF', cloudShade: '#C4CCDE', clouds: .9, disc: 1, lamp: .2, exposure: 1 },
   evening: { sun: '#FFB980', sunK: 2.3, sunDir: [-.75, -.22, .62], fillSky: '#BDB6CC', fillGround: '#957A64', fillK: .8, zenith: '#3B4A7A', horizon: '#E7A983', ground: '#5E5560', cloudLit: '#FFCB9A', cloudShade: '#8A86A6', clouds: .9, disc: 1, lamp: 1.4, exposure: .99 },
-  night: { sun: '#9DB2E6', sunK: .45, sunDir: [-.3, -.75, .6], fillSky: '#40507F', fillGround: '#2A2630', fillK: .3, zenith: '#0A1638', horizon: '#1D2B55', ground: '#0B0F1E', cloudLit: '#3C4A72', cloudShade: '#182040', clouds: .5, disc: 0, lamp: 2.4, exposure: .92 },
+  night: { sun: '#9DB2E6', sunK: .45, sunDir: [-.3, -.75, .6], fillSky: '#40507F', fillGround: '#2A2630', fillK: .3, zenith: '#0A1638', horizon: '#1D2B55', ground: '#0B0F1E', cloudLit: '#3C4A72', cloudShade: '#182040', clouds: .5, disc: 0, lamp: 2.4, exposure: .92, out: .4 },
   dawn: { sun: '#FFD3A8', sunK: 1.6, sunDir: [.7, -.18, .68], fillSky: '#C9C8DF', fillGround: '#8E8090', fillK: .7, zenith: '#5D6FA6', horizon: '#F2C4A5', ground: '#6C6470', cloudLit: '#FFD2B4', cloudShade: '#9894B2', clouds: .85, disc: 1, lamp: .9, exposure: .97 },
   sunset: { sun: '#FF9D66', sunK: 2.4, sunDir: [-.85, -.14, .5], fillSky: '#B79FB8', fillGround: '#7E6158', fillK: .58, zenith: '#2C3768', horizon: '#F0A36F', ground: '#4E4352', cloudLit: '#FFB487', cloudShade: '#7A6A8C', clouds: .9, disc: 1, lamp: 1.6, exposure: .95 },
 };
@@ -390,6 +391,17 @@ void main() {
     const A = HOURS[a], B = HOURS[b], mix = (x, y) => x + (y - x) * k;
     blendC(sun.color, A.sun, B.sun, k); sun.intensity = mix(A.sunK, B.sunK);
     va.set(mix(A.sunDir[0], B.sunDir[0]), mix(A.sunDir[1], B.sunDir[1]), mix(A.sunDir[2], B.sunDir[2])).normalize();
+    // (when the light comes from somewhere quite different, the moon setting and the dawn coming, the light
+    // never slides across the walls: the old fades out, the new comes in from its own place)
+    {
+      const a = new THREE.Vector3(...A.sunDir).normalize(), bb = new THREE.Vector3(...B.sunDir).normalize();
+      if (a.dot(bb) < .9 && a !== bb) {
+        const out = Math.min(1, k / .5), inn = Math.max(0, (k - .5) / .5);
+        va.copy(k < .5 ? a : bb);
+        sun.intensity = k < .5 ? A.sunK * (1 - out) * (1 - out) : B.sunK * inn * inn;
+        blendC(sun.color, k < .5 ? A.sun : B.sun, k < .5 ? A.sun : B.sun, 0);
+      }
+    }
     placeSun();
     blendC(fill.color, A.fillSky, B.fillSky, k); blendC(fill.groundColor, A.fillGround, B.fillGround, k); fill.intensity = mix(A.fillK, B.fillK);
     blendC(skyU.uZenith.value, A.zenith, B.zenith, k); blendC(skyU.uHorizon.value, A.horizon, B.horizon, k); blendC(skyU.uGround.value, A.ground, B.ground, k);
@@ -400,6 +412,8 @@ void main() {
     lampK = mix(A.lamp, B.lamp);
     lamps.forEach(l => { l.light.intensity = l.power * lampK * l.k; });
     final.uniforms.uExposure.value = mix(A.exposure, B.exposure);
+    // (the land outside: dimmed at night, outside.js)
+    OUTSIDE_K.value = mix(A.out ?? 1, B.out ?? 1);
     // (the shadows are drawn again only if the sun has moved; its strength and colour need none)
     if (lastDir.distanceToSquared(va) > 1e-8) { lastDir.copy(va); renderer.shadowMap.needsUpdate = true; }
     stage.dirty = true;
