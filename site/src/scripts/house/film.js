@@ -1894,6 +1894,17 @@ void main() { if (hidden_()) discard; gl_FragColor = vec4(.72, .16, .1, 1.); }`,
       const vis = !!probe || inLecture || (cam.p[0] < READING.X1 && doorN > 0);
       if (lecture.group.visible !== vis) { lecture.group.visible = vis; if (comms) comms.group.visible = vis; world.dirty = true; world.shadowsDirty(); }
     }
+    // (and the rooms behind, a phone's GPU spared their drawing: from the reading room or the lecture room nothing
+    // of the study or the hall can be seen; from the lecture room with its door shut, nothing of the strong room;
+    // from the strong room, nothing of the study. Never a room whose door is in view: the strong room's doors are
+    // its own, so it stays while the reading room's door stands open)
+    {
+      const farEast = cam.p[0] < READING.X1 || inLecture, inStrong = cam.p[0] < ARCHIVE.X1 && cam.p[2] < -27;
+      const show = (grp, vis) => { if (grp && grp.visible !== vis) { grp.visible = vis; world.dirty = true; world.shadowsDirty(); } };
+      show(study && study.group, !!probe || !(farEast || inStrong));
+      show(hall && hall.group, !!probe || !(farEast || (inStrong && doorU <= 0)));
+      show(archive && archive.group, !!probe || !(inLecture && doorN <= 0));
+    }
     const key = `${poseKey(cam)}|${spot.toFixed(4)}`, moved = key !== lastKey;
     watch(dt * 1000, moved);   // (before drawing: a change of tier is drawn in this same frame)
     let show = false;
