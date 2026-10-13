@@ -5,11 +5,11 @@
 // (its own running head and folio, numbered sections, margin notes for standards and sources, lists
 // with hairlines). The site's dark footer follows. The 3D is src/scripts/lamp/inner.js; the words are
 // src/data/lamp.ts. No institution, company or client names.
-import Base from '../../layouts/Base.astro';
-import { regulatory as r, lamp } from '../../data/lamp';
-import { osf } from '../../scripts/lamp/figures.js';
-import { site } from '../../data/site';
-import '../../styles/lamp.css';
+import Base from '../../../layouts/Base.astro';
+import { regulatory as r, lamp } from '../../../data/lamp';
+import { osf } from '../../../scripts/lamp/figures.js';
+import { site } from '../../../data/site';
+import '../../../styles/lamp.css';
 
 const corners = ['tl', 'tr', 'bl', 'br'];
 const two = (j: number) => String(j + 1).padStart(2, '0');
@@ -79,5 +79,5 @@ const two = (j: number) => String(j + 1).padStart(2, '0');
 </Base>
 
 <script>
-  import '../../scripts/lamp/inner.js';
+  import '../../../scripts/lamp/inner.js';
 </script>

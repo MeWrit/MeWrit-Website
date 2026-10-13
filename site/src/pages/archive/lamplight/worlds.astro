@@ -4,7 +4,7 @@
 // its own grade, with a placeholder page at the anchor so the composition can be judged. The worlds
 // are src/scripts/lamp/worlds/; this page's script is viewer.js there (its switches: ?w= ?orbit
 // ?xfade=a,b ?q=low ?clean ?msaa ?ink, the last drawing a world as the film does by day).
-import Base from '../../layouts/Base.astro';
+import Base from '../../../layouts/Base.astro';
 
 const ids = ['desk', 'archive', 'reading', 'sky', 'dawn', 'auditorium', 'workshop'];
 ---
@@ -32,5 +32,5 @@ const ids = ['desk', 'archive', 'reading', 'sky', 'dawn', 'auditorium', 'worksho
 </style>
 
 <script>
-  import '../../scripts/lamp/worlds/viewer.js';
+  import '../../../scripts/lamp/worlds/viewer.js';
 </script>

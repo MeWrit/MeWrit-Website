@@ -20,7 +20,7 @@ const external = { target: '_blank', rel: 'noopener' };
         </div>
         <ul class="learn-mods reveal">{training.modules.map(m => <li>{m}</li>)}</ul>
       </div>
-      <div class="learn-for reveal">
+      {training.deliveredFor && <div class="learn-for reveal">
         <h3>{training.deliveredFor.title}</h3>
         {training.deliveredFor.groups.map(g => (
           <div class="learn-row">
@@ -28,7 +28,7 @@ const external = { target: '_blank', rel: 'noopener' };
             <ul class="learn-names">{g.items.map((n, i) => <>{i > 0 && ' '}<li>{n}</li></>)}</ul>
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   </div>
 </section>

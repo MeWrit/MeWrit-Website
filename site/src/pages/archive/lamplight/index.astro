@@ -9,13 +9,13 @@
 // furniture is a running head by day and a folio; one caption a chapter, its words from
 // src/data/lamp.ts, and its cards (the digital layer) beside the page. The last chapter is the footer.
 // The words are real page content and read in order without the 3D or without scripts.
-import Base from '../../layouts/Base.astro';
-import { lamp } from '../../data/lamp';
-import { CHAPTERS } from '../../scripts/lamp/chapters.js';
-import { osf } from '../../scripts/lamp/figures.js';
-import { site, contact } from '../../data/site';
-import { href } from '../../lib/url';
-import '../../styles/lamp.css';
+import Base from '../../../layouts/Base.astro';
+import { lamp } from '../../../data/lamp';
+import { CHAPTERS } from '../../../scripts/lamp/chapters.js';
+import { osf } from '../../../scripts/lamp/figures.js';
+import { site, contact } from '../../../data/site';
+import { href } from '../../../lib/url';
+import '../../../styles/lamp.css';
 
 // the words, in the chapters' order (a chapter without words fails the build)
 const words = CHAPTERS.map(c => {
@@ -167,5 +167,5 @@ const links = [
 </Base>
 
 <script>
-  import '../../scripts/lamp/film.js';
+  import '../../../scripts/lamp/film.js';
 </script>

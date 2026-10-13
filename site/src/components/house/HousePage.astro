@@ -23,7 +23,7 @@ import '../../styles/house.css';
 // the chapters of the house, in order (How we work is removed, section 11.4); built so far: the title
 // page and the contents (step 2), on the record (step 3: the walk into the hall)
 const ORDER = ['title-page', 'contents', 'on-the-record', 'regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory', 'correspondence'];
-// (a chapter being built is listed in the WIP spread below and shown only on /house-wip/ (dev) until the user has seen it: work in progress never
+// (a chapter being built is listed in the WIP spread below and shown only on /archive/house-wip/ (dev) until the user has seen it: work in progress never
 // reaches the reader's view)
 const { wip = false } = Astro.props;
 const WIP = !!wip && import.meta.env.DEV;

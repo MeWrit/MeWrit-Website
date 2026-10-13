@@ -23,7 +23,7 @@ export const lamp = {
     { id: 'contents', num: '01', name: 'Contents', headline: 'Five practices', line: 'Choose one, or read on.' },
     { id: 'on-the-record', num: '02', name: 'On the record', headline: `${YEARS_WORD_CAP} years, on the record`, line: '100+ trial documents, 30+ clinical study reports, 70+ publications, 3,000+ professionals trained.', note: 1, action: { label: 'Publications', href: '#publications' },
       cards: [{ k: '✦ Citation map', t: '70+ publications · 25 acknowledgements', ai: true }] },
-    { id: 'regulatory-writing', num: '03', name: 'Regulatory writing', headline: 'Submission-ready, to the letter', line: 'Protocols, clinical study reports, CTD modules and responses to regulators, for sponsors and CROs.', action: { label: 'Regulatory writing', href: href('/lamplight/regulatory-writing/'), kind: 'open' },
+    { id: 'regulatory-writing', num: '03', name: 'Regulatory writing', headline: 'Submission-ready, to the letter', line: 'Protocols, clinical study reports, CTD modules and responses to regulators, for sponsors and CROs.', action: { label: 'Regulatory writing', href: href('/archive/lamplight/regulatory-writing/'), kind: 'open' },
       cards: [{ k: 'eCTD · Module 2.7', t: 'Validated ✓' }, { k: 'Submission', t: 'Ready for e-submission', live: true }] },
     { id: 'scientific-publications', num: '04', name: 'Scientific publications', headline: 'From manuscript to acceptance', line: 'Original research, reviews, case reports, abstracts and posters, written to ICMJE and GPP.', action: { label: 'Scientific publications', href: '#scientific-publications' },
       cards: [{ k: 'Journal', t: 'Accepted ✓', live: true }, { k: '✦ ICMJE checklist', t: 'Complete · writing support acknowledged', ai: true }] },
@@ -55,7 +55,7 @@ export const lamp = {
   ] as { label: string; href: string; external?: boolean }[],
   office,
   pages: [
-    { label: 'Regulatory writing', href: href('/lamplight/regulatory-writing/') },
+    { label: 'Regulatory writing', href: href('/archive/lamplight/regulatory-writing/') },
     { label: 'Contents', href: '#contents', go: 'contents' },
     { label: 'Title page', href: '#title-page', go: 'title-page' },
   ],
@@ -86,10 +86,10 @@ export const regulatory = {
   related: {
     title: 'Related practices',
     links: [
-      { label: 'Scientific publications', href: href('/lamplight/#scientific-publications') },
-      { label: 'Medical communications', href: href('/lamplight/#contents') },
-      { label: 'Training', href: href('/lamplight/#contents') },
-      { label: 'AI/ML advisory', href: href('/lamplight/#contents') },
+      { label: 'Scientific publications', href: href('/archive/lamplight/#scientific-publications') },
+      { label: 'Medical communications', href: href('/archive/lamplight/#contents') },
+      { label: 'Training', href: href('/archive/lamplight/#contents') },
+      { label: 'AI/ML advisory', href: href('/archive/lamplight/#contents') },
     ],
   },
   start: { title: 'Start a project', text: enquiry.text, button: { label: 'Start a project', href: href('/#contact') } },
