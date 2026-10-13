@@ -19,11 +19,13 @@ const PARTICLE_VS = /* glsl */`
 uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
 uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDust;
 uniform vec3 uMouseO, uMouseD;
+uniform float uGlowK;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
 attribute float aKeyFrom, aKeyTo, aPick;
 attribute vec4 aRand, aStream;
 varying vec3 vColor;
 varying float vAlpha;
+varying vec3 vP;
 
 // the rivers' course (keep in step with streamAt in formations.js)
 vec3 streamAt(float u, float side, float ang, float rad) {
@@ -92,17 +94,52 @@ void main() {
   gl_Position = projectionMatrix * mv;
   vColor = col * uGain;
   vAlpha = mix(fa, fb, e) * clamp(px / 1.5, .15, 1.) * smoothstep(.5, 2.5, depth) * (1. - smoothstep(45., 70., depth));
+  vP = p;
+  // the glow pass (ink mode's light behind the shapes): one particle in three, each drawn as a large soft
+  // round of one size, so they melt into one haze; the dust (key below zero) gives none
+  if (uGlowK > .5) {
+    if (aRand.z > .34 || aKeyTo < -.5) { gl_Position = vec4(2., 2., 2., 1.); gl_PointSize = 0.; }
+    else gl_PointSize = clamp(uSize * uScale / depth * 16., 14., 300.);
+  }
 }`;
 
 const PARTICLE_FS = /* glsl */`
+uniform float uInk;
+uniform vec3 uInkC;
 varying vec3 vColor;
 varying float vAlpha;
 void main() {
   vec2 c = gl_PointCoord - .5;
   float r2 = dot(c, c) * 4.;
   if (r2 > 1.) discard;
+  if (uInk > .5) {
+    // ink on paper (review switch ?ink): a crisp dot, navy, or the logo's orange where the light was warm;
+    // the brighter the light was, the denser the ink
+    float warm = clamp((vColor.r - vColor.b) * 2.5, 0., 1.);
+    vec3 ink = mix(uInkC, vec3(.72, .33, .04), warm);
+    float lum = clamp(dot(vColor, vec3(.3, .59, .11)), 0., 1.4);
+    gl_FragColor = vec4(ink, min(1., (1. - smoothstep(.5, 1., r2)) * vAlpha * (.2 + lum * .85)));
+    return;
+  }
   float a = (exp(-r2 * 16.) + exp(-r2 * 4.) * .2) * (1. - r2) * vAlpha;
   gl_FragColor = vec4(vColor, a);
+}`;
+
+// ink mode's light: a soft round of colour per glow particle, periwinkle (the navy as light) through
+// lilac and blush to peach (the orange as light) across the shape, so the two brand colours meet in
+// light rather than mixing to grey
+const GLOW_FS = /* glsl */`
+uniform vec3 uGlowA, uGlowB, uGlowC, uGlowD;
+uniform float uGlowAlpha;
+varying float vAlpha;
+varying vec3 vP;
+void main() {
+  vec2 c = gl_PointCoord - .5;
+  float r2 = dot(c, c) * 4.;
+  if (r2 > 1.) discard;
+  float t = clamp(vP.x * .085 - vP.y * .045 + .5, 0., 1.) * 3.;
+  vec3 col = t < 1. ? mix(uGlowA, uGlowB, t) : t < 2. ? mix(uGlowB, uGlowC, t - 1.) : mix(uGlowC, uGlowD, t - 2.);
+  gl_FragColor = vec4(col, exp(-r2 * 3.2) * (1. - r2) * vAlpha * uGlowAlpha);
 }`;
 
 const BG_VS = /* glsl */`
@@ -178,16 +215,19 @@ const circle = (r, n = 192, y = null) => Array.from({ length: n }, (_, i) => {
   return y === null ? [[Math.cos(t0) * r, Math.sin(t0) * r, 0], [Math.cos(t1) * r, Math.sin(t1) * r, 0], t0 * r] : [[Math.cos(t0) * r, y, Math.sin(t0) * r], [Math.cos(t1) * r, y, Math.sin(t1) * r], t0 * r];
 });
 
-export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false }) {
+// look (review switches): night [top, bottom] replaces the scenes' background; paper [top, bottom] and
+// inkColor colour the ink mode
+export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false, ink = false, look: pal = {} }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false });
   renderer.setPixelRatio(dpr);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = ink ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;   // tone mapping would grey the paper
+  const BLEND = ink ? THREE.NormalBlending : THREE.AdditiveBlending;
   renderer.toneMappingExposure = 1;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(40, 1, .1, 220);
   const lineMat = (color, extra = {}) => new THREE.ShaderMaterial({
-    vertexShader: LINE_VS, fragmentShader: LINE_FS, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
-    uniforms: { uColor: { value: new THREE.Color(color) }, uOpacity: { value: 0 }, uDash: { value: 0 }, uDashOffset: { value: 0 }, uCam: { value: camera.position }, uNear: { value: 8 }, uFar: { value: 44 }, ...extra },
+    vertexShader: LINE_VS, fragmentShader: LINE_FS, transparent: true, depthWrite: false, depthTest: false, blending: BLEND,
+    uniforms: { uColor: { value: new THREE.Color(ink ? '#1C3472' : color) }, uOpacity: { value: 0 }, uDash: { value: 0 }, uDashOffset: { value: 0 }, uCam: { value: camera.position }, uNear: { value: 8 }, uFar: { value: 44 }, ...extra },
   });
 
   // the background
@@ -230,10 +270,20 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     uTime: { value: 0 }, uMorph: { value: 0 }, uRevealFrom: { value: 1 }, uRevealTo: { value: 0 }, uSpinFrom: { value: 0 }, uSpinTo: { value: 0 },
     uStreamFrom: { value: 0 }, uStreamTo: { value: 0 }, uGhostFrom: { value: 1 }, uGhostTo: { value: 1 }, uScale: { value: 1 }, uSize: { value: .06 }, uMouse: { value: 0 }, uMotion: { value: 1 }, uFlow: { value: 1.6 }, uGain: { value: 1 },
     uPick: { value: -1 }, uPickOn: { value: 0 }, uDust: { value: 1 }, uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
+    uInk: { value: ink ? 1 : 0 }, uInkC: { value: new THREE.Color(pal.inkColor || '#14265C') }, uGlowK: { value: 0 },
   };
-  const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+  const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, blending: BLEND });
   const points = new THREE.Points(geo, mat);
   points.frustumCulled = false; scene.add(points);
+  // ink mode's light behind the shapes (GLOW_FS): the same particles, about a sixth of them, large and
+  // soft, drawn before the ink. The uniforms are shared with the ink, all but the glow's own
+  if (ink && pal.glow !== false) {
+    const G = pal.glowColors || ['#B3CAFC', '#E1BBE9', '#FABAC2', '#FBC49F'];
+    const glowMat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: GLOW_FS, transparent: true, depthWrite: false, depthTest: false, blending: THREE.NormalBlending,
+      uniforms: { ...U, uGlowK: { value: 1 }, uGlowA: { value: new THREE.Color(G[0]) }, uGlowB: { value: new THREE.Color(G[1]) }, uGlowC: { value: new THREE.Color(G[2]) }, uGlowD: { value: new THREE.Color(G[3]) }, uGlowAlpha: { value: pal.glowAlpha || .07 } } });
+    const glow = new THREE.Points(geo, glowMat);
+    glow.frustumCulled = false; glow.renderOrder = -1; scene.add(glow);
+  }
   let pair = [-1, -1], streamOf = -1;
   function setPair(a, b, streamForm) {
     if (a !== pair[0]) { geo.setAttribute('aFrom', attrs[a].pos); geo.setAttribute('aColFrom', attrs[a].col); geo.setAttribute('aKeyFrom', attrs[a].key); }
@@ -307,7 +357,14 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       o1.material.uniforms.uOpacity.value = s.orbit * .3; o1.material.uniforms.uDash.value = .5; o1.material.uniforms.uDashOffset.value = -s.time * .4;
       o2.material.uniforms.uOpacity.value = s.orbit * .22; o2.material.uniforms.uDash.value = .28;
       bloom.strength = s.bloom; finish.uniforms.uAberr.value = s.aberr;
-      if (trails) trails.damp = s.trails;
+      if (ink) {   // paper: the page's soft blue-grey, no glow, no grid, no bloom, no lens
+        bgMat.uniforms.uTop.value.set((pal.paper || [])[0] || '#F4F6FA'); bgMat.uniforms.uBottom.value.set((pal.paper || [])[1] || '#EAEEF5');
+        bgMat.uniforms.uGlow.value.setRGB(0, 0, 0); bgMat.uniforms.uGrid.value = 0;
+        bloom.strength = 0; finish.uniforms.uAberr.value = 0; finish.uniforms.uVignette.value = 0; finish.uniforms.uGrain.value = .012;
+        U.uDust.value = Math.min(s.dust, 1.4);   // on paper the tail's bright dust would read as dirt: a light speckle only
+      }
+      if (pal.night && !ink) { bgMat.uniforms.uTop.value.set(pal.night[0]); bgMat.uniforms.uBottom.value.set(pal.night[1]); bgMat.uniforms.uGrid.value = 0; }
+      if (trails) trails.damp = ink ? 0 : s.trails;
       finish.uniforms.uTime.value = s.time;
     },
     pointer(ndcX, ndcY, strength) {

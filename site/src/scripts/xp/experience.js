@@ -34,6 +34,10 @@ function start() {
   const big = !matchMedia('(pointer: coarse)').matches && Math.max(innerWidth, screen.width) >= 900;
   const N = big ? 64000 : 24000;
   const motion = REDUCE ? 0 : 1;
+  // review switch ?day: the film by day (cream, the shapes in navy ink over a pastel glow; xp.css's
+  // html.xp-day), the site's light dress around it; the loading screen keeps the night
+  const DAY = /[?&]day\b/.test(location.search);
+  if (DAY) { root.classList.add('xp-day'); root.dataset.theme = 'light'; }
 
   // ---------- the scroll: P runs from 0 to S through the scenes, and on to S + 1 through the tail ----------
   const TAIL_LEN = 1.1;   // the tail, in stage heights (its 110svh in xp.css)
@@ -301,9 +305,21 @@ function start() {
   const warmQ = [...new Set([F.DUST, ...SCENES.map(s => s.form)])].filter(f => f !== SCENES[OPEN].form), WARM_N = warmQ.length;
   let warmReady = false;
   const warmOne = () => { const f = warmQ.shift(); try { world.warm(f); } finally { setProgress(100 - 25 * warmQ.length / WARM_N); } };
+  // colour review switches: ?night=2B4A92,1C3472 &paper=F5EFE6,EFE6D8 &inkc=24304F (hex, no #)
+  function lookFromUrl() {
+    const q = new URLSearchParams(location.search), hex = v => (v || '').split(',').filter(h => /^[0-9a-f]{6}$/i.test(h)).map(h => '#' + h), look = {};
+    if (hex(q.get('night')).length === 2) look.night = hex(q.get('night'));
+    if (hex(q.get('paper')).length === 2) look.paper = hex(q.get('paper'));
+    if (hex(q.get('inkc')).length === 1) look.inkColor = hex(q.get('inkc'))[0];
+    const ga = parseFloat(q.get('glowa'));   // ink mode's glow: its strength (&glowa=0.07), or none (&noglow)
+    if (ga > 0) look.glowAlpha = ga;
+    if (q.has('noglow')) look.glow = false;
+    return look;
+  }
   import('./world.js').then(({ createWorld }) => {
     setProgress(55);
-    world = createWorld(canvas, { N, dpr: Math.min(devicePixelRatio || 1, big ? 2 : 1.75), bloomScale: big ? 1 : .5, trails: big && !!motion, compact });
+    world = createWorld(canvas, { N, dpr: Math.min(devicePixelRatio || 1, big ? 2 : 1.75), bloomScale: big ? 1 : .5, trails: big && !!motion, compact, ink: DAY || /[?&]ink\b/.test(location.search),
+      look: DAY ? { paper: ['#FCF6EE', '#F6EDE2'], inkColor: '#1C3472', glowAlpha: .35, ...lookFromUrl() } : lookFromUrl() });
     world.resize(CW, CH);
     buildKeys(W2, H2);   // the shapes' boxes come with the world
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); world = null; sec.classList.add('xp-nogl'); });

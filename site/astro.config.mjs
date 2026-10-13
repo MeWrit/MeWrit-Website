@@ -9,6 +9,8 @@ const B = (process.env.BASE_PATH || '/').replace(/\/$/, '');
 export default defineConfig({
   site: process.env.SITE_URL || 'https://mewrit.com',
   base: process.env.BASE_PATH || '/',
+  // Astro's own toolbar (dev server only) sits at the foot of the page, where it reads as part of the design under review
+  devToolbar: { enabled: false },
   // the experience became the home page on 2026-10-13; the drafts before it live on in /archive/,
   // and their old addresses (links already sent out) lead there
   redirects: {

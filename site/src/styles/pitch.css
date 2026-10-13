@@ -264,3 +264,13 @@
 @media (prefers-reduced-motion:reduce){
   .prac-num i::after,.why-n i::after,.how-n i::after,.ack figcaption::before,.prac-more summary::before{transition:none}
 }
+
+/* by day (review switch ?day, experience.js): the canvas behind the page is cream, so the light
+   sections are the page itself (the panels lose their frost, edge and shadow; the white cards stay)
+   and the night sections get a navy ground of their own, edge to edge */
+html.xp-day .pitch-panel{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html.xp-day .pitch-night{margin-top:var(--pitch-gap);padding-bottom:var(--pitch-gap);background:#13234C}
+html.xp-day .pitch-light + .pitch-night,html.xp-day .pitch-night + .pitch-light{margin-top:0}
+html.xp-day .pitch-night + .pitch-light{padding-top:var(--pitch-gap)}
+/* the labels in the site's sans, not the monospace: a firm's page, not an instrument's */
+html.xp-day :is(.pitch .eyebrow,.prac-num,.why-n,.how-n,.prac-full,.prac-more summary,.prac-k,.prac-std li,.proof-label,.proof-note,.how-terms,.learn-k,.ack figcaption,.cred-values){font-family:var(--sans);letter-spacing:.08em}
