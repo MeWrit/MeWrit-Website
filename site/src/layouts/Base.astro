@@ -116,7 +116,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.incl
   <slot />
 </main>
 <SiteFooter />
-<QuickContact />
+<QuickContact float={Astro.url.pathname.includes('/archive/')} />
 <PhoneDock />
 <CapsuleMenu />
 <NavExperiments />

@@ -18,7 +18,9 @@
    override what is fitted and where: box (a part of the shape, or a padded one: { c, size }),
    target and targetPhone (the rectangle on the stage, in fractions), pad (room in px kept clear
    inside the target, [top, right, bottom, left], for labels), over (the words may stand over the
-   shape, on a stronger shade). */
+   shape, on a stronger shade). light: 1 for a scene by day (cream, the shape in navy ink; world.js
+   moves between night and day through a pastel dawn as the scroll crosses from one to the other),
+   none for the night. */
 import { F } from './formations.js';
 import { YEARS } from '../../data/years';
 
@@ -50,7 +52,7 @@ export const SCENES = [
     readout: [['Writing', 'Fixed fee per project'], ['Advisory', 'By the hour'], ['Training', 'By topics and days']],
   },
   {
-    id: 'reg-designs', form: F.STREAMS, chapter: 0,
+    id: 'reg-designs', form: F.STREAMS, chapter: 0, light: 1,
     a: [[0, 2.2, 12.5], [0, .2, -14], 46, .1, 0], b: [[0, 2.6, 7.5], [0, .8, -18], 50, .1, 0],
     box: { c: [0, .5, -5], size: [7, 3, 16] },   // the rivers run 42 deep: fit their first stretch, the rest runs off into the distance
     bg: DEEP, glow: ['#1C3472', .45], floor: [-1.9, .45],
@@ -59,35 +61,35 @@ export const SCENES = [
     note: 'The trial shown is illustrative',
   },
   {
-    id: 'reg-dossier', form: F.DOSSIER, chapter: 0,
+    id: 'reg-dossier', form: F.DOSSIER, chapter: 0, light: 1,
     a: [[0, 1.69, 23.93], [0, -.2, -2], 54, .2, -.04], b: [[1.88, .88, 22.91], [0, -.2, -2], 50, .18, -.04],
     bg: NAVY, glow: ['#1C3472', .5],
     callouts: ['CSR, ICH E3', 'CTD 2.5', 'CTD 2.7', 'MAA dossier', 'Narratives', 'CIP / CER', 'Regulatory response'].map((label, j) => ({ at: 'p' + j, label, min: .04 + .9 * j / 7 + .08, dy: j % 2 ? 60 : 12, phone: ![1, 2, 5, 6].includes(j) })),
     readout: [['CSRs, ICH E3', { to: 30 }, '30+'], ['CTD summaries', { to: 30 }, '30+'], ['Narratives', { to: 1500 }, '1,500+']],
   },
   {
-    id: 'pub-literature', form: F.PAPERS, chapter: 1,
+    id: 'pub-literature', form: F.PAPERS, chapter: 1, light: 1,
     a: [[0, -4.87, 25.73], [0, 3.75, -3], 53, .12, -.05], b: [[0, 12.31, 24.71], [0, 3.75, -3], 53, .14, -.01],
     spin: .04, size: 1.2, bg: NAVY, glow: ['#1C3472', .5],
     callouts: [{ at: 'included', label: 'Included in the review', min: .55 }],
     readout: [['Publications and presentations', { to: 70 }, '70+'], ['Acknowledged in', { to: 25 }, '25+ papers'], ['Book chapters', '4']],
   },
   {
-    id: 'pub-manuscript', form: F.MANUSCRIPT, chapter: 1,
+    id: 'pub-manuscript', form: F.MANUSCRIPT, chapter: 1, light: 1,
     a: [[-2.38, .01, 21.33], [0, 1.3, 0], 47, .22, -.05], b: [[1.5, 2.14, 20.94], [0, 1.5, 0], 46, .22, -.04],
     bg: NAVY, glow: ['#1C3472', .5],
     callouts: [{ at: 'title', label: 'Title', min: .1 }, { at: 'abstract', label: 'Structured abstract', min: .3 }, { at: 'figure', label: 'Figure 2', min: .55 }, { at: 'stamp', label: 'Accepted', min: .98 }],
     readout: [['Guidelines', 'ICMJE, GPP'], ['Congress presentations', { to: 30 }, '30'], ['Status', 'In review', 'Accepted']],
   },
   {
-    id: 'med-evidence', form: F.LANDSCAPE, chapter: 2,
+    id: 'med-evidence', form: F.LANDSCAPE, chapter: 2, light: 1,
     a: [[-12, 16.34, 17.67], [0, -1, -9], 67, .21, -.01], b: [[14.07, 20.11, 12.11], [0, -1, -9], 65, .24, .01],
     size: 2, gain: 1.6, bg: DEEP, glow: ['#1C3472', .4], floor: [-2.75, .35], grid: .5,
     callouts: [{ at: 'peak', label: 'Primary outcome', min: .6, side: 'l' }, { at: 'second', label: 'Secondary outcome', min: .4 }, { at: 'near', label: 'Subgroup', min: .1, side: 'l' }],
     readout: [['Evidence', 'Real-world'], ['Readers', 'Clinicians, payers, regulators'], ['Formats', 'Papers, statements, reports']],
   },
   {
-    id: 'med-narrative', form: F.CURVES, chapter: 2,
+    id: 'med-narrative', form: F.CURVES, chapter: 2, light: 1,
     a: [[-5.14, 2.41, 26.44], [0, .5, 0], 46, .24, -.07], b: [[4.43, .34, 24.71], [.6, .5, 0], 44, .23, -.07],
     bg: NAVY, glow: ['#1C3472', .45], grid: 1,
     callouts: [{ at: 'treatment', label: 'Treatment', min: .9 }, { at: 'control', label: 'Control', min: .9 }, { at: 'effect', label: 'HR 0.72, 95% CI 0.58 to 0.89', min: .62, side: 'l' }, { at: 'axis', label: 'Months', min: 0, side: 'l', phone: false }],
@@ -95,7 +97,7 @@ export const SCENES = [
     note: 'Figures are illustrative',
   },
   {
-    id: 'training', form: F.CROWD, chapter: 3,
+    id: 'training', form: F.CROWD, chapter: 3, light: 1,
     a: [[2.42, .46, 31.91], [0, .3, -2], 51, .23, -.11], b: [[-6.62, 2.09, 28.1], [.6, .4, -2], 57, .24, -.1],
     size: 1, gain: 1.7,
     bg: WARM, glow: ['#3A2A3A', .5],
@@ -103,7 +105,7 @@ export const SCENES = [
     readout: [['Professionals trained', { to: 3000 }, '3,000+'], ['Training since', '2008'], ['Formats', 'Half-day to 3 days']],
   },
   {
-    id: 'ai', form: F.NETWORK, chapter: 4,
+    id: 'ai', form: F.NETWORK, chapter: 4, light: 1,
     a: [[-7.62, 5.08, 25.4], [0, 0, 0], 47, .22, -.12], b: [[16.58, 3.33, 18.85], [.5, 0, 0], 43, .18, -.11],
     bg: NAVY, glow: ['#1C3472', .5], grid: .5,
     callouts: [{ at: 'input', label: 'Source data and drafts', min: .05 }, { at: 'model', label: 'The model', min: .35, side: 'l' }, { at: 'output', label: 'Generated content', min: .65 }, { at: 'review', label: 'Expert review, in the loop', min: .85, dy: 40 }],

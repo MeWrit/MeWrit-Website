@@ -34,10 +34,10 @@ function start() {
   const big = !matchMedia('(pointer: coarse)').matches && Math.max(innerWidth, screen.width) >= 900;
   const N = big ? 64000 : 24000;
   const motion = REDUCE ? 0 : 1;
-  // review switch ?day: the film by day (cream, the shapes in navy ink over a pastel glow; xp.css's
-  // html.xp-day), the site's light dress around it; the loading screen keeps the night
-  const DAY = /[?&]day\b/.test(location.search);
-  if (DAY) { root.classList.add('xp-day'); root.dataset.theme = 'light'; }
+  // review switch ?day (or ?ink): the whole film by day, every scene's words in the day's colours; the
+  // loading screen keeps the night
+  const DAY = /[?&](day|ink)\b/.test(location.search);
+  if (DAY) { root.classList.add('xp-day'); articles.forEach(a => { if (a) a.dataset.light = 'day'; }); }
 
   // ---------- the scroll: P runs from 0 to S through the scenes, and on to S + 1 through the tail ----------
   const TAIL_LEN = 1.1;   // the tail, in stage heights (its 110svh in xp.css)
@@ -311,15 +311,12 @@ function start() {
     if (hex(q.get('night')).length === 2) look.night = hex(q.get('night'));
     if (hex(q.get('paper')).length === 2) look.paper = hex(q.get('paper'));
     if (hex(q.get('inkc')).length === 1) look.inkColor = hex(q.get('inkc'))[0];
-    const ga = parseFloat(q.get('glowa'));   // ink mode's glow: its strength (&glowa=0.07), or none (&noglow)
-    if (ga > 0) look.glowAlpha = ga;
-    if (q.has('noglow')) look.glow = false;
+    if (['aces', 'neutral', 'agx'].includes(q.get('tm'))) look.toneMapping = q.get('tm');   // the frame's tone mapping (none by default: &tm=aces)
     return look;
   }
   import('./world.js').then(({ createWorld }) => {
     setProgress(55);
-    world = createWorld(canvas, { N, dpr: Math.min(devicePixelRatio || 1, big ? 2 : 1.75), bloomScale: big ? 1 : .5, trails: big && !!motion, compact, ink: DAY || /[?&]ink\b/.test(location.search),
-      look: DAY ? { paper: ['#FCF6EE', '#F6EDE2'], inkColor: '#1C3472', glowAlpha: .35, ...lookFromUrl() } : lookFromUrl() });
+    world = createWorld(canvas, { N, dpr: Math.min(devicePixelRatio || 1, big ? 2 : 1.75), bloomScale: big ? 1 : .5, trails: big && !!motion, compact, day: DAY, look: lookFromUrl() });
     world.resize(CW, CH);
     buildKeys(W2, H2);   // the shapes' boxes come with the world
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); world = null; sec.classList.add('xp-nogl'); });
@@ -374,7 +371,7 @@ function start() {
   }
 
   // ---------- every frame ----------
-  let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '';
+  let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '', dayCss = '';
   const spinAcc = new Float64Array(Object.keys(F).length), pt = [0, 0, 0];   // how far each formation has turned
   const st8 = {};
   // what the tail fades away (the canvas stays: its dust is the backdrop from here on)
@@ -446,7 +443,14 @@ function start() {
       floor: mix(A.floor ? A.floor[1] : 0, B.floor ? B.floor[1] : 0, kk), floorY: mix((A.floor || B.floor || [-2.2])[0], (B.floor || A.floor || [-2.2])[0], kk),
       orbit: mix(A.orbit || 0, B.orbit || 0, kk) * (1 - te), bloom: mix(mix(A.bloom || .7, B.bloom || .7, kk), TAIL.bloom, te),
       pick: hovered >= 0 ? hovered : focused, pickOn: pickOn ? 1 : 0, dust: mix(1, TAIL.dust, te),
+      // the light (scenes.js light): blended between the two scenes as the shape changes, back to the
+      // night in the tail; world.js passes through the dawn on the way
+      day: DAY ? 1 : mix(mix(A.light || 0, B.light || 0, kk), 0, te),
     });
+    // the shades behind the words, the labels and the bar take the light of the words on screen (xp.css:
+    // data-light); the words swap mid-change, as the light passes its middle
+    const dl = st8.day > .5 ? 'day' : 'night';
+    if (dl !== dayCss) { dayCss = dl; stage.dataset.light = dl; }
     world.set(st8);
     world.render();
 

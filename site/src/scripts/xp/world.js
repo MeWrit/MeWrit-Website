@@ -1,11 +1,16 @@
-/* The experience's 3D world, drawn with three.js (MIT licence). One cloud of glowing particles moves
-   between the formations (formations.js): the shader flies each particle from its place in one
-   formation to its place in the next, through a flow field, each leaving at its own moment, and
-   lights the shape as the reveal passes. Behind it a background with a soft glow, a floor grid and
-   the globe's orbits; after it, bloom and a finishing pass (a touch of lens fringing, a vignette,
-   film grain). The canvas is the page's backdrop, so it can be taller than the stage the shots are
-   framed for (camera() takes the stage's height). experience.js decides everything that changes;
-   this only draws it. */
+/* The experience's 3D world, drawn with three.js (MIT licence). One cloud of particles moves between
+   the formations (formations.js): the shader flies each particle from its place in one formation to
+   its place in the next, through a flow field, each leaving at its own moment, and lights the shape as
+   the reveal passes. Behind it a background with a soft glow, a floor grid and the globe's orbits;
+   after it, bloom and a finishing pass (a touch of lens fringing, a vignette, film grain).
+   Night and day are one world: `day` (0 to 1, from experience.js) moves the sky from the scene's
+   night through a pastel dawn (lavender above, peach at the horizon) to cream, and the particles from
+   light (added to the sky) to navy ink (laid over it), with the night's bloom, fringing and vignette
+   fading out. The night keeps its look without tone mapping on the frame: the background shader
+   tone-maps the night's sky itself (ACES, as the whole frame used to be), so the cream is never
+   greyed. The canvas is the page's backdrop, so it can be taller than the stage the shots are framed
+   for (camera() takes the stage's height). experience.js decides everything that changes; this only
+   draws it. */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -19,13 +24,11 @@ const PARTICLE_VS = /* glsl */`
 uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
 uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDust;
 uniform vec3 uMouseO, uMouseD;
-uniform float uGlowK;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
 attribute float aKeyFrom, aKeyTo, aPick;
 attribute vec4 aRand, aStream;
 varying vec3 vColor;
 varying float vAlpha;
-varying vec3 vP;
 
 // the rivers' course (keep in step with streamAt in formations.js)
 vec3 streamAt(float u, float side, float ang, float rad) {
@@ -94,17 +97,14 @@ void main() {
   gl_Position = projectionMatrix * mv;
   vColor = col * uGain;
   vAlpha = mix(fa, fb, e) * clamp(px / 1.5, .15, 1.) * smoothstep(.5, 2.5, depth) * (1. - smoothstep(45., 70., depth));
-  vP = p;
-  // the glow pass (ink mode's light behind the shapes): one particle in three, each drawn as a large soft
-  // round of one size, so they melt into one haze; the dust (key below zero) gives none
-  if (uGlowK > .5) {
-    if (aRand.z > .34 || aKeyTo < -.5) { gl_Position = vec4(2., 2., 2., 1.); gl_PointSize = 0.; }
-    else gl_PointSize = clamp(uSize * uScale / depth * 16., 14., 300.);
-  }
 }`;
 
+// at night a soft round of light, added to the sky; by day a crisp dot of ink laid over the paper: navy,
+// or the logo's orange where the light was warm, the denser the brighter the light was. The colour is
+// premultiplied and the alpha is the ink's share, so one blend (one, one minus alpha) adds at night
+// (alpha 0) and lays over by day
 const PARTICLE_FS = /* glsl */`
-uniform float uInk;
+uniform float uDay;
 uniform vec3 uInkC;
 varying vec3 vColor;
 varying float vAlpha;
@@ -112,52 +112,41 @@ void main() {
   vec2 c = gl_PointCoord - .5;
   float r2 = dot(c, c) * 4.;
   if (r2 > 1.) discard;
-  if (uInk > .5) {
-    // ink on paper (review switch ?ink): a crisp dot, navy, or the logo's orange where the light was warm;
-    // the brighter the light was, the denser the ink
-    float warm = clamp((vColor.r - vColor.b) * 2.5, 0., 1.);
-    vec3 ink = mix(uInkC, vec3(.72, .33, .04), warm);
-    float lum = clamp(dot(vColor, vec3(.3, .59, .11)), 0., 1.4);
-    gl_FragColor = vec4(ink, min(1., (1. - smoothstep(.5, 1., r2)) * vAlpha * (.2 + lum * .85)));
-    return;
-  }
-  float a = (exp(-r2 * 16.) + exp(-r2 * 4.) * .2) * (1. - r2) * vAlpha;
-  gl_FragColor = vec4(vColor, a);
-}`;
-
-// ink mode's light: a soft round of colour per glow particle, periwinkle (the navy as light) through
-// lilac and blush to peach (the orange as light) across the shape, so the two brand colours meet in
-// light rather than mixing to grey
-const GLOW_FS = /* glsl */`
-uniform vec3 uGlowA, uGlowB, uGlowC, uGlowD;
-uniform float uGlowAlpha;
-varying float vAlpha;
-varying vec3 vP;
-void main() {
-  vec2 c = gl_PointCoord - .5;
-  float r2 = dot(c, c) * 4.;
-  if (r2 > 1.) discard;
-  float t = clamp(vP.x * .085 - vP.y * .045 + .5, 0., 1.) * 3.;
-  vec3 col = t < 1. ? mix(uGlowA, uGlowB, t) : t < 2. ? mix(uGlowB, uGlowC, t - 1.) : mix(uGlowC, uGlowD, t - 2.);
-  gl_FragColor = vec4(col, exp(-r2 * 3.2) * (1. - r2) * vAlpha * uGlowAlpha);
+  float warm = clamp((vColor.r - vColor.b) * 2.5, 0., 1.);
+  vec3 ink = mix(uInkC, vec3(.72, .33, .04), warm);
+  float lum = clamp(dot(vColor, vec3(.3, .59, .11)), 0., 1.4);
+  float aNight = (exp(-r2 * 16.) + exp(-r2 * 4.) * .2) * (1. - r2) * vAlpha;
+  float aDay = min(1., (1. - smoothstep(.5, 1., r2)) * vAlpha * (.2 + lum * .85));
+  float a = mix(aNight, aDay, uDay);
+  gl_FragColor = vec4(mix(vColor, ink, uDay) * a, a * uDay);
 }`;
 
 const BG_VS = /* glsl */`
 varying vec2 vUv;
 void main() { vUv = position.xy * .5 + .5; gl_Position = vec4(position.xy, .999, 1.); }`;
+// the sky: the night's (its two colours, the glow behind the shape, the faint grid), tone-mapped here
+// with ACES (three.js's own fit, MIT), mixed toward the day's side (dawn, then cream: uDayTop and
+// uDayBottom, set by world.set) by uDayMix
 const BG_FS = /* glsl */`
-uniform vec3 uTop, uBottom, uGlow;
+uniform vec3 uTop, uBottom, uGlow, uDayTop, uDayBottom;
 uniform vec2 uGlowAt, uRes;
-uniform float uGlowR, uGrid, uPx;
+uniform float uGlowR, uGrid, uPx, uDayMix;
 varying vec2 vUv;
+vec3 RRTAndODTFit(vec3 v) { vec3 a = v * (v + .0245786) - .000090537; vec3 b = v * (.983729 * v + .4329510) + .238081; return a / b; }
+vec3 aces(vec3 c) {
+  const mat3 IN = mat3(vec3(.59719, .07600, .02840), vec3(.35458, .90834, .13383), vec3(.04823, .01566, .83777));
+  const mat3 OUT = mat3(vec3(1.60475, -.10208, -.00327), vec3(-.53108, 1.10813, -.07276), vec3(-.07367, -.00605, 1.07602));
+  return clamp(OUT * RRTAndODTFit(IN * (c / .6)), 0., 1.);
+}
 void main() {
-  vec3 c = mix(uBottom, uTop, smoothstep(0., 1., vUv.y));
+  float y = smoothstep(0., 1., vUv.y);
+  vec3 c = mix(uBottom, uTop, y);
   vec2 d = (vUv - uGlowAt) * vec2(uRes.x / uRes.y, 1.);
   c += uGlow * exp(-dot(d, d) / (uGlowR * uGlowR));
   float s = 56. * uPx;
   vec2 g = (.5 - abs(fract(gl_FragCoord.xy / s) - .5)) * s;
   c += vec3(.010, .018, .042) * (1. - smoothstep(0., uPx, min(g.x, g.y))) * uGrid;
-  gl_FragColor = vec4(c, 1.);
+  gl_FragColor = vec4(mix(aces(c), mix(uDayBottom, uDayTop, y), uDayMix), 1.);
 }`;
 
 const LINE_VS = /* glsl */`
@@ -171,13 +160,15 @@ void main() {
   vDist = aDist;
   gl_Position = projectionMatrix * viewMatrix * wp;
 }`;
+// light added at night, navy laid over by day (premultiplied, as the particles)
 const LINE_FS = /* glsl */`
-uniform vec3 uColor;
-uniform float uOpacity, uDash, uDashOffset;
+uniform vec3 uColor, uColorDay;
+uniform float uOpacity, uDash, uDashOffset, uDay;
 varying float vFade, vDist;
 void main() {
   if (uDash > 0. && fract((vDist + uDashOffset) / uDash) > .55) discard;
-  gl_FragColor = vec4(uColor, uOpacity * vFade);
+  float a = uOpacity * vFade;
+  gl_FragColor = vec4(mix(uColor, uColorDay, uDay) * a, a * uDay);
 }`;
 
 const FINISH = {
@@ -215,25 +206,37 @@ const circle = (r, n = 192, y = null) => Array.from({ length: n }, (_, i) => {
   return y === null ? [[Math.cos(t0) * r, Math.sin(t0) * r, 0], [Math.cos(t1) * r, Math.sin(t1) * r, 0], t0 * r] : [[Math.cos(t0) * r, y, Math.sin(t0) * r], [Math.cos(t1) * r, y, Math.sin(t1) * r], t0 * r];
 });
 
-// look (review switches): night [top, bottom] replaces the scenes' background; paper [top, bottom] and
-// inkColor colour the ink mode
-export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false, ink = false, look: pal = {} }) {
+// the day's sky, top and bottom, at points of the light (d): a twilight deep enough that the night's
+// light still shows on it (indigo above, dusky rose at the horizon), a pastel dawn (lavender, peach),
+// paler, then cream (look.paper may replace the cream). Colours made in OKLCH from the logo's navy and
+// orange hues (2026-10-13). Below d .5 the sky moves from the night to the twilight (uDayMix)
+const DAWN = [[.5, '#3D4177', '#B37078'], [.68, '#9D97CA', '#F8C4A8'], [.84, '#E7E1F6', '#FAE3D1']];
+// premultiplied blending: added where alpha is 0 (the night), laid over where it is 1 (the day)
+const PREMULT = { blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor };
+
+// day: when set (the review switches ?day and ?ink), the whole film by day; look (review switches):
+// paper [top, bottom] for the cream, inkColor, toneMapping for the frame (none by default)
+export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false, day: allDay = false, look: pal = {} }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false });
   renderer.setPixelRatio(dpr);
-  renderer.toneMapping = ink ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;   // tone mapping would grey the paper
-  const BLEND = ink ? THREE.NormalBlending : THREE.AdditiveBlending;
+  const TM = { aces: THREE.ACESFilmicToneMapping, neutral: THREE.NeutralToneMapping, agx: THREE.AgXToneMapping };
+  renderer.toneMapping = TM[pal.toneMapping] ?? THREE.NoToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(40, 1, .1, 220);
+  const uDay = { value: allDay ? 1 : 0 };   // shared by every material that changes with the light
   const lineMat = (color, extra = {}) => new THREE.ShaderMaterial({
-    vertexShader: LINE_VS, fragmentShader: LINE_FS, transparent: true, depthWrite: false, depthTest: false, blending: BLEND,
-    uniforms: { uColor: { value: new THREE.Color(ink ? '#1C3472' : color) }, uOpacity: { value: 0 }, uDash: { value: 0 }, uDashOffset: { value: 0 }, uCam: { value: camera.position }, uNear: { value: 8 }, uFar: { value: 44 }, ...extra },
+    vertexShader: LINE_VS, fragmentShader: LINE_FS, transparent: true, depthWrite: false, depthTest: false, ...PREMULT,
+    uniforms: { uColor: { value: new THREE.Color(color) }, uColorDay: { value: new THREE.Color(pal.inkColor || '#1C3472') }, uDay, uOpacity: { value: 0 }, uDash: { value: 0 }, uDashOffset: { value: 0 }, uCam: { value: camera.position }, uNear: { value: 8 }, uFar: { value: 44 }, ...extra },
   });
 
   // the background
+  const paper = [new THREE.Color((pal.paper || [])[0] || '#FCF6EE'), new THREE.Color((pal.paper || [])[1] || '#F6EDE2')];
+  const dawn = [...DAWN.map(([at, t, b]) => [at, new THREE.Color(t), new THREE.Color(b)]), [1, paper[0], paper[1]]];
   const bgMat = new THREE.ShaderMaterial({
     vertexShader: BG_VS, fragmentShader: BG_FS, depthTest: false, depthWrite: false,
-    uniforms: { uTop: { value: new THREE.Color() }, uBottom: { value: new THREE.Color() }, uGlow: { value: new THREE.Color() }, uGlowAt: { value: new THREE.Vector2(.6, .5) }, uGlowR: { value: .55 }, uGrid: { value: 0 }, uPx: { value: dpr }, uRes: { value: new THREE.Vector2(1, 1) } },
+    uniforms: { uTop: { value: new THREE.Color() }, uBottom: { value: new THREE.Color() }, uGlow: { value: new THREE.Color() }, uGlowAt: { value: new THREE.Vector2(.6, .5) }, uGlowR: { value: .55 }, uGrid: { value: 0 }, uPx: { value: dpr }, uRes: { value: new THREE.Vector2(1, 1) },
+      uDayTop: { value: new THREE.Color() }, uDayBottom: { value: new THREE.Color() }, uDayMix: { value: 0 } },
   });
   const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
   bg.frustumCulled = false; bg.renderOrder = -10; scene.add(bg);
@@ -248,7 +251,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   // around the globe: a tilted orbit and the equator, dashed
   const orbit = new THREE.Group();
   const o1 = new THREE.LineSegments(lineGeometry(circle(6.4, 256, 0)), lineMat('#8FA8E8', { uNear: { value: 30 }, uFar: { value: 60 } }));
-  const o2 = new THREE.LineSegments(lineGeometry(circle(5.1, 256, 0)), lineMat('#E07A1F', { uNear: { value: 30 }, uFar: { value: 60 } }));
+  const o2 = new THREE.LineSegments(lineGeometry(circle(5.1, 256, 0)), lineMat('#E07A1F', { uNear: { value: 30 }, uFar: { value: 60 }, uColorDay: { value: new THREE.Color('#B4621A') } }));
   o1.rotation.z = .38; o1.rotation.x = .2;
   orbit.add(o1, o2); orbit.children.forEach(c => { c.frustumCulled = false; c.renderOrder = -4; }); scene.add(orbit);
 
@@ -270,20 +273,11 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     uTime: { value: 0 }, uMorph: { value: 0 }, uRevealFrom: { value: 1 }, uRevealTo: { value: 0 }, uSpinFrom: { value: 0 }, uSpinTo: { value: 0 },
     uStreamFrom: { value: 0 }, uStreamTo: { value: 0 }, uGhostFrom: { value: 1 }, uGhostTo: { value: 1 }, uScale: { value: 1 }, uSize: { value: .06 }, uMouse: { value: 0 }, uMotion: { value: 1 }, uFlow: { value: 1.6 }, uGain: { value: 1 },
     uPick: { value: -1 }, uPickOn: { value: 0 }, uDust: { value: 1 }, uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
-    uInk: { value: ink ? 1 : 0 }, uInkC: { value: new THREE.Color(pal.inkColor || '#14265C') }, uGlowK: { value: 0 },
+    uDay, uInkC: { value: new THREE.Color(pal.inkColor || '#1C3472') },
   };
-  const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, blending: BLEND });
+  const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, ...PREMULT });
   const points = new THREE.Points(geo, mat);
   points.frustumCulled = false; scene.add(points);
-  // ink mode's light behind the shapes (GLOW_FS): the same particles, about a sixth of them, large and
-  // soft, drawn before the ink. The uniforms are shared with the ink, all but the glow's own
-  if (ink && pal.glow !== false) {
-    const G = pal.glowColors || ['#B3CAFC', '#E1BBE9', '#FABAC2', '#FBC49F'];
-    const glowMat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: GLOW_FS, transparent: true, depthWrite: false, depthTest: false, blending: THREE.NormalBlending,
-      uniforms: { ...U, uGlowK: { value: 1 }, uGlowA: { value: new THREE.Color(G[0]) }, uGlowB: { value: new THREE.Color(G[1]) }, uGlowC: { value: new THREE.Color(G[2]) }, uGlowD: { value: new THREE.Color(G[3]) }, uGlowAlpha: { value: pal.glowAlpha || .07 } } });
-    const glow = new THREE.Points(geo, glowMat);
-    glow.frustumCulled = false; glow.renderOrder = -1; scene.add(glow);
-  }
   let pair = [-1, -1], streamOf = -1;
   function setPair(a, b, streamForm) {
     if (a !== pair[0]) { geo.setAttribute('aFrom', attrs[a].pos); geo.setAttribute('aColFrom', attrs[a].col); geo.setAttribute('aKeyFrom', attrs[a].key); }
@@ -297,7 +291,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   // does it ahead of time, binding one and drawing once into a tiny target nobody sees
   const warmTarget = new THREE.WebGLRenderTarget(4, 4, { depthBuffer: false });
 
-  // after the scene: bloom, then colour (tone mapping, sRGB), then the finish
+  // after the scene: bloom, then colour (sRGB), then the finish
   const composer = new EffectComposer(renderer);
   composer.setPixelRatio(dpr);
   composer.addPass(new RenderPass(scene, camera));
@@ -316,6 +310,13 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   const look = new THREE.Vector3(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   const cA = new THREE.Color(), cB = new THREE.Color();
   const mixColor = (out, a, b, k) => out.copy(cA.set(a)).lerp(cB.set(b), k);
+  // the day's side of the sky at d: the twilight up to .5, then along the stops to cream
+  const daySide = (top, bottom, d) => {
+    let i = 0;
+    while (i < dawn.length - 2 && d > dawn[i + 1][0]) i++;
+    const [a0, t0, b0] = dawn[i], [a1, t1, b1] = dawn[i + 1], f = Math.min(1, Math.max(0, (d - a0) / (a1 - a0)));
+    top.copy(t0).lerp(t1, f); bottom.copy(b0).lerp(b1, f);
+  };
 
   return {
     N, renderer, anchors: i => list[i].anchors, box: i => list[i].box,
@@ -343,28 +344,28 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       camera.updateProjectionMatrix(); camera.updateMatrixWorld();
       U.uScale.value = fh * px / (2 * Math.tan(fov * Math.PI / 360));
     },
-    // everything else that changes from frame to frame
+    // everything else that changes from frame to frame; s.day is the light (0 night, 1 day)
     set(s) {
+      const d = allDay ? 1 : Math.min(1, Math.max(0, s.day || 0)), n = 1 - d;
+      uDay.value = d;
       U.uTime.value = s.time; U.uMorph.value = s.morph; U.uRevealFrom.value = s.revealFrom; U.uRevealTo.value = s.revealTo;
       U.uSpinFrom.value = s.spinFrom; U.uSpinTo.value = s.spinTo; U.uMotion.value = s.motion; U.uFlow.value = s.flow;
-      U.uSize.value = s.size; U.uGain.value = s.gain; U.uPick.value = s.pick; U.uPickOn.value = s.pickOn; U.uDust.value = s.dust;
+      U.uSize.value = s.size; U.uGain.value = s.gain; U.uPick.value = s.pick; U.uPickOn.value = s.pickOn;
+      U.uDust.value = s.dust * n + Math.min(s.dust, 1.4) * d;   // on paper the tail's bright dust would read as dirt: a light speckle only
       mixColor(bgMat.uniforms.uTop.value, s.bgA[0], s.bgB[0], s.k);
       mixColor(bgMat.uniforms.uBottom.value, s.bgA[1], s.bgB[1], s.k);
       mixColor(bgMat.uniforms.uGlow.value, s.glowA[0], s.glowB[0], s.k).multiplyScalar(s.glow);
       bgMat.uniforms.uGlowAt.value.set(s.glowAt[0], s.glowAt[1]); bgMat.uniforms.uGrid.value = s.grid;
-      floor.position.y = s.floorY; floor.material.uniforms.uOpacity.value = s.floor * .16;
+      daySide(bgMat.uniforms.uDayTop.value, bgMat.uniforms.uDayBottom.value, d);
+      bgMat.uniforms.uDayMix.value = Math.min(1, d * 2);
+      floor.position.y = s.floorY; floor.material.uniforms.uOpacity.value = s.floor * .16 * (n + d * .6);
       orbit.rotation.y = s.time * .04;
       o1.material.uniforms.uOpacity.value = s.orbit * .3; o1.material.uniforms.uDash.value = .5; o1.material.uniforms.uDashOffset.value = -s.time * .4;
       o2.material.uniforms.uOpacity.value = s.orbit * .22; o2.material.uniforms.uDash.value = .28;
-      bloom.strength = s.bloom; finish.uniforms.uAberr.value = s.aberr;
-      if (ink) {   // paper: the page's soft blue-grey, no glow, no grid, no bloom, no lens
-        bgMat.uniforms.uTop.value.set((pal.paper || [])[0] || '#F4F6FA'); bgMat.uniforms.uBottom.value.set((pal.paper || [])[1] || '#EAEEF5');
-        bgMat.uniforms.uGlow.value.setRGB(0, 0, 0); bgMat.uniforms.uGrid.value = 0;
-        bloom.strength = 0; finish.uniforms.uAberr.value = 0; finish.uniforms.uVignette.value = 0; finish.uniforms.uGrain.value = .012;
-        U.uDust.value = Math.min(s.dust, 1.4);   // on paper the tail's bright dust would read as dirt: a light speckle only
-      }
-      if (pal.night && !ink) { bgMat.uniforms.uTop.value.set(pal.night[0]); bgMat.uniforms.uBottom.value.set(pal.night[1]); bgMat.uniforms.uGrid.value = 0; }
-      if (trails) trails.damp = ink ? 0 : s.trails;
+      // the night's lens: bloom, fringing, vignette and a heavier grain, gone by day
+      bloom.strength = s.bloom * n; finish.uniforms.uAberr.value = s.aberr * n;
+      finish.uniforms.uVignette.value = .55 * n; finish.uniforms.uGrain.value = .035 * n + .012 * d;
+      if (trails) trails.damp = s.trails * n;
       finish.uniforms.uTime.value = s.time;
     },
     pointer(ndcX, ndcY, strength) {

@@ -1,13 +1,15 @@
 ---
 // Always-to-hand contact: a bar at the foot of the screen on phones (shown once the hero's
-// buttons have scrolled away) and a WhatsApp button on larger screens.
+// buttons have scrolled away) and, on the archived drafts only, a WhatsApp button on larger
+// screens (the user had it taken off the live site, 2026-10-13: Base.astro passes float).
 import Icon from './Icon.astro';
 import { contact } from '../data/site';
 import { href } from '../lib/url';
+const { float = true } = Astro.props;
 ---
 <nav class="action-bar" id="actionBar" aria-label="Quick contact">
   <a href={contact.phoneHref}>Call</a>
   <a href={contact.whatsapp}>WhatsApp</a>
   <a class="go" href={href('/#contact')}>Enquire</a>
 </nav>
-<a class="wa-float" href={contact.whatsapp} aria-label="Chat on WhatsApp"><Icon name="whatsapp" size={28} /></a>
+{float && <a class="wa-float" href={contact.whatsapp} aria-label="Chat on WhatsApp"><Icon name="whatsapp" size={28} /></a>}

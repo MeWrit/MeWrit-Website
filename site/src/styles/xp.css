@@ -203,6 +203,70 @@ html.xp-lock .xp-stage{opacity:0}
   .xp-rail .t{display:none}
 }
 
+/* ---------- night and day (scenes.js light, world.js day). The words, labels and furniture of a firm's
+   page, not an instrument's: no readouts and no frame; the labels on the shapes set as a printed
+   figure's captions (italic, a hairline leader); kickers, lists and buttons in the site's sans. Each
+   scene's words take the colours of its own light (data-light on the article); the labels, the bar and
+   the hint take the light of the scene on screen (data-light on the stage, experience.js), and the
+   shade behind the words follows the light as it changes (--day). By day: navy #13234C and #1C3472
+   (the logo's), terracotta #AC571D for small orange text, cream #FCF6EE. ?day: day throughout ---------- */
+.xp-panel,.xp-frame{display:none}
+.xp-kicker{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em}
+.xp-docs{font-family:var(--sans);font-size:.86rem;font-weight:500;letter-spacing:.01em;text-transform:none}
+.xp-pickhint{font-family:var(--serif);font-style:italic;font-size:.98rem;font-weight:400;letter-spacing:0;text-transform:none}
+.xp-pick{font-family:var(--sans);font-size:.78rem;font-weight:500;letter-spacing:.01em;text-transform:none}
+.xp-hint,.xp-rail button{font-family:var(--sans)}
+.xp-rail button{font-size:.76rem;font-weight:500;letter-spacing:.02em;text-transform:none}
+/* the labels: a dot on the point, a hairline, an italic caption with a halo of the sky behind it */
+.xp-co i{left:-3.5px;top:-3.5px;width:7px;height:7px;border:0;background:#F2F5FC;box-shadow:0 0 0 3px rgba(242,245,252,.16)}
+.xp-co i::after{content:none}
+.xp-co span{padding:2px 4px;border:0;border-radius:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;font-family:var(--serif);font-size:.95rem;font-style:italic;font-weight:400;letter-spacing:0;text-transform:none;color:#F2F5FC;
+  text-shadow:0 0 2px #050B1E,0 0 6px #050B1E,0 0 12px #050B1E}
+.xp-co span::before{background:rgba(242,245,252,.5)}
+/* the shades behind the words go with the words: the night's while a night scene's words are up, the
+   day's once a day scene's are (they swap with the words, mid-change, when the sky is at its twilight) */
+.xp-shade{transition:opacity .6s ease}
+.xp-shade-day{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .6s ease;background:linear-gradient(90deg,rgba(252,246,238,.88) 0%,rgba(252,246,238,.52) 34%,rgba(252,246,238,0) 58%)}
+.xp-stage[data-light="day"] .xp-shade{opacity:0}
+.xp-stage[data-light="day"] .xp-shade-day{opacity:1}
+/* a scene's words by day */
+.xp-scene[data-light="day"]{--xp-ink:#13234C;--xp-soft:#45506A;color:#13234C}
+.xp-scene[data-light="day"] :is(.xp-kicker,.xp-pickhint){color:#AC571D}
+.xp-scene[data-light="day"] .xp-title{color:#13234C}
+.xp-scene[data-light="day"] .xp-text{color:#45506A}
+.xp-scene[data-light="day"] .xp-docs{color:#1C3472}
+.xp-scene[data-light="day"] .xp-docs li:not(:last-child)::after{color:#E07A1F}
+.xp-scene[data-light="day"] .xp-btn-ghost{color:#1C3472;border-color:rgba(28,52,114,.5);background:rgba(255,255,255,.6)}
+@media (hover:hover){.xp-scene[data-light="day"] .xp-btn-ghost:hover{background:#1C3472;border-color:#1C3472;color:#fff}}
+/* the labels, the bar and the hint by day */
+.xp-stage[data-light="day"] .xp-co i{background:#1C3472;box-shadow:0 0 0 3px rgba(28,52,114,.14)}
+.xp-stage[data-light="day"] .xp-co span{color:#13234C;text-shadow:0 0 2px #FCF6EE,0 0 6px #FCF6EE,0 0 12px #FCF6EE}
+.xp-stage[data-light="day"] .xp-co span::before{background:rgba(19,35,76,.42)}
+.xp-stage[data-light="day"] .xp-hint{color:#45506A}
+.xp-stage[data-light="day"] .xp-rail button{color:rgba(19,35,76,.5)}
+.xp-stage[data-light="day"] .xp-rail i{background:rgba(19,35,76,.12)}
+.xp-stage[data-light="day"] .xp-rail button[aria-current="true"]{color:#13234C}
+.xp-stage[data-light="day"] .xp-rail button[aria-current="true"] .n{color:#AC571D}
+.xp-stage[data-light="day"] :is(.xp-rail button,.xp-hint):focus-visible{outline-color:#AC571D}
+/* the header: on screen through the film (it hides on the way down elsewhere), its plate solid cream
+   (glass would tint the logo blue over the night) */
+body.xp-page .site-header.is-hidden{transform:none}
+body.xp-page .site-header .wrap::before{background-color:#FCF6EE;-webkit-backdrop-filter:none;backdrop-filter:none}
+html.xp-day .xp-canvas{background:#FCF6EE}
+/* without the 3D (or without scripts) every scene stands on the night: a day scene's words keep the
+   night's colours there */
+:is(.xp-nogl,html:not(.js) .xp) .xp-scene[data-light="day"]{--xp-ink:#F2F5FC;--xp-soft:rgba(214,224,246,.84);color:#F2F5FC}
+:is(.xp-nogl,html:not(.js) .xp) .xp-scene[data-light="day"] .xp-title{color:#F2F5FC}
+:is(.xp-nogl,html:not(.js) .xp) .xp-scene[data-light="day"] .xp-text{color:rgba(214,224,246,.84)}
+:is(.xp-nogl,html:not(.js) .xp) .xp-scene[data-light="day"] .xp-docs{color:#C9D8FF}
+:is(.xp-nogl,html:not(.js) .xp) .xp-scene[data-light="day"] :is(.xp-kicker,.xp-pickhint){color:var(--accent)}
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  .xp-shade-day{background:linear-gradient(0deg,rgba(252,246,238,.97) 0%,rgba(252,246,238,.78) 36%,rgba(252,246,238,0) 62%)}
+  .xp-docs{font-size:.8rem}
+  .xp-pick{max-width:112px;padding:6px 10px 5px;font-size:.68rem}
+  .xp-co span{font-size:.84rem}
+}
+
 /* phones on their side (short and wide): the words have about 300px under the header, so the type steps
    down and the practices' bar at the foot goes (the header's menu has them) */
 @media (max-height:520px) and (min-aspect-ratio:4/3){
@@ -225,51 +289,6 @@ html:not(.js) .xp-scenes{position:static;display:block}
 html:not(.js) .xp-scene{opacity:1;transform:none;margin-bottom:72px;max-width:none}
 html:not(.js) .xp-title .c{opacity:1;filter:none;transform:none}
 html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas,html:not(.js) .xp-picks{display:none}
-
-/* ---------- by day (review switch ?day, experience.js): the canvas cream, the shapes in navy ink over a
-   pastel glow (world.js), the words in the site's navy, its serif and its sans; no readouts and no
-   frame; the labels on the shapes are a printed figure's captions (italic, a hairline leader). The
-   colours: navy #13234C and #1C3472 (the logo's), terracotta #AC571D for small text in orange, cream
-   #FCF6EE ---------- */
-html.xp-day .xp{--xp-ink:#13234C;--xp-soft:#45506A;--xp-dim:#5E6884;--xp-line:rgba(19,35,76,.14);--xp-gold:#AC571D;color:var(--xp-ink)}
-html.xp-day .xp-canvas{background:#FCF6EE}
-html.xp-day .xp-shade{background:linear-gradient(90deg,rgba(252,246,238,.88) 0%,rgba(252,246,238,.52) 34%,rgba(252,246,238,0) 58%)}
-html.xp-day .xp-shade::after{background:linear-gradient(90deg,rgba(252,246,238,.95) 0%,rgba(252,246,238,.82) 30%,rgba(252,246,238,.4) 52%,rgba(252,246,238,0) 70%)}
-html.xp-day .xp-kicker{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;color:#AC571D}
-html.xp-day .xp-title{color:#13234C}
-html.xp-day .xp-docs{font-family:var(--sans);font-size:.86rem;font-weight:500;letter-spacing:.01em;text-transform:none;color:#1C3472}
-html.xp-day .xp-docs li:not(:last-child)::after{color:#E07A1F}
-html.xp-day .xp-pickhint{font-family:var(--serif);font-style:italic;font-size:.98rem;font-weight:400;letter-spacing:0;text-transform:none;color:#AC571D}
-html.xp-day .xp-btn-ghost{color:#1C3472;border-color:rgba(28,52,114,.5);background:rgba(255,255,255,.6)}
-@media (hover:hover){html.xp-day .xp-btn-ghost:hover{background:#1C3472;border-color:#1C3472;color:#fff}}
-html.xp-day .xp-pick{font-family:var(--sans);font-size:.78rem;font-weight:500;letter-spacing:.01em;text-transform:none;color:#13234C;border-color:rgba(19,35,76,.2);background:rgba(255,255,255,.9);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 6px 18px -8px rgba(19,35,76,.3)}
-html.xp-day .xp-pick .n,html.xp-day .xp-pick b{color:#AC571D}
-html.xp-day .xp-pick::after{background:rgba(172,87,29,.55)}
-html.xp-day .xp-pick::before{border-color:#AC571D}
-html.xp-day .xp-pick:is(:hover,:focus-visible,.lit){border-color:#AC571D;background-color:#fff;color:#13234C}
-html.xp-day .xp-pick:focus-visible{outline-color:#AC571D}
-html.xp-day .xp-co i{left:-3.5px;top:-3.5px;width:7px;height:7px;border:0;background:#1C3472;box-shadow:0 0 0 3px rgba(28,52,114,.14)}
-html.xp-day .xp-co i::after{content:none}
-html.xp-day .xp-co span{padding:2px 4px;border:0;border-radius:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;font-family:var(--serif);font-size:.95rem;font-style:italic;font-weight:400;letter-spacing:0;text-transform:none;color:#13234C;
-  text-shadow:0 0 2px #FCF6EE,0 0 6px #FCF6EE,0 0 12px #FCF6EE}   /* a cream halo keeps a caption clear where it crosses the shape */
-html.xp-day .xp-co span::before{background:rgba(19,35,76,.42)}
-html.xp-day .xp-panel,html.xp-day .xp-frame{display:none}
-html.xp-day .xp-hint{font-family:var(--sans);letter-spacing:.16em;color:#45506A}
-html.xp-day .xp-rail button{font-family:var(--sans);font-size:.76rem;font-weight:500;letter-spacing:.02em;text-transform:none;color:rgba(19,35,76,.5)}
-html.xp-day .xp-rail i{background:rgba(19,35,76,.12)}
-html.xp-day .xp-rail button[aria-current="true"]{color:#13234C}
-html.xp-day .xp-rail button[aria-current="true"] .n{color:#AC571D}
-html.xp-day .xp-rail button:focus-visible,html.xp-day .xp-hint:focus-visible{outline-color:#AC571D}
-/* the header stays on screen through the film by day (it hides on the way down elsewhere), its plate
-   solid cream: glass would tint the logo blue over the navy bands */
-html.xp-day .site-header.is-hidden{transform:none}
-html.xp-day .site-header .wrap::before{background-color:#FCF6EE;-webkit-backdrop-filter:none;backdrop-filter:none}
-@media (max-width:759.98px),(max-aspect-ratio:4/5){
-  html.xp-day .xp-shade{background:linear-gradient(0deg,rgba(252,246,238,.97) 0%,rgba(252,246,238,.78) 36%,rgba(252,246,238,0) 62%)}
-  html.xp-day .xp-docs{font-size:.8rem}
-  html.xp-day .xp-pick{max-width:112px;padding:6px 10px 5px;font-size:.68rem}
-  html.xp-day .xp-co span{font-size:.84rem}
-}
 
 @media (prefers-reduced-motion:reduce){
   .xp-title .c{opacity:1;filter:none;transform:none;animation:none !important}

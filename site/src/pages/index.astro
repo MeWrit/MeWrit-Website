@@ -29,7 +29,7 @@ const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const letters = (t: string) => t.split(' ').map(word => [...word].map(ch => ({ ch, d: Math.round(rnd() * 560) })));
 const pad = (j: number) => String(j + 1).padStart(2, '0');
 ---
-<Base intro="none" theme="dark" title={`${experience.title} | ${site.name}`} description={experience.description}>
+<Base intro="none" theme="light" title={`${experience.title} | ${site.name}`} description={experience.description}>
   <div class="xp-loader" id="xpLoader" aria-hidden="true">
     <p class="xp-load-brand">MeWriT · Medical writing</p>
     <div class="xp-load-foot">
@@ -44,13 +44,14 @@ const pad = (j: number) => String(j + 1).padStart(2, '0');
     <div class="xp-track">
       <div class="xp-stage">
         <div class="xp-shade" aria-hidden="true"></div>
+        <div class="xp-shade-day" aria-hidden="true"></div>
         <div class="xp-callouts" aria-hidden="true"></div>
         <div class="xp-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <div class="xp-scenes">
           {SCENES.map((s, i) => {
             const w = words[i], Tag = i === 0 ? 'h1' : 'h2';
             return (
-              <article class="xp-scene" data-scene={s.id}>
+              <article class="xp-scene" data-scene={s.id} data-light={s.light ? 'day' : 'night'}>
                 <p class="xp-kicker"><span class="sr-only">{w.kicker}</span><span class="xp-kick" aria-hidden="true">{w.kicker}</span></p>
                 <Tag class="xp-title"><span class="sr-only">{w.title}</span><span aria-hidden="true">{letters(w.title).map((word, wi) => <>{wi > 0 && ' '}<span class="w">{word.map(l => <span class="c" style={`--d:${l.d}`}>{l.ch}</span>)}</span></>)}</span></Tag>
                 <p class="xp-text">{w.text}</p>
