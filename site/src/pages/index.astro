@@ -1,20 +1,22 @@
 ---
-// The immersive page: MeWriT's five practices, each standing on its own, for a client to choose
-// from. While it loads, the dust gathers into a blank page and its outline draws itself with the
-// counter; as the loading screen lifts the page writes itself, then one cloud of particles takes a
-// shape for each scene as you scroll: the opening, the five practices as shapes to pick from, two
-// scenes for each practice, the close, and past it the dust that drifts behind the rest of the page
-// (the scenes in src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in
-// src/scripts/xp/world.js). The canvas is the whole page's backdrop: past the close, the pitch
-// sections (src/components/pitch/PitchSections.astro) float over its dust as light panels and bands
-// of night. The words are real page content: they read in order without the 3D.
+// The home page: one film. While it loads, the dust gathers into a blank page and its outline draws
+// itself with the counter; as the loading screen lifts the page writes itself, then one cloud of
+// particles takes a shape for each scene as you scroll: three screens at night that say what MeWriT
+// is, who writes and why it is chosen (the figures among them); the five practices to choose from, on
+// dusk indigo; each practice by day, reached through a dawn (a choice in the list goes straight to its
+// practice); and the close at night, where the foot opens. Each scene's words stand in two columns
+// (.xp-col-a, .xp-col-b), so a shape can stand between them (data-layout). The scenes are in
+// src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in src/scripts/xp/world.js.
+// The words are real page content: they read in order without the 3D.
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import PitchSections from '../components/pitch/PitchSections.astro';
 import { experience } from '../data/experience';
+import { practices } from '../data/pitch';
 import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
 import { F } from '../scripts/xp/formations.js';
 import { site, contact } from '../data/site';
 import { href } from '../lib/url';
+import portrait from '../assets/hetal-shah.png';
 import '../styles/xp.css';
 
 // the words, in the scenes' order (a scene without words fails the build)
@@ -28,8 +30,9 @@ let seed = 11;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const letters = (t: string) => t.split(' ').map(word => [...word].map(ch => ({ ch, d: Math.round(rnd() * 560) })));
 const pad = (j: number) => String(j + 1).padStart(2, '0');
+const fulls = practices.list.map(p => p.full);
 ---
-<Base intro="none" theme="light" title={`${experience.title} | ${site.name}`} description={experience.description}>
+<Base intro="none" theme="light" foot="film" title={`${experience.title} | ${site.name}`} description={experience.description}>
   <div class="xp-loader" id="xpLoader" aria-hidden="true">
     <p class="xp-load-brand">MeWriT · Medical writing</p>
     <div class="xp-load-foot">
@@ -51,20 +54,33 @@ const pad = (j: number) => String(j + 1).padStart(2, '0');
           {SCENES.map((s, i) => {
             const w = words[i], Tag = i === 0 ? 'h1' : 'h2';
             return (
-              <article class="xp-scene" data-scene={s.id} data-light={s.light ? 'day' : 'night'}>
-                <p class="xp-kicker"><span class="sr-only">{w.kicker}</span><span class="xp-kick" aria-hidden="true">{w.kicker}</span></p>
-                <Tag class="xp-title"><span class="sr-only">{w.title}</span><span aria-hidden="true">{letters(w.title).map((word, wi) => <>{wi > 0 && ' '}<span class="w">{word.map(l => <span class="c" style={`--d:${l.d}`}>{l.ch}</span>)}</span></>)}</span></Tag>
-                <p class="xp-text">{w.text}</p>
-                {w.hint && <p class="xp-pickhint">{w.hint}</p>}
-                {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
+              <article class="xp-scene" id={s.id === 'practices' ? 'practices' : undefined} data-scene={s.id} data-light={s.light ? 'day' : 'night'} data-layout={s.layout || 'right'}>
+                <div class="xp-col xp-col-a">
+                  <p class="xp-kicker"><span class="sr-only">{w.kicker}</span><span class="xp-kick" aria-hidden="true">{w.kicker}</span></p>
+                  <Tag class="xp-title"><span class="sr-only">{w.title}</span><span aria-hidden="true">{letters(w.title).map((word, wi) => <>{wi > 0 && ' '}<span class="w">{word.map(l => <span class="c" style={`--d:${l.d}`}>{l.ch}</span>)}</span></>)}</span></Tag>
+                </div>
+                <div class="xp-col xp-col-b">
+                  <p class="xp-text">{w.text}</p>
+                  {w.lead && <p class="xp-lead"><Image class="xp-face" src={portrait} alt="" width={96} height={96} />{w.lead}</p>}
+                  {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map(f => <li><b>{f.value.replace(/\+$/, '')}{f.value.endsWith('+') && <i>+</i>}</b><span>{f.label}</span></li>)}</ul>}
+                  {w.points && <ol class="xp-points">{w.points.map((p, j) => <li><span class="n" aria-hidden="true">{pad(j)}</span><b>{p.title}</b><span class="d">{p.text}</span></li>)}</ol>}
+                  {w.hint && <p class="xp-pickhint">{w.hint}</p>}
+                  {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
+                  {w.hub && <>
+                    <ol class="xp-hub" aria-label="The five practices">
+                      {CHAPTERS.map((c, j) => <li><button class="xp-hub-item" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="t">{c}</span><span class="f">{fulls[j]}</span><b aria-hidden="true">{'→'}</b></button></li>)}
+                    </ol>
+                    <div class="btn-row xp-cta"><button class="btn btn-primary xp-explore" type="button">Explore the services</button></div>
+                  </>}
+                  {w.more && <a class="xp-more" href={href(`/services/${w.more}/`)}>Know more<span class="sr-only"> about {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>}
+                  {w.cta && <div class="btn-row xp-cta">
+                    <a class="btn btn-primary" href={href('/#contact')}>Start a project</a>
+                    <a class="btn xp-btn-ghost" href={contact.academy} target="_blank" rel="noopener">Book a training</a>
+                  </div>}
+                </div>
                 {s.form === F.CHOICE && <div class="xp-picks idle">
                   {CHAPTERS.map((_, j) => <i class="xp-hit" data-practice={j} aria-hidden="true"></i>)}
-                  {CHAPTERS.map((c, j) => <button class="xp-pick" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="t">{c.split(' ').slice(0, -1).join(' ')} <span class="nw">{c.split(' ').pop()}<b aria-hidden="true">{'→'}</b></span></span></button>)}
-                </div>}
-                {w.cta && <div class="btn-row xp-cta">
-                  <a class="btn btn-primary" href={href('/#contact')}>Start a project</a>
-                  <a class="btn xp-btn-ghost" href={contact.academy} target="_blank" rel="noopener">Book a training</a>
-                  <a class="btn xp-btn-ghost" href="#practices">See the five practices</a>
+                  {CHAPTERS.map((c, j) => <button class="xp-pick" type="button" data-practice={j} tabindex="-1" aria-hidden="true"><span class="n">{pad(j)}</span><span class="t">{c.split(' ').slice(0, -1).join(' ')} <span class="nw">{c.split(' ').pop()}<b aria-hidden="true">{'→'}</b></span></span></button>)}
                 </div>}
               </article>
             );
@@ -85,7 +101,6 @@ const pad = (j: number) => String(j + 1).padStart(2, '0');
       </div>
     </div>
   </section>
-  <PitchSections />
 </Base>
 
 <script>

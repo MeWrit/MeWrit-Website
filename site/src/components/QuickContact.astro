@@ -5,11 +5,11 @@
 import Icon from './Icon.astro';
 import { contact } from '../data/site';
 import { href } from '../lib/url';
-const { float = true } = Astro.props;
+const { float = true, bar = true } = Astro.props;   // bar: off where the film's foot carries the contact (SiteFoot.astro)
 ---
-<nav class="action-bar" id="actionBar" aria-label="Quick contact">
+{bar && <nav class="action-bar" id="actionBar" aria-label="Quick contact">
   <a href={contact.phoneHref}>Call</a>
   <a href={contact.whatsapp}>WhatsApp</a>
   <a class="go" href={href('/#contact')}>Enquire</a>
-</nav>
+</nav>}
 {float && <a class="wa-float" href={contact.whatsapp} aria-label="Chat on WhatsApp"><Icon name="whatsapp" size={28} /></a>}

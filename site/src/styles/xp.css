@@ -15,9 +15,10 @@
    but made every restyle of the page several times slower in Chrome */
 body.xp-page{isolation:isolate}
 html.xp-lock{overflow:hidden;scrollbar-gutter:stable}
-/* a stage height for each scene, one for the last, and the tail (110svh, which experience.js counts
-   on) where the shapes dissolve into the dust */
-.xp-track{position:relative;height:calc(var(--units) * 115svh + 210svh)}
+/* a scene runs 175svh of scroll (a reader who scrolls fast still sees each one form), then the stage's
+   own height and a short run (50svh, which experience.js counts on) to the page's end, where the foot
+   opens */
+.xp-track{position:relative;height:calc(var(--units) * 175svh + 150svh)}
 .xp-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate;transition:opacity .8s ease .15s}
 /* as tall as the screen can get (lvh), so a phone's bars coming and going never resize it */
 .xp-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#030817}
@@ -169,7 +170,7 @@ html.xp-lock .xp-stage{opacity:0}
      thing on a phone's frame (measured, int_perf_probe.js) */
   .xp-title .c{filter:none}
   .xp-scene.on .xp-title .c{animation-name:xpCharLite}
-  .xp-track{height:calc(var(--units) * 100svh + 210svh)}
+  .xp-track{height:calc(var(--units) * 150svh + 150svh)}
   .xp-shade{background:linear-gradient(0deg,rgba(3,8,23,.94) 0%,rgba(3,8,23,.7) 36%,rgba(3,8,23,0) 62%)}
   .xp-scenes{align-items:end;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
   .xp-scene{max-width:none}
@@ -267,6 +268,84 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-co span{font-size:.84rem}
 }
 
+/* ---------- the film's parts (2026-10-13): two columns of words and the scenes' layouts; the figures,
+   the portrait line and the reasons in the intro; the practices' list; Know more; the practices' bar
+   only among the practices; and room for the foot's bar (foot.css: --foot-gap). Colours on the night
+   and the dusk: ink #F2F5FC, soft text, the orange lightened to #F2A65A for small figures and numbers ---------- */
+.xp-col-b > :first-child{margin-top:0}
+/* on wider screens: the words on the left (the shape on the right), on the right (layout left), or in
+   two columns with the shape between them (layout center) */
+.xp-scene[data-layout="left"]{justify-self:end}
+.xp-scene[data-layout="center"]{justify-self:stretch;max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr) minmax(0,1fr);column-gap:24px;align-items:center}
+.xp-scene[data-layout="center"] .xp-col-a{grid-column:1}
+.xp-scene[data-layout="center"] .xp-col-b{grid-column:3;justify-self:end;max-width:44ch}
+/* who: the portrait line and the figures (the plus in orange) */
+.xp-lead{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:.92rem;line-height:1.5;color:var(--xp-soft)}
+.xp-face{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 18%;box-shadow:0 0 0 2px rgba(242,245,252,.22)}
+.xp-figs{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px;margin-top:22px}
+.xp-figs li{padding-top:12px;border-top:1px solid var(--xp-line)}
+.xp-figs b{display:block;font:400 clamp(1.9rem,1.2rem + 1.6vw,2.7rem)/1 var(--serif);letter-spacing:-.02em;color:var(--xp-ink);font-variant-numeric:lining-nums}
+.xp-figs b i{margin-left:.04em;font-style:normal;font-size:.62em;vertical-align:.42em;color:#F2A65A}
+.xp-figs span{display:block;margin-top:8px;font-size:.8rem;line-height:1.4;color:var(--xp-soft)}
+/* why: the reasons, numbered */
+.xp-points{list-style:none;display:grid;gap:16px;margin-top:22px}
+.xp-points li{display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:12px;padding-top:14px;border-top:1px solid var(--xp-line)}
+.xp-points .n{grid-row:1 / span 2;font:600 .74rem/1.7 var(--sans);letter-spacing:.08em;color:#F2A65A}
+.xp-points b{font:500 1.12rem/1.25 var(--serif);color:var(--xp-ink)}
+.xp-points .d{margin-top:4px;font-size:.9rem;line-height:1.5;color:var(--xp-soft)}
+/* the five practices: a row each, the number, the name, what it covers and an arrow; a row is a button
+   (straight to the practice, experience.js) */
+.xp-hub{list-style:none;margin-top:22px;border-top:1px solid rgba(242,245,252,.16)}
+.xp-hub-item{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;min-height:58px;padding:10px 4px;text-align:left;
+  border-bottom:1px solid rgba(242,245,252,.16);color:var(--xp-ink);cursor:pointer;transition:background-color .25s}
+.xp-hub-item .n{grid-row:1 / span 2;font:600 .74rem/1 var(--sans);letter-spacing:.08em;color:#F2A65A}
+.xp-hub-item .t{font:500 1.18rem/1.2 var(--serif)}
+.xp-hub-item .f{grid-column:2;margin-top:3px;font-size:.82rem;line-height:1.35;color:var(--xp-soft)}
+.xp-hub-item b{grid-column:3;grid-row:1 / span 2;color:#F2A65A;transition:transform .25s ease}
+@media (hover:hover){.xp-hub-item:hover{background:rgba(255,255,255,.06)}.xp-hub-item:hover b{transform:translateX(4px)}}
+.xp-hub-item:focus-visible{outline:2px solid #F2A65A;outline-offset:2px}
+.xp-hub + .xp-cta{margin-top:22px}
+/* Know more: to the practice's own page */
+.xp-more{display:inline-flex;align-items:center;gap:10px;margin-top:22px;min-height:44px;padding:0 20px;border:1.5px solid currentColor;border-radius:999px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:none;transition:background-color .25s,color .25s,border-color .25s}
+.xp-more b{transition:transform .25s ease}
+.xp-scene[data-light="day"] .xp-more{color:#1C3472}
+@media (hover:hover){.xp-scene[data-light="day"] .xp-more:hover{background:#1C3472;border-color:#1C3472;color:#fff}.xp-more:hover b{transform:translateX(3px)}}
+.xp-more:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
+/* the practices' bar: only among the practices */
+.xp-railnav{opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
+.xp-stage[data-sec="services"] .xp-railnav{opacity:1;visibility:visible;transition:opacity .4s ease}
+/* room for the foot's bar at the bottom of the screen */
+@media (min-width:760px) and (min-aspect-ratio:4/5){
+  .xp-scenes{padding-bottom:calc(var(--foot-gap,42px) + 92px)}
+  .xp-railnav{bottom:calc(var(--foot-gap,42px) + 14px)}
+  .xp-hint{bottom:calc(var(--foot-gap,42px) + 64px)}
+}
+/* phones: every layout stands under its shape; the figures and reasons tighter, the practices' rows
+   their names only (the buttons over the shapes give way to the list) */
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  .xp-scene[data-layout]{justify-self:stretch;display:block;max-width:none}
+  .xp-scene[data-layout="center"] .xp-col-b{max-width:none}
+  .xp-scenes{padding-bottom:calc(var(--foot-gap,46px) + 18px)}
+  .xp-lead{margin-top:14px;font-size:.84rem}
+  .xp-face{width:42px;height:42px}
+  .xp-figs{gap:10px 16px;margin-top:14px}
+  .xp-figs li{padding-top:8px}
+  .xp-figs b{font-size:1.65rem}
+  .xp-figs span{margin-top:5px;font-size:.72rem}
+  .xp-points{gap:10px;margin-top:14px}
+  .xp-points li{padding-top:10px}
+  .xp-points b{font-size:1rem}
+  .xp-points .d{font-size:.82rem;line-height:1.45}
+  .xp-scene[data-scene="practices"] .xp-text{display:none}   /* (room for the five shapes above the list) */
+  .xp-hub{margin-top:14px}
+  .xp-hub-item{min-height:48px;padding:8px 2px}
+  .xp-hub-item .t{font-size:1.05rem}
+  .xp-hub-item .f{display:none}
+  .xp-hub + .xp-cta{margin-top:14px}
+  .xp-picks .xp-pick{display:none}
+  .xp-more{margin-top:14px;min-height:42px}
+}
+
 /* phones on their side (short and wide): the words have about 300px under the header, so the type steps
    down and the practices' bar at the foot goes (the header's menu has them) */
 @media (max-height:520px) and (min-aspect-ratio:4/3){
@@ -279,6 +358,30 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-pickhint{margin-top:8px}
   .xp-cta{margin-top:12px}
   .xp-railnav,.xp-hint{display:none}
+  /* (a centred scene stands its words on the left, its shape on the right; experience.js sees the
+     columns stacked and fits the shape beside them) */
+  .xp-scene[data-layout="center"]{display:block;justify-self:start;max-width:min(470px,54vw)}
+  .xp-scene[data-layout="center"] .xp-col-b{max-width:none;justify-self:auto}
+  .xp-scenes{padding-bottom:calc(var(--foot-gap,46px) + 8px)}
+  .xp-figs{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;margin-top:10px}
+  .xp-figs b{font-size:1.3rem}
+  .xp-figs span{margin-top:4px;font-size:.62rem}
+  .xp-lead{margin-top:8px;font-size:.74rem}
+  .xp-face{width:32px;height:32px}
+  .xp-points{gap:6px;margin-top:8px}
+  .xp-points li{padding-top:6px}
+  .xp-points b{font-size:.92rem}
+  .xp-points .d{display:none}
+  .xp-scene[data-scene="practices"] .xp-text{display:none}
+  .xp-picks .xp-pick{display:none}   /* (the list does their work, and they would stand on the title) */
+  .xp-hub{margin-top:8px}
+  .xp-hub-item{min-height:32px;padding:3px 2px}
+  .xp-hub-item .t{font-size:.9rem}
+  .xp-hub-item .f{display:none}
+  .xp-hub + .xp-cta{margin-top:8px}
+  .xp-cta .btn{min-height:34px;padding:7px 16px;font-size:.82rem}
+  .xp-docs,html.xp-day .xp-docs{display:none}   /* (the paragraph names them) */
+  .xp-more{margin-top:8px;min-height:34px;padding:0 14px;font-size:.8rem}
 }
 
 /* without scripts: the words in order, as a normal page */

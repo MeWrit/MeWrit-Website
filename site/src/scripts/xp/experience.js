@@ -40,12 +40,24 @@ function start() {
   if (DAY) { root.classList.add('xp-day'); articles.forEach(a => { if (a) a.dataset.light = 'day'; }); }
 
   // ---------- the scroll: P runs from 0 to S through the scenes, and on to S + 1 through the tail ----------
-  const TAIL_LEN = 1.1;   // the tail, in stage heights (its 110svh in xp.css)
+  const TAIL_LEN = .5;   // the run past the close to the page's end, in stage heights (its 50svh in xp.css)
   const span = () => { const r = track.getBoundingClientRect(), hs = stage.offsetHeight, tl = hs * TAIL_LEN; return [r, r.height - hs - tl, tl]; };
   const rawP = () => { const [r, len, tl] = span(), y = -r.top; return len <= 0 ? 0 : y <= len ? y / len * S : S + (y - len) / tl; };
   const targetP = () => Math.max(0, Math.min(S + 1, rawP()));
   const scrollFor = P => { const [r, len, tl] = span(); return scrollY + r.top + (P <= S ? len * clamp(P / S) : len + (P - S) * tl); };
   const goTo = i => window.scrollTo({ top: scrollFor(i + (i ? W : 0) + .04), behavior: REDUCE ? 'auto' : 'smooth' });
+  // a jump straight to a scene (the practices' list): the scroll goes there at once, and the film plays
+  // the change on time instead (frame(): the shape becomes the scene's, the light passes through the
+  // dawn, the words swap halfway, the camera flies between the two shots). Scrolling on ends it there
+  let warp = null;
+  function warpTo(i) {
+    if (i < 0) return;
+    if (window.mewritFoot) window.mewritFoot.close();
+    const P1 = i + .5;
+    if (REDUCE || !world || !loaderOut) { window.scrollTo({ top: Math.round(scrollFor(P1)), behavior: 'auto' }); return; }
+    warp = { a: active >= 0 ? active : 0, b: i, P0: Pr, P1, t0: performance.now(), dur: 1800 };
+    window.scrollTo({ top: Math.round(scrollFor(P1)), behavior: 'instant' });
+  }
   // the scene the words show (k), and the two scenes the shape is between (a to b, m of the way)
   const at = P => {
     const k = Math.min(S - 1, Math.max(0, Math.floor(P))), l = P - k;
@@ -75,8 +87,16 @@ function start() {
   // centre is the rectangle's. The move from one shot to the other is the scene's slow drift, kept
   // small (DRIFT of the turn between them, about their middle); between scenes the camera flies
   // along a Catmull-Rom path through every fitted shot. Recomputed on every resize.
-  const TARGET = { desk: { x: .52, y: .16, w: .44, h: .62 }, short: { x: .5, y: .16, w: .47, h: .58 }, phone: { x: .06, y: .15, w: .88, h: .40 } };
-  const DRIFT = .6, DMAX = 36;   // DMAX: the farthest the camera stands from a shape's centre (particles fade from 45 away)
+  // (on computers by the scene's layout, scenes.js: right of the words, left of them, or between their
+  // two columns; on phones always above the words)
+  const TARGET = {
+    desk: { right: { x: .52, y: .16, w: .44, h: .62 }, left: { x: .04, y: .16, w: .44, h: .62 }, center: { x: .3, y: .14, w: .4, h: .66 } },
+    short: { right: { x: .5, y: .16, w: .47, h: .58 }, left: { x: .03, y: .16, w: .47, h: .58 }, center: { x: .28, y: .14, w: .44, h: .6 } },
+    phone: { x: .06, y: .15, w: .88, h: .40 },
+  };
+  // DRIFT 0: within a scene the camera holds still (the user: no wiggling on scroll); it moves only
+  // between scenes, carrying the shape to its next place on the screen
+  const DRIFT = 0, DMAX = 36;   // DMAX: the farthest the camera stands from a shape's centre (particles fade from 45 away)
   let keys = [], small = false, layout = 'desk', headPx = 80, targets = [];
   const avoid = [];
   const panel = sec.querySelector('.xp-panel'), railEl = sec.querySelector('.xp-railnav');
@@ -144,7 +164,10 @@ function start() {
   // a scene's target on this screen: its rectangle, cut back by what stands in it (ob: the scene's
   // words, its panel, the rail and the hint, in px)
   function targetOf(s, i, w, h, box, ob) {
-    const phone = layout === 'phone', base = (phone ? s.targetPhone : s.target) || TARGET[layout];
+    const phone = layout === 'phone';
+    let comp = s.layout || 'right';
+    if (!phone && comp === 'center' && ob.colA && ob.colB && ob.colB[0] < ob.colA[2]) comp = 'right';   // its columns stacked (a short screen): beside the words
+    const base = (phone ? s.targetPhone : s.target) || (phone ? TARGET.phone : TARGET[layout][comp]);
     const frac = q => q && [q[0] / w, q[1] / h, q[2] / w, q[3] / h];
     let x0 = base.x, y0 = Math.max(base.y, (headPx + 10) / h), x1 = base.x + base.w, y1 = base.y + base.h;
     const rail = frac(ob.rail), pnl = frac(ob.panel), hn = i === 0 ? frac(ob.hint) : null, words = frac(ob.words);
@@ -154,7 +177,14 @@ function start() {
     } else {
       if (rail) y1 = Math.min(y1, rail[1] - 16 / h);
       if (hn && hn[0] < x1 && hn[2] > x0) y1 = Math.min(y1, hn[1] - 12 / h);
-      if (words && !s.over) x0 = Math.max(x0, words[2] + 28 / w);
+      if (words && !s.over) {
+        if (comp === 'left') x1 = Math.min(x1, words[0] - 28 / w);   // the words on the right
+        else if (comp === 'center') {   // between the two columns of words
+          const ca = frac(ob.colA), cb = frac(ob.colB);
+          if (ca) x0 = Math.max(x0, ca[2] + 24 / w);
+          if (cb) x1 = Math.min(x1, cb[0] - 24 / w);
+        } else x0 = Math.max(x0, words[2] + 28 / w);
+      }
       // the figures panel in the corner: the shape goes below it or left of it, whichever lets it be bigger
       if (pnl && pnl[0] < x1 && pnl[3] > y0) {
         const below = [x0, Math.max(y0, pnl[3] + 16 / h), x1, y1], left = [x0, y0, Math.min(x1, pnl[0] - 20 / w), y1];
@@ -178,16 +208,22 @@ function start() {
       const art = articles[i], words = pxBox(art, sr), tt = art && art.querySelector('.xp-title');
       // a title's long word can run past its column
       if (words && tt && tt.scrollWidth > tt.clientWidth + 1) words[2] = Math.max(words[2], tt.getBoundingClientRect().left - sr.left + tt.scrollWidth);
-      const ob = { words, panel: panels[i], rail, hint: hn };
-      avoid[i] = [words, panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
+      const ca = pxBox(art && art.querySelector('.xp-col-a'), sr), cb = pxBox(art && art.querySelector('.xp-col-b'), sr), center = (s.layout || 'right') === 'center' && layout !== 'phone';
+      const ob = { words, colA: ca, colB: cb, panel: panels[i], rail, hint: hn };
+      avoid[i] = [...(center ? [ca, cb] : [words]), panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
       const box = s.box || world.box(s.form), t = targetOf(s, i, w, h, box, ob);
       targets.push(t);
-      keys.push({ P: i + (i ? W : 0), v: fitShot(box, dirs[i][0], s.a[2], t, aspect) }, { P: i + 1 - (i < S - 1 ? W : 0), v: fitShot(box, dirs[i][1], s.b[2], t, aspect) });
+      // (one field of view for the whole scene, so it holds without a zoom)
+      const fv = (s.a[2] + s.b[2]) / 2;
+      keys.push({ P: i + (i ? W : 0), v: fitShot(box, dirs[i][0], fv, t, aspect) }, { P: i + 1 - (i < S - 1 ? W : 0), v: fitShot(box, dirs[i][1], fv, t, aspect) });
     });
   }
   function camAt(P) {
     let i = 0;
     while (i < keys.length - 2 && P > keys[i + 1].P) i++;
+    // within a scene (its two keys, an even pair) the shot holds exactly: the path's curve, shaped by
+    // the scenes either side, would otherwise sway it; the curve runs only between scenes
+    if (i % 2 === 0 && P >= keys[i].P && P <= keys[i + 1].P) return keys[i].v.slice();
     const k0 = keys[Math.max(0, i - 1)], k1 = keys[i], k2 = keys[i + 1], k3 = keys[Math.min(keys.length - 1, i + 2)];
     const t = clamp((P - k1.P) / (k2.P - k1.P || 1));
     return k1.v.map((_, j) => cr(k0.v[j], k1.v[j], k2.v[j], k3.v[j], t));
@@ -202,6 +238,7 @@ function start() {
     const prev = active; active = i;
     articles.forEach((el, j) => { if (!el) return; el.classList.toggle('on', j === i); el.classList.toggle('was', j === prev); });
     stage.dataset.scene = SCENES[i].id;   // the close's words stand over its globe, on a stronger shade (xp.css)
+    stage.dataset.sec = SCENES[i].chapter >= 0 ? 'services' : 'intro';   // the practices' bar shows only among the practices (xp.css)
     decodeAt = performance.now();
     const ch = chapterOf(i);
     rail.forEach((b, j) => b.setAttribute('aria-current', j === ch ? 'true' : 'false'));
@@ -262,8 +299,12 @@ function start() {
   const picks = [...sec.querySelectorAll('.xp-pick')].map(el => ({ el, g: +el.dataset.practice, hit: hits.find(h => +h.dataset.practice === +el.dataset.practice), on: false, want: false, below: false, w: 0, h: 0, stem: '', hs: '', sz: '' }));
   let hovered = -1, focused = -1, pickAt = null;
   const woke = () => { if (pickLayer && pickLayer.classList.contains('idle')) pickLayer.classList.remove('idle'); };
+  // the list of the five practices and Explore the services: straight to the practice, or to the first
+  sec.querySelectorAll('.xp-hub-item').forEach(el => el.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === +el.dataset.practice))));
+  const explore = sec.querySelector('.xp-explore');
+  if (explore) explore.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === 0)));
   picks.forEach(p => {
-    const go = () => { woke(); goTo(SCENES.findIndex(s => s.chapter === p.g)); };
+    const go = () => { woke(); warpTo(SCENES.findIndex(s => s.chapter === p.g)); };
     [p.el, p.hit].forEach(el => {
       if (!el) return;
       el.addEventListener('click', go);
@@ -382,11 +423,18 @@ function start() {
     const speed = Math.min(1, Math.abs(Pt - Pr) * 2.2) * motion;   // how fast the reader is scrolling, roughly
     if (Math.abs(Pt - Pr) < 1e-4) Pr = Pt;
     time += dt;
-    const P = Math.min(S, Pr), tail = clamp(Pr - S);
-    tailNow = tail;
-    const { k, a, b, m } = at(P);
+    // the film ends at the close: past it the scroll only runs on to the page's end, where the foot opens
+    // (foot.js); nothing dissolves
+    const P = Math.min(S, Pr), tail = 0;
+    tailNow = clamp(Pr - S);
+    let { k, a, b, m } = at(P), wt = -1;
+    if (warp) {
+      wt = clamp((now - warp.t0) / warp.dur);
+      if (wt >= 1 || Math.abs(Pt - warp.P1) > .35) { warp = null; wt = -1; }   // done, or the reader scrolled on
+      else { a = warp.a; b = warp.b; m = wt; k = wt < .5 ? warp.a : warp.b; }
+    }
     if (loaderOut) activate(k);   // the words wait for the loading screen to lift
-    const rev = revAt(k, P, now);
+    const rev = revAt(k, wt >= 0 && k === warp.b ? warp.P1 : P, now);
     updateWords(now, rev);
     if (hint) hint.classList.toggle('gone', Pr > .15);
     fills.forEach((f, j) => {
@@ -404,8 +452,9 @@ function start() {
     // the shapes: which two, how far between them, how far revealed, how they turn
     const A = SCENES[a], B = SCENES[b], same = A.form === B.form;
     [A.form, B.form].forEach((f, j) => { if (j && same) return; const sa = A.form === f ? A.spin || 0 : null, sb = B.form === f ? B.spin || 0 : null; spinAcc[f] += dt * motion * (sa === null ? sb : sb === null ? sa : mix(sa, sb, m)); });
-    const spinOf = i => { const s = SCENES[i], base = s.rock ? s.rock[0] * Math.sin(Math.max(0, time - rockFrom) * s.rock[1] * motion) : spinAcc[s.form]; return base + (s.spinFrom || 0) + (s.spinBy || 0) * clamp(P - i); };
-    let from = A.form, to = B.form, morph = same ? 0 : m, rf = revAt(a, P, now), rt = revAt(b, P, now), sf = spinOf(same ? k : a), stt = spinOf(same ? k : b), flow = 1.6;
+    // a shape that turns (spin) turns slowly on its own; nothing rocks or turns with the scroll
+    const spinOf = i => { const s = SCENES[i]; return spinAcc[s.form] + (s.spinFrom || 0); };
+    let from = A.form, to = B.form, morph = same ? 0 : m, rf = revAt(a, P, now), rt = revAt(b, wt >= 0 ? warp.P1 : P, now), sf = spinOf(same ? k : a), stt = spinOf(same ? k : b), flow = 1.6;
     if (same) { from = to = A.form; rf = rt = rev; }
     // the opening: the dust gathers into the page while the loading screen is up
     if (!firstAt) firstAt = now;
@@ -416,7 +465,8 @@ function start() {
     world.setPair(from, to, F.STREAMS);
 
     // the camera, with a slow sway and a little parallax from the pointer
-    const v = camAt(P), kk = ease(m), te = ease(tail);
+    // (in a jump, from the shot the reader left to the one the jump lands on)
+    const v = wt >= 0 ? (() => { const va = camAt(warp.P0), vb = camAt(warp.P1), e = ease(wt); return va.map((x, j) => x + (vb[j] - x) * e); })() : camAt(P), kk = ease(m), te = ease(tail);
     // while loading the page stands in the middle of the screen, the camera aimed at its centre (the
     // words are not there yet), and it moves aside for them as they come
     const hand = !loaderOut ? 0 : !outAt || !motion ? 1 : ease(clamp((now - outAt) / 1600));
@@ -428,7 +478,8 @@ function start() {
     }
     ptr.s += ((ptr.on ? 1 : 0) - ptr.s) * (1 - Math.exp(-dt * 3));
     ptr.px += (ptr.x * ptr.s - ptr.px) * (1 - Math.exp(-dt * 2.5)); ptr.py += (ptr.y * ptr.s - ptr.py) * (1 - Math.exp(-dt * 2.5));
-    const pos = [v[0] + (Math.sin(time * .21) * .25 + ptr.px * .7) * motion, v[1] + (Math.sin(time * .17) * .15 + ptr.py * .4) * motion, v[2]];
+    // (no idle sway: only the pointer's parallax on computers)
+    const pos = [v[0] + ptr.px * .7 * motion, v[1] + ptr.py * .4 * motion, v[2]];
     const surge = same || gather < 1 ? 0 : Math.sin(Math.PI * m) * motion;   // mid-change: the view widens a touch
     world.camera(pos, [v[3], v[4], v[5]], v[6] + surge * 5, v[7], v[8], H2);
     world.pointer(ptr.x, ptr.y, ptr.s * .9);
@@ -446,6 +497,7 @@ function start() {
       // the light (scenes.js light): blended between the two scenes as the shape changes, back to the
       // night in the tail; world.js passes through the dawn on the way
       day: DAY ? 1 : mix(mix(A.light || 0, B.light || 0, kk), 0, te),
+      raw: mix(A.raw || 0, B.raw || 0, kk),   // a sky given as it is (the practices' dusk indigo)
     });
     // the shades behind the words, the labels and the bar take the light of the words on screen (xp.css:
     // data-light); the words swap mid-change, as the light passes its middle

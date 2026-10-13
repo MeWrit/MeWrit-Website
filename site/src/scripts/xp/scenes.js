@@ -8,8 +8,10 @@
    screens where the picture is drawn small enough to crowd it); readouts are the figures in the
    corner, counting up with the reveal where they have a `to` (a third value shows once the reveal
    is complete). The figures are MeWriT's own; a scene whose picture or figures are only
-   illustrative says so in its `note`, shown under them. A shape either turns (spin, radians a
-   second) or rocks to and fro (rock: [how far, how fast]).
+   illustrative says so in its `note`, shown under them. A shape may turn slowly on its own (spin,
+   radians a second); nothing rocks or turns with the scroll, and within a scene the camera holds
+   still (experience.js: the user found the movement on scroll nauseating, 2026-10-13). layout:
+   'center' stands the shape between the words' two columns; used rarely, the rest keep one place.
    A shot is [camera position, the point it looks at, field of view, shift right, shift up], but
    only its direction (from the point looked at to the camera) and its field of view are used: the
    experience fits every shape to its frame on each screen (experience.js, fitShot), standing the
@@ -39,17 +41,32 @@ export const SCENES = [
     // the page writes itself as the loading screen lifts (its reveal runs on time, not scroll)
     id: 'open', form: F.PAGE, chapter: -1,
     a: [[0, .41, 27.45], [0, 0, 0], 38, .22, -.11], b: [[1.77, .97, 27.61], [0, .2, 0], 38, .22, -.1],
-    rock: [.2, .3], bg: NAVY, glow: ['#1C3472', .55],
+    bg: NAVY, glow: ['#1C3472', .55],
     readout: [['Since', '2017'], ['Experience', `${YEARS}+ years`], ['Practices', '05']],
   },
   {
-    // the five practices as shapes, a button above each (experience.js pins them; where they stand
-    // too close, every other one hangs below), so the fit keeps room above and below the arc
+    // who writes: a molecule (the science behind the words), centred, the words on one side and the
+    // figures on the other
+    id: 'who', form: F.MOLECULE, chapter: -1, layout: 'center',
+    a: [[1.6, .9, 12], [0, 0, 0], 36, 0, 0], b: [[-1.8, 1.3, 11.6], [0, .1, 0], 36, 0, 0],
+    bg: NAVY, glow: ['#1C3472', .5],
+  },
+  {
+    // why: the opening's page again, now checked and approved
+    id: 'why', form: F.PAGE, chapter: -1,
+    a: [[-1.9, .5, 27.3], [0, 0, 0], 38, 0, 0], b: [[-.5, 1.1, 27.6], [0, .2, 0], 38, 0, 0],
+    bg: NAVY, glow: ['#1C3472', .5],
+    callouts: [{ at: 'figure', label: 'Checked against the source', min: .3 }, { at: 'seal', label: 'Reviewed and approved', min: .6, side: 'l' }],
+  },
+  {
+    // the five practices to choose from, on dusk indigo (raw: the sky is not tone-mapped, world.js):
+    // the list in the words; the shapes, a button above each on wider screens (experience.js pins
+    // them; where they stand too close, every other one hangs below), so the fit keeps room above and
+    // below the arc
     id: 'practices', form: F.CHOICE, chapter: -1,
     a: [[-2.37, 1.78, 35.56], [0, 0, 0], 42, .23, -.06], b: [[2.45, 2.67, 35.48], [0, .1, 0], 42, .23, -.06],
     target: { x: .46, y: .16, w: .52, h: .62 }, pad: [62, 6, 62, 6],
-    bg: NAVY, glow: ['#1C3472', .6], grid: .5,
-    readout: [['Writing', 'Fixed fee per project'], ['Advisory', 'By the hour'], ['Training', 'By topics and days']],
+    raw: 1, bg: ['#34315D', '#1A1B3B'], glow: ['#4B447B', .3],
   },
   {
     id: 'reg-designs', form: F.STREAMS, chapter: 0, light: 1,
@@ -116,7 +133,7 @@ export const SCENES = [
     a: [[0, 2.82, 23.83], [0, 0, 0], 41, .22, -.15], b: [[0, 6.19, 25.57], [0, 1.5, 0], 39, .21, -.06],
     // the globe, centred behind the words (the arcs to the far cities run past its box)
     box: { c: [0, .4, 0], size: [10.6, 10.6, 10.6] }, target: { x: .3, y: .1, w: .62, h: .78 }, over: true,
-    spin: .03, spinFrom: -1.27, spinBy: .9, bg: DEEP, glow: ['#1C3472', .75], orbit: 1,
+    spin: .03, spinFrom: -1.27, bg: DEEP, glow: ['#1C3472', .75], orbit: 1,
     callouts: [{ at: 'home', label: 'Ahmedabad', min: 0 }, ...['London', 'Boston', 'Singapore', 'Tokyo', 'Sydney'].map((c, j) => ({ at: c, label: c, min: .5, side: j % 2 ? 'l' : 'r', facing: true }))],
     readout: [['Working with', 'Sponsors, CROs, clinicians'], ['Based in', 'Ahmedabad, India'], ['Reach', 'Global']],
   },

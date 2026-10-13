@@ -126,11 +126,11 @@ varying vec2 vUv;
 void main() { vUv = position.xy * .5 + .5; gl_Position = vec4(position.xy, .999, 1.); }`;
 // the sky: the night's (its two colours, the glow behind the shape, the faint grid), tone-mapped here
 // with ACES (three.js's own fit, MIT), mixed toward the day's side (dawn, then cream: uDayTop and
-// uDayBottom, set by world.set) by uDayMix
+// uDayBottom, set by world.set) by uDayMix; a scene may give its night sky as it is to show (uRaw)
 const BG_FS = /* glsl */`
 uniform vec3 uTop, uBottom, uGlow, uDayTop, uDayBottom;
 uniform vec2 uGlowAt, uRes;
-uniform float uGlowR, uGrid, uPx, uDayMix;
+uniform float uGlowR, uGrid, uPx, uDayMix, uRaw;
 varying vec2 vUv;
 vec3 RRTAndODTFit(vec3 v) { vec3 a = v * (v + .0245786) - .000090537; vec3 b = v * (.983729 * v + .4329510) + .238081; return a / b; }
 vec3 aces(vec3 c) {
@@ -146,7 +146,7 @@ void main() {
   float s = 56. * uPx;
   vec2 g = (.5 - abs(fract(gl_FragCoord.xy / s) - .5)) * s;
   c += vec3(.010, .018, .042) * (1. - smoothstep(0., uPx, min(g.x, g.y))) * uGrid;
-  gl_FragColor = vec4(mix(aces(c), mix(uDayBottom, uDayTop, y), uDayMix), 1.);
+  gl_FragColor = vec4(mix(mix(aces(c), c, uRaw), mix(uDayBottom, uDayTop, y), uDayMix), 1.);
 }`;
 
 const LINE_VS = /* glsl */`
@@ -236,7 +236,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   const bgMat = new THREE.ShaderMaterial({
     vertexShader: BG_VS, fragmentShader: BG_FS, depthTest: false, depthWrite: false,
     uniforms: { uTop: { value: new THREE.Color() }, uBottom: { value: new THREE.Color() }, uGlow: { value: new THREE.Color() }, uGlowAt: { value: new THREE.Vector2(.6, .5) }, uGlowR: { value: .55 }, uGrid: { value: 0 }, uPx: { value: dpr }, uRes: { value: new THREE.Vector2(1, 1) },
-      uDayTop: { value: new THREE.Color() }, uDayBottom: { value: new THREE.Color() }, uDayMix: { value: 0 } },
+      uDayTop: { value: new THREE.Color() }, uDayBottom: { value: new THREE.Color() }, uDayMix: { value: 0 }, uRaw: { value: 0 } },
   });
   const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
   bg.frustumCulled = false; bg.renderOrder = -10; scene.add(bg);
@@ -358,6 +358,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       bgMat.uniforms.uGlowAt.value.set(s.glowAt[0], s.glowAt[1]); bgMat.uniforms.uGrid.value = s.grid;
       daySide(bgMat.uniforms.uDayTop.value, bgMat.uniforms.uDayBottom.value, d);
       bgMat.uniforms.uDayMix.value = Math.min(1, d * 2);
+      bgMat.uniforms.uRaw.value = s.raw || 0;   // a sky given as it is to show (the services' dusk indigo), not tone-mapped
       floor.position.y = s.floorY; floor.material.uniforms.uOpacity.value = s.floor * .16 * (n + d * .6);
       orbit.rotation.y = s.time * .04;
       o1.material.uniforms.uOpacity.value = s.orbit * .3; o1.material.uniforms.uDash.value = .5; o1.material.uniforms.uDashOffset.value = -s.time * .4;

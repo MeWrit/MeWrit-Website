@@ -1,0 +1,54 @@
+/* ---------------- the foot (src/components/SiteFoot.astro, src/scripts/foot.js) ----------------
+   A slim bar along the bottom of the screen in dusk indigo (#1A1B3B, the film's third ground, between
+   its night and its cream): the brand in the serif, the phone and the email, and Open. Opened, the
+   colophon rises from it: the logo on a cream card (never on the dark itself), the practices, MeWriT,
+   how to write to us and the office, then the colophon line. On phones the bar says less and the
+   colophon is a sheet from the bottom, its sections one under another. The bar stands over the
+   phone's home indicator (safe area). */
+:root{--foot-h:42px;--foot-gap:calc(var(--foot-h) + env(safe-area-inset-bottom,0px))}
+.sf{position:fixed;left:0;right:0;bottom:0;z-index:45;color:#FCF6EE;
+  --sf-bg:#1A1B3B;--sf-soft:rgba(252,246,238,.74);--sf-line:rgba(252,246,238,.14);--sf-accent:#F2A65A}
+.sf-bar{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:var(--foot-gap);padding:0 clamp(16px,4vw,48px) env(safe-area-inset-bottom,0px);
+  background:var(--sf-bg);box-shadow:0 -1px 0 var(--sf-line);font:400 .8rem/1 var(--sans);color:var(--sf-soft)}
+.sf-brand{font:600 .94rem/1 var(--serif);letter-spacing:.02em;color:#FCF6EE;text-decoration:none}
+.sf-bar a{color:inherit;text-decoration:none;transition:color .2s}
+@media (hover:hover){.sf-bar a:hover{color:#FCF6EE}}
+.sf-sep{opacity:.45}
+.sf-narrow{display:none}
+.sf-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:4px 0 3px;background:none;border:0;border-bottom:1.5px solid var(--sf-accent);
+  font:italic 400 .95rem/1 var(--serif);color:#FCF6EE;cursor:pointer}
+.sf-toggle i{width:6px;height:6px;border-left:1.5px solid currentColor;border-top:1.5px solid currentColor;transform:translateY(2px) rotate(45deg);transition:transform .4s ease}
+.sf[data-open="true"] .sf-toggle i{transform:translateY(-2px) rotate(225deg)}
+.sf-close,.sf[data-open="true"] .sf-open{display:none}
+.sf[data-open="true"] .sf-close{display:inline}
+.sf-toggle:focus-visible,.sf a:focus-visible{outline:2px solid var(--sf-accent);outline-offset:3px}
+.sf-panel{position:absolute;left:0;right:0;bottom:var(--foot-gap);z-index:1;padding:34px clamp(16px,4vw,48px) 22px;background:var(--sf-bg);
+  box-shadow:0 -30px 70px rgba(6,8,24,.35);transform:translateY(calc(100% + var(--foot-gap)));opacity:0;
+  transition:transform .6s cubic-bezier(.2,.7,.2,1),opacity .4s ease}
+.sf[data-open="true"] .sf-panel{transform:none;opacity:1}
+.sf-cols{display:grid;grid-template-columns:1.35fr 1fr 1fr 1.1fr;gap:28px 44px;max-width:1180px;margin:0 auto}
+.sf-card{display:inline-block;padding:12px 16px;border-radius:12px;background:#FCF6EE;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.sf-card img{display:block;width:190px;height:auto}
+.sf-about p{margin:16px 0 0;max-width:32ch;font:italic 400 .98rem/1.5 var(--serif);color:var(--sf-soft)}
+.sf-col h3{margin:2px 0 12px;font:500 .8rem/1 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--sf-accent)}
+.sf-col ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.sf-col a{font:400 .98rem/1.3 var(--serif);color:#FCF6EE;text-decoration:none}
+@media (hover:hover){.sf-col a:hover{box-shadow:inset 0 -1.5px 0 var(--sf-accent)}}
+.sf-col address{display:grid;margin-top:14px;font:normal 400 .85rem/1.55 var(--sans);color:var(--sf-soft)}
+.sf-colophon{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;max-width:1180px;margin:26px auto 0;padding-top:14px;border-top:1px solid var(--sf-line);font:400 .8rem/1.4 var(--sans);color:var(--sf-soft)}
+.sf-colophon a{color:#FCF6EE;text-decoration:none;box-shadow:inset 0 -1px 0 var(--sf-accent)}
+.sf-heart{color:var(--sf-accent)}
+/* phones: the line says less (the brand, Contact, Open); the colophon is a sheet from the bottom */
+@media (max-width:760px){
+  :root{--foot-h:46px}
+  .sf-wide{display:none}
+  .sf-narrow{display:inline}
+  .sf-panel{max-height:min(80svh,660px);overflow:auto;overscroll-behavior:contain;padding:24px 20px 16px;border-radius:18px 18px 0 0}
+  .sf-cols{grid-template-columns:1fr;gap:22px}
+  .sf-card img{width:170px}
+}
+@media (prefers-reduced-motion:reduce){.sf-panel,.sf-toggle i{transition:none}}
+/* without scripts: the foot is the page's last block, open */
+html:not(.js) .sf{position:static}
+html:not(.js) .sf-toggle{display:none}
+html:not(.js) .sf-panel{position:static;transform:none;opacity:1;box-shadow:none}

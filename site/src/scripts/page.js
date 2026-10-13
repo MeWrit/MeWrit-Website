@@ -48,7 +48,7 @@ addEventListener('scroll', onScroll, { passive: true }); onScroll();
 // phone action bar
 const bar = $('actionBar');
 let ctasGone = false, formNear = false, typing = false;
-const sync = () => bar.classList.toggle('show', ctasGone && !formNear && !typing);
+const sync = () => bar && bar.classList.toggle('show', ctasGone && !formNear && !typing);   // (pages with the film's foot have no bar)
 // it appears once the page's own buttons have scrolled away (the hero's on the home page, the
 // first row of buttons elsewhere), and steps aside near the enquiry form, if the page has one
 const ctas = $('heroCtas') || document.querySelector('main .btn-row'), contactEl = $('contact');
