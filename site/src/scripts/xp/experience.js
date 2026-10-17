@@ -84,9 +84,9 @@ function start() {
   // taller box on short screens; above the words on phones), cut back wherever the scene's words,
   // the figures panel, the rail or the hint stand in it: the camera stands as far back along the
   // direction as the shape's box needs to fill the rectangle, and the picture shifts so the box's
-  // centre is the rectangle's. The move from one shot to the other is the scene's slow drift, kept
-  // small (DRIFT of the turn between them, about their middle); between scenes the camera flies
-  // along a Catmull-Rom path through every fitted shot. Recomputed on every resize.
+  // centre is the rectangle's. Within a scene the camera glides straight from its first shot to its
+  // second with the scroll (ORB round the shape, PUSH closer); between scenes it flies along a
+  // Catmull-Rom path through every fitted shot. Recomputed on every resize.
   // (on computers by the scene's layout, scenes.js: right of the words, left of them, or between their
   // two columns; on phones always above the words)
   const TARGET = {
@@ -94,9 +94,11 @@ function start() {
     short: { right: { x: .5, y: .16, w: .47, h: .58 }, left: { x: .03, y: .16, w: .47, h: .58 }, center: { x: .28, y: .14, w: .44, h: .6 } },
     phone: { x: .06, y: .15, w: .88, h: .40 },
   };
-  // DRIFT 0: within a scene the camera holds still (the user: no wiggling on scroll); it moves only
-  // between scenes, carrying the shape to its next place on the screen
-  const DRIFT = 0, DMAX = 36;   // DMAX: the farthest the camera stands from a shape's centre (particles fade from 45 away)
+  // within a scene the camera glides with the scroll, one way only and at the reader's own pace: round the
+  // shape by ORB (always the same way, so going on always reads the same) and in toward it to PUSH of its
+  // distance. No back and forth, nothing on a timer (the user: "dont have them wiggle awkwardly, have
+  // some motion associated"). Between scenes it flies on to the next shot
+  const ORB = 10 * Math.PI / 180, PUSH = .95, DMAX = 36;   // DMAX: the farthest the camera stands from a shape's centre (particles fade from 45 away)
   let keys = [], small = false, layout = 'desk', headPx = 80, targets = [];
   const avoid = [];
   const panel = sec.querySelector('.xp-panel'), railEl = sec.querySelector('.xp-railnav');
@@ -106,11 +108,11 @@ function start() {
   const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
   const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  // each scene's two directions, drawn in toward their middle
+  // each scene's two directions: its shots' middle, turned half of ORB each way about the upright
+  const rotY = (d, a) => [d[0] * Math.cos(a) + d[2] * Math.sin(a), d[1], -d[0] * Math.sin(a) + d[2] * Math.cos(a)];
   const dirs = SCENES.map(s => {
     const da = norm(sub(s.a[0], s.a[1])), db = norm(sub(s.b[0], s.b[1])), m = norm([da[0] + db[0], da[1] + db[1], da[2] + db[2]]);
-    const toward = d => norm(m.map((v, j) => v + (d[j] - v) * DRIFT));
-    return [toward(da), toward(db)];
+    return [norm(rotY(m, -ORB / 2)), norm(rotY(m, ORB / 2))];
   });
   // a shot that fits `box` into the target t, looking along -dir: [camera, the point looked at, fov, shift right, shift up]
   function fitShot(box, dir, fov, t, aspect) {
@@ -215,15 +217,21 @@ function start() {
       targets.push(t);
       // (one field of view for the whole scene, so it holds without a zoom)
       const fv = (s.a[2] + s.b[2]) / 2;
-      keys.push({ P: i + (i ? W : 0), v: fitShot(box, dirs[i][0], fv, t, aspect) }, { P: i + 1 - (i < S - 1 ? W : 0), v: fitShot(box, dirs[i][1], fv, t, aspect) });
+      const va = fitShot(box, dirs[i][0], fv, t, aspect), vb = fitShot(box, dirs[i][1], fv, t, aspect);
+      for (let j = 0; j < 3; j++) vb[j] = vb[j + 3] + (vb[j] - vb[j + 3]) * PUSH;   // (the end shot a little closer in)
+      keys.push({ P: i + (i ? W : 0), v: va }, { P: i + 1 - (i < S - 1 ? W : 0), v: vb });
     });
   }
   function camAt(P) {
     let i = 0;
     while (i < keys.length - 2 && P > keys[i + 1].P) i++;
-    // within a scene (its two keys, an even pair) the shot holds exactly: the path's curve, shaped by
-    // the scenes either side, would otherwise sway it; the curve runs only between scenes
-    if (i % 2 === 0 && P >= keys[i].P && P <= keys[i + 1].P) return keys[i].v.slice();
+    // within a scene (its two keys, an even pair) the camera goes straight from one shot to the other with
+    // the scroll: the path's curve, shaped by the scenes either side, would overshoot and sway it; the
+    // curve runs only between scenes
+    if (i % 2 === 0 && P >= keys[i].P && P <= keys[i + 1].P) {
+      const t = (P - keys[i].P) / ((keys[i + 1].P - keys[i].P) || 1);
+      return keys[i].v.map((x, j) => x + (keys[i + 1].v[j] - x) * t);
+    }
     const k0 = keys[Math.max(0, i - 1)], k1 = keys[i], k2 = keys[i + 1], k3 = keys[Math.min(keys.length - 1, i + 2)];
     const t = clamp((P - k1.P) / (k2.P - k1.P || 1));
     return k1.v.map((_, j) => cr(k0.v[j], k1.v[j], k2.v[j], k3.v[j], t));
@@ -499,6 +507,11 @@ function start() {
       day: DAY ? 1 : mix(mix(A.light || 0, B.light || 0, kk), 0, te),
       raw: mix(A.raw || 0, B.raw || 0, kk),   // a sky given as it is (the practices' dusk indigo)
     });
+    // the motes circling the shape (world.js uHalo): its centre and a radius just outside it, carried
+    // from one shape to the next as they change
+    const ba = A.box || world.box(A.form), bb = B.box || world.box(B.form), hl = st8.halo || (st8.halo = [0, 0, 0, 0]);
+    for (let j = 0; j < 3; j++) hl[j] = mix(ba.c[j], bb.c[j], kk);
+    hl[3] = mix(Math.max(...ba.size), Math.max(...bb.size), kk) * .55 + 1;
     // the shades behind the words, the labels and the bar take the light of the words on screen (xp.css:
     // data-light); the words swap mid-change, as the light passes its middle
     const dl = st8.day > .5 ? 'day' : 'night';

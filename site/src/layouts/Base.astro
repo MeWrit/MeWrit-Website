@@ -50,7 +50,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.includes('/archive/');   // previews and the archive stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme} data-page={page}>
+<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme} data-page={page} data-foot={foot}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

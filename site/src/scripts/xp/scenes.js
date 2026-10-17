@@ -9,8 +9,9 @@
    corner, counting up with the reveal where they have a `to` (a third value shows once the reveal
    is complete). The figures are MeWriT's own; a scene whose picture or figures are only
    illustrative says so in its `note`, shown under them. A shape may turn slowly on its own (spin,
-   radians a second); nothing rocks or turns with the scroll, and within a scene the camera holds
-   still (experience.js: the user found the movement on scroll nauseating, 2026-10-13). layout:
+   radians a second); nothing rocks, and within a scene the camera only glides one way with the
+   scroll, round the shape and a little closer (experience.js: ORB, PUSH; the user found back-and-forth
+   movement nauseating and wanted calm motion tied to the scroll, 2026-10-13 to 17). layout:
    'center' stands the shape between the words' two columns; used rarely, the rest keep one place.
    A shot is [camera position, the point it looks at, field of view, shift right, shift up], but
    only its direction (from the point looked at to the camera) and its field of view are used: the

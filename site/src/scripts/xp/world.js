@@ -24,6 +24,8 @@ const PARTICLE_VS = /* glsl */`
 uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
 uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDust;
 uniform vec3 uMouseO, uMouseD;
+uniform vec4 uHalo;   // the shape on screen: its centre and a radius just outside it (for the motes circling it)
+uniform float uDay;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
 attribute float aKeyFrom, aKeyTo, aPick;
 attribute vec4 aRand, aStream;
@@ -46,14 +48,33 @@ vec3 flow(vec3 p, float t) {
 }
 // a particle's place in one formation: dust drifts, the rivers flow, the rest turn with their shape
 vec3 placeOf(vec3 p, float key, float spin, float stream, out float fade) {
-  fade = 1.;
-  if (key < -.5) return p + flow(p * .12 + aRand.y * 2., uTime * .05) * .6 * uMotion;
-  if (stream > .5 && aStream.y != 0.) {
+  float f = 1.;
+  vec3 o = spinY(p, spin);
+  if (key < -.5 && aRand.w > 3.7) {
+    // one mote in ten circles the shape on screen (uHalo), just outside it: slowly, always the same
+    // way, the nearer ones a little quicker, rising gently through a band of the shape's height and
+    // fading out and in where the band ends
+    float r = uHalo.w * (1. + aRand.y * .45), h = uHalo.w * 1.1;
+    float a = aRand.z * 6.2832 + uTime * uMotion * .6 / max(r, 3.);
+    float yy = mod(aRand.y * h + uTime * .1 * uMotion, h) - h * .5;
+    f = smoothstep(-h * .5, -h * .3, yy) * (1. - smoothstep(h * .3, h * .5, yy));
+    o = uHalo.xyz + vec3(cos(a) * r, yy, sin(a) * r * .7);
+  } else if (key < -.5) {
+    // the dust: round the shape and up through the scene, slowly and always the same way (motes in a
+    // beam of light), whether or not the reader scrolls; a mote that leaves at the top comes back at
+    // the bottom, faded out and in at the ends of its run so it never pops (the field spans y -10.9 to
+    // 15.1, formations.js makeDust)
+    vec3 q = spinY(p, uTime * .012 * uMotion);
+    float y = mod(q.y + 10.9 + uTime * (.12 + aRand.x * .1) * uMotion, 26.) - 10.9;
+    f = smoothstep(-10.9, -8.4, y) * (1. - smoothstep(12.6, 15.1, y));
+    o = vec3(q.x, y, q.z) + flow(q * .12 + aRand.y * 2., uTime * .05) * .6 * uMotion;
+  } else if (stream > .5 && aStream.y != 0.) {
     float u = fract(aStream.x + uTime * .018 * uMotion);
-    fade = smoothstep(0., .05, u) * (1. - smoothstep(.85, 1., u));
-    return streamAt(u, aStream.y, aStream.z + uTime * .6 * uMotion, aStream.w);
+    f = smoothstep(0., .05, u) * (1. - smoothstep(.85, 1., u));
+    o = streamAt(u, aStream.y, aStream.z + uTime * .6 * uMotion, aStream.w);
   }
-  return spinY(p, spin);
+  fade = f;
+  return o;
 }
 // before the reveal reaches it, a particle waits as a faint blueprint (or dark, in a formation whose
 // ghost is 0); it flares as it lights. Where it stays dark until written, the flare only trails the
@@ -80,6 +101,10 @@ void main() {
   // the dust's own brightness (1 in the scenes, where it stays faint behind the shapes; up in the
   // tail, where it is all there is), on particles as they become dust
   if (aKeyTo < -.5) col *= mix(1., uDust, aKeyFrom < -.5 ? 1. : e);
+  // the motes circling the shape: a light of their own (mostly ice, a few warm), not the dust's dimness
+  bool mote = aKeyTo < -.5 && aRand.w > 3.7;
+  // (by day finer and fainter, so on the paper they read as motion, not as specks of dirt)
+  if (mote) col = mix(col, mix(vec3(.75, .82, 1.), vec3(1., .62, .32), step(.78, aRand.z)) * (.55 + aRand.y * .5) * mix(1., .45, uDay), aKeyFrom < -.5 ? 1. : e);
   // the practices' shapes: the one picked brightens, the others dim (aPick: its shape, -1 for the rest)
   if (uPickOn > .5 && uPick > -.5 && aPick > -.5) col *= abs(aPick - uPick) < .5 ? 1.55 : .55;
   // the pointer parts the particles and warms them
@@ -92,7 +117,7 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(p, 1.);
   float depth = max(-mv.z, .01);
   float tw = 1. + .18 * sin(uTime * aRand.w + aRand.y * 6.283) * uMotion;
-  float px = uSize * aRand.x * tw * uScale / depth;
+  float px = uSize * aRand.x * tw * uScale / depth * (mote ? mix(1.5, .9, uDay) : 1.);
   gl_PointSize = clamp(px, 1.5, 80.);
   gl_Position = projectionMatrix * mv;
   vColor = col * uGain;
@@ -273,7 +298,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     uTime: { value: 0 }, uMorph: { value: 0 }, uRevealFrom: { value: 1 }, uRevealTo: { value: 0 }, uSpinFrom: { value: 0 }, uSpinTo: { value: 0 },
     uStreamFrom: { value: 0 }, uStreamTo: { value: 0 }, uGhostFrom: { value: 1 }, uGhostTo: { value: 1 }, uScale: { value: 1 }, uSize: { value: .06 }, uMouse: { value: 0 }, uMotion: { value: 1 }, uFlow: { value: 1.6 }, uGain: { value: 1 },
     uPick: { value: -1 }, uPickOn: { value: 0 }, uDust: { value: 1 }, uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
-    uDay, uInkC: { value: new THREE.Color(pal.inkColor || '#1C3472') },
+    uDay, uInkC: { value: new THREE.Color(pal.inkColor || '#1C3472') }, uHalo: { value: new THREE.Vector4(0, 0, 0, 6) },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, ...PREMULT });
   const points = new THREE.Points(geo, mat);
@@ -351,7 +376,10 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       U.uTime.value = s.time; U.uMorph.value = s.morph; U.uRevealFrom.value = s.revealFrom; U.uRevealTo.value = s.revealTo;
       U.uSpinFrom.value = s.spinFrom; U.uSpinTo.value = s.spinTo; U.uMotion.value = s.motion; U.uFlow.value = s.flow;
       U.uSize.value = s.size; U.uGain.value = s.gain; U.uPick.value = s.pick; U.uPickOn.value = s.pickOn;
-      U.uDust.value = s.dust * n + Math.min(s.dust, 1.4) * d;   // on paper the tail's bright dust would read as dirt: a light speckle only
+      if (s.halo) U.uHalo.value.set(s.halo[0], s.halo[1], s.halo[2], s.halo[3]);
+      // the dust brighter at night, so its drift round the shape shows; on paper a light speckle only
+      // (bright dust would read as dirt there)
+      U.uDust.value = s.dust * 1.8 * n + Math.min(s.dust, 1.4) * d;
       mixColor(bgMat.uniforms.uTop.value, s.bgA[0], s.bgB[0], s.k);
       mixColor(bgMat.uniforms.uBottom.value, s.bgA[1], s.bgB[1], s.k);
       mixColor(bgMat.uniforms.uGlow.value, s.glowA[0], s.glowB[0], s.k).multiplyScalar(s.glow);

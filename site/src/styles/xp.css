@@ -249,10 +249,7 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-stage[data-light="day"] .xp-rail button[aria-current="true"]{color:#13234C}
 .xp-stage[data-light="day"] .xp-rail button[aria-current="true"] .n{color:#AC571D}
 .xp-stage[data-light="day"] :is(.xp-rail button,.xp-hint):focus-visible{outline-color:#AC571D}
-/* the header: on screen through the film (it hides on the way down elsewhere), its plate solid cream
-   (glass would tint the logo blue over the night) */
-body.xp-page .site-header.is-hidden{transform:none}
-body.xp-page .site-header .wrap::before{background-color:#FCF6EE;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* (the header on the film's pages: foot.css) */
 html.xp-day .xp-canvas{background:#FCF6EE}
 /* without the 3D (or without scripts) every scene stands on the night: a day scene's words keep the
    night's colours there */
