@@ -38,6 +38,8 @@ function start() {
   // loading screen keeps the night
   const DAY = /[?&](day|ink)\b/.test(location.search);
   if (DAY) { root.classList.add('xp-day'); articles.forEach(a => { if (a) a.dataset.light = 'day'; }); }
+  // the scenes' small actions at rest (scenes.js idle); review switch ?noidle turns them off
+  const IDLE = !/[?&]noidle\b/.test(location.search);
 
   // ---------- the scroll: P runs from 0 to S through the scenes, and on to S + 1 through the tail ----------
   const TAIL_LEN = .5;   // the run past the close to the page's end, in stage heights (its 50svh in xp.css)
@@ -69,7 +71,8 @@ function start() {
   // how far a scene's shape has revealed itself: over the first scene of its run of scenes with
   // the same shape, and complete from then on
   const runStart = SCENES.map((s, i) => { let r = i; while (r > 0 && SCENES[r - 1].form === s.form) r--; return r; });
-  const revealOf = (i, P) => { const r = runStart[i], s0 = r + (r ? W : 0), s1 = r + 1 - W; return clamp((P - s0) / ((s1 - s0) * .85)); };
+  // (drawn by the scene's middle, so a reader who stops there sees it whole, and its action at rest)
+  const revealOf = (i, P) => { const r = runStart[i], s0 = r + (r ? W : 0), s1 = r + 1 - W; return clamp((P - s0) / ((s1 - s0) * .5)); };
   // except the opening's page: its outline draws itself with the loading counter (keys up to
   // OUTLINE), and as the loading screen lifts it writes itself, on time rather than scroll; the
   // reveal runs on past 1 so the pen's glow leaves the last strokes
@@ -420,7 +423,7 @@ function start() {
   }
 
   // ---------- every frame ----------
-  let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '', dayCss = '';
+  let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '', dayCss = '', idleScene = -1, idleFrom = 0;
   const spinAcc = new Float64Array(Object.keys(F).length), pt = [0, 0, 0];   // how far each formation has turned
   const st8 = {};
   // what the tail fades away (the canvas stays: its dust is the backdrop from here on)
@@ -507,11 +510,31 @@ function start() {
       day: DAY ? 1 : mix(mix(A.light || 0, B.light || 0, kk), 0, te),
       raw: mix(A.raw || 0, B.raw || 0, kk),   // a sky given as it is (the practices' dusk indigo)
     });
-    // the motes circling the shape (world.js uHalo): its centre and a radius just outside it, carried
-    // from one shape to the next as they change
-    const ba = A.box || world.box(A.form), bb = B.box || world.box(B.form), hl = st8.halo || (st8.halo = [0, 0, 0, 0]);
-    for (let j = 0; j < 3; j++) hl[j] = mix(ba.c[j], bb.c[j], kk);
-    hl[3] = mix(Math.max(...ba.size), Math.max(...bb.size), kk) * .55 + 1;
+    // the scene's small action at rest (scenes.js idle; world.js uIdle): once its shape is drawn and
+    // still, after a moment, and again every few seconds; it stops the moment the scene changes
+    const IS = SCENES[k].idle;
+    let idleOn = 0;
+    if (IDLE && motion && IS && m === 0 && wt < 0 && gather >= 1 && rev >= .99) {
+      if (idleScene !== k) { idleScene = k; idleFrom = time + 1.2; }
+      const t = time - idleFrom;
+      if (t > 0) {
+        const n = Math.floor(t / IS.every), ph = t - n * IS.every, [r0, r1] = IS.range, il = st8.idle || (st8.idle = [0, 0, -1, 0]);
+        if (IS.mode === 'rewrite') {
+          // a stretch faded back over FADE seconds, then the pen writes it again; the next time, the next stretch
+          const FADE = .6, segs = Math.max(1, Math.floor((r1 - r0) / IS.len)), k0 = r0 + (n % segs) * IS.len, k1 = k0 + IS.len;
+          il[0] = k0; il[1] = k1;
+          if (ph < FADE) { il[2] = k0 - .01; il[3] = ph / FADE; }
+          else if (ph < FADE + IS.take) { il[2] = k0 + (ph - FADE) / IS.take * IS.len; il[3] = 1; }
+          else { il[2] = k1 + .2; il[3] = 0; }
+        } else {
+          // only the pen's front, through the whole range
+          il[0] = r0; il[1] = r1; il[3] = 0;
+          il[2] = ph < IS.take ? r0 + ph / IS.take * (r1 - r0) : -1;
+        }
+        idleOn = 1;
+      }
+    } else idleScene = -1;
+    st8.idleOn = idleOn;
     // the shades behind the words, the labels and the bar take the light of the words on screen (xp.css:
     // data-light); the words swap mid-change, as the light passes its middle
     const dl = st8.day > .5 ? 'day' : 'night';
