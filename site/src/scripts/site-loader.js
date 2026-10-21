@@ -4,8 +4,8 @@
    drawing is done and the page is ready (mewritLoader.ready: a page that waits sets it itself; any
    other is ready at its own load), 'mewrit:loaderout' tells the page to show itself (the home page puts
    the reader back where they were), and the logo glides on a soft arc into the header's logo while the
-   paper lifts away; then the header's real logo takes over, the loader goes and 'mewrit:loaderdone'
-   follows.
+   paper folds up into the header's bar; then the header's real logo takes over, the loader goes and
+   'mewrit:loaderdone' follows.
    A tap, key or wheel hurries the drawing. With reduced motion the logo stands written and the paper
    only fades. Whatever happens, the page shows after FAILSAFE. */
 import { clamp, easeInOutCubic, easeInOutSine, REDUCE } from './shared.js';
@@ -39,14 +39,21 @@ function start() {
   };
   requestAnimationFrame(watch);
 
+  // a colour without its transparency (the header's bar is a little translucent; the paper turns to its
+  // full tone)
+  const solid = c => { const m = /rgba?\(([^,]+),([^,]+),([^,)]+)/.exec(c || ''); return m ? `rgb(${m[1]},${m[2]},${m[3]})` : c; };
   function lift() {
     lifting = true; L.out = true;
     if (fill) fill.style.transform = 'scaleX(1)';
     document.dispatchEvent(new Event('mewrit:loaderout'));
-    // where the header's logo is (none showing: the logo only fades)
-    const head = document.getElementById('headerLogo');
+    // where the header's logo is, and the header's bar the paper folds into (none showing: the logo and
+    // the paper only fade)
+    const head = document.getElementById('headerLogo'), hdr = document.getElementById('siteHeader');
     const src = logo.getBoundingClientRect(), dst = head && head.getClientRects().length ? head.getBoundingClientRect() : null;
     const flip = !REDUCE && dst && dst.width ? { x: dst.left - src.left, y: dst.top - src.top, s: dst.width / src.width } : null;
+    const hb = flip && hdr && hdr.getClientRects().length ? hdr.getBoundingClientRect() : null;
+    const H0 = paper.offsetHeight, fold = hb && hb.bottom > 0 ? hb.bottom : 0;
+    if (fold) paper.style.setProperty('--sl-bar', solid(getComputedStyle(hdr).backgroundColor));
     const t0 = performance.now(), dur = flip ? GLIDE : 420;
     const step = now => {
       const u = clamp((now - t0) / dur), g = easeInOutCubic(u);
@@ -57,10 +64,15 @@ function start() {
         logo.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${(1 + (flip.s - 1) * g).toFixed(4)})`;
         head.style.opacity = clamp((u - .82) / .18).toFixed(3);
       } else logo.style.opacity = (1 - u).toFixed(3);
-      // the paper lifts away like a sheet, up off the screen (a fade would pass through a muddy grey,
-      // cream over the night); with reduced motion it fades
-      if (flip) paper.style.transform = `translate3d(0,${(-100 * easeInOutCubic(clamp((u - .04) / .92))).toFixed(2)}%,0)`;
-      else paper.style.opacity = (1 - easeInOutSine(u)).toFixed(3);
+      if (fold) {
+        // the paper folds up into the header's bar: its foot rises to the bar's while its colour turns to
+        // the bar's, then it gives way to the bar itself, the bar's words coming in (a fade of the whole
+        // sheet passed through a muddy grey, cream over the night)
+        const e = easeInOutCubic(clamp(u / .86));
+        paper.style.height = `${(H0 + (fold - H0) * e).toFixed(1)}px`;
+        paper.style.setProperty('--sl-k', e.toFixed(3));
+        paper.style.opacity = (1 - clamp((u - .84) / .16)).toFixed(3);
+      } else paper.style.opacity = (1 - easeInOutSine(u)).toFixed(3);
       if (bar) bar.style.opacity = (1 - clamp(u / .25)).toFixed(3);
       if (u < 1) requestAnimationFrame(step); else land(head);
     };

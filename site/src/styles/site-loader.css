@@ -1,14 +1,17 @@
 /* ---------------- the site's loader (src/components/SiteLoader.astro, src/scripts/site-loader.js) ----------------
    A sheet of paper over the page while it gets ready: the logo written on it by the pen, a hairline
-   under it filling with the page's progress. Then the logo glides into its place in the header while
-   the paper lifts away like a sheet; the logo, outside the paper, glides on. The header's own logo
-   waits hidden under the paper until the loader's logo lands on it. */
+   under it filling with the page's progress. Then the paper folds up into the header's bar (its foot
+   rising to the bar's, its colour turning to the bar's) while the logo, outside the paper, glides into
+   its place in the bar; the bar's own words come in as the paper gives way to it. The header's own
+   logo waits hidden under the paper until the loader's logo lands on it. */
 .sl{position:fixed;inset:0;z-index:300;display:none}
 html.sl-on{overflow:hidden}
 html.sl-on .sl{display:block}
 html.sl-on #headerLogo{opacity:0}
-/* (the paper's shadow shows only as it lifts away, along its foot) */
-.sl-paper{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 42%,#FFFBF5 0%,#FCF6EE 55%,#F3E9DD 100%);box-shadow:0 18px 60px rgba(3,8,23,.32);will-change:transform}
+/* (its height and its turn to the header's colour, --sl-bar by --sl-k, set by site-loader.js as it folds
+   up into the header; its shadow shows only then, along its foot) */
+.sl-paper{position:absolute;left:0;right:0;top:0;height:100%;overflow:hidden;background:radial-gradient(120% 90% at 50% 42%,#FFFBF5 0%,#FCF6EE 55%,#F3E9DD 100%);box-shadow:0 18px 60px rgba(3,8,23,.32)}
+.sl-paper::after{content:"";position:absolute;inset:0;background:var(--sl-bar,transparent);opacity:var(--sl-k,0)}
 .sl-mid{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:clamp(24px,4vh,40px);padding:24px}
 .sl-logo{width:min(600px,80vw);transform-origin:0 0;will-change:transform}
 .sl-bar{display:block;width:min(200px,42vw);height:1px;background:rgba(28,52,114,.14);overflow:hidden}

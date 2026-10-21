@@ -53,16 +53,27 @@ html[data-foot="film"]::-webkit-scrollbar{display:none}
 @media (prefers-reduced-motion:reduce){.sf-panel,.sf-toggle i{transition:none}}
 
 /* ---------------- the header on the film's pages ----------------
-   The site's capsule in a soft light tone (--hd-bg), not glaring white (the user, 2026-10-17) and not
-   dark either: the logo sits on it as it is, with no plate of its own (a light patch on a dark bar
-   looked stuck on). A little translucent, so the scene shows faintly through it at night and it
-   settles into the cream by day. Its links in the site's navy, Get in touch in the orange. It stays
-   on screen through the film (elsewhere it slips away on the way down). */
-html[data-foot="film"]{--hd-bg:rgba(222,227,238,.9)}   /* a pale mist from the navy's own hue: of the light tones tried (parchment, stone, mist) the calmest over the night */
+   A flat bar across the top of the screen (the user, 2026-10-21: not the floating capsule, which the
+   site's loader looked bad folding into; the loader's paper now folds up into this bar,
+   site-loader.js), its words in line with the film's (the same gutter). In a soft light tone (--hd-bg),
+   not glaring white (the user, 2026-10-17) and not dark either: the logo sits on it as it is, with no
+   plate of its own (a light patch on a dark bar looked stuck on). A little translucent, so the scene
+   shows faintly through it at night and it settles into the cream by day. Its links in the site's
+   navy, Get in touch in the orange. It stays on screen through the film, the same size all the way
+   (elsewhere it slips away on the way down). */
+html[data-foot="film"]{--hd-bg:rgba(222,227,238,.9);--header-h:68px}   /* a pale mist from the navy's own hue: of the light tones tried (parchment, stone, mist) the calmest over the night */
+html[data-foot="film"] .site-header,html[data-foot="film"] .site-header.is-solid{top:0;pointer-events:auto;background-color:var(--hd-bg);background-image:none;
+  -webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1);border-bottom:1px solid rgba(19,35,76,.12);box-shadow:0 6px 18px rgba(6,8,24,.12)}
 html[data-foot="film"] .site-header.is-hidden{transform:none}
-html[data-foot="film"] .site-header .wrap::before,html[data-foot="film"] .site-header.is-solid .wrap::before{background-color:var(--hd-bg);background-image:none;
-  -webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1);box-shadow:0 0 0 .5px rgba(19,35,76,.1),0 8px 24px rgba(6,8,24,.16)}
-html[data-foot="film"] .site-header .wrap::after{opacity:.35}
+html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{width:100%;max-width:none;height:var(--header-h);margin:0;padding:0 clamp(20px,6vw,104px);border-radius:0}
+html[data-foot="film"] .site-header .wrap::before,html[data-foot="film"] .site-header .wrap::after{display:none}
+html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:42px}
+@media (max-width:899.98px){
+  html[data-foot="film"]{--header-h:60px}
+  html[data-foot="film"] .site-header{padding-top:env(safe-area-inset-top)}
+  html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{padding:0 10px 0 16px}
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:34px}
+}
 @media (min-width:900px){
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){text-shadow:none}
 }
