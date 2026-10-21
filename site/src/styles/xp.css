@@ -58,43 +58,9 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-btn-ghost{color:var(--xp-ink);border:1px solid rgba(201,216,255,.42);background:rgba(255,255,255,.04)}
 @media (hover:hover){.xp-btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(201,216,255,.7)}}
 
-/* the practices scene: its hint under the words, and a button above each of the five shapes, pinned
-   there by experience.js (the layer is a point; each button is placed from it) with a stem down to
-   its shape; where the shapes stand too close for that, every other button hangs below its shape */
+/* a scene's hint under its words */
 .xp-pickhint{margin-top:20px;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--xp-gold)}
 .xp-pickhint::before{content:"";display:inline-block;width:20px;height:1px;margin-right:10px;vertical-align:middle;background:currentColor}
-.xp-picks{position:absolute;left:0;top:0;width:0;height:0}
-/* each button is a pill of dark glass: the number in orange, the name in ice and an arrow, a stem
-   down to its shape. Hover and focus turn its edge gold (and light its shape, experience.js) */
-.xp-pick{position:absolute;left:0;top:0;display:grid;justify-items:center;gap:3px;width:max-content;max-width:132px;padding:8px 16px 7px;cursor:pointer;
-  font-family:var(--mono);font-size:.62rem;font-weight:600;line-height:1.3;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#DCE5FF;
-  border:1px solid rgba(201,216,255,.45);border-radius:999px;background:rgba(4,10,28,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  opacity:0;pointer-events:none;transition:opacity .35s ease,border-color .25s,background-color .25s,color .25s;will-change:transform}
-.xp-pick.on{opacity:1;pointer-events:auto}
-.xp-pick .n{color:var(--accent)}
-.xp-pick .nw{white-space:nowrap}   /* the arrow stays with the last word */
-.xp-pick b{display:inline-block;margin-left:.5em;font-weight:600;color:var(--xp-gold);transition:transform .25s ease}
-.xp-pick::after{content:"";position:absolute;left:var(--stem,50%);top:100%;width:1px;height:10px;background:rgba(240,195,92,.75)}
-.xp-pick.below::after{top:auto;bottom:100%}
-.xp-pick:is(:hover,:focus-visible,.lit){border-color:var(--xp-gold);background-color:rgba(12,24,58,.88);color:#fff}
-.xp-pick:is(:hover,:focus-visible,.lit) b{transform:translateX(3px)}
-.xp-pick:focus-visible{outline:2px solid var(--xp-gold);outline-offset:3px}
-/* until the first hover, tap or focus, a hairline ring breathes out of each button, in turn */
-.xp-pick::before{content:"";position:absolute;inset:-1px;border:1px solid var(--xp-gold);border-radius:inherit;opacity:0;pointer-events:none}
-.xp-picks.idle .xp-pick.on::before{animation:xpPulse 2.4s cubic-bezier(.2,.6,.3,1) infinite}
-.xp-picks.idle .xp-pick:nth-of-type(2)::before{animation-delay:.18s}
-.xp-picks.idle .xp-pick:nth-of-type(3)::before{animation-delay:.36s}
-.xp-picks.idle .xp-pick:nth-of-type(4)::before{animation-delay:.54s}
-.xp-picks.idle .xp-pick:nth-of-type(5)::before{animation-delay:.72s}
-@keyframes xpPulse{0%{opacity:.85;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.18,1.5)}}
-/* the hit area over each shape (sized by experience.js): invisible, but the pointer finds it */
-.xp-hit{position:absolute;left:0;top:0;width:0;height:0;cursor:pointer;pointer-events:none;border-radius:12px}
-.xp-hit.on{pointer-events:auto}
-.xp-nogl .xp-hit,html:not(.js) .xp-hit{display:none}
-.xp-nogl .xp-picks{position:static;display:flex;flex-wrap:wrap;gap:8px;width:auto;height:auto;margin-top:18px}
-.xp-nogl .xp-pick{position:static;max-width:none}
-.xp-nogl .xp-pick::after{display:none}
-.xp-nogl .xp-scene.on .xp-pick{opacity:1;pointer-events:auto}
 
 /* the labels pinned to the shapes: a ringed dot on the point, a leader line, the label */
 .xp-callouts{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -179,7 +145,6 @@ html.xp-lock .xp-stage{opacity:0}
   .xp-text{font-size:.98rem;line-height:1.55}
   .xp-docs{margin-top:14px;font-size:.62rem}
   .xp-pickhint{margin-top:14px;font-size:.62rem}
-  .xp-pick{max-width:100px;padding:5px 9px 4px;font-size:.52rem;letter-spacing:.06em}
   .xp-cta{margin-top:20px}
   .xp-panel,.xp-hint,.xp-frame{display:none}
   .xp-railnav{left:20px;right:20px;bottom:auto;top:calc(var(--header-h) + 8px)}
@@ -215,7 +180,6 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-kicker{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em}
 .xp-docs{font-family:var(--sans);font-size:.86rem;font-weight:500;letter-spacing:.01em;text-transform:none}
 .xp-pickhint{font-family:var(--serif);font-style:italic;font-size:.98rem;font-weight:400;letter-spacing:0;text-transform:none}
-.xp-pick{font-family:var(--sans);font-size:.78rem;font-weight:500;letter-spacing:.01em;text-transform:none}
 .xp-hint,.xp-rail button{font-family:var(--sans)}
 .xp-rail button{font-size:.76rem;font-weight:500;letter-spacing:.02em;text-transform:none}
 /* the labels: a dot on the point, a hairline, an italic caption with a halo of the sky behind it */
@@ -261,7 +225,6 @@ html.xp-day .xp-canvas{background:#FCF6EE}
 @media (max-width:759.98px),(max-aspect-ratio:4/5){
   .xp-shade-day{background:linear-gradient(0deg,rgba(252,246,238,.97) 0%,rgba(252,246,238,.78) 36%,rgba(252,246,238,0) 62%)}
   .xp-docs{font-size:.8rem}
-  .xp-pick{max-width:112px;padding:6px 10px 5px;font-size:.68rem}
   .xp-co span{font-size:.84rem}
 }
 
@@ -321,18 +284,50 @@ html.xp-day .xp-canvas{background:#FCF6EE}
 .xp-points .n{grid-row:1 / span 2;font:600 .74rem/1.7 var(--sans);letter-spacing:.08em;color:#F2A65A}
 .xp-points b{font:500 1.12rem/1.25 var(--serif);color:var(--xp-ink)}
 .xp-points .d{margin-top:4px;font-size:.9rem;line-height:1.5;color:var(--xp-soft)}
-/* the five practices: a row each, the number, the name, what it covers and an arrow; a row is a button
-   (straight to the practice, experience.js) */
-.xp-hub{list-style:none;margin-top:22px;border-top:1px solid rgba(242,245,252,.16)}
-.xp-hub-item{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;min-height:58px;padding:10px 4px;text-align:left;
-  border-bottom:1px solid rgba(242,245,252,.16);color:var(--xp-ink);cursor:pointer;transition:background-color .25s}
-.xp-hub-item .n{grid-row:1 / span 2;font:600 .74rem/1 var(--sans);letter-spacing:.08em;color:#F2A65A}
-.xp-hub-item .t{font:500 1.18rem/1.2 var(--serif)}
-.xp-hub-item .f{grid-column:2;margin-top:3px;font-size:.82rem;line-height:1.35;color:var(--xp-soft)}
-.xp-hub-item b{grid-column:3;grid-row:1 / span 2;color:#F2A65A;transition:transform .25s ease}
-@media (hover:hover){.xp-hub-item:hover{background:rgba(255,255,255,.06)}.xp-hub-item:hover b{transform:translateX(4px)}}
-.xp-hub-item:focus-visible{outline:2px solid #F2A65A;outline-offset:2px}
-.xp-hub + .xp-cta{margin-top:22px}
+/* the five practices as tiles (layout tiles; the user chose them over a list and buttons over the
+   shapes, 2026-10-21): a title row, the Explore button at its right, and five tall tiles of dark glass
+   across the screen, each its number, its shape (the 3D, which experience.js sets in the tile's art),
+   its name, what it covers and an arrow; the tile is the button (straight to the practice,
+   experience.js), and pointing at it lights its shape. Phones: two columns of three rows, the sixth
+   tile to all five */
+.xp-tiles{display:grid;list-style:none;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,1.1vw,20px)}
+.xp-tiles li{min-height:0}
+.xp-tile{position:relative;display:flex;flex-direction:column;width:100%;height:100%;padding:clamp(16px,1.3vw,24px);text-align:left;color:var(--xp-ink);cursor:pointer;
+  border:1px solid rgba(242,245,252,.13);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.01) 0%,rgba(255,255,255,.025) 52%,rgba(255,255,255,.07) 100%);
+  transition:border-color .3s ease,background-color .3s ease}
+.xp-tile .n{font:600 .74rem/1 var(--sans);letter-spacing:.12em;color:#F2A65A}
+.xp-tile-art{display:block;flex:1 1 auto;min-height:0}
+.xp-tile .t{display:block;padding-right:46px;font:500 clamp(1.12rem,.82rem + .62vw,1.6rem)/1.15 var(--serif);letter-spacing:-.01em;text-wrap:balance}
+.xp-tile .f{display:block;margin-top:8px;padding-right:46px;font-size:clamp(.8rem,.72rem + .16vw,.92rem);line-height:1.45;color:var(--xp-soft)}
+.xp-tile b{position:absolute;right:clamp(14px,1.1vw,20px);bottom:clamp(14px,1.1vw,20px);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(242,166,90,.55);font-weight:500;color:#F2A65A;transition:transform .3s ease,background-color .3s ease,color .3s ease}
+@media (hover:hover){
+  .xp-tile:hover{border-color:rgba(242,166,90,.6);background-color:rgba(255,255,255,.035)}
+  .xp-tile:hover b{background:#F2A65A;color:#1A1B3B;transform:translateX(3px)}
+}
+.xp-tile:focus-visible{outline:2px solid #F2A65A;outline-offset:3px;border-color:rgba(242,166,90,.6)}
+.xp-tile:active{background-color:rgba(255,255,255,.05)}
+/* the sixth tile, to all five (phones): warm, its words and arrow only */
+.xp-tile-all{display:none}
+.xp-tile-all .xp-tile{justify-content:flex-end;border-color:rgba(242,166,90,.45);background:linear-gradient(180deg,rgba(242,166,90,.06),rgba(242,166,90,.16))}
+.xp-explore b{margin-left:.35em}
+/* (no shade on this screen: the tiles are the ground for their words, and the shade would dim the shapes
+   on one side) */
+.xp-stage[data-scene="practices"]:has(.xp-scene[data-layout="tiles"]) .xp-shade{opacity:0}
+@media (min-width:760px) and (min-aspect-ratio:4/5) and (min-height:521px){
+  /* (as tall as the screen under the header, to 40px over the foot's bar, as strata; the title row and the
+     tiles in its middle, the tiles a little taller than wide, or as tall as there is room for) */
+  .xp-scene[data-layout="tiles"]{justify-self:stretch;align-self:start;height:calc(100svh - var(--header-h) - var(--foot-gap,42px) - 64px);max-width:none;display:grid;
+    grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;align-content:center;column-gap:40px}
+  .xp-scene[data-layout="tiles"] .xp-col-a{grid-column:1;grid-row:1 / 3;align-self:end}
+  .xp-scene[data-layout="tiles"] .xp-title{margin-bottom:0;font-size:clamp(2.4rem,1rem + 3.4vw,4.6rem)}
+  .xp-scene[data-layout="tiles"] .xp-col-b{display:contents}
+  .xp-scene[data-layout="tiles"] .xp-text{grid-column:2;grid-row:1;align-self:end;max-width:34ch;font-size:clamp(.95rem,.86rem + .2vw,1.06rem)}
+  .xp-scene[data-layout="tiles"] .xp-cta{grid-column:2;grid-row:2;align-self:end;margin-top:16px}
+  .xp-scene[data-layout="tiles"] .xp-tiles{grid-column:1 / -1;grid-row:3;margin-top:clamp(20px,3.4vh,40px)}
+  .xp-scene[data-layout="tiles"] .xp-tile{aspect-ratio:7 / 10;max-height:calc(100svh - var(--header-h) - var(--foot-gap,42px) - 64px - 230px)}
+}
+
 /* Know more: to the practice's own page */
 .xp-more{display:inline-flex;align-items:center;gap:10px;margin-top:22px;min-height:44px;padding:0 20px;border:1.5px solid currentColor;border-radius:999px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:none;transition:background-color .25s,color .25s,border-color .25s}
 .xp-more b{transition:transform .25s ease}
@@ -348,8 +343,8 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-railnav{bottom:calc(var(--foot-gap,42px) + 14px)}
   .xp-hint{bottom:calc(var(--foot-gap,42px) + 64px)}
 }
-/* phones: every layout stands under its shape; the figures and reasons tighter, the practices' rows
-   their names only (the buttons over the shapes give way to the list) */
+/* phones: every layout stands under its shape, but the practices' tiles (below); the figures and
+   reasons tighter */
 @media (max-width:759.98px),(max-aspect-ratio:4/5){
   .xp-scene[data-layout]{justify-self:stretch;display:block;max-width:none}
   .xp-scene[data-layout="center"] .xp-col-b{max-width:none}
@@ -364,14 +359,21 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-points li{padding-top:10px}
   .xp-points b{font-size:1rem}
   .xp-points .d{font-size:.82rem;line-height:1.45}
-  .xp-scene[data-scene="practices"] .xp-text{display:none}   /* (room for the five shapes above the list) */
-  .xp-hub{margin-top:14px}
-  .xp-hub-item{min-height:48px;padding:8px 2px}
-  .xp-hub-item .t{font-size:1.05rem}
-  .xp-hub-item .f{display:none}
-  .xp-hub + .xp-cta{margin-top:14px}
-  .xp-picks .xp-pick{display:none}
   .xp-more{margin-top:14px;min-height:42px}
+  /* the practices' tiles: from under the header to the foot's bar, the title over two columns of three
+     rows, the sixth tile to all five; the tiles their number, shape and name */
+  .xp-scene[data-layout="tiles"]{display:grid;grid-template-rows:auto minmax(0,1fr);height:calc(100svh - var(--header-h) - var(--foot-gap,46px) - 34px)}
+  .xp-scene[data-layout="tiles"] .xp-col-b{display:contents}
+  .xp-scene[data-layout="tiles"] :is(.xp-text,.xp-cta){display:none}
+  .xp-scene[data-layout="tiles"] .xp-title{margin-bottom:14px}
+  .xp-scene[data-layout="tiles"] .xp-tiles{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:10px}
+  .xp-tile-all{display:block}
+  .xp-tile{padding:12px 14px;border-radius:18px}
+  .xp-tile .t{padding-right:0;font-size:1rem}
+  .xp-tile .f{display:none}
+  .xp-tile b{top:9px;right:10px;bottom:auto;width:28px;height:28px;font-size:.85rem}   /* (by the number, so the name has the tile's width) */
+  .xp-tile-all .xp-tile b{top:auto;bottom:10px}
+  .xp-tile-all .xp-tile .t{padding-right:34px}
 }
 
 /* phones on their side (short and wide): the words have about 300px under the header, so the type steps
@@ -401,17 +403,28 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-points li{padding-top:6px}
   .xp-points b{font-size:.92rem}
   .xp-points .d{display:none}
-  .xp-scene[data-scene="practices"] .xp-text{display:none}
-  .xp-picks .xp-pick{display:none}   /* (the list does their work, and they would stand on the title) */
-  .xp-hub{margin-top:8px}
-  .xp-hub-item{min-height:32px;padding:3px 2px}
-  .xp-hub-item .t{font-size:.9rem}
-  .xp-hub-item .f{display:none}
-  .xp-hub + .xp-cta{margin-top:8px}
   .xp-cta .btn{min-height:34px;padding:7px 16px;font-size:.82rem}
   .xp-docs,html.xp-day .xp-docs{display:none}   /* (the paragraph names them) */
   .xp-more{margin-top:8px;min-height:34px;padding:0 14px;font-size:.8rem}
 }
+
+/* the practices' tiles on a phone on its side: the title and the Explore button in one row, the five
+   tiles under them, their number, shape and name */
+@media (max-height:520px) and (min-aspect-ratio:4/3){
+  .xp-scene[data-layout="tiles"]{justify-self:stretch;max-width:none;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr);column-gap:20px;
+    height:calc(100svh - var(--header-h) - var(--foot-gap,46px) - 22px)}
+  .xp-scene[data-layout="tiles"] .xp-col-a{grid-column:1;grid-row:1}
+  .xp-scene[data-layout="tiles"] .xp-col-b{display:contents}
+  .xp-scene[data-layout="tiles"] .xp-text{display:none}
+  .xp-scene[data-layout="tiles"] .xp-cta{grid-column:2;grid-row:1;align-self:end;margin:0 0 10px}
+  .xp-scene[data-layout="tiles"] .xp-tiles{grid-column:1 / -1;grid-row:2;gap:8px}
+  .xp-tile{padding:10px 12px;border-radius:14px}
+  .xp-tile .t{padding-right:0;font-size:.86rem}
+  .xp-tile .f,.xp-tile b{display:none}
+}
+/* without the 3D (or without scripts) the tiles are their words */
+:is(.xp-nogl,html:not(.js) .xp) .xp-tile-art{display:none}
+html:not(.js) .xp-scene[data-layout="tiles"]{height:auto}
 
 /* without scripts: the words in order, as a normal page */
 html:not(.js) .xp{background:#030817}
@@ -420,13 +433,12 @@ html:not(.js) .xp-stage{position:static;height:auto;padding:calc(var(--header-h)
 html:not(.js) .xp-scenes{position:static;display:block}
 html:not(.js) .xp-scene{opacity:1;transform:none;margin-bottom:72px;max-width:none}
 html:not(.js) .xp-title .c{opacity:1;filter:none;transform:none}
-html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas,html:not(.js) .xp-picks{display:none}
+html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
 
 @media (prefers-reduced-motion:reduce){
   .xp-title .c{opacity:1;filter:none;transform:none;animation:none !important}
   .xp-scene{transform:none !important;transition:opacity .25s linear}
   .xp-hint i{animation:none}
   .xp-co span{transition:none;transform:none}
-  .xp-picks.idle .xp-pick.on::before{animation:none}
   .xp-figs li,.xp-figs li::before,.xp-figs b i{animation:none !important}
 }

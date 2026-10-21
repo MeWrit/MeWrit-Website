@@ -74,12 +74,11 @@ export const SCENES = [
   },
   {
     // the five practices to choose from, on dusk indigo (raw: the sky is not tone-mapped, world.js):
-    // the list in the words; the shapes, a button above each on wider screens (experience.js pins
-    // them; where they stand too close, every other one hangs below), so the fit keeps room above and
-    // below the arc
-    id: 'practices', form: F.CHOICE, chapter: -1, idle: { mode: 'pass', range: [.07, .91], every: 8, take: 4 },
+    // five tiles across the screen (layout tiles; the user chose them, 2026-10-21), each shape standing
+    // in its tile's art (experience.js fits the middle one to its tile and nudges the rest into theirs),
+    // so the camera holds still here (still: no glide, no parallax, no push from the pointer)
+    id: 'practices', form: F.CHOICE, chapter: -1, layout: 'tiles', still: true, idle: { mode: 'pass', range: [.07, .91], every: 8, take: 4 },
     a: [[-2.37, 1.78, 35.56], [0, 0, 0], 42, .23, -.06], b: [[2.45, 2.67, 35.48], [0, .1, 0], 42, .23, -.06],
-    target: { x: .46, y: .16, w: .52, h: .62 }, pad: [62, 6, 62, 6],
     raw: 1, bg: ['#34315D', '#1A1B3B'], glow: ['#4B447B', .3],
   },
   {

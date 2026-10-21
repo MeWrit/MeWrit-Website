@@ -18,7 +18,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { buildFormations, random } from './formations.js';
+import { buildFormations, random, F } from './formations.js';
 
 const PARTICLE_VS = /* glsl */`
 uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
@@ -26,6 +26,8 @@ uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDus
 uniform vec3 uMouseO, uMouseD;
 uniform vec3 uAxisFrom, uAxisTo;   // the axis each of the two shapes turns about (unit; the upright unless a scene names one)
 uniform vec3 uPivotFrom, uPivotTo;   // and the point it turns about (the origin unless a scene names one)
+uniform vec3 uOff[5];   // the practices' five shapes, each nudged into its tile on the page (experience.js)
+uniform float uOffFrom, uOffTo;   // 1 where that side's formation is the practices'
 uniform vec4 uIdle;   // the scene's small action at rest: [from, to] of the drawing order, the pen's place, how far faded
 uniform float uIdleOn;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
@@ -45,6 +47,10 @@ vec3 streamAt(float u, float side, float ang, float rad) {
 vec3 spinY(vec3 p, float a) { float c = cos(a), s = sin(a); return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z); }
 // p turned by a about the unit axis k through the origin (about the upright it is spinY)
 vec3 turn(vec3 p, float a, vec3 k) { float c = cos(a), s = sin(a); return p * c + cross(k, p) * s + k * dot(k, p) * (1. - c); }
+// the nudge for the practices' shape g (0 to 4), picked out without indexing the array by a variable
+vec3 offOf(float g) {
+  return uOff[0] * step(abs(g), .5) + uOff[1] * step(abs(g - 1.), .5) + uOff[2] * step(abs(g - 2.), .5) + uOff[3] * step(abs(g - 3.), .5) + uOff[4] * step(abs(g - 4.), .5);
+}
 vec3 flow(vec3 p, float t) {
   return vec3(sin(p.y * .55 + t) + sin(p.z * .8 - t * .7),
               sin(p.z * .45 + t * .8) + sin(p.x * .65 + t * .3),
@@ -85,6 +91,7 @@ void main() {
   float fa, fb;
   vec3 a = placeOf(aFrom, aKeyFrom, uSpinFrom, uAxisFrom, uPivotFrom, uStreamFrom, fa);
   vec3 b = placeOf(aTo, aKeyTo, uSpinTo, uAxisTo, uPivotTo, uStreamTo, fb);
+  if (aPick > -.5) { vec3 o = offOf(aPick); a += o * uOffFrom; b += o * uOffTo; }
   // each particle leaves at its own moment, so shapes dissolve and reform rather than slide
   float d = aRand.z * .45;
   float m = clamp((uMorph - d) / .55, 0., 1.);
@@ -305,6 +312,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     uIdle: { value: new THREE.Vector4(0, 0, -1, 0) }, uIdleOn: { value: 0 },
     uAxisFrom: { value: new THREE.Vector3(0, 1, 0) }, uAxisTo: { value: new THREE.Vector3(0, 1, 0) },
     uPivotFrom: { value: new THREE.Vector3() }, uPivotTo: { value: new THREE.Vector3() },
+    uOff: { value: [0, 1, 2, 3, 4].map(() => new THREE.Vector3()) }, uOffFrom: { value: 0 }, uOffTo: { value: 0 },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, ...PREMULT });
   const points = new THREE.Points(geo, mat);
@@ -316,6 +324,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     pair = [a, b]; streamOf = streamForm;
     U.uStreamFrom.value = a === streamForm ? 1 : 0; U.uStreamTo.value = b === streamForm ? 1 : 0;
     U.uGhostFrom.value = list[a].ghost ?? 1; U.uGhostTo.value = list[b].ghost ?? 1;
+    U.uOffFrom.value = a === F.CHOICE ? 1 : 0; U.uOffTo.value = b === F.CHOICE ? 1 : 0;   // (the practices' shapes nudged into their tiles)
   }
   setPair(0, 0, -1);
   // the first time a formation is bound its buffers go up to the GPU, which costs a frame: warm()
@@ -352,6 +361,8 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
   return {
     N, renderer, anchors: i => list[i].anchors, box: i => list[i].box,
     setPair,
+    // the practices' shapes, each nudged into its tile on the page: five [x, y, z] in world units
+    offsets(o) { o.forEach((v, g) => { if (U.uOff.value[g]) U.uOff.value[g].set(v[0], v[1], v[2]); }); },
     warm(i) {
       const [a, b] = pair, s = streamOf;
       setPair(i, i, -1);

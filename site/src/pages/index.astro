@@ -3,10 +3,11 @@
 // itself with the counter; as the loading screen lifts the page writes itself, then one cloud of
 // particles takes a shape for each scene as you scroll: three screens at night that say what MeWriT
 // is, who writes and why it is chosen (the figures among them); the five practices to choose from, on
-// dusk indigo; each practice by day, reached through a dawn (a choice in the list goes straight to its
-// practice); and the close at night, where the foot opens. Each scene's words stand in two columns
-// (.xp-col-a, .xp-col-b), so a shape can stand beside them, between them or across the middle of the
-// screen with the words above and the figures below (data-layout). The scenes are in
+// dusk indigo, as five tiles with their shapes in them; each practice by day, reached through a dawn
+// (a tile goes straight to its practice); and the close at night, where the foot opens. Each scene's
+// words stand in two columns (.xp-col-a, .xp-col-b), so a shape can stand beside them, between them,
+// across the middle of the screen with the words above and the figures below, or in tiles
+// (data-layout). The scenes are in
 // src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in src/scripts/xp/world.js.
 // The words are real page content: they read in order without the 3D.
 import { Image } from 'astro:assets';
@@ -14,7 +15,6 @@ import Base from '../layouts/Base.astro';
 import { experience } from '../data/experience';
 import { practices } from '../data/pitch';
 import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
-import { F } from '../scripts/xp/formations.js';
 import { site, contact } from '../data/site';
 import { href } from '../lib/url';
 import portrait from '../assets/hetal-shah.png';
@@ -72,10 +72,12 @@ const fulls = practices.list.map(p => p.full);
                   {w.hint && <p class="xp-pickhint">{w.hint}</p>}
                   {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
                   {w.hub && <>
-                    <ol class="xp-hub" aria-label="The five practices">
-                      {CHAPTERS.map((c, j) => <li><button class="xp-hub-item" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="t">{c}</span><span class="f">{fulls[j]}</span><b aria-hidden="true">{'→'}</b></button></li>)}
+                    <div class="btn-row xp-cta"><button class="btn btn-primary xp-explore" type="button">Explore all five <b aria-hidden="true">{'→'}</b></button></div>
+                    {/* each practice a tile: its number, its shape (the 3D, set in the tile's art by experience.js), its name and what it covers; on phones a sixth tile goes to all five */}
+                    <ol class="xp-tiles" aria-label="The five practices">
+                      {CHAPTERS.map((c, j) => <li><button class="xp-tile" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="xp-tile-art" aria-hidden="true"></span><span class="t">{c}</span><span class="f">{fulls[j]}</span><b aria-hidden="true">{'→'}</b></button></li>)}
+                      <li class="xp-tile-all"><button class="xp-tile xp-explore" type="button"><span class="t">Explore all five</span><b aria-hidden="true">{'→'}</b></button></li>
                     </ol>
-                    <div class="btn-row xp-cta"><button class="btn btn-primary xp-explore" type="button">Explore the services</button></div>
                   </>}
                   {w.more && <a class="xp-more" href={href(`/services/${w.more}/`)}>Know more<span class="sr-only"> about {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>}
                   {w.cta && <div class="btn-row xp-cta">
@@ -83,10 +85,6 @@ const fulls = practices.list.map(p => p.full);
                     <a class="btn xp-btn-ghost" href={contact.academy} target="_blank" rel="noopener">Book a training</a>
                   </div>}
                 </div>
-                {s.form === F.CHOICE && <div class="xp-picks idle">
-                  {CHAPTERS.map((_, j) => <i class="xp-hit" data-practice={j} aria-hidden="true"></i>)}
-                  {CHAPTERS.map((c, j) => <button class="xp-pick" type="button" data-practice={j} tabindex="-1" aria-hidden="true"><span class="n">{pad(j)}</span><span class="t">{c.split(' ').slice(0, -1).join(' ')} <span class="nw">{c.split(' ').pop()}<b aria-hidden="true">{'→'}</b></span></span></button>)}
-                </div>}
               </article>
             );
           })}

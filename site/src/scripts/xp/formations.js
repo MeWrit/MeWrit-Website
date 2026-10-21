@@ -584,20 +584,19 @@ function page(N, R, dust) {
   return { ...f.done({ title: p3(L, 3.85), section: p3(L, 2.05), table: p3(RT, top), figure: p3(X1, Y0), seal: p3(SC[0] + .55, SC[1], SW) }), ghost: 0 };
 }
 
-/* the practices scene: the five practices as shapes on a shallow arc around the viewer, facing it,
-   each its own group (the experience pins a button above each, and brightens the one picked): 01
-   regulatory writing, a stack of pages under a seal; 02 publications, a journal page; 03 medical
-   communications, a slide; 04 training, a group of people; 05 AI/ML advisory, a small network.
-   Strokes in ice, accents in orange. Each lights from left to right in turn. Phones (compact) set
-   them in two rows, three over two, where one row would draw them too small to read */
+/* the practices scene: the five practices as shapes, each in its tile on the page and each its own
+   group (the experience brightens the one pointed at): 01 regulatory writing, a stack of pages under
+   a seal; 02 publications, a journal page; 03 medical communications, a slide; 04 training, a group
+   of people; 05 AI/ML advisory, a small network. Strokes in ice, accents in orange. Each lights from
+   left to right in turn. They stand flat, facing the viewer, a pitch of 4.1 apart: in a row, or on
+   phones (compact) in two columns of three rows, as the tiles stand there (the sixth place is the
+   page's Explore tile); experience.js then nudges each into its own tile */
 function choice(N, R, dust, compact = false) {
   const f = former(N, dust, true), anchors = {}, n = q => Math.max(1, Math.round(N * q)), cl = v => v < 0 ? 0 : v > 1 ? 1 : v;
   for (let g = 0; g < 5; g++) {
     f.group = g;
     // where the shape stands, and which way it faces (u across it, v up, w toward the viewer)
-    const row = compact && g > 2 ? 1 : 0, slot = compact ? (g < 3 ? g - 1 : g - 3.5) : g - 2, Ra = 26;
-    const th = slot * (compact ? 10 : 9.2) * RAD, cx = Math.sin(th) * Ra, cv = compact ? (row ? -2.5 : 2.5) : 0;
-    const cz = (1 - Math.cos(th)) * Ra + (compact ? 0 : [0, -.45, .2, -.45, 0][g]);
+    const th = 0, cz = 0, cx = compact ? (g % 2 - .5) * 4.1 : (g - 2) * 4.1, cv = compact ? (1 - Math.floor(g / 2)) * 4 : 0;
     const ux = Math.cos(th), uz = Math.sin(th), nx = -Math.sin(th), nz = Math.cos(th), lo = .05 + .18 * g, hi = .2 + .18 * g;
     const at = (u, v, w, c, b) => f.put(cx + ux * u + nx * w, cv + v, cz + uz * u + nz * w, c, b, lo + (hi - lo) * cl((u + 1.6) / 3.2));
     const seg = (u0, v0, u1, v1, m, c, b, w = 0, jit = .015) => { for (let q = 0; q < m; q++) { const s = R(); at(u0 + (u1 - u0) * s + (R() - .5) * jit, v0 + (v1 - v0) * s + (R() - .5) * jit, w, c, b); } };

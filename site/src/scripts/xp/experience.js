@@ -111,11 +111,12 @@ function start() {
   const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
   const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  // each scene's two directions: its shots' middle, turned half of ORB each way about the upright
+  // each scene's two directions: its shots' middle, turned half of ORB each way about the upright (a
+  // still scene, the practices' tiles, keeps the middle: its shapes stand in their tiles)
   const rotY = (d, a) => [d[0] * Math.cos(a) + d[2] * Math.sin(a), d[1], -d[0] * Math.sin(a) + d[2] * Math.cos(a)];
   const dirs = SCENES.map(s => {
     const da = norm(sub(s.a[0], s.a[1])), db = norm(sub(s.b[0], s.b[1])), m = norm([da[0] + db[0], da[1] + db[1], da[2] + db[2]]);
-    return [norm(rotY(m, -ORB / 2)), norm(rotY(m, ORB / 2))];
+    return s.still ? [m, m] : [norm(rotY(m, -ORB / 2)), norm(rotY(m, ORB / 2))];
   });
   // a shot that fits `box` into the target t, looking along -dir: [camera, the point looked at, fov, shift right, shift up]
   function fitShot(box, dir, fov, t, aspect) {
@@ -148,6 +149,19 @@ function start() {
     if (!el || !el.getClientRects().length) return null;
     const q = el.getBoundingClientRect();
     return q.width ? [q.left - sr.left, q.top - sr.top, q.right - sr.left, q.bottom - sr.top] : null;
+  };
+  // the same for an element in a scene's words, as laid out: without the scene's rise as it comes and
+  // goes (the article's transform; .xp-scenes, the article's offset parent, covers the stage)
+  const laidBox = (el, art) => {
+    if (!el || !el.getClientRects().length) return null;
+    const q = el.getBoundingClientRect(), a = art.getBoundingClientRect(), x = art.offsetLeft - a.left, y = art.offsetTop - a.top;
+    return q.width ? [q.left + x, q.top + y, q.right + x, q.bottom + y] : null;
+  };
+  // where a world point falls on the stage (fractions) in a fitted shot v (fitShot's), with the view's
+  // right and up, the point's depth and the tangent of half the field of view
+  const onStage = (v, p, aspect) => {
+    const cam = [v[0], v[1], v[2]], dir = norm(sub(cam, [v[3], v[4], v[5]])), R = norm(cross([0, 1, 0], dir)), U = cross(dir, R), tn = Math.tan(v[6] * Math.PI / 360), d = sub(p, cam), z = -dot(d, dir);
+    return { x: .5 + dot(d, R) / (z * tn * aspect) / 2 + v[7], y: .5 - dot(d, U) / (z * tn) / 2 - v[8], z, R, U, tn };
   };
   // the figures panel's box for every scene: its rows (and note) differ, and a long value wraps, so
   // a hidden copy is filled with each scene's figures (as they end) and measured
@@ -229,13 +243,35 @@ function start() {
       }
       const ob = { words, colA: ca, colB: cb, panel: panels[i], rail, hint: hn, strata };
       avoid[i] = [...(center ? [ca, cb] : strata ? [strata.top, strata.band] : [words]), panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
-      const box = s.box || world.box(s.form), t = targetOf(s, i, w, h, box, ob);
+      // in tiles (the practices) each shape stands in its tile's art: the camera is fitted so the middle
+      // shape (by its anchors) fills the middle tile's art, less 6% all round, and every shape is
+      // then nudged into its own tile's art (world.offsets, below)
+      const shapeOf = (an, g) => { const tp = an['pick' + g], bs = an['pickBase' + g]; return [tp[0], (tp[1] + bs[1]) / 2, tp[2]]; };
+      let tilesT = null, tilesBox = null, arts = null;
+      if (s.layout === 'tiles' && art) {
+        arts = [...art.querySelectorAll('.xp-tile-art')].map(el => laidBox(el, art));
+        if (arts.length === 5 && arts.every(Boolean)) {
+          const a2 = arts[2], an = world.anchors(s.form), c2 = shapeOf(an, 2);
+          tilesT = { x: (a2[0] + (a2[2] - a2[0]) * .06) / w, y: (a2[1] + (a2[3] - a2[1]) * .06) / h, w: (a2[2] - a2[0]) * .88 / w, h: (a2[3] - a2[1]) * .88 / h };
+          tilesBox = { c: c2, size: [3.3, an.pick2[1] - an.pickBase2[1], 1.2] };
+        } else arts = null;
+      }
+      const box = tilesBox || s.box || world.box(s.form), t = tilesT || targetOf(s, i, w, h, box, ob);
       targets.push(t);
       // (one field of view for the whole scene, so it holds without a zoom)
       const fv = (s.a[2] + s.b[2]) / 2;
       const va = fitShot(box, dirs[i][0], fv, t, aspect), vb = fitShot(box, dirs[i][1], fv, t, aspect);
-      for (let j = 0; j < 3; j++) vb[j] = vb[j + 3] + (vb[j] - vb[j + 3]) * PUSH;   // (the end shot a little closer in)
+      if (!s.still) for (let j = 0; j < 3; j++) vb[j] = vb[j + 3] + (vb[j] - vb[j + 3]) * PUSH;   // (the end shot a little closer in)
       keys.push({ P: i + (i ? W : 0), v: va }, { P: i + 1 - (i < S - 1 ? W : 0), v: vb });
+      if (arts) {
+        // each shape's nudge: from where it falls in this shot to its tile's art centre, across the view
+        // at the shape's own depth (so it keeps its size)
+        const an = world.anchors(s.form);
+        world.offsets(arts.map((q, g) => {
+          const o = onStage(va, shapeOf(an, g), aspect), dx = ((q[0] + q[2]) / 2 / w - o.x) * 2 * o.z * o.tn * aspect, dy = -((q[1] + q[3]) / 2 / h - o.y) * 2 * o.z * o.tn;
+          return [o.R[0] * dx + o.U[0] * dy, o.R[1] * dx + o.U[1] * dy, o.R[2] * dx + o.U[2] * dy];
+        }));
+      }
     });
   }
   function camAt(P) {
@@ -304,7 +340,6 @@ function start() {
   // a link or button in a scene that is not showing brings its scene into view when it gets focus,
   // and so does anything on the stage once the tail has faded it
   articles.forEach((el, i) => el && el.addEventListener('focusin', e => {
-    if (e.target.classList.contains('xp-pick')) return;   // the practices' buttons bring their scene in themselves
     if (i !== active || tailNow > .02) goTo(i);
   }));
   const hud = sec.querySelector('.xp-hud');
@@ -320,8 +355,7 @@ function start() {
     el.innerHTML = '<i></i><span></span>'; el.lastChild.textContent = c.label;
     callLayer.append(el); callouts.push({ ...c, el, i, on: false });
   }));
-  const spinY = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return [c * p[0] + s * p[2], p[1], -s * p[0] + c * p[2]]; };
-  // p turned by a about the unit axis q through the origin (world.js turn; about the upright it is spinY)
+  // p turned by a about the unit axis q through the origin (world.js turn)
   const UP = [0, 1, 0];
   const turn = (p, a, q = UP) => {
     const c = Math.cos(a), s = Math.sin(a), d = (q[0] * p[0] + q[1] * p[1] + q[2] * p[2]) * (1 - c);
@@ -331,35 +365,17 @@ function start() {
   const ORIGIN = [0, 0, 0];
   const turnAbout = (p, a, q, o = ORIGIN) => { const t = turn([p[0] - o[0], p[1] - o[1], p[2] - o[2]], a, q); return [t[0] + o[0], t[1] + o[1], t[2] + o[2]]; };
 
-  // the practices' buttons, one above each of their shapes, and an invisible hit area over each
-  // shape itself: a click on either goes to the practice, the pointer or the focus on one
-  // brightens its shape and dims the others. Until the first of these, a slow ring pulses out of
-  // the buttons (.idle, xp.css), to say they can be clicked
-  const pickLayer = sec.querySelector('.xp-picks');
-  const hits = [...sec.querySelectorAll('.xp-hit')];
-  const picks = [...sec.querySelectorAll('.xp-pick')].map(el => ({ el, g: +el.dataset.practice, hit: hits.find(h => +h.dataset.practice === +el.dataset.practice), on: false, want: false, below: false, w: 0, h: 0, stem: '', hs: '', sz: '' }));
-  let hovered = -1, focused = -1, pickAt = null;
-  const woke = () => { if (pickLayer && pickLayer.classList.contains('idle')) pickLayer.classList.remove('idle'); };
-  // the list of the five practices and Explore the services: straight to the practice, or to the first
-  sec.querySelectorAll('.xp-hub-item').forEach(el => el.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === +el.dataset.practice))));
-  const explore = sec.querySelector('.xp-explore');
-  if (explore) explore.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === 0)));
-  picks.forEach(p => {
-    const go = () => { woke(); warpTo(SCENES.findIndex(s => s.chapter === p.g)); };
-    [p.el, p.hit].forEach(el => {
-      if (!el) return;
-      el.addEventListener('click', go);
-      el.addEventListener('pointerenter', () => { hovered = p.g; woke(); });
-      el.addEventListener('pointerleave', () => { if (hovered === p.g) hovered = -1; });
-    });
-    if (p.hit) p.hit.addEventListener('pointerenter', () => p.el.classList.add('lit'));
-    if (p.hit) p.hit.addEventListener('pointerleave', () => p.el.classList.remove('lit'));
-    p.el.addEventListener('focus', () => {
-      focused = p.g; woke();
-      // reached from the keyboard: bring the scene in with its shapes lit, so every button shows
-      if (active !== PICK || revealOf(PICK, Math.min(S, Pr)) < .95) window.scrollTo({ top: scrollFor(PICK + .74), behavior: REDUCE ? 'auto' : 'smooth' });
-    });
-    p.el.addEventListener('blur', () => { if (focused === p.g) focused = -1; });
+  // the practices' tiles: a click goes to the practice (Explore all five, to the first); pointing at a
+  // tile, or its focus, brightens its shape and dims the others (world.js uPick)
+  let hovered = -1, focused = -1;
+  sec.querySelectorAll('.xp-explore').forEach(el => el.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === 0))));
+  sec.querySelectorAll('.xp-tile[data-practice]').forEach(el => {
+    const g = +el.dataset.practice;
+    el.addEventListener('click', () => warpTo(SCENES.findIndex(s => s.chapter === g)));
+    el.addEventListener('pointerenter', () => { hovered = g; });
+    el.addEventListener('pointerleave', () => { if (hovered === g) hovered = -1; });
+    el.addEventListener('focus', () => { focused = g; });
+    el.addEventListener('blur', () => { if (focused === g) focused = -1; });
   });
 
   // ---------- the 3D world, loaded on its own ----------
@@ -371,11 +387,9 @@ function start() {
   function sizeUp() {
     W2 = stage.clientWidth; H2 = stage.clientHeight; CW = canvas.clientWidth || W2; CH = canvas.clientHeight || H2;
     buildKeys(W2, H2);
-    // the labels' and buttons' sizes, measured together now rather than one by one as each first
-    // shows, which would force a layout in the middle of a frame
+    // the labels' sizes, measured together now rather than one by one as each first shows, which
+    // would force a layout in the middle of a frame
     callouts.forEach(c => { c.sw = c.el.lastChild.offsetWidth; c.sh = c.el.lastChild.offsetHeight; });
-    pickAt = null;
-    picks.forEach(p => { p.w = p.el.offsetWidth; p.h = p.el.offsetHeight; });
     if (world) world.resize(CW, CH);
   }
   const ro = new ResizeObserver(sizeUp);
@@ -525,10 +539,11 @@ function start() {
     ptr.s += ((ptr.on ? 1 : 0) - ptr.s) * (1 - Math.exp(-dt * 3));
     ptr.px += (ptr.x * ptr.s - ptr.px) * (1 - Math.exp(-dt * 2.5)); ptr.py += (ptr.y * ptr.s - ptr.py) * (1 - Math.exp(-dt * 2.5));
     // (no idle sway: only the pointer's parallax on computers)
-    const pos = [v[0] + ptr.px * .7 * motion, v[1] + ptr.py * .4 * motion, v[2]];
+    const free = 1 - mix(A.still ? 1 : 0, B.still ? 1 : 0, kk);   // (none in a still scene: its shapes stand in their tiles)
+    const pos = [v[0] + ptr.px * .7 * motion * free, v[1] + ptr.py * .4 * motion * free, v[2]];
     const surge = same || gather < 1 ? 0 : Math.sin(Math.PI * m) * motion;   // mid-change: the view widens a touch
     world.camera(pos, [v[3], v[4], v[5]], v[6] + surge * 5, v[7], v[8], H2);
-    world.pointer(ptr.x, ptr.y, ptr.s * .9);
+    world.pointer(ptr.x, ptr.y, ptr.s * .9 * free);   // (not in a still scene: the pointer on a tile would push its shape apart)
 
     // the look: blended between the two scenes, and into the plain night of the tail
     const bgB = te > 0 ? TAIL.bg : B.bg, glowB = te > 0 ? TAIL.glow : B.glow, lk = te > 0 ? te : kk;
@@ -607,49 +622,6 @@ function start() {
       }
       if (on !== c.on) { c.on = on; c.el.classList.toggle('on', on); }
     });
-
-    // the practices' buttons, above their shapes once each has lit (or when one has the focus); placed
-    // from their layer, wherever the scene's words have it, and kept on the stage near its edges.
-    // Where the shapes stand closer than the buttons are wide, every other button hangs below its shape
-    let any = false;
-    picks.forEach(p => { p.want = pickOn && k === PICK && (rev >= .2 + .18 * p.g || focused === p.g); any = any || p.want || p.on; });
-    if (any && pickLayer) {
-      // where the buttons' layer is: read while its words are still settling in (they rise into place
-      // over .8 s), then kept, so most frames do not ask for a layout after this frame's style writes
-      if (!pickAt || now - decodeAt < 1200) pickAt = pickLayer.getBoundingClientRect();
-      const o = pickAt, anchors = world.anchors(F.CHOICE), spin = spinOf(PICK);
-      const tops = picks.map(p => { world.project(spinY(anchors['pick' + p.g], spin), pt); return [pt[0], pt[1], pt[2]]; });
-      const bases = picks.map(p => { world.project(spinY(anchors['pickBase' + p.g], spin), pt); return [pt[0], pt[1], pt[2]]; });
-      picks.forEach(p => { if (!p.w) { p.w = p.el.offsetWidth; p.h = p.el.offsetHeight; } });
-      let pitch = 1e9;
-      for (let g = 1; g < tops.length; g++) if (Math.abs(tops[g][1] - tops[g - 1][1]) < 40) pitch = Math.min(pitch, Math.abs(tops[g][0] - tops[g - 1][0]));
-      // (never in the phones' two rows, where a button hung below would sit on the second row: there
-      // the buttons are narrow enough to stand side by side, xp.css)
-      const stagger = !compact && pitch < Math.max(...picks.map(p => p.w)) + 12;
-      picks.forEach((p, g) => {
-        let on = p.want;
-        const below = stagger && g % 2 === 1;
-        if (below) world.project(spinY(anchors['pickBase' + p.g], spin), pt); else [pt[0], pt[1], pt[2]] = tops[g];
-        if (pt[2] > 1 || pt[0] < 0 || pt[0] > W2 || pt[1] < 60 || pt[1] > H2) on = false;
-        const x = Math.max(8, Math.min(W2 - 8 - p.w, pt[0] - p.w / 2)), y = below ? pt[1] + 10 : pt[1] - p.h - 10;
-        const tf = `translate3d(${Math.round(x - o.left)}px,${Math.round(y - o.top)}px,0)`;
-        if (tf !== p.tf) { p.tf = tf; p.el.style.transform = tf; }
-        const stem = `${(pt[0] - x - .5).toFixed(1)}px`;
-        if (stem !== p.stem) { p.stem = stem; p.el.style.setProperty('--stem', stem); }
-        if (below !== p.below) { p.below = below; p.el.classList.toggle('below', below); }
-        // the hit area: the shape's projected box (its anchors run from its top to its foot; the
-        // shapes are about as wide as they are tall), padded, in steps of 4 px so a slow drift of
-        // the camera does not resize it every frame
-        if (p.hit) {
-          const t = tops[g], f = bases[g], hgt = Math.abs(f[1] - t[1]), q = v => Math.round(v / 4) * 4;
-          const w = q(hgt * .95 + 20), hh = q(hgt + 20), cx = (t[0] + f[0]) / 2, cy = (t[1] + f[1]) / 2;
-          const hs = `translate3d(${q(cx - w / 2 - o.left)}px,${q(cy - hh / 2 - o.top)}px,0)`, sz = w + 'x' + hh;
-          if (hs !== p.hs) { p.hs = hs; p.hit.style.transform = hs; }
-          if (sz !== p.sz) { p.sz = sz; p.hit.style.width = w + 'px'; p.hit.style.height = hh + 'px'; }
-        }
-        if (on !== p.on) { p.on = on; p.el.classList.toggle('on', on); if (p.hit) p.hit.classList.toggle('on', on); }
-      });
-    }
   }
   // the canvas is behind the whole page, so it draws as long as the page is in view; past the
   // experience only the dust drifts, and phones draw it every other frame there
