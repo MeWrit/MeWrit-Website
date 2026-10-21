@@ -5,7 +5,8 @@
 // is, who writes and why it is chosen (the figures among them); the five practices to choose from, on
 // dusk indigo; each practice by day, reached through a dawn (a choice in the list goes straight to its
 // practice); and the close at night, where the foot opens. Each scene's words stand in two columns
-// (.xp-col-a, .xp-col-b), so a shape can stand between them (data-layout). The scenes are in
+// (.xp-col-a, .xp-col-b), so a shape can stand beside them, between them or across the middle of the
+// screen with the words above and the figures below (data-layout). The scenes are in
 // src/scripts/xp/scenes.js, their words in src/data/experience.ts, the 3D in src/scripts/xp/world.js.
 // The words are real page content: they read in order without the 3D.
 import { Image } from 'astro:assets';
@@ -62,7 +63,11 @@ const fulls = practices.list.map(p => p.full);
                 <div class="xp-col xp-col-b">
                   <p class="xp-text">{w.text}</p>
                   {w.lead && <p class="xp-lead"><Image class="xp-face" src={portrait} alt="" width={96} height={96} />{w.lead}</p>}
-                  {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map(f => <li><b>{f.value.replace(/\+$/, '')}{f.value.endsWith('+') && <i>+</i>}</b><span>{f.label}</span></li>)}</ul>}
+                  {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map((f, j) => {
+                    // the figure, and its count up (experience.js): the running count over an unseen copy
+                    const v = f.value.replace(/\+$/, '');
+                    return <li style={`--i:${j}`}><b><span class="sr-only">{f.value}</span><span class="xp-count" data-to={v.replace(/\D/g, '')} aria-hidden="true"><span>{v}</span><span>{v}</span></span>{f.value.endsWith('+') && <i aria-hidden="true">+</i>}</b><span>{f.label}</span></li>;
+                  })}</ul>}
                   {w.points && <ol class="xp-points">{w.points.map((p, j) => <li><span class="n" aria-hidden="true">{pad(j)}</span><b>{p.title}</b><span class="d">{p.text}</span></li>)}</ol>}
                   {w.hint && <p class="xp-pickhint">{w.hint}</p>}
                   {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}

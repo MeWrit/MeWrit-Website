@@ -270,20 +270,51 @@ html.xp-day .xp-canvas{background:#FCF6EE}
    only among the practices; and room for the foot's bar (foot.css: --foot-gap). Colours on the night
    and the dusk: ink #F2F5FC, soft text, the orange lightened to #F2A65A for small figures and numbers ---------- */
 .xp-col-b > :first-child{margin-top:0}
-/* on wider screens: the words on the left (the shape on the right), on the right (layout left), or in
-   two columns with the shape between them (layout center) */
+/* on wider screens: the words on the left (the shape on the right), on the right (layout left), in two
+   columns with the shape between them (layout center), or in three bands across the screen (layout
+   strata, below: the words above, the shape across the middle, the figures along the foot) */
 .xp-scene[data-layout="left"]{justify-self:end}
 .xp-scene[data-layout="center"]{justify-self:stretch;max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr) minmax(0,1fr);column-gap:24px;align-items:center}
 .xp-scene[data-layout="center"] .xp-col-a{grid-column:1}
 .xp-scene[data-layout="center"] .xp-col-b{grid-column:3;justify-self:end;max-width:44ch}
-/* who: the portrait line and the figures (the plus in orange) */
+/* who: the portrait line and the figures (the plus in orange). As the words come in the figures rise one
+   after another, a rule drawn over each, and count up: experience.js writes the running count over an
+   unseen copy of the figure, which keeps its room, and the plus comes in as the count lands (these
+   delays go with experience.js: COUNT, and its 420 ms and 180 ms) */
 .xp-lead{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:.92rem;line-height:1.5;color:var(--xp-soft)}
 .xp-face{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 18%;box-shadow:0 0 0 2px rgba(242,245,252,.22)}
 .xp-figs{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px;margin-top:22px}
-.xp-figs li{padding-top:12px;border-top:1px solid var(--xp-line)}
+.xp-figs li{position:relative;padding-top:12px}
+.xp-figs li::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--xp-line);transform-origin:left center}
 .xp-figs b{display:block;font:400 clamp(1.9rem,1.2rem + 1.6vw,2.7rem)/1 var(--serif);letter-spacing:-.02em;color:var(--xp-ink);font-variant-numeric:lining-nums}
 .xp-figs b i{margin-left:.04em;font-style:normal;font-size:.62em;vertical-align:.42em;color:#F2A65A}
-.xp-figs span{display:block;margin-top:8px;font-size:.8rem;line-height:1.4;color:var(--xp-soft)}
+.xp-figs li > span{display:block;margin-top:8px;font-size:.8rem;line-height:1.4;color:var(--xp-soft)}
+.xp-count{display:inline-grid}
+.xp-count > span{grid-area:1 / 1}
+.xp-count > span:first-child{visibility:hidden}
+@keyframes xpFig{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes xpRule{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes xpPlus{from{opacity:0}to{opacity:1}}
+.xp-scene.on .xp-figs li{animation:xpFig .9s calc(var(--i,0) * 180ms + 380ms) cubic-bezier(.2,.7,.2,1) both}
+.xp-scene.on .xp-figs li::before{animation:xpRule 1.2s calc(var(--i,0) * 180ms + 300ms) cubic-bezier(.6,0,.2,1) both}
+.xp-scene.on .xp-figs b i{animation:xpPlus .5s calc(var(--i,0) * 180ms + 2100ms) ease-out both}
+/* who on computer screens, in three bands (layout strata; experience.js fits the molecule between the
+   words and the figures): the title on the left, who writes and who leads on the right, the figures
+   large along the foot. As tall as the screen under the header, to 40px over the foot's bar: the scenes
+   share one row of their grid, as tall as the tallest of them, so stretching would follow that one.
+   (Not on a phone on its side, under 521px: there the words keep one column, below) */
+@media (min-width:760px) and (min-aspect-ratio:4/5) and (min-height:521px){
+  .xp-scene[data-layout="strata"]{justify-self:stretch;align-self:start;height:calc(100svh - var(--header-h) - var(--foot-gap,42px) - 64px);max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:clamp(32px,5vw,96px)}
+  .xp-scene[data-layout="strata"] .xp-col-a{grid-column:1;grid-row:1 / 3}
+  .xp-scene[data-layout="strata"] .xp-col-b{display:contents}
+  .xp-scene[data-layout="strata"] .xp-text{grid-column:2;grid-row:1;max-width:44ch;padding-top:40px;font-size:clamp(1.05rem,.86rem + .5vw,1.32rem);line-height:1.55;color:var(--xp-ink)}
+  .xp-scene[data-layout="strata"] .xp-lead{grid-column:2;grid-row:2;align-self:start;max-width:540px;margin-top:22px;font-size:clamp(.88rem,.8rem + .2vw,1rem)}
+  .xp-scene[data-layout="strata"] .xp-face{width:56px;height:56px}
+  .xp-scene[data-layout="strata"] .xp-figs{grid-column:1 / -1;grid-row:4;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 clamp(20px,3vw,56px);margin-top:0}
+  .xp-scene[data-layout="strata"] .xp-figs li{padding-top:clamp(14px,2vh,24px)}
+  .xp-scene[data-layout="strata"] .xp-figs b{font-size:clamp(2.6rem,1rem + 3.2vw,5.4rem)}
+  .xp-scene[data-layout="strata"] .xp-figs li > span{margin-top:12px;max-width:26ch;font-size:clamp(.84rem,.76rem + .2vw,1rem)}
+}
 /* why: the reasons, numbered */
 .xp-points{list-style:none;display:grid;gap:16px;margin-top:22px}
 .xp-points li{display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:12px;padding-top:14px;border-top:1px solid var(--xp-line)}
@@ -328,7 +359,7 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-figs{gap:10px 16px;margin-top:14px}
   .xp-figs li{padding-top:8px}
   .xp-figs b{font-size:1.65rem}
-  .xp-figs span{margin-top:5px;font-size:.72rem}
+  .xp-figs li > span{margin-top:5px;font-size:.72rem}
   .xp-points{gap:10px;margin-top:14px}
   .xp-points li{padding-top:10px}
   .xp-points b{font-size:1rem}
@@ -360,9 +391,10 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-scene[data-layout="center"]{display:block;justify-self:start;max-width:min(470px,54vw)}
   .xp-scene[data-layout="center"] .xp-col-b{max-width:none;justify-self:auto}
   .xp-scenes{padding-bottom:calc(var(--foot-gap,46px) + 8px)}
+  .xp-scene[data-scene="who"] .xp-text{display:none}   /* (who and the figures fit; with the paragraph they would run under the foot's bar) */
   .xp-figs{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;margin-top:10px}
   .xp-figs b{font-size:1.3rem}
-  .xp-figs span{margin-top:4px;font-size:.62rem}
+  .xp-figs li > span{margin-top:4px;font-size:.62rem}
   .xp-lead{margin-top:8px;font-size:.74rem}
   .xp-face{width:32px;height:32px}
   .xp-points{gap:6px;margin-top:8px}
@@ -396,4 +428,5 @@ html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas,html:not
   .xp-hint i{animation:none}
   .xp-co span{transition:none;transform:none}
   .xp-picks.idle .xp-pick.on::before{animation:none}
+  .xp-figs li,.xp-figs li::before,.xp-figs b i{animation:none !important}
 }

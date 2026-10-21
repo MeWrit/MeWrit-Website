@@ -12,7 +12,8 @@
    radians a second); nothing rocks, and within a scene the camera only glides one way with the
    scroll, round the shape and a little closer (experience.js: ORB, PUSH; the user found back-and-forth
    movement nauseating and wanted calm motion tied to the scroll, 2026-10-13 to 17). layout:
-   'center' stands the shape between the words' two columns; used rarely, the rest keep one place.
+   'center' stands the shape between the words' two columns, 'strata' across the middle of the screen
+   with the words above it and the figures along the foot (who); used rarely, the rest keep one place.
    idle: the scene's small action at rest (the user chose "small real actions", 2026-10-17), on the
    shape's own drawing order (its keys): 'rewrite' fades back a stretch len long and the pen writes it
    again (a line of the page, a page of the dossier, a stretch of the curves), stepping through range;
@@ -53,9 +54,10 @@ export const SCENES = [
     readout: [['Since', '2017'], ['Experience', `${YEARS}+ years`], ['Practices', '05']],
   },
   {
-    // who writes: a molecule (the science behind the words), centred, the words on one side and the
-    // figures on the other
-    id: 'who', form: F.MOLECULE, chapter: -1, layout: 'center',
+    // who writes: a molecule (the science behind the words), large across the middle of the screen, the
+    // words above it and the figures along the foot (layout strata). Fitted by its atoms (box): its
+    // faint cloud reaches about half as far again, and fitting that would draw the atoms small
+    id: 'who', form: F.MOLECULE, chapter: -1, layout: 'strata', box: { c: [0, 0, 0], size: [10.2, 4.4, 1.6] },
     a: [[1.6, .9, 12], [0, 0, 0], 36, 0, 0], b: [[-1.8, 1.3, 11.6], [0, .1, 0], 36, 0, 0],
     bg: NAVY, glow: ['#1C3472', .5],
   },

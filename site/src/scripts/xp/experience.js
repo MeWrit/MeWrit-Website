@@ -93,8 +93,8 @@ function start() {
   // (on computers by the scene's layout, scenes.js: right of the words, left of them, or between their
   // two columns; on phones always above the words)
   const TARGET = {
-    desk: { right: { x: .52, y: .16, w: .44, h: .62 }, left: { x: .04, y: .16, w: .44, h: .62 }, center: { x: .3, y: .14, w: .4, h: .66 } },
-    short: { right: { x: .5, y: .16, w: .47, h: .58 }, left: { x: .03, y: .16, w: .47, h: .58 }, center: { x: .28, y: .14, w: .44, h: .6 } },
+    desk: { right: { x: .52, y: .16, w: .44, h: .62 }, left: { x: .04, y: .16, w: .44, h: .62 }, center: { x: .3, y: .14, w: .4, h: .66 }, strata: { x: .1, y: .12, w: .8, h: .76 } },
+    short: { right: { x: .5, y: .16, w: .47, h: .58 }, left: { x: .03, y: .16, w: .47, h: .58 }, center: { x: .28, y: .14, w: .44, h: .6 }, strata: { x: .06, y: .12, w: .88, h: .76 } },
     phone: { x: .06, y: .15, w: .88, h: .40 },
   };
   // within a scene the camera glides with the scroll, one way only and at the reader's own pace: round the
@@ -172,6 +172,7 @@ function start() {
     const phone = layout === 'phone';
     let comp = s.layout || 'right';
     if (!phone && comp === 'center' && ob.colA && ob.colB && ob.colB[0] < ob.colA[2]) comp = 'right';   // its columns stacked (a short screen): beside the words
+    if (!phone && comp === 'strata' && !ob.strata) comp = 'right';   // its words in one column (a phone on its side): beside them
     const base = (phone ? s.targetPhone : s.target) || (phone ? TARGET.phone : TARGET[layout][comp]);
     const frac = q => q && [q[0] / w, q[1] / h, q[2] / w, q[3] / h];
     let x0 = base.x, y0 = Math.max(base.y, (headPx + 10) / h), x1 = base.x + base.w, y1 = base.y + base.h;
@@ -184,7 +185,11 @@ function start() {
       if (hn && hn[0] < x1 && hn[2] > x0) y1 = Math.min(y1, hn[1] - 12 / h);
       if (words && !s.over) {
         if (comp === 'left') x1 = Math.min(x1, words[0] - 28 / w);   // the words on the right
-        else if (comp === 'center') {   // between the two columns of words
+        else if (comp === 'strata') {   // between the words above and the figures below
+          const tp = frac(ob.strata.top), bd = frac(ob.strata.band);
+          if (tp) y0 = Math.max(y0, tp[3] + 24 / h);
+          if (bd) y1 = Math.min(y1, bd[1] - 24 / h);
+        } else if (comp === 'center') {   // between the two columns of words
           const ca = frac(ob.colA), cb = frac(ob.colB);
           if (ca) x0 = Math.max(x0, ca[2] + 24 / w);
           if (cb) x1 = Math.min(x1, cb[0] - 24 / w);
@@ -214,8 +219,16 @@ function start() {
       // a title's long word can run past its column
       if (words && tt && tt.scrollWidth > tt.clientWidth + 1) words[2] = Math.max(words[2], tt.getBoundingClientRect().left - sr.left + tt.scrollWidth);
       const ca = pxBox(art && art.querySelector('.xp-col-a'), sr), cb = pxBox(art && art.querySelector('.xp-col-b'), sr), center = (s.layout || 'right') === 'center' && layout !== 'phone';
-      const ob = { words, colA: ca, colB: cb, panel: panels[i], rail, hint: hn };
-      avoid[i] = [...(center ? [ca, cb] : [words]), panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
+      // in three bands (strata) the second column's parts stand in the scene's own grid (xp.css): the
+      // words above, the figures below, measured each on its own; where they stand in one column, none
+      let strata = null;
+      const colB = art && art.querySelector('.xp-col-b');
+      if (s.layout === 'strata' && layout !== 'phone' && colB && getComputedStyle(colB).display === 'contents') {
+        const part = q => pxBox(art.querySelector(q), sr), top = [ca, part('.xp-text'), part('.xp-lead')].filter(Boolean);
+        strata = { top: top.length ? top.reduce((u, q) => [Math.min(u[0], q[0]), Math.min(u[1], q[1]), Math.max(u[2], q[2]), Math.max(u[3], q[3])]) : null, band: part('.xp-figs') };
+      }
+      const ob = { words, colA: ca, colB: cb, panel: panels[i], rail, hint: hn, strata };
+      avoid[i] = [...(center ? [ca, cb] : strata ? [strata.top, strata.band] : [words]), panels[i], rail, [0, 0, w, headPx + 6]].filter(Boolean);   // where the scene's labels may not go
       const box = s.box || world.box(s.form), t = targetOf(s, i, w, h, box, ob);
       targets.push(t);
       // (one field of view for the whole scene, so it holds without a zoom)
@@ -267,6 +280,10 @@ function start() {
     // the note under the figures, only where a scene's picture or figures are illustrative
     if (note) { note.textContent = SCENES[i].note || ''; note.hidden = !SCENES[i].note; }
   }
+  // a scene's figures in its words (who) count up as the words come in, one after another, from nothing
+  // to the figure over COUNT ms, written over an unseen copy of the figure that keeps its room (xp.css)
+  const COUNT = 2200, NONE = [];
+  const counts = articles.map(a => a ? [...a.querySelectorAll('.xp-count')].map(el => ({ el: el.lastElementChild, to: +el.dataset.to, last: '' })) : NONE);
   function updateWords(now, rev) {
     const kick = kicks[active], e = now - decodeAt;
     if (kick && e < 900) kick.textContent = motion ? scramble(kick.dataset.text, e, 650) : kick.dataset.text;
@@ -275,6 +292,10 @@ function start() {
       let t = r.val === 'N' ? fmt(N) : typeof r.val === 'object' ? fmt(Math.round(r.val.to * easeOut(Math.min(1, rev)))) : r.val;
       if (r.alt && rev >= .98) t = r.alt;
       if (t !== r.last) { r.dd.textContent = t; r.last = t; }
+    });
+    (counts[active] || NONE).forEach((c, j) => {
+      const t = motion ? clamp((e - 420 - j * 180) / COUNT) : 1, s = fmt(Math.round(c.to * easeOut(t)));
+      if (s !== c.last) { c.el.textContent = s; c.last = s; }
     });
   }
   kicks.forEach(k => { if (k) k.dataset.text = k.textContent; });
