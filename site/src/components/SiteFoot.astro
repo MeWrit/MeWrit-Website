@@ -2,10 +2,12 @@
 // The foot of the film's pages (the home page and the practices' own pages): a slim bar along the bottom
 // of the screen, as the header runs along the top. Opened (its button, a link to #contact anywhere on
 // the page, or by itself at the end of the scroll) it rises into the colophon: the practices, MeWriT,
-// how to write to us and the office. On phones the bar says less and the colophon is a sheet from the
-// bottom. In dusk indigo, the film's third ground (between its night and its cream); the logo sits on a
+// how to write to us (the contact page first) and the office on Google Maps (its address opens the
+// directions; the map loads the first time the foot opens). On phones the bar says less and the
+// colophon is a sheet from the bottom. In dusk indigo, the film's third ground (between its night and
+// its cream); the logo sits on a
 // cream card there, never on the dark itself. Script: src/scripts/foot.js; styles: src/styles/foot.css.
-import { contact, office } from '../data/site';
+import { contact, office, maps } from '../data/site';
 import { practicePages } from '../data/experience';
 import { CHAPTERS } from '../scripts/xp/scenes.js';
 import { href } from '../lib/url';
@@ -19,7 +21,7 @@ const ext = { target: '_blank', rel: 'noopener' };
     <a class="sf-brand" href={href('/')}>MeWriT</a>
     <span class="sf-sep sf-wide" aria-hidden="true">·</span><a class="sf-wide" href={contact.phoneHref}>{contact.phoneDisplay}</a>
     <span class="sf-sep sf-wide" aria-hidden="true">·</span><a class="sf-wide" href={`mailto:${contact.email}`}>{contact.email}</a>
-    <span class="sf-sep sf-narrow" aria-hidden="true">·</span><span class="sf-narrow">Contact</span>
+    <span class="sf-sep sf-narrow" aria-hidden="true">·</span><a class="sf-narrow" href={href('/contact/')}>Contact</a>
     <button class="sf-toggle" type="button" aria-expanded="false" aria-controls="sf-panel"><span class="sf-open">Open</span><span class="sf-close">Close</span><i aria-hidden="true"></i></button>
   </div>
   <div class="sf-panel" id="sf-panel" inert>
@@ -43,11 +45,19 @@ const ext = { target: '_blank', rel: 'noopener' };
       <div class="sf-col">
         <h3>Write to us</h3>
         <ul>
+          <li><a class="sf-enquire" href={href('/contact/')}>Send an enquiry <span aria-hidden="true">→</span></a></li>
           <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
           <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
           <li><a href={contact.whatsapp} {...ext}>WhatsApp <span aria-hidden="true">↗</span></a></li>
         </ul>
-        <address>{office.map(l => <span>{l}</span>)}</address>
+      </div>
+      <div class="sf-col sf-place">
+        <h3>The office</h3>
+        <div class="sf-map"><iframe title="MeWriT's office, Santorini Square, Satellite, on Google Maps" data-src={maps.embed} referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+        <a class="sf-addr" href={maps.directions} {...ext} aria-label={`Directions to the office on Google Maps: ${office.join(', ')}`}>
+          <address>{office.map(l => <span>{l}</span>)}</address>
+          <span class="sf-dir" aria-hidden="true">Directions ↗</span>
+        </a>
       </div>
     </div>
     <p class="sf-colophon"><span>© <span data-year>{new Date().getFullYear()}</span> MeWriT</span><span>Made with <span class="sf-heart" role="img" aria-label="love">♥</span> by <a href="https://github.com/Git-Ansh" {...ext}>Ansh Shah</a></span></p>

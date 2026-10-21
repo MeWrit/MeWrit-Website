@@ -42,7 +42,7 @@ export const nav: NavItem[] = [
   },
   { label: 'Trainings', href: '/#trainings', key: 'trainings' },
   { label: 'Gallery', href: '#' },
-  { label: 'Contact', href: '/#contact', key: 'contact' },
+  { label: 'Contact', href: '/contact/', key: 'contact' },
 ];
 
 // the nav lab's experimental layouts (spine, tabs, dock, comments, corners) use these entries;
@@ -111,12 +111,24 @@ export const mobileNav: NavItem[] = [
   },
   { label: 'Trainings', href: '/#trainings' },
   { label: 'Gallery', href: '#' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Contact', href: '/contact/' },
   { label: 'MeWriT Academy', href: contact.academy },
 ];
 
 // the office, as the deck (July 2026) gives it, one line each
 export const office = ['710, Santorini Square, Lane Opp. Star Bazar', 'Satellite, Ahmedabad 380015', 'Gujarat, India'];
+// the office on Google Maps: found by its building (with the unit and the lane, Maps returns a list of
+// places rather than one pin); the map embedded on the contact page and in the foot, and the
+// directions its address opens. Both forms of link are allowed by Google's robots.txt (/maps?q=,
+// /maps/dir/; checked 2026-10-21)
+const officeMap = 'Santorini Square, Satellite, Ahmedabad 380015';
+export const maps = {
+  embed: `https://www.google.com/maps?q=${encodeURIComponent(officeMap)}&output=embed&hl=en&z=16`,
+  directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(officeMap)}`,
+};
+// where the enquiry form posts (a form service's address); empty, the form writes the enquiry as an
+// email in the visitor's own mail app instead (src/scripts/contact.js)
+export const formEndpoint = '';
 
 // the dark footer's practices column (src/components/SiteFooter.astro): the experience page's own
 // sections, and the Academy

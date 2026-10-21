@@ -1,0 +1,127 @@
+/* ---------------- the contact page (src/pages/contact.astro, src/scripts/contact.js) ----------------
+   Every way to reach MeWriT, at a glance. On dusk indigo (the film's third ground): the quick ways
+   (email, call, WhatsApp), the office on Google Maps with its address under it (the address opens the
+   directions), then LinkedIn and the Academy. On cream: the enquiry form. On computers the two stand
+   side by side and the page is the screen, between the header's bar and the foot's: nothing to
+   scroll, the map takes whatever height is left. On phones and narrow windows they stand one over the
+   other, the quick ways first. Few words, large targets. */
+.ct{display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);min-height:100svh;padding-top:var(--header-h);padding-bottom:var(--foot-gap);background:#FCF6EE}
+
+/* the ways to reach us, on dusk indigo */
+.ct-reach{display:flex;padding:clamp(24px,4.4vh,56px) clamp(24px,3.4vw,64px) clamp(20px,3.4vh,44px) clamp(20px,6vw,104px);color:#F2F5FC;
+  background:radial-gradient(90% 70% at 20% 10%,rgba(75,68,123,.55),rgba(75,68,123,0) 70%),linear-gradient(160deg,#34315D 0%,#272552 55%,#1A1B3B 100%)}
+.ct-in{display:flex;flex-direction:column;width:100%;max-width:620px;container-type:inline-size}
+.ct-kicker{margin:0 0 12px;font:600 .74rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#F2A65A}
+.ct-title{margin:0 0 10px;font:500 clamp(2.4rem,1.3rem + 2.6vw,4.2rem)/1 var(--serif);letter-spacing:-.02em;color:#F2F5FC}
+.ct-line{margin:0 0 clamp(18px,3vh,30px);font-size:clamp(.96rem,.9rem + .16vw,1.06rem);line-height:1.5;color:rgba(214,224,246,.84)}
+.ct-ways{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ct-ways li{position:relative;min-width:0}
+.ct-way{display:grid;align-content:start;gap:6px;height:100%;min-height:104px;padding:16px;border-radius:18px;text-decoration:none;color:#F2F5FC;
+  border:1px solid rgba(242,245,252,.13);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.08));transition:border-color .25s,background-color .25s}
+.ct-ico{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(242,166,90,.16);color:#F2A65A}
+.ct-k{margin-top:4px;font:500 1.06rem/1.2 var(--serif)}
+.ct-v{font-size:.8rem;line-height:1.35;color:rgba(214,224,246,.8);overflow-wrap:anywhere}
+@media (hover:hover){.ct-way:hover{border-color:rgba(242,166,90,.6);background-color:rgba(255,255,255,.04)}}
+.ct-way:focus-visible,.ct-addr:focus-visible,.ct-more a:focus-visible,.ct-copy:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
+/* copy to the clipboard, at a tile's corner; "Copied" for a moment after */
+.ct-copy{position:absolute;top:12px;right:12px;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.07);color:rgba(214,224,246,.8);cursor:pointer;transition:background-color .2s,color .2s}
+@media (hover:hover){.ct-copy:hover{background:rgba(255,255,255,.16);color:#fff}}
+.ct-copy[data-done]::after{content:"Copied";position:absolute;right:0;bottom:calc(100% + 6px);padding:4px 8px;border-radius:6px;background:#F2A65A;color:#1A1B3B;font:600 .72rem/1 var(--sans);white-space:nowrap}
+/* the office: the map takes what height is left (on computers), the address under it opens the directions */
+.ct-office{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px;margin-top:clamp(14px,2.4vh,22px)}
+.ct-map{flex:1 1 auto;min-height:150px;max-height:460px;border-radius:18px;overflow:hidden;border:1px solid rgba(242,245,252,.13);background:#2A2850}
+.ct-map iframe{display:block;width:100%;height:100%;border:0}
+.ct-addr{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:6px 12px;padding:12px 14px;border-radius:14px;text-decoration:none;color:#F2F5FC;border:1px solid rgba(242,245,252,.1);background:rgba(255,255,255,.04);transition:border-color .25s}
+@media (hover:hover){.ct-addr:hover{border-color:rgba(242,166,90,.6)}}
+.ct-addr .ct-ico{width:34px;height:34px}
+.ct-addr address{display:grid;font-style:normal;font-size:.88rem;line-height:1.45}
+.ct-dir{font:600 .84rem/1 var(--sans);color:#F2A65A;white-space:nowrap}
+.ct-more{display:flex;flex-wrap:wrap;gap:8px 22px;margin:clamp(12px,2vh,18px) 0 0}
+.ct-more a{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:rgba(214,224,246,.86);text-decoration:none}
+@media (hover:hover){.ct-more a:hover{color:#fff}}
+/* a narrower column: the tiles centred, their detail smaller, no copy (a tap is the action); very narrow,
+   their icon and name only */
+@container (max-width:520px){
+  .ct-way{min-height:88px;justify-items:center;text-align:center;padding:14px 6px 12px;gap:5px}
+  .ct-v{font-size:.7rem;letter-spacing:-.005em}
+  .ct-copy{display:none}
+}
+@container (max-width:300px){
+  .ct-v{display:none}
+}
+
+/* the enquiry form, on cream */
+.ct-write{display:grid;place-items:center;padding:clamp(24px,4.4vh,56px) clamp(20px,5vw,96px) clamp(20px,3.4vh,44px) clamp(20px,4vw,72px)}
+.ct-form{width:100%;max-width:640px;padding:clamp(22px,3.2vh,36px) clamp(20px,2.6vw,40px);border-radius:24px;color:#13234C;
+  background:#FFFDF9;border:1px solid rgba(19,35,76,.1);box-shadow:0 30px 80px rgba(19,35,76,.08)}
+.ct-form h2{margin:0 0 clamp(14px,2.2vh,22px);font:500 clamp(1.5rem,1.1rem + 1vw,2.1rem)/1.1 var(--serif);color:#13234C}
+.ct-needs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 clamp(14px,2.2vh,20px);padding:0;border:0}
+.ct-needs legend{margin-bottom:10px;padding:0;font:600 .8rem/1 var(--sans);color:#45506A}
+.ct-chip{position:relative;cursor:pointer}
+.ct-chip input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.ct-chip span{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(19,35,76,.2);font:500 .86rem/1 var(--sans);color:#1C3472;transition:background-color .2s,color .2s,border-color .2s}
+@media (hover:hover){.ct-chip:hover span{border-color:#1C3472}}
+.ct-chip input:checked + span{background:#1C3472;border-color:#1C3472;color:#fff}
+.ct-chip input:focus-visible + span{outline:2px solid #AC571D;outline-offset:2px}
+.ct-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.ct-field{display:grid;gap:6px;min-width:0}
+.ct-field > span{font:600 .8rem/1.2 var(--sans);color:#45506A}
+.ct-field > span i{font-style:normal;font-weight:400;opacity:.75}
+.ct-field input,.ct-field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(19,35,76,.18);background:#fff;font:400 1rem/1.4 var(--sans);color:#13234C;transition:border-color .2s,box-shadow .2s}
+.ct-field textarea{min-height:clamp(84px,13vh,150px);resize:vertical}
+.ct-field :is(input,textarea):focus{outline:none;border-color:#1C3472;box-shadow:0 0 0 3px rgba(28,52,114,.14)}
+.ct-field.bad :is(input,textarea){border-color:#B42318;box-shadow:0 0 0 3px rgba(180,35,24,.1)}
+.ct-err{font:500 .78rem/1.3 var(--sans);color:#B42318}
+.ct-send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:clamp(14px,2.2vh,20px)}
+.ct-send .btn b{margin-left:.35em}
+.ct-status{margin:0;font-size:.88rem;line-height:1.45;color:#45506A}
+.ct-status a{color:#1C3472;font-weight:600}
+.ct-note{margin:12px 0 0;font-size:.78rem;color:#6B7183}
+
+/* computers with the height for it: the page exactly the screen; the form never taller than its panel,
+   its message box giving way when the room is short (and the map taking what is left on the other side) */
+@media (min-width:1024px) and (min-height:700px){
+  .ct{height:100svh}
+  .ct-reach,.ct-write{min-height:0}
+  /* (the form's row exactly the panel's height: an auto row grows to the form's own height, and the
+     form's max-height would then never hold) */
+  .ct-write{grid-template-rows:minmax(0,1fr)}
+  .ct-form{display:flex;flex-direction:column;max-height:100%}
+  .ct-msg{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  .ct-msg textarea{flex:1 1 clamp(84px,13vh,150px);min-height:60px}
+}
+/* wide screens: both sides a little wider, so the form and the map use the room they have */
+@media (min-width:1600px){
+  .ct-in{max-width:680px}
+  .ct-form{max-width:720px}
+}
+/* phones and narrow windows: one over the other, the quick ways first; the map a fixed height */
+@media (max-width:1023.98px){
+  .ct{display:block}
+  .ct-reach{padding:28px 20px 30px}
+  .ct-in{max-width:none}
+  .ct-office{flex:none}
+  .ct-map{flex:none;height:min(260px,48vw);min-height:190px}
+  .ct-write{padding:26px 16px 34px}
+  .ct-form{max-width:none;padding:22px 18px;border-radius:20px}
+}
+/* phones: the quick ways as rows (icon, name, the address or number in full, copy), so nothing wraps; the
+   form's topics a tidy grid of two, the two optional fields side by side */
+@media (max-width:560px){
+  .ct-ways{grid-template-columns:1fr;gap:8px}
+  .ct-way{grid-template-columns:38px auto minmax(0,1fr);align-items:center;justify-items:start;gap:0 12px;min-height:60px;padding:10px 54px 10px 12px;text-align:left}
+  .ct-k{margin:0}
+  .ct-v{display:block;justify-self:end;font-size:.86rem;text-align:right}
+  .ct-copy{display:grid;top:50%;right:12px;margin-top:-16px}
+  .ct-row{grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+  .ct-row.ct-pair{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ct-pair .ct-field > span{font-size:.74rem}
+  .ct-addr{grid-template-columns:34px minmax(0,1fr);align-items:start}
+  .ct-dir{grid-column:2}
+  .ct-needs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ct-needs legend{grid-column:1 / -1}
+  .ct-chip span{width:100%;min-height:40px;justify-content:center;padding:6px 8px;border-radius:12px;line-height:1.2;text-align:center}
+}
+/* (the page's own ground, under and past its panels, is the cream) */
+html[data-page="contact"],html[data-page="contact"] body{background:#FCF6EE}
+@media (prefers-reduced-motion:reduce){.ct-way,.ct-addr,.ct-chip span,.ct-copy{transition:none}}
