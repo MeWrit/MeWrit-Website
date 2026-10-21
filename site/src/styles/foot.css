@@ -180,10 +180,17 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
 }
 @media (min-width:1100px){
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){text-shadow:none}
-  /* the entry for where the reader is (a part of the film, experience.js; or a page of its own): an orange
-     line under it, as the pointer's lens draws (the user, 2026-10-21) */
+  /* one orange line under the menu (the user, 2026-10-21): under the entry for where the reader is (a part
+     of the film, experience.js; or a page of its own), gliding to the entry pointed at and back, and from
+     entry to entry as the reader moves through the film (site-nav.js places it: --nl, --nw). The frosted
+     lens is not used here. Without scripts, the page's own entry is underlined in place */
+  html[data-foot="film"] .cap-lens{display:none}
+  html[data-foot="film"] .nav-line{display:block;position:absolute;left:0;top:50%;height:2px;width:var(--nw,0px);margin-top:15px;border-radius:2px;background:#E07A1F;
+    opacity:0;pointer-events:none;transform:translateX(var(--nl,0px));transition:transform .5s cubic-bezier(.3,1.12,.4,1),width .5s cubic-bezier(.3,1.12,.4,1),opacity .3s ease}
+  html[data-foot="film"] .nav-line.on{opacity:1}
+  html[data-foot="film"] .nav-line.jump{transition:opacity .3s ease}
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){position:relative}
-  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{content:"";position:absolute;left:16px;right:16px;top:50%;height:2px;margin-top:15px;border-radius:2px;background:#E07A1F}
+  html[data-foot="film"]:not(.js) .nav-desktop > ul > li > [aria-current]::before{content:"";position:absolute;left:16px;right:16px;top:50%;height:2px;margin-top:15px;border-radius:2px;background:#E07A1F}
   /* Practices leads to the five practices; its panel opens on the pointer (a chevron says so), and goes
      once a practice in it is chosen (dd-off, site-nav.js) */
   html[data-foot="film"] .dd-top::after{content:"";width:7px;height:7px;margin-left:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg)}
@@ -200,8 +207,6 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   html[data-foot="film"] .nav-desktop .ext{margin-left:5px;font-size:.86em;color:#AC571D}
   /* Get in touch with the site's nib (buttons.css), the same size scrolled or not */
   html[data-foot="film"] .site-header .header-cta,html[data-foot="film"] .site-header.is-solid .header-cta{min-height:46px;padding:0 8px 0 20px;gap:12px}
-  /* pointing at an entry: an orange line under it, gliding from entry to entry (the lens, nav-variants.js) */
-  html[data-foot="film"] .cap-lens{height:2px;margin-top:15px;left:calc(var(--l,0px) + 16px);right:calc(var(--r,100%) + 16px);border-radius:2px;background:#E07A1F;box-shadow:none}
   /* the practices' panel: a sheet of dusk indigo dropping from under the bar, the width of the screen, in
      the film's own colours (the frosted glass card it was, the only glass on the site, looked out of place:
      the user, 2026-10-21). The practices numbered, in five columns. Each entry a tall target: its name,
@@ -236,15 +241,11 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   html[data-foot="film"]{--header-h:84px}
   html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:54px}
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){font-size:1.12rem;padding:0 18px}
-  html[data-foot="film"] .cap-lens{left:calc(var(--l,0px) + 18px);right:calc(var(--r,100%) + 18px)}
-  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{left:18px;right:18px}
 }
 /* (1100 to 1280px: the entries a little closer, so all five and Get in touch keep one row) */
 @media (min-width:1100px) and (max-width:1279.98px){
   html[data-foot="film"] .nav-desktop{margin-right:8px}
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){padding:0 11px;font-size:.96rem}
-  html[data-foot="film"] .cap-lens{left:calc(var(--l,0px) + 11px);right:calc(var(--r,100%) + 11px)}
-  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{left:11px;right:11px}
 }
 /* without scripts: the foot is the page's last block, open */
 html:not(.js) .sf{position:static}

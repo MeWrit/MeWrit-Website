@@ -11,6 +11,8 @@
 .logo img{height:40px;width:auto}
 /* (the header's Get in touch has a short form, Contact, which only the narrowest phones show: foot.css) */
 .cta-s{display:none}
+/* (the film's pages' gliding line under the menu: foot.css, site-nav.js) */
+.nav-line{display:none}
 .intro-on:not(.logo-landed) .site-header .logo img{opacity:0}
 .menu-btn{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;margin-right:-6px}
 .nav-desktop,.header-cta{display:none}

@@ -32,6 +32,9 @@ const ext = { target: '_blank', rel: 'noopener' };
     <nav class="nav-desktop" aria-label="Main">
       {/* floating capsule: the drop of glass that glides to the link you point at */}
       <span class="cap-lens" aria-hidden="true"></span>
+      {/* the film's pages: one orange line under the entry for where the reader is, gliding to the one
+          pointed at and back (site-nav.js) */}
+      <span class="nav-line" aria-hidden="true"></span>
       <ul>
         {nav.map(item => 'items' in item ? (
           <li class="has-dd" data-key={item.key}>
