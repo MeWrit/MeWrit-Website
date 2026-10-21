@@ -2,7 +2,8 @@
    A sheet over the whole screen. Its top is the header itself (the same bar, logo and Get in touch; the
    menu button turned into Close), and under it, on dusk indigo, the menu drops down as tiles a finger
    finds at once (the user, 2026-10-21: no little links): Who we are and Why MeWriT; the five practices
-   (each goes straight to its place in the film) and all five; Dr Hetal Shah and the Academy; at the foot
+   (each goes straight to its place in the film) and all five; the expertise (Publications, Therapeutic
+   areas); Leadership and the Academy; at the foot
    the quick ways to reach us: call, WhatsApp and email. Large targets, few words. */
 .sm{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;background:none;color:#F2F5FC;overflow:hidden}
 .sm[open]{display:flex;flex-direction:column}
@@ -55,6 +56,8 @@
   .sm[open] .sm-body > :nth-child(2){animation-delay:.05s}
   .sm[open] .sm-body > :nth-child(3){animation-delay:.1s}
   .sm[open] .sm-body > :nth-child(4){animation-delay:.15s}
+  .sm[open] .sm-body > :nth-child(5){animation-delay:.2s}
+  .sm[open] .sm-body > :nth-child(6){animation-delay:.25s}
   .sm.closing .sm-body{animation:smRise .3s cubic-bezier(.4,0,.6,1) both}
   .sm.closing .sm-body > *{animation:none}
 }

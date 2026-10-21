@@ -42,10 +42,10 @@ const ext = { target: '_blank', rel: 'noopener' };
                 opens its panel when pressed) */}
             {item.href
               ? <a class="dd-top" href={href(item.href)} data-nav-key={item.key}>{item.label}</a>
-              : <button aria-expanded="false" aria-controls={item.id}>{item.label}</button>}
+              : <button aria-expanded="false" aria-controls={item.id} data-nav-key={item.key} aria-current={item.items.some(l => isHere(l.href)) ? 'page' : undefined}>{item.label}</button>}
             <div class="dd" id={item.id}>
               {item.items.map((link, j) => (
-                <a href={href(link.href)} data-nav-practice={item.id === 'dd-practices' ? j : undefined}>
+                <a href={href(link.href)} data-nav-practice={item.id === 'dd-practices' ? j : undefined} aria-current={isHere(link.href) ? 'page' : undefined}>
                   <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
                   <strong>{link.label}</strong><span>{link.note}</span>
                 </a>

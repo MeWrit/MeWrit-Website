@@ -9,8 +9,13 @@ import BackLink from '../../components/BackLink.astro';
 import { leadership } from '../../data/leadership';
 import { site } from '../../data/site';
 import hetal from '../../assets/hetal-shah.png';
+import amit from '../../assets/amit-shah.jpg';
 import { href } from '../../lib/url';
 import '../../styles/leadership.css';
+
+// the portraits by leader (Dr Amit's, from the current site, is small: 247 x 205, so its card's frame is
+// drawn smaller, leadership.css .ld-small, rather than blown up soft)
+const photos: Record<string, { src: ImageMetadata; small?: boolean }> = { 'hetal-shah': { src: hetal }, 'amit-shah': { src: amit, small: true } };
 ---
 <Base title={`${leadership.title} | ${site.name}`} description="Dr Hetal Shah, Founder and Director, and Dr Amit Shah, Chief Medical Expert: the people who lead MeWriT's medical writing, training and healthcare consulting." foot="film" page="leadership">
   <div class="ld-page">
@@ -23,9 +28,11 @@ import '../../styles/leadership.css';
     <div class="ld-list">
       {leadership.leaders.map(l => (
         <article class="ld-card" id={l.id} aria-labelledby={`${l.id}-name`}>
-          <div class="ld-face">
-            {l.photo
-              ? <Image src={hetal} alt={l.name} widths={[320, 440, 622]} sizes="(min-width: 900px) 420px, calc(100vw - 32px)" loading="eager" />
+          <div class={`ld-face${l.photo && photos[l.id]?.small ? ' ld-small' : ''}`}>
+            {l.photo && photos[l.id]
+              ? (photos[l.id].small
+                ? <Image src={photos[l.id].src} alt={l.name} loading="eager" />
+                : <Image src={photos[l.id].src} alt={l.name} widths={[320, 440, 622]} sizes="(min-width: 900px) 420px, calc(100vw - 32px)" loading="eager" />)
               : <div class="ld-initials" role="img" aria-label={`${l.name} (portrait to come)`}><span aria-hidden="true">{l.initials}</span></div>}
           </div>
           <div class="ld-copy">

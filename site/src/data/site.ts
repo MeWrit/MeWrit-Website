@@ -23,12 +23,14 @@ export const contact = {
 export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string; ext?: boolean };
 export type NavItem = NavLink | { label: string; id: string; key?: string; href?: string; items: NavLink[] };
 
-// desktop navigation (the practices' dropdown shows a short note under each), in the home page's own
-// order: who we are, why MeWriT, the five practices, then the leadership and the Academy's courses; Get
-// in touch is the header's button, so no Contact link beside it (2026-10-21, the user: the old menu was
-// "redundant and a lot in the wrong place": Trainings repeated the Training practice, Contact the button;
-// then: Who we are and Why MeWriT as items of their own, not in a dropdown; Practices itself leads to the
-// five practices, its panel opening on the pointer only; Leadership for Dr Hetal and Dr Amit). Its places
+// desktop navigation (the dropdowns show a short note under each), in the home page's own order: who we
+// are, why MeWriT, the five practices, the expertise behind them (publications, therapeutic areas), then
+// the leadership; Get in touch is the header's button, so no Contact link beside it (2026-10-21, the
+// user: the old menu was "redundant and a lot in the wrong place": Trainings repeated the Training
+// practice, Contact the button; then: Who we are and Why MeWriT as items of their own, not in a dropdown;
+// Practices itself leads to the five practices, its panel opening on the pointer only; Leadership for Dr
+// Hetal and Dr Amit; Expertise for the publications and the therapeutic areas, the Academy moving to the
+// Training practice, the phone menu and the foot so the header keeps five entries). Its places
 // in the home page's film (/#who, /#practices, /#regulatory-writing ...) are the ids index.astro gives
 // those scenes: experience.js opens the film there, or goes there at once on the home page, and marks
 // the item for the part of the film on screen (`key`). The phone menu (SiteMenu.astro) follows the same
@@ -45,16 +47,22 @@ export const nav: NavItem[] = [
       { label: 'AI/ML advisory', note: 'Domain expertise for AI and ML in medical writing', href: '/#ai-ml-advisory', art: 'chips' },
     ],
   },
+  {
+    label: 'Expertise', id: 'dd-expertise', key: 'expertise', items: [
+      { label: 'Publications', note: 'Papers, chapters, reviews and congress presentations, and the published work we supported', href: '/publications/', art: 'paper' },
+      { label: 'Therapeutic areas', note: 'From oncology and cardiology to vaccines and medical devices', href: '/therapeutic-areas/', art: 'chips' },
+    ],
+  },
   { label: 'Leadership', href: '/leadership/', key: 'leadership' },
-  { label: 'Academy', href: contact.academy, key: 'academy', ext: true },
 ];
 
 // the nav lab's experimental layouts (spine, tabs, dock, comments, corners) use these entries;
 // `note` is the short line the margin comments show
 export const navEntries = [
-  { label: 'About', href: '/#founder', key: 'about', note: 'Dr Hetal Shah and team' },
-  { label: 'Services', href: '/#services', key: 'services', note: 'Protocols to publications' },
-  { label: 'Trainings', href: '/#trainings', key: 'trainings', note: 'Classroom and online' },
+  // (the old home's places, #founder, #services and #trainings, are gone: each leads to the new site's own)
+  { label: 'About', href: '/leadership/', key: 'about', note: 'Dr Hetal Shah and team' },
+  { label: 'Services', href: '/#practices', key: 'services', note: 'Protocols to publications' },
+  { label: 'Trainings', href: '/#training', key: 'trainings', note: 'Classroom and online' },
   { label: 'Gallery', href: '#', key: 'gallery', note: 'Workshops and conferences' },
   { label: 'Contact', href: '/#contact', key: 'contact', note: 'Start a project' },
 ];
@@ -62,17 +70,17 @@ export const navEntries = [
 // the nav lab's ask bar: what a visitor might type, and where it leads. `need` is the matching
 // choice in the enquiry form's "I need help with" list (src/data/home.ts)
 export const askIndex = [
-  { label: 'Clinical study report (CSR)', terms: 'csr clinical study report ich e3 regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
-  { label: 'Study protocol', terms: 'protocol study clinical trial regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
-  { label: 'CTD modules', terms: 'ctd module modules dossier submission regulatory', section: 'Regulatory Documentation', href: '/#services', need: 'Regulatory documents' },
-  { label: 'Manuscript', terms: 'manuscript paper journal article publication', section: 'Scientific Publications', href: '/#services', need: 'Scientific publication' },
-  { label: 'Abstract or poster', terms: 'abstract poster conference congress publication', section: 'Scientific Publications', href: '/#services', need: 'Scientific publication' },
-  { label: 'Slide deck', terms: 'slides slide deck presentation', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
-  { label: 'Leaflet', terms: 'leaflet brochure patient information', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
-  { label: 'Grant application', terms: 'grant funding proposal application', section: 'Medical Communications', href: '/#services', need: 'Medical communications' },
-  { label: 'EC or IRB submission support', terms: 'ec irb ethics committee submission research', section: 'Research Support', href: '/#services', need: 'Research support' },
-  { label: 'Quality review of a document', terms: 'qc quality review check edit proofread', section: 'Quality Review', href: '/#services', need: 'Something else' },
-  { label: 'Training for my team', terms: 'training workshop team course classroom in-person', section: 'Trainings', href: '/#trainings', need: 'Training or workshop' },
+  { label: 'Clinical study report (CSR)', terms: 'csr clinical study report ich e3 regulatory', section: 'Regulatory Documentation', href: '/#regulatory-writing', need: 'Regulatory documents' },
+  { label: 'Study protocol', terms: 'protocol study clinical trial regulatory', section: 'Regulatory Documentation', href: '/#regulatory-writing', need: 'Regulatory documents' },
+  { label: 'CTD modules', terms: 'ctd module modules dossier submission regulatory', section: 'Regulatory Documentation', href: '/#regulatory-writing', need: 'Regulatory documents' },
+  { label: 'Manuscript', terms: 'manuscript paper journal article publication', section: 'Scientific Publications', href: '/#scientific-publications', need: 'Scientific publication' },
+  { label: 'Abstract or poster', terms: 'abstract poster conference congress publication', section: 'Scientific Publications', href: '/#scientific-publications', need: 'Scientific publication' },
+  { label: 'Slide deck', terms: 'slides slide deck presentation', section: 'Medical Communications', href: '/#medical-communications', need: 'Medical communications' },
+  { label: 'Leaflet', terms: 'leaflet brochure patient information', section: 'Medical Communications', href: '/#medical-communications', need: 'Medical communications' },
+  { label: 'Grant application', terms: 'grant funding proposal application', section: 'Medical Communications', href: '/#medical-communications', need: 'Medical communications' },
+  { label: 'EC or IRB submission support', terms: 'ec irb ethics committee submission research', section: 'Research Support', href: '/#practices', need: 'Research support' },
+  { label: 'Quality review of a document', terms: 'qc quality review check edit proofread', section: 'Quality Review', href: '/#practices', need: 'Something else' },
+  { label: 'Training for my team', terms: 'training workshop team course classroom in-person', section: 'Trainings', href: '/#training', need: 'Training or workshop' },
   { label: 'Online course (MeWriT Academy)', terms: 'online course academy learn certificate self-paced', section: 'MeWriT Academy', href: contact.academy, need: '' },
 ];
 export const askChips = ['CSR', 'Protocol', 'Manuscript', 'Slide deck', 'Training'];
@@ -80,16 +88,16 @@ export const askChips = ['CSR', 'Protocol', 'Manuscript', 'Slide deck', 'Trainin
 // the phone dock (nav lab): the sheets its buttons open
 export const dock = {
   services: [
-    { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#services' },
-    { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#services' },
-    { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#services' },
-    { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#services' },
-    { label: 'Quality Review', note: 'An expert second read', href: '/#services' },
+    { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#regulatory-writing' },
+    { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#scientific-publications' },
+    { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#medical-communications' },
+    { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#practices' },
+    { label: 'Quality Review', note: 'An expert second read', href: '/#practices' },
   ],
   about: [
-    { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder' },
-    { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas' },
-    { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#' },
+    { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/leadership/' },
+    { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/therapeutic-areas/' },
+    { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '/publications/' },
     { label: 'Gallery', note: 'Workshops and conferences', href: '#' },
     { label: 'MeWriT Academy', note: 'Online courses', href: contact.academy },
   ],
@@ -99,21 +107,21 @@ export const dock = {
 export const mobileNav: NavItem[] = [
   {
     label: 'About', id: 'm-about', items: [
-      { label: 'Our Leadership', href: '/#founder' },
-      { label: 'Therapeutic Areas', href: '/#areas' },
-      { label: 'Publications', href: '#' },
+      { label: 'Our Leadership', href: '/leadership/' },
+      { label: 'Therapeutic Areas', href: '/therapeutic-areas/' },
+      { label: 'Publications', href: '/publications/' },
     ],
   },
   {
     label: 'Services', id: 'm-svc', items: [
-      { label: 'Regulatory Documentation', href: '/#services' },
-      { label: 'Scientific Publications', href: '/#services' },
-      { label: 'Medical Communications', href: '/#services' },
-      { label: 'Trainings', href: '/#trainings' },
-      { label: 'Research Support', href: '/#services' },
+      { label: 'Regulatory Documentation', href: '/#regulatory-writing' },
+      { label: 'Scientific Publications', href: '/#scientific-publications' },
+      { label: 'Medical Communications', href: '/#medical-communications' },
+      { label: 'Trainings', href: '/#training' },
+      { label: 'Research Support', href: '/#practices' },
     ],
   },
-  { label: 'Trainings', href: '/#trainings' },
+  { label: 'Trainings', href: '/#training' },
   { label: 'Gallery', href: '#' },
   { label: 'Contact', href: '/contact/' },
   { label: 'MeWriT Academy', href: contact.academy },

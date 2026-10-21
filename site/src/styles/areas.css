@@ -1,0 +1,52 @@
+/* ---------------- Therapeutic areas (src/pages/therapeutic-areas.astro) ----------------
+   On the site's paper: the title, then the seventeen areas as tiles, four to a row on wide screens and two
+   on phones: each its icon in a round of warm paper with its number beside it, its name, and where it
+   leads (a WHO or NIH overview of the area: the tile is one link as a whole, lifting a little when
+   pointed at); then a closing tile on dusk indigo for an area not listed. */
+html[data-page="areas"],html[data-page="areas"] body{background:#FCF6EE}
+.ta-page{padding:calc(var(--header-h) + clamp(24px,4vh,48px)) clamp(16px,6vw,104px) calc(var(--foot-gap) + clamp(40px,6vh,72px));color:#13234C}
+.ta-head{max-width:820px;margin-bottom:clamp(22px,3.6vh,40px)}
+.ta-kicker{margin:0 0 12px;font:600 .74rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#AC571D}
+.ta-title{margin:0 0 12px;font:500 clamp(2.4rem,1.2rem + 3vw,4.4rem)/1 var(--serif);letter-spacing:-.02em;color:#13234C}
+.ta-line{margin:0;max-width:62ch;font-size:clamp(1rem,.92rem + .2vw,1.12rem);line-height:1.55;color:#45506A}
+.ta-note{margin:10px 0 0;max-width:62ch;font-size:.9rem;line-height:1.5;color:#5A6280}
+.ta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
+.ta-grid > li{display:flex;min-width:0}
+.ta-tile{position:relative;display:flex;flex-direction:column;gap:12px;width:100%;min-height:clamp(150px,19vh,190px);padding:16px 18px 16px;border-radius:18px;color:inherit;text-decoration:none;
+  background:#FFFDF9;border:1px solid rgba(19,35,76,.1);box-shadow:0 14px 40px rgba(19,35,76,.05);transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
+.ta-tile:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
+.ta-top{display:flex;align-items:flex-start;justify-content:space-between}
+.ta-ico{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#F6EADB;color:#1C3472;transition:background-color .25s ease}
+.ta-ico svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.ta-ico svg .a{stroke:#E07A1F}
+.ta-ico svg .af{fill:currentColor;stroke:none}
+.ta-ico svg .a.af,.ta-ico svg .af.soft{fill:#E07A1F;stroke:none}
+.ta-ico svg .af.soft{opacity:.35}
+.ta-ico svg g.a circle{stroke:#E07A1F}
+.ta-n{font:600 .74rem/1 var(--sans);letter-spacing:.1em;color:#AC571D}
+.ta-name{display:block;margin:auto 0 0;font:500 clamp(1.1rem,.96rem + .4vw,1.36rem)/1.2 var(--serif);color:#13234C}
+.ta-src{font:600 .74rem/1 var(--sans);letter-spacing:.06em;color:#5A6280}
+@media (hover:hover){
+  .ta-tile:hover{border-color:rgba(224,122,31,.55);box-shadow:0 18px 44px rgba(19,35,76,.09);transform:translateY(-2px)}
+  .ta-tile:hover .ta-ico{background:#F9DFC4}
+  .ta-tile:hover .ta-name{text-decoration:underline;text-decoration-color:#E07A1F;text-decoration-thickness:2px;text-underline-offset:4px}
+  .ta-tile:hover .ta-src{color:#1C3472}
+}
+@media (prefers-reduced-motion:reduce){.ta-tile{transition:none}.ta-tile:hover{transform:none}}
+/* the closing tile: an area not listed */
+.ta-more{grid-column:span 3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding:20px 22px;border-radius:18px;color:#F2F5FC;
+  background:radial-gradient(90% 90% at 15% 0%,rgba(75,68,123,.6),rgba(75,68,123,0) 70%),linear-gradient(160deg,#34315D 0%,#272552 55%,#1A1B3B 100%)}
+.ta-more p{margin:0;max-width:44ch;font:500 clamp(1.1rem,.96rem + .4vw,1.36rem)/1.3 var(--serif)}
+@media (max-width:1099.98px){
+  .ta-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ta-more{grid-column:span 2}
+}
+@media (max-width:699.98px){
+  .ta-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .ta-tile{min-height:150px;gap:10px;padding:14px 14px 14px}
+  .ta-ico{width:52px;height:52px}
+  .ta-ico svg{width:34px;height:34px}
+  .ta-name{font-size:1.02rem}
+  .ta-src{font-size:.7rem}
+  .ta-more{grid-column:1 / -1}
+}

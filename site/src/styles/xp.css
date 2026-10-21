@@ -242,7 +242,7 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
 .xp-figs li::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--xp-line);transform-origin:left center}
 .xp-figs b{display:block;font:400 clamp(1.9rem,1.2rem + 1.6vw,2.7rem)/1 var(--serif);letter-spacing:-.02em;color:var(--xp-ink);font-variant-numeric:lining-nums}
 .xp-figs b i{margin-left:.04em;font-style:normal;font-size:.62em;vertical-align:.42em;color:#F2A65A}
-.xp-figs li > span{display:block;margin-top:8px;font-size:.8rem;line-height:1.4;color:var(--xp-soft)}
+.xp-figs .xp-fl{display:block;margin-top:8px;font-size:.8rem;line-height:1.4;color:var(--xp-soft)}
 .xp-count{display:inline-grid}
 .xp-count > span{grid-area:1 / 1}
 .xp-count > span:first-child{visibility:hidden}
@@ -267,7 +267,7 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-scene[data-layout="strata"] .xp-figs{grid-column:1 / -1;grid-row:4;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 clamp(20px,3vw,56px);margin-top:0}
   .xp-scene[data-layout="strata"] .xp-figs li{padding-top:clamp(14px,2vh,24px)}
   .xp-scene[data-layout="strata"] .xp-figs b{font-size:clamp(2.6rem,1rem + 3.2vw,5.4rem)}
-  .xp-scene[data-layout="strata"] .xp-figs li > span{margin-top:12px;max-width:26ch;font-size:clamp(.84rem,.76rem + .2vw,1rem)}
+  .xp-scene[data-layout="strata"] .xp-figs .xp-fl{margin-top:12px;max-width:26ch;font-size:clamp(.84rem,.76rem + .2vw,1rem)}
 }
 /* why: the reasons, numbered */
 .xp-points{list-style:none;display:grid;gap:16px;margin-top:22px}
@@ -275,6 +275,40 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
 .xp-points .n{grid-row:1 / span 2;font:600 .74rem/1.7 var(--sans);letter-spacing:.08em;color:#F2A65A}
 .xp-points b{font:500 1.12rem/1.25 var(--serif);color:var(--xp-ink)}
 .xp-points .d{margin-top:4px;font-size:.9rem;line-height:1.5;color:var(--xp-soft)}
+/* the clients' testimonials (voices; the user, 2026-10-21: eye-catching, not obnoxious): one at a time in
+   the serif, an orange opening quote over it and who said it under it, after a short rule. The next fades
+   in as the last fades out, all stacked in one place so the words keep one height (experience.js turns
+   them). Under them: back, a dot for each (the one on screen longer, filling as its time runs), on, and
+   pause. The title a step smaller here, so the voice is what is read */
+.xp-scene[data-scene="voices"] .xp-title{font-size:clamp(2.2rem,1rem + 3vw,4.2rem)}
+.xp-voices{margin-top:26px}
+.xp-qs{display:grid}
+.xp-q{grid-area:1 / 1;margin:0;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .8s ease,transform 1s cubic-bezier(.2,.7,.2,1),visibility 0s linear .8s}
+.xp-q.on{opacity:1;visibility:visible;transform:none;transition:opacity 1.1s ease .3s,transform 1.3s cubic-bezier(.2,.7,.2,1) .3s,visibility 0s}
+.xp-q blockquote{margin:0}
+.xp-q blockquote::before{content:"\201C";display:block;height:.46em;font:400 4.4rem/1 var(--serif);color:#F2A65A}
+.xp-q p{margin:0;font:400 clamp(1.18rem,.9rem + .62vw,1.6rem)/1.42 var(--serif);letter-spacing:-.005em;color:var(--xp-ink);text-wrap:pretty}
+.xp-q figcaption{display:flex;align-items:center;gap:12px;margin-top:16px;font:600 .74rem/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--xp-soft)}
+.xp-q figcaption::before{content:"";flex:none;width:24px;height:1px;background:#F2A65A}
+.xp-qnav{display:flex;align-items:center;gap:6px;margin-top:22px}
+.xp-qbtn{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;border:1px solid rgba(201,216,255,.3);color:var(--xp-ink);transition:border-color .25s,background-color .25s}
+.xp-qbtn svg{width:18px;height:18px}
+.xp-qpause{margin-left:8px;border-color:transparent;color:var(--xp-soft)}
+.xp-qi-play,.xp-voices.stopped .xp-qi-pause{display:none}
+.xp-voices.stopped .xp-qi-play{display:block}
+.xp-qdots{display:flex;align-items:center;gap:6px;padding:0 8px}
+.xp-qdots i{position:relative;display:block;width:14px;height:3px;border-radius:2px;background:rgba(201,216,255,.24);overflow:hidden;transition:width .45s cubic-bezier(.2,.7,.2,1),background-color .45s}
+.xp-qdots i.on{width:34px;background:rgba(242,166,90,.3)}
+.xp-qdots b{position:absolute;inset:0;background:#F2A65A;transform:scaleX(0);transform-origin:left center}
+@media (hover:hover){.xp-qbtn:hover{border-color:rgba(242,166,90,.7);background:rgba(255,255,255,.06);color:var(--xp-ink)}}
+.xp-qbtn:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
+/* who: a figure that leads to its page (the publications, the therapeutic areas) is a link as a whole, an
+   orange arrow after its words; pointing at it brightens them and moves the arrow on */
+.xp-flink{display:block;color:inherit;text-decoration:none;border-radius:6px}
+.xp-fgo{display:inline-block;margin-left:.12em;font-style:normal;color:#F2A65A;transition:transform .25s ease}   /* (a no-break space before it: it never starts a line alone) */
+.xp-fl{transition:color .25s}
+@media (hover:hover){.xp-flink:hover .xp-fl{color:var(--xp-ink)}.xp-flink:hover .xp-fgo{transform:translateX(4px)}}
+.xp-flink:focus-visible{outline:2px solid #F2A65A;outline-offset:6px}
 /* the five practices as tiles (layout tiles; the user chose them over a list and buttons over the
    shapes, 2026-10-21): a title row, the Explore button at its right, and five tall tiles of dark glass
    across the screen, each its number, its shape (the 3D, which experience.js sets in the tile's art),
@@ -318,7 +352,16 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-scene[data-layout="tiles"] .xp-tile{aspect-ratio:7 / 10;max-height:calc(100svh - var(--header-h) - var(--foot-gap,42px) - 64px - 230px)}
 }
 
-/* Know more: to the practice's own page */
+/* Know more: to the practice's own page; beside it, on the training, the Academy (an underlined link, so
+   Know more stays the one button) */
+.xp-morerow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px;margin-top:22px}
+.xp-morerow > .xp-more{margin-top:0}
+.xp-acad{display:inline-flex;align-items:center;gap:6px;min-height:44px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:underline;text-decoration-color:rgba(242,166,90,.8);text-decoration-thickness:1.5px;text-underline-offset:6px}
+.xp-acad span{color:#F2A65A;text-decoration:none}
+.xp-scene[data-light="day"] .xp-acad{color:#1C3472;text-decoration-color:#E07A1F}
+.xp-scene[data-light="day"] .xp-acad span{color:#AC571D}
+@media (hover:hover){.xp-acad:hover{text-decoration-thickness:2.5px}}
+.xp-acad:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
 /* (an outlined pill with the site's nib at its end, buttons.css: a navy nib by day, a cream one by night;
    its arrow runs out of the nib and back in when pointed at) */
 .xp-more{display:inline-flex;align-items:center;gap:12px;margin-top:22px;min-height:44px;padding:0 7px 0 20px;border:1.5px solid currentColor;border-radius:999px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:none;transition:background-color .25s,color .25s,border-color .25s}
@@ -348,12 +391,20 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-figs{gap:10px 16px;margin-top:14px}
   .xp-figs li{padding-top:8px}
   .xp-figs b{font-size:1.65rem}
-  .xp-figs li > span{margin-top:5px;font-size:.72rem}
+  .xp-figs .xp-fl{margin-top:5px;font-size:.72rem}
   .xp-points{gap:10px;margin-top:14px}
   .xp-points li{padding-top:10px}
   .xp-points b{font-size:1rem}
   .xp-points .d{font-size:.82rem;line-height:1.45}
-  .xp-more{margin-top:14px;min-height:42px}
+  .xp-morerow{margin-top:14px;gap:6px 20px}
+  .xp-more{min-height:42px}
+  /* the testimonials: the voice a little smaller, its quote mark too, the buttons closer */
+  .xp-scene[data-scene="voices"] .xp-title{font-size:clamp(1.8rem,1.2rem + 3vw,2.4rem)}
+  .xp-voices{margin-top:14px}
+  .xp-q blockquote::before{font-size:3rem}
+  .xp-q p{font-size:1.06rem;line-height:1.45}
+  .xp-q figcaption{margin-top:10px;font-size:.66rem}
+  .xp-qnav{margin-top:12px}
   /* the practices' tiles: from under the header to the foot's bar, the title over two columns of three
      rows, the sixth tile to all five; the tiles their number, shape and name */
   .xp-scene[data-layout="tiles"]{display:grid;grid-template-rows:auto minmax(0,1fr);height:calc(100svh - var(--header-h) - var(--foot-gap,46px) - 34px)}
@@ -370,11 +421,36 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-tile-all .xp-tile .t{padding-right:34px}
 }
 
+/* short phones held upright (most phones' real screen once the browser's bars are in, about 390 x 664):
+   the words of a dense scene took all but 53px, and the shape sat on the kicker (measured, scratchpad
+   all_scenes.js). As on a phone on its side, the lists the paragraph already names go (the topics, the
+   reasons' lines), the type steps down a little and who's figures stand in one row */
+@media (max-width:759.98px) and (max-height:760px) and (max-aspect-ratio:4/5){
+  .xp-docs{display:none}
+  .xp-points{gap:6px}
+  .xp-points li{padding-top:8px}
+  .xp-points .d{display:none}
+  .xp-kicker{margin-bottom:8px}
+  .xp-title{font-size:clamp(1.9rem,1.1rem + 4.2vw,2.5rem);margin-bottom:10px}
+  .xp-text{font-size:.92rem;line-height:1.5}
+  .xp-figs{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 10px}
+  .xp-figs b{font-size:1.4rem}
+  .xp-figs .xp-fl{font-size:.64rem}
+  /* (the testimonials: the voice a little smaller, its quote mark beside it rather than over it) */
+  .xp-q blockquote::before{display:none}
+  .xp-q p{font-size:.98rem}
+  .xp-q p::before{content:"\201C";color:#F2A65A}
+}
 /* very narrow phones (a folding phone's cover screen, 280px): the titles a step smaller, so a long word
    like "Submission-ready," fits, and a list's items may wrap inside themselves (their dot still ends them) */
 @media (max-width:339.98px){
   .xp-title,.xp-scene[data-scene="open"] .xp-title{font-size:clamp(1.7rem,1.1rem + 4.4vw,2.2rem)}
   .xp-docs li{white-space:normal}
+  /* (the testimonials' buttons and dots in one row: the dots shorter and closer) */
+  .xp-qdots{gap:4px;padding:0 4px}
+  .xp-qdots i{width:8px}
+  .xp-qdots i.on{width:20px}
+  .xp-qpause{margin-left:0}
 }
 /* phones on their side (short and wide): the words have about 300px under the header, so the type steps
    down and the practices' bar at the foot goes (the header's menu has them) */
@@ -396,7 +472,7 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-scene[data-scene="who"] .xp-text{display:none}   /* (who and the figures fit; with the paragraph they would run under the foot's bar) */
   .xp-figs{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;margin-top:10px}
   .xp-figs b{font-size:1.3rem}
-  .xp-figs li > span{margin-top:4px;font-size:.62rem}
+  .xp-figs .xp-fl{margin-top:4px;font-size:.62rem}
   .xp-lead{margin-top:8px;font-size:.74rem}
   .xp-face{width:32px;height:32px}
   .xp-points{gap:6px;margin-top:8px}
@@ -405,7 +481,17 @@ a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
   .xp-points .d{display:none}
   .xp-cta .btn{min-height:34px;padding:7px 16px;font-size:.82rem}
   .xp-docs,html.xp-day .xp-docs{display:none}   /* (the paragraph names them) */
-  .xp-more{margin-top:8px;min-height:34px;padding:0 5px 0 14px;font-size:.8rem}
+  .xp-morerow{margin-top:8px}
+  .xp-more{min-height:34px;padding:0 5px 0 14px;font-size:.8rem}
+  .xp-acad{font-size:.8rem}
+  /* (the testimonials: the paragraph goes, the voice small and its quote mark beside it) */
+  .xp-scene[data-scene="voices"] .xp-text{display:none}
+  .xp-voices{margin-top:8px}
+  .xp-q blockquote::before{display:none}
+  .xp-q p{font-size:.86rem;line-height:1.42}
+  .xp-q p::before{content:"\201C";color:#F2A65A}
+  .xp-q figcaption{margin-top:6px;font-size:.6rem}
+  .xp-qnav{margin-top:6px}
 }
 
 /* the practices' tiles on a phone on its side: the title and the Explore button in one row, the five
@@ -431,11 +517,15 @@ html:not(.js) .xp-scene[data-layout="tiles"]{height:auto}
    a thin line, its buttons taller around it) */
 @media (max-width:899.98px),(pointer:coarse){
   .xp-more{min-height:48px;padding:0 9px 0 22px}
+  .xp-acad{min-height:48px}
+  .xp-qbtn{width:48px;height:48px}
   .xp-cta .btn{min-height:48px}
   .xp-rail button{padding-top:16px;padding-bottom:16px}
 }
 @media (max-height:520px) and (min-aspect-ratio:4/3){
   .xp-more{min-height:44px}
+  .xp-acad{min-height:44px}
+  .xp-qbtn{width:44px;height:44px}
   .xp-cta .btn{min-height:44px}
 }
 
@@ -447,6 +537,8 @@ html:not(.js) .xp-scenes{position:static;display:block}
 html:not(.js) .xp-scene{opacity:1;transform:none;margin-bottom:72px;max-width:none}
 html:not(.js) .xp-title .c{opacity:1;filter:none;transform:none}
 html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
+html:not(.js) .xp-q{grid-area:auto;opacity:1;visibility:visible;transform:none;margin-bottom:28px}
+html:not(.js) .xp-qnav{display:none}
 
 @media (prefers-reduced-motion:reduce){
   .xp-title .c{opacity:1;filter:none;transform:none;animation:none !important}
@@ -454,4 +546,6 @@ html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
   .xp-hint i{animation:none}
   .xp-co span{transition:none;transform:none}
   .xp-figs li,.xp-figs li::before,.xp-figs b i{animation:none !important}
+  .xp-q,.xp-q.on{transform:none;transition:opacity .2s linear,visibility 0s linear .2s}
+  .xp-q.on{transition:opacity .2s linear,visibility 0s}
 }

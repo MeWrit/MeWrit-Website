@@ -24,10 +24,11 @@ function start() {
   const readout = sec.querySelector('.xp-readout'), note = sec.querySelector('.xp-note'), hint = sec.querySelector('.xp-hint'), callLayer = sec.querySelector('.xp-callouts');
   // where the reader is, in the menus: the header's entry for the part of the film on screen (Who we are,
   // Why MeWriT, Practices: data-nav-key) and, in the practices' panel and the phone menu, the practice
-  // itself (data-nav-practice), each marked aria-current="location" (styled in foot.css, site-menu.css)
+  // itself (data-nav-practice), each marked aria-current="location" (styled in foot.css, site-menu.css);
+  // the clients' testimonials (voices) are part of Why MeWriT
   const navKeys = [...document.querySelectorAll('[data-nav-key]')], navPractices = [...document.querySelectorAll('[data-nav-practice]')];
   function markNav(i) {
-    const s = SCENES[i], key = s.id === 'who' || s.id === 'why' ? s.id : s.id === 'practices' || s.chapter >= 0 ? 'practices' : '';
+    const s = SCENES[i], key = s.id === 'who' || s.id === 'why' ? s.id : s.id === 'voices' ? 'why' : s.id === 'practices' || s.chapter >= 0 ? 'practices' : '';
     navKeys.forEach(a => {
       if (a.dataset.navKey === key) a.setAttribute('aria-current', 'location');
       else if (a.getAttribute('aria-current') === 'location') a.removeAttribute('aria-current');
@@ -395,6 +396,53 @@ function start() {
     el.addEventListener('blur', () => { if (focused === g) focused = -1; });
   });
 
+  // ---------- the voices (scenes.js voices): the clients' testimonials, one at a time ----------
+  // A new one every VOICE ms while the scene is on screen, the one before fading as it comes in, a dot
+  // under them filling as its time runs. The mouse resting on them, or the keyboard among them, holds the
+  // one on screen; the pause button stops them until played again (with reduced motion they start
+  // stopped, and change only when asked). As each comes in, the page is signed again (the scene's idle,
+  // restarted: frame()). Screen readers hear a testimonial when it changes while held (its buttons), not
+  // on the timer (aria-live off while they turn by themselves)
+  const VOICE = 8000;
+  const voices = (() => {
+    const vi = SCENES.findIndex(s => s.id === 'voices'), box = vi >= 0 && articles[vi] ? articles[vi].querySelector('.xp-voices') : null;
+    if (!box) return null;
+    const qs = [...box.querySelectorAll('.xp-q')], dots = [...box.querySelectorAll('.xp-qdots i')], bars = dots.map(d => d.firstElementChild);
+    const live = box.querySelector('.xp-qs'), pause = box.querySelector('.xp-qpause');
+    let at = 0, left = VOICE, stopped = !motion, hover = false, focus = false, held = null, bar = '';
+    const setStopped = v => {
+      stopped = v; box.classList.toggle('stopped', v);
+      pause.setAttribute('aria-label', v ? 'Play the testimonials' : 'Pause the testimonials');
+    };
+    function show(j) {
+      at = (j + qs.length) % qs.length; left = VOICE;
+      qs.forEach((q, n) => q.classList.toggle('on', n === at));
+      dots.forEach((d, n) => d.classList.toggle('on', n === at));
+      bars.forEach(b => { b.style.transform = ''; }); bar = '';
+      if (idleScene === vi) idleFrom = time;   // the page signed again
+    }
+    setStopped(stopped);
+    box.querySelector('.xp-qprev').addEventListener('click', () => show(at - 1));
+    box.querySelector('.xp-qnext').addEventListener('click', () => show(at + 1));
+    pause.addEventListener('click', () => setStopped(!stopped));
+    box.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') hover = true; });
+    box.addEventListener('pointerleave', () => { hover = false; });
+    box.addEventListener('focusin', e => { focus = e.target.matches(':focus-visible'); });
+    box.addEventListener('focusout', e => { if (!box.contains(e.relatedTarget)) focus = false; });
+    return {
+      // each frame: k, the scene on screen; dt, seconds since the last frame
+      tick(k, dt) {
+        const h = stopped || hover || focus || k !== vi;
+        if (h !== held) { held = h; live.setAttribute('aria-live', h ? 'polite' : 'off'); }
+        if (h) return;
+        left -= dt * 1000;
+        if (left <= 0) { show(at + 1); return; }
+        const t = `scaleX(${(1 - left / VOICE).toFixed(3)})`;
+        if (t !== bar) { bar = t; bars[at].style.transform = t; }
+      },
+    };
+  })();
+
   // ---------- the 3D world, loaded on its own ----------
   let world = null, W2 = 0, H2 = 0, CW = 0, CH = 0;   // the stage (the frame the shots are framed for), and the canvas (as tall as the screen gets)
   // the site's loader (SiteLoader.astro, Base's loader="wait") covers the page while the film gets
@@ -520,6 +568,7 @@ function start() {
     if (loaderOut) activate(k);   // the words wait for the loading screen to lift
     const rev = revAt(k, wt >= 0 && k === warp.b ? warp.P1 : P, now);
     updateWords(now, rev);
+    if (voices) voices.tick(loaderOut && m === 0 && wt < 0 && tailNow === 0 ? k : -1, dt);   // (the testimonials turn only while their scene holds the screen)
     if (hint) hint.classList.toggle('gone', Pr > .15);
     if (topBtn && (Pr > .9) !== topOn) { topOn = Pr > .9; topBtn.classList.toggle('on', topOn); }   // (the foot's way back to the top, once past the opening)
     fills.forEach((f, j) => {
@@ -594,7 +643,8 @@ function start() {
       if (idleScene !== k) { idleScene = k; idleFrom = time + 1.2; }
       const t = time - idleFrom;
       if (t > 0) {
-        const n = Math.floor(t / IS.every), ph = t - n * IS.every, [r0, r1] = IS.range, il = st8.idle || (st8.idle = [0, 0, -1, 0]);
+        // (every 0: once, then again only when asked: the voices, as each testimonial comes in)
+        const n = IS.every ? Math.floor(t / IS.every) : 0, ph = IS.every ? t - n * IS.every : t, [r0, r1] = IS.range, il = st8.idle || (st8.idle = [0, 0, -1, 0]);
         if (IS.mode === 'rewrite') {
           // a stretch faded back over FADE seconds, then the pen writes it again; the next time, the next stretch
           const FADE = .6, segs = Math.max(1, Math.floor((r1 - r0) / IS.len)), k0 = r0 + (n % segs) * IS.len, k1 = k0 + IS.len;

@@ -16,8 +16,8 @@ export type Point = { title: string; text: string };
 export type Quote = { text: string; source: string; names?: boolean };
 
 // Client, institution and trial names wait for Dr Hetal's permission (asked 2026-10-09, not yet
-// given): the workshops' client lists, the COVAXIN line and the quote naming an agency stay off the
-// page until this is true.
+// given): the workshops' client lists, the trial's name and the quote naming an agency stay off the
+// page until this is true, and out of this (public) source: they are in the repository's history
 export const NAMES_APPROVED = false;
 
 // the training topics: the training practice lists them, and the training section repeats them
@@ -134,14 +134,10 @@ export const training = {
   title: 'Learn to write it yourself',
   lead: 'Classroom training with theory, live demonstrations and hands-on exercises, individually or in groups. Half-day and full-day sessions; two to three day advanced programmes. Topics are chosen with you; the common ones are listed here. Open workshops and courses run through the MeWriT Academy.',
   modules: [...trainingTopics, 'Guidelines and recommendations', 'Writing a narrative review of literature', 'Preparing a poster', 'Preparing a slide presentation'],
-  deliveredFor: !NAMES_APPROVED ? null : {
-    title: 'Workshops delivered for',
-    groups: [
-      { label: 'Academia', items: ['Tata Memorial Hospital, Mumbai', 'Sri Jayadeva Institute of Cardiovascular Sciences, Bengaluru', 'Nepal Cancer Hospital, Kathmandu', 'National Forensic Sciences University, Gandhinagar', 'Delhi Pharmaceutical Sciences and Research University', 'Institute of Pharmacy, Nirma University', 'L. M. College of Pharmacy, Ahmedabad', 'SRM Medical College, Chennai', 'Chitkara University', 'Lovely Professional University', 'Indrashil University', 'Anand Pharmacy College', 'Indus University', 'Gujarat Technological University', 'Indira IVF Centre, Udaipur', 'PG Pharmacology Forum, India'] },
-      { label: 'Industry', items: ['IQVIA', 'Syngene', 'Lupin, with ISCR', 'Allergan Aesthetics, AbbVie', 'Zydus Wellness, TatvaCare', 'Cliantha Research', 'Veeda Clinical Research', 'Meril Life Sciences', 'Serdia Pharma', 'Alceon Medtech Consulting', 'Docplexus', 'NovoBliss Research'] },
-      { label: 'Also', items: ['MeWriT open workshops: CSR and publications 2025', 'GCP for medical writers 2025', 'ISCR workshops', 'DIA India medical writing conferences'] },
-    ],
-  },
+  // the workshops' client and institution lists wait for Dr Hetal's permission to name them, and are kept
+  // out of the source until then (the repository is public): they are in its history before 2026-10-22,
+  // to restore here, as { title, groups: [{ label, items }] }, once NAMES_APPROVED
+  deliveredFor: null as null | { title: string; groups: { label: string; items: string[] }[] },
   ctas: [
     { label: 'Visit the MeWriT Academy', href: contact.academy, external: true, style: 'primary' },
     { label: 'Ask about a workshop', href: href('/#contact'), style: 'outline' },
@@ -159,14 +155,15 @@ export const acknowledged = {
     { text: 'The authors thank Dr. Hetal Shah from MeWriT Healthcare Consulting, Ahmedabad, India for providing medical writing support in the development of this manuscript.', source: 'Arthritis Research & Therapy, 2024' },
     { text: 'The authors thank Dr. Hetal Shah, MeWriT Healthcare Consulting, Ahmedabad, India, for her professional medical writing support in developing this manuscript and for styling it per journal requirements.', source: 'Experimental and Clinical Transplantation, 2022' },
     { text: 'The authors would also like to acknowledge the medical writing and editorial support provided by Dr. Hetal Shah, Founder & Principal Consultant, MeWriT™ from Ahmedabad, India, in the preparation and revision of this manuscript in collaboration with all the authors and reviewers, and in styling the article as per journal requirements.', source: 'ACR Open Rheumatology, 2019' },
-    { text: 'The Consensus Task Force would like to acknowledge the medical writing efforts of Dr. Hetal Shah, and ProAdWise Communications for their support in the development, revision, and publishing of this content.', source: 'Indian Consensus Statement on the Evaluation and Management of Insomnia Disorders, API and ISSR, 2022', names: true },
+    // (a fifth, naming an agency, waits for permission to name it: in the repository's history)
   ].filter(q => NAMES_APPROVED || !q.names) as Quote[],
 };
 
 export const credentials = {
   eyebrow: 'Who leads the work',
   title: `A principal consultant with ${YEARS} years in clinical research`,
-  text: `MeWriT's principal consultant, Dr Hetal Shah, PhD (Pharmacology), has worked across clinical sites, CROs and medical writing since 2003${NAMES_APPROVED ? ", including as principal medical writer on India's landmark COVAXIN trial" : ''}. She is Section Editor for Medical Writing at Perspectives in Clinical Research, a member of the ISCR Medical Writing Council (Hall of Fame 2021 to 2023), a DIA global mentor and subject-matter expert, and Scientific Programme Co-chair of DIA India's Medical Writing and Scientific Communication Conference 2026. Projects draw on an extended team of medical writers, therapeutic-area experts and biostatisticians.`,
+  // (the trial she led the writing of is named once permission is given: in the repository's history)
+  text: `MeWriT's principal consultant, Dr Hetal Shah, PhD (Pharmacology), has worked across clinical sites, CROs and medical writing since 2003. She is Section Editor for Medical Writing at Perspectives in Clinical Research, a member of the ISCR Medical Writing Council (Hall of Fame 2021 to 2023), a DIA global mentor and subject-matter expert, and Scientific Programme Co-chair of DIA India's Medical Writing and Scientific Communication Conference 2026. Projects draw on an extended team of medical writers, therapeutic-area experts and biostatisticians.`,
   link: { label: 'Full profile', href: href('/leadership/hetal-shah/') } as PitchLink,
   values: ['Scientific rigour', 'Participant centricity', 'Quality and excellence', 'Integrity', 'Confidentiality', 'Trust and collaboration'],
 };

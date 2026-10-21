@@ -1,0 +1,40 @@
+---
+// Therapeutic areas: the seventeen areas MeWriT writes in, as tiles (src/data/areas.ts; styles
+// src/styles/areas.css), each with its icon (src/data/area-icons.ts) and leading, as a whole, to an
+// overview of the area from the WHO or the NIH (the user, 2026-10-21: "symbols with the tiles... and have
+// each linked to credible info"); and a way to ask about another. Under the header's Expertise; Who we
+// are's "17 therapeutic areas" leads here.
+import Base from '../layouts/Base.astro';
+import BackLink from '../components/BackLink.astro';
+import { areas, SOURCES } from '../data/areas';
+import { areaIcons } from '../data/area-icons';
+import { site } from '../data/site';
+import { href } from '../lib/url';
+import '../styles/areas.css';
+
+const pad = (j: number) => String(j + 1).padStart(2, '0');
+---
+<Base title={`${areas.title} | ${site.name}`} description={`Medical writing across ${areas.list.length} therapeutic areas: ${areas.list.slice(0, 6).map(a => a.name).join(', ').toLowerCase()} and more.`} foot="film" page="areas">
+  <div class="ta-page">
+    <header class="ta-head">
+      <div><BackLink /></div>
+      <p class="ta-kicker">Expertise</p>
+      <h1 class="ta-title">{areas.title}</h1>
+      <p class="ta-line">{areas.line}</p>
+      <p class="ta-note">{areas.note}</p>
+    </header>
+    <ul class="ta-grid" aria-label={`${areas.list.length} therapeutic areas`}>
+      {/* (each tile one link as a whole: the size a finger finds is the tile's) */}
+      {areas.list.map((a, j) => (
+        <li>
+          <a class="ta-tile" href={a.url} target="_blank" rel="noopener">
+            <span class="ta-top"><span class="ta-ico" aria-hidden="true"><svg viewBox="0 0 32 32" set:html={areaIcons[a.icon]} /></span><span class="ta-n" aria-hidden="true">{pad(j)}</span></span>
+            <span class="ta-name">{a.name}<span class="sr-only">: an overview from {SOURCES[a.by]} (opens in a new tab)</span></span>
+            <span class="ta-src" aria-hidden="true">{a.by} overview ↗</span>
+          </a>
+        </li>
+      ))}
+      <li class="ta-more"><p>Working in another area? Tell us about it.</p><a class="btn btn-primary" href={href('/contact/')}>Get in touch</a></li>
+    </ul>
+  </div>
+</Base>

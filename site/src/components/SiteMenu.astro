@@ -4,7 +4,8 @@
 // touch, and Close where the menu button is); under it, on dusk indigo, everything is a tile a finger
 // finds at once (the user, 2026-10-21: no little links), in the header's order: Who we are and Why
 // MeWriT; the five practices, each going straight to its place in the film (/#regulatory-writing ...:
-// experience.js), and all five; Dr Hetal Shah and the Academy; then call, WhatsApp and email.
+// experience.js), and all five; the expertise (Publications, Therapeutic areas); Leadership and the
+// Academy; then call, WhatsApp and email.
 import Icon from './Icon.astro';
 import { contact } from '../data/site';
 import { practicePages } from '../data/experience';
@@ -33,6 +34,13 @@ const here = Astro.url.pathname;
         {CHAPTERS.map((c, j) => <li><a class="sm-tile" href={href(`/#${practicePages[j]}`)} data-nav-practice={j}><span class="n">{pad(j)}</span><span class="t">{c}</span><b aria-hidden="true">→</b></a></li>)}
         <li><a class="sm-tile sm-all" href={href('/#practices')}><span class="n">01 to 05</span><span class="t">All five</span><b aria-hidden="true">→</b></a></li>
       </ol>
+    </div>
+    <div>
+      <p class="sm-h">Expertise</p>
+      <ul class="sm-tiles sm-two">
+        <li><a class="sm-tile" href={href('/publications/')} aria-current={here.startsWith(href('/publications/')) ? 'page' : undefined}><span class="t">Publications</span><b aria-hidden="true">→</b></a></li>
+        <li><a class="sm-tile" href={href('/therapeutic-areas/')} aria-current={here.startsWith(href('/therapeutic-areas/')) ? 'page' : undefined}><span class="t">Therapeutic areas</span><b aria-hidden="true">→</b></a></li>
+      </ul>
     </div>
     <ul class="sm-tiles sm-two">
       <li><a class="sm-tile" href={href('/leadership/')} aria-current={here.startsWith(href('/leadership/')) ? 'page' : undefined}><span class="t">Leadership</span><b aria-hidden="true">→</b></a></li>

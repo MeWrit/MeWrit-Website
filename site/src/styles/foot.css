@@ -195,8 +195,11 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
      once a practice in it is chosen (dd-off, site-nav.js) */
   html[data-foot="film"] .dd-top::after{content:"";width:7px;height:7px;margin-left:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg)}
   html[data-foot="film"] .has-dd.dd-off .dd{opacity:0;visibility:hidden;transform:translateY(-8px)}
-  /* in the panel, the practice the reader is in (experience.js): its rule orange, its number full */
-  html[data-foot="film"] .dd a[aria-current="location"]{border-top-color:#F2A65A;border-top-width:2px;padding-top:17px}
+  /* in a panel, the practice the reader is in (experience.js), or the page they are on: its rule orange */
+  html[data-foot="film"] .dd a:is([aria-current="location"],[aria-current="page"]){border-top-color:#F2A65A;border-top-width:2px;padding-top:17px}
+  /* Expertise's panel: its two entries side by side, at the right under the menu (across the whole sheet
+     they stood far from the entry that opened them) */
+  html[data-foot="film"] #dd-expertise{grid-template-columns:repeat(2,minmax(0,330px));justify-content:end}
   html[data-foot="film"] .dd a[aria-current="location"] strong{color:#fff}
   /* the menu at the right, one cluster with Get in touch (centred in so wide a bar it stood apart from
      both); each entry the bar's full height, so the pointer keeps its panel open on the way down to it */

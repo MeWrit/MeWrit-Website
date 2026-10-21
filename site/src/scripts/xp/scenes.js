@@ -21,7 +21,8 @@
    again (a line of the page, a page of the dossier, a stretch of the curves), stepping through range;
    'pass' sends only the pen's front (the logo's orange) through range: a signal through the network,
    routes out from Ahmedabad. The crowd uses 'rewrite' (people inked again in turn): an orange front
-   would vanish among its orange people. every: seconds from one action to the next; take: the pen's
+   would vanish among its orange people. every: seconds from one action to the next (0: only when
+   experience.js asks, the voices' page signed again as each testimonial comes in); take: the pen's
    seconds. The molecule and the rivers have none (the rivers flow on their own).
    A shot is [camera position, the point it looks at, field of view, shift right, shift up], but
    only its direction (from the point looked at to the camera) and its field of view are used: the
@@ -71,6 +72,17 @@ export const SCENES = [
     a: [[-1.9, .5, 27.3], [0, 0, 0], 38, 0, 0], b: [[-.5, 1.1, 27.6], [0, .2, 0], 38, 0, 0],
     bg: NAVY, glow: ['#1C3472', .5],
     callouts: [{ at: 'figure', label: 'Checked against the source', min: .3 }, { at: 'seal', label: 'Reviewed and approved', min: .6, side: 'l' }],
+  },
+  {
+    // why others chose MeWriT, in their words (the clients' testimonials, one at a time): the same page,
+    // the camera gone in close on its foot, where it is signed and sealed (box: the figure, the signature
+    // and the seal; scratchpad page_keys.mjs). Each time a new voice comes in, the signature and the seal
+    // are written again (idle: those strokes' keys; every 0, so only when experience.js asks, as the
+    // testimonial changes)
+    id: 'voices', form: F.PAGE, chapter: -1, idle: { mode: 'rewrite', range: [.924, .986], len: .062, every: 0, take: 2.8 },
+    a: [[.9, -1.6, 27.5], [0, -3.6, 0], 36, 0, 0], b: [[2.6, -1.1, 27.2], [0, -3.5, 0], 36, 0, 0],
+    box: { c: [-.05, -3.55, .39], size: [6.7, 3.3, 1.12] },
+    bg: NAVY, glow: ['#1C3472', .5],
   },
   {
     // the five practices to choose from, on dusk indigo (raw: the sky is not tone-mapped, world.js):

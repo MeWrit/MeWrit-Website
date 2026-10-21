@@ -1,0 +1,99 @@
+---
+// Publications, in two parts that say what each is (the user, 2026-10-21: the acknowledged work "needs to
+// be clear", or "it just looks like we have posted some random pubs"): the published work whose authors
+// thank Dr Hetal Shah, or MeWriT, for medical writing support, each card quoting the acknowledgement as
+// the paper words it (the user: "show up as is... what exactly they had to say about her and mewrit");
+// then her own research papers, reviews, book chapters and congress presentations, her name in bold among
+// the authors. A filter (the kinds, a search, a year: src/scripts/publications.js; styles
+// src/styles/publications.css). A card with a link is a link as a whole (the user: "entire publication
+// tile should be clickable"). The list comes from the current site's publications page
+// (src/data/publications.json, made by the scratchpad's extract_pubs2.js): the citations, and of each
+// acknowledgement its sentences naming her or MeWriT, word for word, company names withheld ([…]) until
+// Dr Hetal approves naming them; links checked before publishing. Under the header's Expertise.
+import Base from '../layouts/Base.astro';
+import BackLink from '../components/BackLink.astro';
+import data from '../data/publications.json';
+import { site } from '../data/site';
+import '../styles/publications.css';
+
+type Item = { authors: string; title: string; source: string; year: number | null; url: string | null; ack?: string };
+// the kinds as the filter names them (the acknowledgements first, as on the page)
+const LABEL: Record<string, string> = { acknowledgements: 'Writing support', papers: 'Research paper', chapters: 'Book chapter', reviews: 'Review article', congress: 'Congress presentation' };
+const TAB: Record<string, string> = { acknowledgements: 'Acknowledged', papers: 'Research papers', chapters: 'Book chapters', reviews: 'Review articles', congress: 'Congress presentations' };
+const byYear = (a: { year: number | null }, b: { year: number | null }) => (b.year || 0) - (a.year || 0);
+const items = (ids: string[]) => data.kinds.filter(k => ids.includes(k.id)).flatMap(k => (k.items as Item[]).map(it => ({ ...it, kind: k.id }))).sort(byYear);
+const acknowledged = items(['acknowledgements']);
+const authored = items(['papers', 'reviews', 'chapters', 'congress']);
+const total = acknowledged.length + authored.length;
+const years = [...new Set([...acknowledged, ...authored].map(it => it.year).filter(Boolean))].sort((a, b) => (b as number) - (a as number));
+const kindsOrder = ['acknowledgements', 'papers', 'reviews', 'chapters', 'congress'].map(id => data.kinds.find(k => k.id === id)!).filter(Boolean);
+// Dr Hetal Shah's name, set in bold among the authors of her own work
+const mine = /\b(Shah H[AD]?|H[AD]? Shah)\b/g;
+const authorsHtml = (a: string, bold: boolean) => {
+  const esc = a.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return bold ? esc.replace(mine, '<b>$1</b>') : esc;
+};
+// an acknowledgement, word for word, with Dr Hetal Shah's name and MeWriT's set a little heavier so the eye
+// finds them (the words themselves unchanged)
+const ackHtml = (a: string) => a.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+  .replace(/(Dr\.? Hetal Shah|MeWriT(?:™)?(?: Healthcare Consulting| Consultancy)?)/g, '<b>$1</b>');
+const linkLabel = (u: string) => /pubmed/.test(u) ? 'PubMed' : /doi\.org/.test(u) ? 'DOI' : /researchgate/.test(u) ? 'ResearchGate' : /\.pdf($|\?)/.test(u) ? 'PDF' : 'Read online';
+const ext = { target: '_blank', rel: 'noopener' };
+---
+<Base title={`Publications | ${site.name}`} description={`Published work acknowledging Dr Hetal Shah's and MeWriT's medical writing support, and her own research papers, reviews, book chapters and congress presentations: ${total} in all.`} foot="film" page="publications">
+  <div class="pb-page">
+    <header class="pb-head">
+      <div><BackLink /></div>
+      <p class="pb-kicker">Expertise</p>
+      <h1 class="pb-title-page">Publications</h1>
+      <p class="pb-line">The published work our medical writing supported, as its authors acknowledge, and Dr Hetal Shah's own papers, reviews, book chapters and congress presentations.</p>
+    </header>
+    <div class="pb-filters" role="search" aria-label="Filter the publications">
+      <ul class="pb-kinds" aria-label="Kinds">
+        <li><button class="pb-kind-btn" type="button" data-kind="all" aria-pressed="true">All <b>{total}</b></button></li>
+        {kindsOrder.map(k => <li><button class="pb-kind-btn" type="button" data-kind={k.id} aria-pressed="false">{TAB[k.id]} <b>{k.items.length}</b></button></li>)}
+      </ul>
+      <div class="pb-row">
+        <label class="pb-search"><span class="sr-only">Search titles, authors and journals</span><input type="search" placeholder="Search titles, authors, journals" autocomplete="off"></label>
+        <label class="pb-year"><span class="sr-only">Year</span><select><option value="">All years</option>{years.map(y => <option value={String(y)}>{y}</option>)}</select></label>
+        <p class="pb-count" aria-live="polite">{total} publications</p>
+      </div>
+    </div>
+
+    {[
+      { id: 'acknowledged', list: acknowledged, kicker: 'Acknowledged', title: 'Published with our writing support',
+        line: 'Papers, posters and statements whose authors thank Dr Hetal Shah, or MeWriT, in their acknowledgements, quoted on each as the paper words it.' },
+      { id: 'authored', list: authored, kicker: 'Authored', title: 'By Dr Hetal Shah',
+        line: 'Her research papers, reviews, book chapters and congress presentations, as author or co-author: her name in bold.' },
+    ].map(sec => (
+      <section class="pb-sec" data-sec={sec.id} aria-labelledby={`pb-${sec.id}`}>
+        <div class="pb-sec-head">
+          <p class="pb-sec-k">{sec.kicker} <b class="pb-sec-n">{sec.list.length}</b></p>
+          <h2 id={`pb-${sec.id}`}>{sec.title}</h2>
+          <p>{sec.line}</p>
+        </div>
+        <ol class="pb-list">
+          {sec.list.map(it => (
+            <li class={`pb-card${it.url ? ' has-link' : ''}${it.ack ? ' pb-ack' : ''}`} data-kind={it.kind} data-year={it.year ? String(it.year) : ''}>
+              <p class="pb-meta"><span>{LABEL[it.kind]}</span>{it.year && <span class="pb-year">{it.year}</span>}</p>
+              <h3>{it.url ? <a class="pb-hit" href={it.url} {...ext}>{it.title}</a> : it.title}</h3>
+              {it.authors && <p class="pb-authors" set:html={authorsHtml(it.authors, !it.ack)} />}
+              {it.source && <p class="pb-source">{it.source}</p>}
+              {/* what the authors wrote about Dr Hetal Shah and MeWriT, word for word */}
+              {it.ack && <figure class="pb-quote">
+                <figcaption><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.4 10.3l2.4 2.4 4.9-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>In the paper’s acknowledgements</figcaption>
+                <blockquote><p set:html={`“${ackHtml(it.ack)}”`} /></blockquote>
+              </figure>}
+              {it.url && <span class="pb-go" aria-hidden="true">{linkLabel(it.url)} ↗</span>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+    <p class="pb-empty" hidden>No publications match. Try another word or year.</p>
+  </div>
+</Base>
+
+<script>
+  import '../scripts/publications.js';
+</script>

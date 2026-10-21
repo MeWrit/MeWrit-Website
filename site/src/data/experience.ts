@@ -8,14 +8,16 @@
 
 import { YEARS, YEARS_WORD_CAP } from './years';
 
-export type XpFigure = { value: string; label: string };
+export type XpFigure = { value: string; label: string; href?: string };
 export type XpPoint = { title: string; text: string };
+export type XpQuote = { quote: string; by: string };
 export type XpScene = {
   id: string; kicker: string; title: string; text: string; docs?: string[]; hint?: string; cta?: boolean;
-  lead?: string; figures?: XpFigure[]; points?: XpPoint[]; hub?: boolean; more?: string;
+  lead?: string; figures?: XpFigure[]; points?: XpPoint[]; hub?: boolean; more?: string; quotes?: XpQuote[]; academy?: boolean;
 };
 
-// the practices' own pages (Know more), by the slug in their address: /services/<slug>/
+// the practices' slugs: each practice's place in the film (/#regulatory-writing ...: the menus and the
+// foot link there), and the address its own page will have (/services/<slug>/), not built yet
 export const practicePages = ['regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory'];
 
 export const experience = {
@@ -30,11 +32,13 @@ export const experience = {
       id: 'who', kicker: 'Who we are', title: 'Scientists who write',
       text: 'Medical writers, therapeutic-area experts and biostatisticians who understand the science behind every sentence, so a document holds when it is read closely.',
       lead: 'Led by Dr Hetal Shah, PhD (Pharmacology), in clinical research and medical writing since 2003.',
+      // (two lead to the Expertise pages: the user, 2026-10-21; the narratives and the trained are on the
+      // dossier's and the training's shapes)
       figures: [
         { value: `${YEARS}+`, label: 'years in clinical research and medical writing' },
         { value: '100+', label: 'essential trial documents' },
-        { value: '1,500+', label: 'patient and event narratives' },
-        { value: '3,000+', label: 'professionals trained' },
+        { value: '70+', label: 'publications and presentations', href: '/publications/' },
+        { value: '17', label: 'therapeutic areas', href: '/therapeutic-areas/' },
       ],
     },
     {
@@ -44,6 +48,22 @@ export const experience = {
         { title: 'Scientific rigour', text: 'Written by people who understand the science: study design, interpretation and compliance, not just the words.' },
         { title: 'Guideline discipline', text: 'ICH E3 and E6 (R3), CTD, ICMJE and GPP: built to the standard each document is judged by.' },
         { title: 'Fit for purpose', text: 'Tailored to the document, the audience and the deadline, with a fixed fee per project.' },
+      ],
+    },
+    {
+      // why others chose MeWriT (the user, 2026-10-21: testimonials in the Why MeWriT section, "why they
+      // should choose mewrit and why others chose it"): the clients' testimonials on the current site
+      // ("MeWriT Website Text for Editing.docx"), each an exact excerpt, one at a time (experience.js);
+      // attributions by role, as the site gives them, less an association's name (permission pending: the
+      // first is credited there as a former EMWA President). The colleagues' and mentor's are left for now
+      id: 'voices', kicker: 'In their words', title: 'Why clients choose MeWriT',
+      text: 'Clients on working with Dr Hetal Shah, who leads MeWriT.',
+      quotes: [
+        { quote: 'I have always found her work to be of exceptionally high quality, delivered in a timely manner, and communication was straightforward and easy.', by: 'Senior partner, writing consultancy, Germany' },
+        { quote: 'Hetal Shah has been able to understand the intricacies of complex assignments, is able to meet time lines and give out perfect jobs, acceptable to the customer and the international regulatory authorities.', by: 'Director, research consultancy firm, India' },
+        { quote: 'She is always responsive and asked the right questions to understand our subject matter. Her knowledge of subject is in depth and there is so much value addition that she brings with her work.', by: 'Medical device company, India' },
+        { quote: 'She unfailingly completed her set tasks to our complete satisfaction. Reliable and concise work was consistently displayed.', by: 'Research consultancy firm, Germany' },
+        { quote: 'Hetal loves medical writing and is very good at it! She is a dependable resource with a strong work ethics who researches, analyses and then writes her documents and therefore executes well written documents.', by: 'Director, research consultancy firm, India' },
       ],
     },
     {
@@ -91,7 +111,7 @@ export const experience = {
       id: 'training', kicker: '04 · Training · MeWriT Academy', title: 'Learn to write it yourself',
       text: 'Structured, hands-on workshops in medical writing and clinical research, basic to advanced, from half a day to three days, tailored to the audience: pharma and CRO teams, clinicians and residents, pharmacy and medical students. Open workshops and courses through the MeWriT Academy.',
       docs: ['Essentials of medical writing', 'Clinical study reports', 'Scientific publications', 'GCP for medical writers', 'CTD modules'],
-      more: 'training',
+      more: 'training', academy: true,
     },
     {
       id: 'ai', kicker: '05 · AI/ML advisory', title: 'Domain expertise, in the loop',

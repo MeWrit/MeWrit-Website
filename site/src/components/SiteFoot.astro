@@ -33,12 +33,15 @@ const ext = { target: '_blank', rel: 'noopener' };
       </div>
       <div class="sf-col">
         <h3>The practices</h3>
-        <ul>{CHAPTERS.map((c, j) => <li><a href={href(`/services/${practicePages[j]}/`)}>{c}</a></li>)}</ul>
+        {/* (each to its place in the film, as in the menus: the practices' own pages are not built yet) */}
+        <ul>{CHAPTERS.map((c, j) => <li><a href={href(`/#${practicePages[j]}`)}>{c}</a></li>)}</ul>
       </div>
       <div class="sf-col">
         <h3>MeWriT</h3>
         <ul>
           <li><a href={href('/leadership/')}>Leadership</a></li>
+          <li><a href={href('/publications/')}>Publications</a></li>
+          <li><a href={href('/therapeutic-areas/')}>Therapeutic areas</a></li>
           <li><a href={contact.academy} {...ext}>MeWriT Academy <span aria-hidden="true">↗</span></a></li>
           <li><a href={contact.linkedin} {...ext}>LinkedIn <span aria-hidden="true">↗</span></a></li>
         </ul>

@@ -36,7 +36,7 @@ const fulls = practices.list.map(p => p.full);
 // where a link can land in the film (/#who, /#training, ...: the menus' links, experience.js): the intro's
 // scenes by their own names, and each practice's first scene by the practice's address
 const anchorOf = (s: { id: string; chapter: number }, i: number) =>
-  ['who', 'why', 'practices'].includes(s.id) ? s.id
+  ['who', 'why', 'voices', 'practices'].includes(s.id) ? s.id
     : s.chapter >= 0 && SCENES.findIndex(x => x.chapter === s.chapter) === i ? practicePages[s.chapter] : undefined;
 ---
 <Base intro="none" theme="light" foot="film" loader="wait" title={`${experience.title} | ${site.name}`} description={experience.description}>
@@ -62,11 +62,30 @@ const anchorOf = (s: { id: string; chapter: number }, i: number) =>
                   <p class="xp-text">{w.text}</p>
                   {w.lead && <a class="xp-lead" href={href('/leadership/hetal-shah/')}><Image class="xp-face" src={portrait} alt="" width={96} height={96} /><span>{w.lead} <b aria-hidden="true">→</b></span></a>}
                   {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map((f, j) => {
-                    // the figure, and its count up (experience.js): the running count over an unseen copy
+                    // the figure, and its count up (experience.js): the running count over an unseen copy; a
+                    // figure with a page of its own (the publications, the therapeutic areas) is the way there
                     const v = f.value.replace(/\+$/, '');
-                    return <li style={`--i:${j}`}><b><span class="sr-only">{f.value}</span><span class="xp-count" data-to={v.replace(/\D/g, '')} aria-hidden="true"><span>{v}</span><span>{v}</span></span>{f.value.endsWith('+') && <i aria-hidden="true">+</i>}</b><span>{f.label}</span></li>;
+                    const inner = <><b><span class="sr-only">{f.value}</span><span class="xp-count" data-to={v.replace(/\D/g, '')} aria-hidden="true"><span>{v}</span><span>{v}</span></span>{f.value.endsWith('+') && <i aria-hidden="true">+</i>}</b><span class="xp-fl">{f.label}{f.href && <>{' '}<i class="xp-fgo" aria-hidden="true">→</i></>}</span></>;
+                    return <li style={`--i:${j}`}>{f.href ? <a class="xp-flink" href={href(f.href)}>{inner}</a> : inner}</li>;
                   })}</ul>}
                   {w.points && <ol class="xp-points">{w.points.map((p, j) => <li><span class="n" aria-hidden="true">{pad(j)}</span><b>{p.title}</b><span class="d">{p.text}</span></li>)}</ol>}
+                  {/* the testimonials, one at a time (experience.js turns them, and the page is signed again
+                      as each comes in): stacked in one place, so the words keep one height; without scripts,
+                      every one in turn */}
+                  {w.quotes && <div class="xp-voices" role="region" aria-roledescription="carousel" aria-label="What clients say">
+                    <div class="xp-qs" aria-live="off">
+                      {w.quotes.map((q, j) => <figure class={j ? 'xp-q' : 'xp-q on'} role="group" aria-roledescription="slide" aria-label={`${j + 1} of ${w.quotes!.length}`}>
+                        <blockquote><p>{q.quote}</p></blockquote>
+                        <figcaption>{q.by}</figcaption>
+                      </figure>)}
+                    </div>
+                    <div class="xp-qnav">
+                      <button class="xp-qbtn xp-qprev" type="button" aria-label="Previous testimonial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+                      <span class="xp-qdots" aria-hidden="true">{w.quotes.map((_, j) => <i class={j ? '' : 'on'}><b></b></i>)}</span>
+                      <button class="xp-qbtn xp-qnext" type="button" aria-label="Next testimonial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+                      <button class="xp-qbtn xp-qpause" type="button" aria-label="Pause the testimonials"><svg class="xp-qi-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="6" width="3.2" height="12" rx="1"/><rect x="13.8" y="6" width="3.2" height="12" rx="1"/></svg><svg class="xp-qi-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.5 6.2v11.6c0 .7.8 1.1 1.4.7l8.4-5.8c.5-.4.5-1.1 0-1.4L9.9 5.5c-.6-.4-1.4 0-1.4.7z"/></svg></button>
+                    </div>
+                  </div>}
                   {w.hint && <p class="xp-pickhint">{w.hint}</p>}
                   {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
                   {w.hub && <>
@@ -77,7 +96,12 @@ const anchorOf = (s: { id: string; chapter: number }, i: number) =>
                       <li class="xp-tile-all"><button class="xp-tile xp-explore" type="button"><span class="t">Explore all five</span><b aria-hidden="true">{'→'}</b></button></li>
                     </ol>
                   </>}
-                  {w.more && <a class="xp-more" href={href(`/services/${w.more}/`)}>Know more<span class="sr-only"> about {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>}
+                  {/* (the practices' own pages are not built yet: each practice leads to the contact page for now) */}
+                  {w.more && <div class="xp-morerow">
+                    <a class="xp-more" href={href('/contact/')}>{w.academy ? 'Plan a training' : 'Discuss your project'}<span class="sr-only">: {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>
+                    {/* (training: the Academy's open workshops and courses, from the practice itself) */}
+                    {w.academy && <a class="xp-acad" href={contact.academy} target="_blank" rel="noopener">MeWriT Academy <span aria-hidden="true">↗</span></a>}
+                  </div>}
                   {w.cta && <div class="btn-row xp-cta">
                     <a class="btn btn-primary" href={href('/contact/')}>Start a project</a>
                     <a class="btn xp-btn-ghost" href={contact.academy} target="_blank" rel="noopener">Book a training</a>

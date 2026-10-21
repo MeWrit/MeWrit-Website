@@ -1,0 +1,585 @@
+{
+ "source": "MeWriT Website Text for Editing.docx, Page 4 (the current mewrit.com publications page): the citations, and each acknowledgement’s sentences naming Dr Hetal Shah or MeWriT, word for word, company names withheld",
+ "omitted": [
+  {
+   "kind": "papers",
+   "n": 5,
+   "why": "the source cuts its title off (\"Effect of Metoprolol CR/XL on Pulmonary Artery Pressure in\")"
+  }
+ ],
+ "kinds": [
+  {
+   "id": "acknowledgements",
+   "label": "Writing support",
+   "line": "Papers and posters acknowledging MeWriT’s medical writing support",
+   "items": [
+    {
+     "authors": "Maharaj N, Uppada DR, Eswaraiah A, Kakkattu R, Reddy P, Kalenik VA, Belada D, Ramos AO, Kim JS, Baranau YV",
+     "title": "Efficacy and safety of rituximab biosimilar (DRL_RI) versus MabThera® in low-tumor-burden follicular lymphoma: the FLINTER study",
+     "source": "Ther Adv Med Oncol. 2025 May 24;17:17588359251339925",
+     "year": 2025,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/40421128/",
+     "ack": "The authors thank clinical science team Dr. Tazeen Aamena Idris, Dr. Routhu Kasi Viswanath […] and Dr. Hetal Shah from MeWriT Healthcare Consulting, Ahmedabad for providing writing assistance."
+    },
+    {
+     "authors": "Ghosh AK, Chakraborty D, Sudhalkar A, Chawla R, Singh SR, Sahu AK, Venkatesh R, Raval V, Shah S, Preetha P, Bhavsar M, Patil S, Khadke I, Thorat A",
+     "title": "Safety and effectiveness of brolucizumab in patients with neovascular age-related macular degeneration: A phase IV study from India",
+     "source": "Indian J Ophthalmol. 2025 Jun 1;73(6):826-832",
+     "year": 2025,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/40243051/",
+     "ack": "The authors would like to acknowledge the medical writing support provided by Dr. Hetal Shah from MeWriT Healthcare Consulting, Ahmedabad, India in the development of this manuscript, and styling and formatting it to the journal’s requirements."
+    },
+    {
+     "authors": "Maharaj N, Uppada DR, Reddy N, Reddy P, Batalov A, Lvanova D, Staykova N, Baranauskaite A, Hassan LA",
+     "title": "Comparing immunogenicity and safety following transition from reference rituximab to biosimilar rituximab (DRL_RI) in patients with rheumatoid arthritis: a randomized, double-blind, phase 3 study",
+     "source": "Arthritis Res Ther. 2024 Dec 21;26(1):225",
+     "year": 2024,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/39709462/",
+     "ack": "The authors thank Dr. Hetal Shah from MeWriT Healthcare Consulting, Ahmedabad, India for providing medical writing support in the development of this manuscript."
+    },
+    {
+     "authors": "Chodankar, Deepa; Raval, Tapan K.; Jeyaraj, Jeyaseelan",
+     "title": "The role of remote data capture, wearables, and digital biomarkers in decentralized clinical trials",
+     "source": "Perspectives in Clinical Research 15(1):p 38-41, Jan-Mar 2024",
+     "year": 2024,
+     "url": "https://doi.org/10.4103/picr.picr_219_22",
+     "ack": "We thank Anushila Vaishali (MW Council Chair) and Dr. Hetal Shah (MW Council Member) for their efforts in the overall planning and execution of the publication activities for the DCT Position Paper initiative."
+    },
+    {
+     "authors": "Sharma P, Bhowmick S, Nayak K, Bhattacharjee S, Lahiry S",
+     "title": "Home nursing in clinical trials: Result from semi-structured qualitative interviews",
+     "source": "Perspectives in Clinical Research December 06, 2023",
+     "year": 2023,
+     "url": "https://doi.org/10.4103/picr.picr_218_22",
+     "ack": "We thank Anushila Vaishali (MW Council Chair) and Dr. Hetal Shah (MW Council Member) for their efforts in the overall planning and execution of the publication activities for the DCT Position Paper initiative."
+    },
+    {
+     "authors": "Gupta A, Bhalla AK, Malik M, Gupta A, Bhargava V, Tiwari V, Gaur L, Gupta P, Jain M, Rana DS",
+     "title": "Anti-T-Lymphocyte Immunoglobulin (Grafalon) as an Induction Agent for Renal Transplantation: A Real-World, Retrospective, Single-Center Experience",
+     "source": "Exp Clin Transplant. 2022 May;20(5):480-486",
+     "year": 2022,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/35620891/",
+     "ack": "The authors thank Dr. Hetal Shah, MeWriT Healthcare Consulting, Ahmedabad, India, for her professional medical writing support in developing this manuscript and for styling it per journal requirements."
+    },
+    {
+     "authors": "",
+     "title": "Indian Consensus Statement on the Evaluation and Management of Insomnia Disorders",
+     "source": "A joint initiative by the Association of Physicians of India (API) and the Indian Society for Sleep Research (ISSR). Released at APICON 2022, 14-17 April 2022, Jaipur",
+     "year": 2022,
+     "url": null,
+     "ack": "The Consensus Task Force would like to acknowledge the medical writing efforts of Dr. Hetal Shah, and […] for their support in the development, revision, and publishing of this content."
+    },
+    {
+     "authors": "",
+     "title": "Decentralized Clinical Trials (DCT) - A Landscape Assessment with Recommendations for Growing the Ecosystem",
+     "source": "Position paper, Indian Society for Clinical Research (ISCR). Released on 04 Mar 2022 at the 15th Annual Conference of the ISCR",
+     "year": 2022,
+     "url": "https://www.iscr.org/files/Article/1317861265_ISCR-DCT-Position-Paper-[Fina.pdf",
+     "ack": "We thank the ISCR Medical Writing Council – Anushila Vaishali (MW Council Chair) and Dr. Hetal Shah (MW Council Member) for their efforts in planning and execution of the publication activity for the DCT initiative; and contributing as principal medical writers in the development of this position paper content"
+    },
+    {
+     "authors": "Bhattacharya A, Patra S, Banerjee S",
+     "title": "Prevalence of Cardiovascular Risk Factors among Executive and Nonexecutive Workers in an Urban Public Sector Office Setting: A Cross-Sectional Epidemiological Study from Eastern India",
+     "source": "Indian J Community Med. 2021 Oct-Dec;46(4):723-726",
+     "year": 2021,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/35068743/",
+     "ack": "The authors would like to acknowledge the ……and the editorial support provided by MeWriT Healthcare Consulting, Ahmedabad, India, in the revision and styling of this manuscript as per journal requirements."
+    },
+    {
+     "authors": "Majumdar S, Chatterjee A, Banerjee S",
+     "title": "A patient with atrioventricular block and ventricular tachycardia: think sarcoid!",
+     "source": "J R Coll Physicians Edinb. 2020 Sep;50(3):284-286",
+     "year": 2020,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/32936104/",
+     "ack": "The authors would like to acknowledge the medical writing support provided by Dr. Hetal Shah, MeWriT™ from Ahmedabad, India for her professional support in revising the write-up, and styling the report as per the journal’s requirements"
+    },
+    {
+     "authors": "Chopra A, Mitra D, Agarwal R, Saraswat N, Chemburkar P, Sharma L",
+     "title": "Real-life efficacy and safety of biosimilar adalimumab (ZRC-3197) in patients with plaque psoriasis: A tertiary care center experience",
+     "source": "Indian Dermatol Online J 2020;11:182-6",
+     "year": 2020,
+     "url": "https://www.ovid.com/jnls/idoj/fulltext/10.4103/idoj.idoj_120_19~real-life-efficacy-and-safety-of-biosimilar-adalimumab",
+     "ack": "The authors acknowledge the contribution of Dr Hetal Shah, Principal Consultant, MeWriT™ from Ahmedabad, India, for her medical writing and editing support in the development and revision of this manuscript."
+    },
+    {
+     "authors": "Suvro B, Majumdar S, Konar A",
+     "title": "Prevalence of atrial high‐rate episodes and the risk factors in Indian patients with cardiac implantable electronic devices: Real‐world data",
+     "source": "Journal of Arrhythmia. 2019;00:1-6",
+     "year": 2019,
+     "url": "https://doi.org/10.1002/joa3.12239",
+     "ack": "The authors thank Dr Hetal Shah, PhD, Principal Medical Writing Consultant from MeWriT™, Ahmedabad, India for providing her professional support in preparation and revision of this manuscript."
+    },
+    {
+     "authors": "Kapoor S, Kaushik VV, Jain R, Rao V, Gharia M",
+     "title": "Real-Life Tolerability and Effectiveness of Adalimumab Biosimilar in Ankylosing Spondylitis: the Adalimumab Biosimilar Patient Registry Data",
+     "source": "ACR Open Rheumatol. 2019; 1(8): 480-4",
+     "year": 2019,
+     "url": "https://doi.org/10.1002/acr2.11067",
+     "ack": "The authors would also like to acknowledge the medical writing and editorial support provided by Dr. Hetal Shah, Founder & Principal Consultant, MeWriT™ from Ahmedabad, India, in the preparation and revision of this manuscript in collaboration with all the authors and reviewers, and in styling the article as per journal requirements. Medical Writing Support was outsourced to Dr. Hetal Shah, Founder and Principal Consultant of MeWriT (Ahmedabad, India)."
+    },
+    {
+     "authors": "Kapoor S, Kaushik VV, Jain R, Rao V, Gharia M",
+     "title": "Real-Life Tolerability and Effectiveness of Adalimumab Biosimilar in Rheumatoid Arthritis: ASPIRE Registry Data",
+     "source": "Rheumatol Ther. 2019; 6(3): 451-459",
+     "year": 2019,
+     "url": "https://link.springer.com/article/10.1007/s40744-019-0166-2",
+     "ack": "The authors would like to acknowledge the medical writing and editorial support provided by Dr. Hetal Shah, Founder & Principal Consultant of MeWriT™, from Ahmedabad, India, in the preparation of this manuscript in collaboration with all the authors and reviewers, and in revising and styling the article as per journal requirements."
+    },
+    {
+     "authors": "Anupama Ramkumar",
+     "title": "The New Pharmacovigilance Guidance In India- Diluted Wine In A Borrowed Bottle",
+     "source": "Scientific Poster presentation at the 18th annual meeting of the International Society of Pharmacovigilance (ISoP) held on 11-14 November 2018 at Geneva, Switzerland",
+     "year": 2018,
+     "url": null,
+     "ack": "We thank Dr. Hetal Shah, PhD, our Medical Writing Consultant for her support in design and layout of this poster."
+    },
+    {
+     "authors": "Jha AB, Panchal SS, Shah A",
+     "title": "Ellagic acid: Insights into its neuroprotective and cognitive enhancement effects in sporadic Alzheimer's disease",
+     "source": "Pharmacol Biochem Behav. 2018 Dec;175:33-46",
+     "year": 2018,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/30171934/",
+     "ack": "Authors would like to thank Dr. Hetal Shah, Principal Medical Writing Consultant at MeWriT Consultancy, India, for her professional editing services for this paper."
+    },
+    {
+     "authors": "Patil S",
+     "title": "Low-dose adalimumab biosimilar (ZRC-3197) in the treatment of hidradenitis suppurativa",
+     "source": "Indian J Dermatol Venereol Leprol. 2018 Nov-Dec;84(6):745-747",
+     "year": 2018,
+     "url": "http://www.ijdvl.com/article.asp?issn=0378-6323;year=2018;volume=84;issue=6;spage=745;epage=747;aulast=Patil",
+     "ack": "The author would like to thank Dr. Hetal Shah, Independent Medical Writing Consultant from Ahmedabad, India for her professional support in drafting and revising this paper."
+    },
+    {
+     "authors": "Bandyopadhyay S, et al.",
+     "title": "Comparison of efficacy of biosimilar adalimumab therapy in ankylosing spondylitis patients - 6 months vs 1 year",
+     "source": "Scientific Poster Presentation at IRACON 2017. Abstract published in Ind J Rheumatol. 2017. S16",
+     "year": 2017,
+     "url": null,
+     "ack": "The authors would like to thank Dr. Hetal Shah, Independent Medical Writing Expert from Ahmedabad, India for her professional support in data analysis and abstract writing."
+    },
+    {
+     "authors": "Bandyopadhyay S",
+     "title": "Comparison of efficacy of biosimilar adalimumab therapy in ankylosing spondylitis patients - 6 months vs 1 year",
+     "source": "ABS124. Scientific Poster Presentation at the 19th Asia Pacific League of Associations for Rheumatology Congress (APLAR 2017) on 16 - 20 October 2017; Dubai, U.A.E",
+     "year": 2017,
+     "url": null,
+     "ack": "We thank Dr Hetal Shah, Independent Consultant-Medical Writing from Ahmedabad, India for her professional support in the content development and design of this scientific poster."
+    },
+    {
+     "authors": "Rao VKR",
+     "title": "Improvement in disease activity and functional disability following treatment with biosimilar adalimumab in patients with ankylosing spondylitis",
+     "source": "Scientific Poster Presentation. Presented at the 19th Asia Pacific League of Associations for Rheumatology Congress (APLAR 2017) on 16 - 20 October 2017; Dubai, U.A.E",
+     "year": 2017,
+     "url": null,
+     "ack": "We thank Dr Hetal Shah, Independent Consultant-Medical Writing from Ahmedabad, India for her professional support in the content development and design of this scientific poster."
+    },
+    {
+     "authors": "Badika A",
+     "title": "Real-life patient characteristics and treatment assessments following clinical use of biosimilar adalimumab (Exemptia™) in patients with various inflammatory arthritis conditions",
+     "source": "ABS356. Scientific Poster Presentation at the 19th Asia Pacific League of Associations for Rheumatology Congress (APLAR 2017) on 16 - 20 October 2017; Dubai, U.A.E",
+     "year": 2017,
+     "url": null,
+     "ack": "We thank Dr Hetal Shah, Independent Consultant-Medical Writing from Ahmedabad, India for her professional support in the content development and design of this scientific poster."
+    },
+    {
+     "authors": "V Kaushik, S Apparao",
+     "title": "Real-life safety profile of biosimilar adalimumab in patients with inflammatory arthritic conditions",
+     "source": "POSTER presentation at the Annual European Congress of Rheumatology (EULAR 2017); 14-17 Jun 2017; Madrid, Spain. Ann Rheum Dis 2017;76:561 (FRI0209)",
+     "year": 2017,
+     "url": "https://doi.org/10.1136/annrheumdis-2017-eular.2357",
+     "ack": "We thank Dr Hetal Shah, Independent Medical Writing Consultant from Ahmedabad, India for her professional support in preparation of this scientific poster."
+    },
+    {
+     "authors": "Dr. Syamasis Bandyopadhyay, Dr. Subhasis Dash, Dr. Abhrajit Ray, Dr. R. N. Sarkar",
+     "title": "Efficacy and safety of adalimumab biosimilar (Exemptia) in Ankylosing spondylitis",
+     "source": "POSTER presentation at the 18th Asia Pacific League of Associations for Rheumatology Congress (APLAR 2016); 26-29 Sep 2016; Shanghai, China",
+     "year": 2016,
+     "url": null,
+     "ack": "We thank Dr Hetal Shah, Independent Medical Writing Consultant from Ahmedabad, India for her professional support in preparation of this scientific poster."
+    },
+    {
+     "authors": "Mathew AJ, Ganapati A, Kumar T S, Goel R, Sandhya P, Danda D",
+     "title": "Real-life Safety Profile of ZRC3197 (Adalimumab Biosimilar) in Indian Patients with Common Rheumatic Diseases",
+     "source": "Supplement of J Assoc Physicians India. 2017 May;65:30-2",
+     "year": 2017,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/28836749/",
+     "ack": "We thank Dr Hetal Shah, Consultant Medical Writing Expert, from Ahmedabad, India, for her expert comments on this manuscript."
+    },
+    {
+     "authors": "Kapoor S",
+     "title": "Switching from Other Biologics to ZRC3197 (Adalimumab Biosimilar) in Patients with Spondyloarthropathy: A Prospective Evaluation from Real-Life Clinical Practice",
+     "source": "Supplement of J Assoc Physicians India. 2017 May;65:26-9",
+     "year": 2017,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/28836748/",
+     "ack": "We thank Dr Hetal Shah, Consultant Medical Writing Expert from Ahmedabad, India, for her professional service in drafting this paper."
+    },
+    {
+     "authors": "Bhati M, Bandyopadhyay S",
+     "title": "Efficacy and safety of an anti-CD20 monoclonal antibody (Reditux™) for the treatment of patients with moderate to severe rheumatoid arthritis following the failure of conventional synthetic disease-modifying anti-rheumatic drugs",
+     "source": "Clin Rheumatol. 2016 Aug;35(8):1931-5",
+     "year": 2016,
+     "url": "https://link.springer.com/article/10.1007/s10067-016-3332-8",
+     "ack": "We thank Dr Hetal Shah from […], Ahmedabad, India, for her professional support in drafting this manuscript."
+    },
+    {
+     "authors": "Sharma B",
+     "title": "Clinical use of ZRC3197 (Adalimumab Biosimilar) in Patients with Inflammatory Arthritis: A Real-life Experience",
+     "source": "Supplement of J Assoc Physicians India. 2017 May;65:22-5",
+     "year": 2017,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/28836747/",
+     "ack": "We thank Dr Hetal Shah, Consultant Medical Writing Expert from Ahmedabad, India, for her professional service in drafting this manuscript."
+    }
+   ]
+  },
+  {
+   "id": "papers",
+   "label": "Research papers",
+   "line": "Original research",
+   "items": [
+    {
+     "authors": "Rozenman Y, Schwartz RS, Shah H, Parikh KH",
+     "title": "Wireless acoustic communication with a miniature pressure sensor in the pulmonary artery for disease surveillance and therapy of patients with congestive heart failure",
+     "source": "J Am Coll Cardiol 2007; 49: 784-9",
+     "year": 2007,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/17306708/"
+    },
+    {
+     "authors": "Shah HD, Parikh KH, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah JN, Shah KJ, Iyer S, Goyal RK",
+     "title": "Beneficial Effects Of Addition Of Fenofibrate To Statin Therapy In Patients with Acute Coronary Syndrome After Percutaneous Coronary Interventions",
+     "source": "Exp Clin Cardiol 2007, 12: 91-6",
+     "year": 2007,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/18650989/"
+    },
+    {
+     "authors": "Parikh KH, Chag MC, Shah KJ, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah JN, Shah HD, Goyal RK",
+     "title": "Intracoronary boluses of adenosine and sodium nitroprusside in combination reverses slow/no-reflow during angioplasty: a clinical scenario of ischemic preconditioning",
+     "source": "Can J Physiol Pharmacol 2007; 85: 476-82",
+     "year": 2007,
+     "url": "https://www.researchgate.net/publication/6224504_Intracoronary_boluses_of_adenosine_and_sodium_nitroprusside_in_combination_reverses_slow_no-reflow_during_angioplasty_A_clinical_scenario_of_ischemic_preconditioning"
+    },
+    {
+     "authors": "Parikh KH, Shah HA, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah JN, Goyal RK",
+     "title": "Efficacy of PercuSurge in Acute myocardial Infarction patients undergoing Revascularization with a special emphasis on Procedural time",
+     "source": "Ind Heart J 2008; 60: 101-9",
+     "year": 2008,
+     "url": "https://www.researchgate.net/publication/24011878_Efficacy_of_PercuSurge_in_acute_myocardial_infarction_patients_undergoing_revascularization_with_a_special_emphasis_on_procedural_time"
+    }
+   ]
+  },
+  {
+   "id": "chapters",
+   "label": "Book chapters",
+   "line": "Chapters in books",
+   "items": [
+    {
+     "authors": "Shah HD, Parikh KH, Goyal RK",
+     "title": "Recent Trends in Antiplatelet Therapy for Acute Coronary Syndromes: Glycoprotein IIb/IIIa receptor antagonists",
+     "source": "In Pharmacotherapy of Heart Failure by S K Gupta 2005; 102:22",
+     "year": 2005,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD",
+     "title": "Stem Cell Therapy in ACS: Type, timing and promise",
+     "source": "In The Post Graduate Medicine-2006",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HA",
+     "title": "A Year in Percutaneous Interventions",
+     "source": "In Cardiology Update 2006",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Goyal RK, Parikh KH, Shah HA",
+     "title": "An Overview on the Management of Chronic Refractory Angina Pectoris",
+     "source": "In Proceedings of International Symposium on RACS 2008: Pg 135-153",
+     "year": 2008,
+     "url": null
+    }
+   ]
+  },
+  {
+   "id": "reviews",
+   "label": "Review articles",
+   "line": "Reviews",
+   "items": [
+    {
+     "authors": "Goyal RK, Parikh KH, Shah HA",
+     "title": "First-in-man Clinical Trials in India",
+     "source": "CV Network Online 2007; 6(3): 46",
+     "year": 2007,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HA",
+     "title": "Investigational Treatments and future directions in heart failure",
+     "source": "Cardiology Today 2007; 12: 96-103",
+     "year": 2007,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Tanna MT, Shah HA, Shah AR",
+     "title": "Basics of Stem Cell Therapy in Heart Failure",
+     "source": "Cardiology Today 2007; 12: 104-114",
+     "year": 2007,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Goyal RK",
+     "title": "Nesiritide-A recombinant human BNP as a therapy for decompensated heart failure",
+     "source": "Ind J Pharmacol 2005; 37: 196-7",
+     "year": 2005,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Goyal RK",
+     "title": "Angiogenesis: A novel approach for future therapy",
+     "source": "Indian J Pharmac Edu 2004;38(2)",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Goyal RK",
+     "title": "Glycoprotein IIb/IIIa receptor and its inhibition: A platelet directed therapeutic strategy",
+     "source": "Ind J Pharmacol 2004; 36 (3): 133-9",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah HD",
+     "title": "Novel Agents in Osteoporosis",
+     "source": "Ind J Pharmacol 2004; 36 (1):48-9",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Goyal RK",
+     "title": "Novel anti-obesity agents",
+     "source": "Ind J Pharmacol 2002;34(5):372 - 3",
+     "year": 2002,
+     "url": null
+    }
+   ]
+  },
+  {
+   "id": "congress",
+   "label": "Congress presentations",
+   "line": "Abstracts, posters and talks at scientific congresses",
+   "items": [
+    {
+     "authors": "Parikh KH, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah HD, Goyal RK",
+     "title": "Beneficial Effects Of Distal Protection Device In Reducing The Use Of Intracoronary Vasodilators And Glycoprotein IIb/IIIa Receptor Antagonists During Percutaneous Coronary Interventions",
+     "source": "Poster Presentation at Annual Conference of Society of Cardiovascular Angiography and Interventions (SCAI), San Diego, May 2004. Catheter Cardiovasc Interven 2004; 62: pg 90",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Goyal RK",
+     "title": "Revascularization In Acute Myocardial Infarction Using Percusurge In Distal Protection (RAPID)",
+     "source": "Poster Presentation at Annual Conference of Society of Cardiovascular Angiography and Interventions (SCAI), San Diego, May 2004. Catheter Cardiovasc Interven 2004; 62: pg 116",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah HD, Goyal RK",
+     "title": "Improvement In Mace By Sequential Administration Of Boluses Of Intracoronary Adenosine And Sodium Nitroprusside During Percutaneous Coroanry Interventions",
+     "source": "Poster Presentation at Annual Conference of Society of Cardiovascular Angiography and Interventions (SCAI), San Diego, May 2004. Catheter Cardiovasc Interven 2004; 62: pg 130-131",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Iyer S, Shah K, Parikh K, Chag M, Shah U, Baxi H, Chandarana A, Naik A, Goyal RK",
+     "title": "Effect of Statins in combination with fenofibrate in patients after percutaneous transluminal coronary angioplasty",
+     "source": "Ind J Pharmacol 2004; 36(2): pg 113",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah H, Iyer S, Mehta K, Parikh K, Jain A, Goyal RK",
+     "title": "Pharmaco-epidemiology and risk factors of Hypertension in western Gujarat",
+     "source": "Ind J Pharmacol 2003:35(4), pg. 277",
+     "year": 2003,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Parikh KH, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Patel GT, Mathan G, Shah JN, Goyal RK",
+     "title": "Association of White Blood cell count with the occurrence of slow/no reflow in acute coronary syndrome patients undergoing PCI",
+     "source": "Poster presentation at Joint International Conference of ISHR and IACS, Jan 2005, Gujarat, India",
+     "year": 2005,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Parikh KH, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Patel GT, Mathan G, Shah JN, Goyal RK",
+     "title": "Efficacy of PercuSurge Guardwire system in acute myocardial patients undergoing Primary / rescue PCI",
+     "source": "Oral presentation at Joint International Conference of ISHR and IACS, Jan 2005, Gujarat, India",
+     "year": 2005,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, Chag MC, Shah UG, et al.",
+     "title": "Improvement In Mace By Sequential Administration Of Boluses Of Intracoronary Adenosine And Sodium Nitroprusside During Percutaneous Coronary Interventions",
+     "source": "(Poster Presentation at Annual Congress) European Society of Cardiology, 2004, Munich, Germany",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Chag MC, Shah HD, Joshi MV, Parikh KH, Shah UG, et al.",
+     "title": "Renal artery stenting is safe and effective modality of treatment on Mid Term Follow Up",
+     "source": "Poster Presentation at 56th Annual Conference of The Cardiological Society of India (CSI) at Bangalore, December 2004",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Chag MC, Parikh KH, Shah UG, Baxi HA, Chandarana AH, Naik AM, Shah JN, Shah HD, Shah KJ, Goyal RK",
+     "title": "Increased Lipoprotien(a) as a strong risk factor for Coronary artery disease and the effect of Niacin amongst Indians",
+     "source": "Oral Presentation at 56th Annual Conference of The Cardiological Society of India (CSI) at Bangalore, December 2004",
+     "year": 2004,
+     "url": null
+    },
+    {
+     "authors": "Shah HD, Goyal RK, Parikh KH",
+     "title": "Intracoronary Boluses Of Adenosine And Sodium Nitroprusside Combination Reverses Slow/No Reflow During Angioplasty: A Clinical Scenario of Experimental Preconditioning",
+     "source": "Oral and Poster presentation at the Young Investigator’s Awards competition, American College of Cardiology Conference, March 2006",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, et al.",
+     "title": "First in Man:PAPIRUS - Monitoring Pulmonary artery Pressure by Implantable device Responding to Ultrasonic Signals",
+     "source": "Oral presentation at the Late breaking Clinical trials session at ACC-i2 summit, American College of Cardiology Conference, March 2006",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, et al.",
+     "title": "First in Human Implanted Device in Pulmonary Artery Using Acoustic Telemetry Based On Non-Invasive Ultrasound Activation and Communication",
+     "source": "American College of Cardiology Conference, March 2006 (e Poster Presentation)",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, et al.",
+     "title": "Effect Of Metoprolol XL on Pulmonary Artery Pressure In Patients With Heart Failure Measured Using First In Human Implantable Device Responding To Ultrasonic Signal",
+     "source": "American College of Cardiology Conference, March 2006 (Poster Presentation). J Am Coll Cardiol 2006; 47: 310A",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HD, et al.",
+     "title": "Effect Of Metoprolol XL On Diurnal Variation In Pulmonary Artery Pressure Measured Non-invasively Using First In Human Implant Responding To Ultrasonic Signals",
+     "source": "American College of Cardiology Conference, March 2006 (Poster Presentation). J Am Coll Cardiol 2006; 47: 370A",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Banai S, Keren G, Sievert H, Seth A, Ben Muvhar S, Naik AM, Medina A, Chandra P, Shah H, Parikh KH",
+     "title": "First in Man: Coronary Sinus Narrowing with a Reducer Stent - A Possible Alternative Percutaneous Treatment for Patients with Refractory Angina",
+     "source": "American College of Cardiology Conference, March 2006 (Poster Presentation). J Am Coll Cardiol; 47: 17B",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh K, Shah HA, Naik AM, Baxi HB, Chag MC, Chandarana AH, Hjalmarson A, Rozenman Y",
+     "title": "First in man: measurement of diurnal variation in pulmonary artery systolic and diastolic pressure in heart failure patients using an innovative implantable device responding to ultrasonic signals",
+     "source": "Presented at Annual conference of European Society of Cardiology- World Congress of Cardiology, September 2006, Spain (Poster Presentation). Eur Heart J 2006; 27 (Abstract Supplement): 485",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh K, Shah HA, Naik AM, Baxi HB, Chag MC, Chandarana AH, Hjalmarson A, Rozenman Y",
+     "title": "First in Man: non-invasive measurement of variation in pulmonary artery pressure following exercise in heart failure patients using an innovative implantable device involving acoustic telemetry",
+     "source": "Presented at Annual conference of European Society of Cardiology-World Congress of Cardiology, September 2006, Spain (Poster Presentation) Eur Heart J 2006; 27 (Abstract Supplement): 949",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh K, Shah HA, Naik AM, Baxi HB, Chag MC, Chandarana AH, Hjalmarson A, Rozenman Y",
+     "title": "First in man: effect of metoprolol CR/XL on exercise capacity and subsequent variation in Pulmonary Artery Pressure in Heart Failure patients using an innovative implant involving acoustic telemetry",
+     "source": "Presented at Annual conference of European Society of Cardiology-World Congress of Cardiology, September 2006, Spain (Poster Presentation) Eur Heart J 2006; 27 (Abstract Supplement): 949",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh K, Shah HA, Naik AM, Baxi HB, Chag MC, Chandarana AH, Hjalmarson A, Rozenman Y",
+     "title": "First in man non-invasive monitoring of pulmonary artery pressure from an implantable device using acoustic telemetry: a one-year follow-up data",
+     "source": "Presented at Annual conference of European Society of Cardiology-World Congress of Cardiology, September 2006, Spain (Poster Presentation) Eur Heart J 2006; 27 (Abstract Supplement): 202",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Chag MC, Shah HA, Naik AM, et al.",
+     "title": "First-In-Man: comparison of ImPressure device measuring pulmonary artery pressure non-invasively with conventional contrast echocardiography In Congestive Heart Failure",
+     "source": "Presented at Annual conference of European Society of Cardiology-World Congress of Cardiology, September 2006, Spain (Poster Presentation). Eur Heart J 2006; 27 (Abstract Supplement): 202",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Shah H, Goyal RK, Naik AM, Baxi HA, Chag MC, Hjalmarson A, Rozenman Y, Parikh KH",
+     "title": "First in Man study: effect of Metoprolol CR/XL on diurnal variation in pulmonary artery pressure assessed non-invasively using an innovative implantable device responding to ultrasonic signals",
+     "source": "Presented at Annual conference of European Society of Cardiology- World Congress of Cardiology, September 2006, Spain (Poster Presentation) Eur Heart J 2006; 27 (Abstract Supplement): 344",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Naik AM, Shah HA, Chandarana AH, Chag MC, Shah UG, Baxi HA, Shah JN, Medina A, Bania S",
+     "title": "First-in Man: Direct Comparison of Conventional Coronary Sinus Angiography And CT Angiography For Visualization And Sizing Of Coronary Sinus",
+     "source": "Presented at 18th annual International Symposium of Transcatheter Cardiovascular Therapeutics (TCT) 2006, Washington, DC (ePoster)",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Parikh KH, Shah HA, Chandarana AH, Naik AM, Chag MC, Shah UG, Baxi HA, Shah JN, Medina A, Bania S",
+     "title": "First-in Man: MultiSlice CT Angiography Visualization Of An Innovative First-in-man Coronary Sinus Reducer Stent In Patients With Refractory Angina",
+     "source": "Presented at 18th annual International Symposium of Transcatheter Cardiovascular Therapeutics (TCT) 2006, Washington, DC (ePoster)",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "HA Shah, JN Shah, AH Chandarana, MC Chag, UG Shah, HA Baxi, AM Naik, KH Parikh, RK Goyal",
+     "title": "Association between the White Blood Cell Count and Occurrence of Slow or No Reflow Phenomenon in Patients with Acute Coronary Syndromes in the coronary Interventional Era",
+     "source": "Accepted at Annual Conference of The Cardiological Society of India (CSI-2006). Ind Heart J 2006; 58: 436",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "HA Shah, MC Chag, MP Tanna, UG Shah, HA Baxi, et al.",
+     "title": "Incidences and Clinical Characteristics of No Reflow after Percutaneous Coronary Interventions in High Risk Asian Indian Patients",
+     "source": "Presented at Annual Conference of The Cardiological Society of India (CSI- 2006). Ind Heart J 2006; 58: 418",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "KH Parikh, HA Shah, UG Shah, HA Baxi, AH Chandarana, et al.",
+     "title": "Initial Clinical experience with Bivalirudin as an anticoagulant during percutaneous coronary interventions in Asian Indian patients",
+     "source": "Presented at Annual Conference of The Cardiological Society of India (CSI-2006). Ind Heart J 2006; 58: 435-6",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "KH Parikh, HA Shah, JN Shah, UG Shah, HA Baxi, AH Chandarana, AM Naik, RK Goyal, MC Chag",
+     "title": "Prospective randomized study of PercuSurge in Acute Myocardial Infarction Patients undergoing Revascularization with a special Emphasis on Procedural Time: A Two Year Follow-up",
+     "source": "Presented at Annual Conference of The Cardiological Society of India (CSI-2006). Ind Heart J 2006; 58: 417-8",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Chandarana AH, Shah JN, Shah HA, Shah UG, Baxi HA, Naik AM, Joshi M, Goyal RK, Parikh KH, Chag MC",
+     "title": "High Prevalence Of Renal Artery Stenosis In Hypertensive Patients With Triple Vessel Coronary Artery Disease: Recommendation For Simultaneous Renal Arteriogram For Earlier Intervention",
+     "source": "Presented at Annual Conference of The Cardiological Society of India (CSI-2006). Ind Heart J 2006; 58:454",
+     "year": 2006,
+     "url": null
+    },
+    {
+     "authors": "Shah HA, Naik AM, Baxi HA, Chag MC, Shah UG, Chandarana AH, Goyal RK, Rozenman Y, Parikh KH",
+     "title": "First-in-man: effect of Metoprolol CR/XL uptitration on pulmonary artery pressure and its variation in chronic heart failure monitored non-invasively by an implanted device using ultrasonic signals",
+     "source": "Accepted for Oral Presentation at European Society of Cardiology Congress, September 2007 - Austria",
+     "year": 2007,
+     "url": null
+    }
+   ]
+  }
+ ]
+}
