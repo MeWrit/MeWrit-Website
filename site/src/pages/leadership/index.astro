@@ -1,0 +1,45 @@
+---
+// Leadership: the people who lead MeWriT, each as a wide card (portrait, name, role, what they do, a
+// few credentials, and a way to reach them; Dr Hetal's full profile has its own page). The header's
+// Leadership item leads here (data/site.ts nav). Words: src/data/leadership.ts; styles:
+// src/styles/leadership.css.
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import BackLink from '../../components/BackLink.astro';
+import { leadership } from '../../data/leadership';
+import { site } from '../../data/site';
+import hetal from '../../assets/hetal-shah.png';
+import { href } from '../../lib/url';
+import '../../styles/leadership.css';
+---
+<Base title={`${leadership.title} | ${site.name}`} description="Dr Hetal Shah, Founder and Director, and Dr Amit Shah, Chief Medical Expert: the people who lead MeWriT's medical writing, training and healthcare consulting." foot="film" page="leadership">
+  <div class="ld-page">
+    <header class="ld-head">
+      <div><BackLink /></div>
+      <p class="ld-kicker">MeWriT</p>
+      <h1 class="ld-title">{leadership.title}</h1>
+      <p class="ld-line">{leadership.line}</p>
+    </header>
+    <div class="ld-list">
+      {leadership.leaders.map(l => (
+        <article class="ld-card" id={l.id} aria-labelledby={`${l.id}-name`}>
+          <div class="ld-face">
+            {l.photo
+              ? <Image src={hetal} alt={l.name} widths={[320, 440, 622]} sizes="(min-width: 900px) 420px, calc(100vw - 32px)" loading="eager" />
+              : <div class="ld-initials" role="img" aria-label={`${l.name} (portrait to come)`}><span aria-hidden="true">{l.initials}</span></div>}
+          </div>
+          <div class="ld-copy">
+            <h2 id={`${l.id}-name`}>{l.name}</h2>
+            <p class="ld-role">{l.role}</p>
+            {l.bio.map(p => <p class="ld-bio">{p}</p>)}
+            <ul class="ld-chips" aria-label="Credentials">{l.chips.map(c => <li>{c}</li>)}</ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href={href('/contact/')}>Get in touch</a>
+              {l.profile && <a class="btn btn-outline" href={href(l.profile)}>Full profile</a>}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</Base>

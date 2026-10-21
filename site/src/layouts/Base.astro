@@ -20,12 +20,14 @@ import '../styles/responsive.css';
 import '../styles/nav-variants.css';
 import '../styles/nav-experiments.css';
 import '../styles/theme-dark.css';
+import '../styles/buttons.css';
 import Intro from '../components/Intro.astro';
 import SiteLoader from '../components/SiteLoader.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteFoot from '../components/SiteFoot.astro';
+import SiteMenu from '../components/SiteMenu.astro';
 import QuickContact from '../components/QuickContact.astro';
 import PhoneDock from '../components/PhoneDock.astro';
 import CapsuleMenu from '../components/CapsuleMenu.astro';
@@ -50,11 +52,13 @@ interface Props {
 // on paper, then gliding into the header); "wait": the page reports its progress and says when it is
 // ready (window.mewritLoader), otherwise the loader waits for the page's own load
 const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page, foot = 'site', loader } = Astro.props;
+// the film's pages have their own phone menu (SiteMenu.astro: data-phone "sheet"), unless a page asks otherwise
+const phoneV = foot === 'film' && !Astro.props.phone ? 'sheet' : phone;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.includes('/archive/');   // previews and the archive stay out of search results
 ---
 <!doctype html>
-<html lang="en" data-intro={intro} data-nav={nav} data-phone={phone} data-theme={theme} data-page={page} data-foot={foot}>
+<html lang="en" data-intro={intro} data-nav={nav} data-phone={phoneV} data-theme={theme} data-page={page} data-foot={foot}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -75,6 +79,9 @@ const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.incl
   d.classList.add('js');
   var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
   var stat = /[?&]static\b/.test(q), skip = /[?&]nointro\b/.test(q);
+  if (/[?&]vtslow\b/.test(q)) d.classList.add('vt-slow');   // review switch: the move between pages four times slower (base.css)
+  var hd = (q.match(/[?&]hd=(\w+)/) || [])[1];
+  if (hd) d.setAttribute('data-hd', hd);   // review switch: the header's shade on the film's pages (foot.css)
   if (stat) d.classList.add('static');
   var anim = d.getAttribute('data-intro');
   if (!reduce && !stat && !skip) {
@@ -125,6 +132,7 @@ const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.incl
   <slot />
 </main>
 {foot === 'film' ? <SiteFoot /> : <SiteFooter />}
+{foot === 'film' && <SiteMenu />}
 <QuickContact float={Astro.url.pathname.includes('/archive/')} bar={foot !== 'film'} />
 <PhoneDock />
 <CapsuleMenu />

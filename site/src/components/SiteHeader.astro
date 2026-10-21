@@ -9,6 +9,11 @@ import { nav } from '../data/site';
 import { href } from '../lib/url';
 
 const logoBase = href('/brand/logo-base.png');
+// an item that is a page of its own (Leadership) is marked on that page and the pages under it; the
+// film's places (/#who ...) are marked by experience.js as the reader comes to them (data-nav-key)
+const here = Astro.url.pathname;
+const isHere = (to?: string) => !!to && !to.includes('#') && /^\//.test(to) && to !== '/' && here.startsWith(href(to));
+const ext = { target: '_blank', rel: 'noopener' };
 ---
 <header class="site-header" id="siteHeader">
   <div class="wrap">
@@ -30,10 +35,14 @@ const logoBase = href('/brand/logo-base.png');
       <ul>
         {nav.map(item => 'items' in item ? (
           <li class="has-dd" data-key={item.key}>
-            <button aria-expanded="false" aria-controls={item.id}>{item.label}</button>
+            {/* (an entry with a place of its own leads there, its panel opening on the pointer; one without
+                opens its panel when pressed) */}
+            {item.href
+              ? <a class="dd-top" href={href(item.href)} data-nav-key={item.key}>{item.label}</a>
+              : <button aria-expanded="false" aria-controls={item.id}>{item.label}</button>}
             <div class="dd" id={item.id}>
-              {item.items.map(link => (
-                <a href={href(link.href)}>
+              {item.items.map((link, j) => (
+                <a href={href(link.href)} data-nav-practice={item.id === 'dd-practices' ? j : undefined}>
                   <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
                   <strong>{link.label}</strong><span>{link.note}</span>
                 </a>
@@ -41,7 +50,7 @@ const logoBase = href('/brand/logo-base.png');
             </div>
           </li>
         ) : (
-          <li data-key={item.key}><a href={href(item.href)}>{item.label}</a></li>
+          <li data-key={item.key}><a href={href(item.href)} data-nav-key={item.key} aria-current={isHere(item.href) ? 'page' : undefined} {...(item.ext ? ext : {})}>{item.label}{item.ext && <span class="ext" aria-hidden="true">↗</span>}</a></li>
         ))}
       </ul>
       {/* nav lab, heartbeat rail: the trace the links sit on, and the logo's pen that writes on it */}
@@ -49,7 +58,7 @@ const logoBase = href('/brand/logo-base.png');
       <img class="rail-pen" src={href('/brand/pen-cutout.png')} alt="" aria-hidden="true">
     </nav>
     <AskBar />
-    <a class="btn btn-primary header-cta" href={href('/contact/')}>Get in touch</a>
+    <a class="btn btn-primary header-cta" href={href('/contact/')}><span class="cta-l">Get in touch</span><span class="cta-s">Contact</span></a>
     <button class="menu-btn" id="menuOpen" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       <span class="menu-label">Menu</span>

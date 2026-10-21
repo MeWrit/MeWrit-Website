@@ -1,0 +1,26 @@
+---
+// The way back from an inner page (the user, 2026-10-21: every inner page leads back to the page the
+// reader came from, or to the home page). Arriving from another page of this site, it reads Back and
+// goes back to it (to the very place on the home page's film: experience.js keeps it); arriving from
+// elsewhere, or opened fresh, it reads Home and goes there. Without scripts it is Home. `dark`: on a dark
+// ground. Styles: src/styles/back-link.css.
+import { href } from '../lib/url';
+import '../styles/back-link.css';
+
+interface Props { dark?: boolean }
+const { dark = false } = Astro.props;
+---
+<a class:list={['bk', { 'bk-dark': dark }]} href={href('/')} data-back><span class="bk-arrow" aria-hidden="true">←</span><span class="bk-t">Home</span></a>
+<script is:inline>
+(function () {
+  var a = document.currentScript.previousElementSibling, from = null;
+  try { from = new URL(document.referrer); } catch (e) { return; }
+  if (from.origin !== location.origin || from.pathname === location.pathname || history.length < 2) return;
+  a.querySelector('.bk-t').textContent = 'Back';
+  a.setAttribute('aria-label', 'Back to the previous page');
+  a.addEventListener('click', function (e) {
+    if (e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault(); history.back();
+  });
+})();
+</script>

@@ -13,7 +13,7 @@
 // The words are real page content: they read in order without the 3D.
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { experience } from '../data/experience';
+import { experience, practicePages } from '../data/experience';
 import { practices } from '../data/pitch';
 import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
 import { site, contact } from '../data/site';
@@ -33,9 +33,15 @@ const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const letters = (t: string) => t.split(' ').map(word => [...word].map(ch => ({ ch, d: Math.round(rnd() * 560) })));
 const pad = (j: number) => String(j + 1).padStart(2, '0');
 const fulls = practices.list.map(p => p.full);
+// where a link can land in the film (/#who, /#training, ...: the menus' links, experience.js): the intro's
+// scenes by their own names, and each practice's first scene by the practice's address
+const anchorOf = (s: { id: string; chapter: number }, i: number) =>
+  ['who', 'why', 'practices'].includes(s.id) ? s.id
+    : s.chapter >= 0 && SCENES.findIndex(x => x.chapter === s.chapter) === i ? practicePages[s.chapter] : undefined;
 ---
 <Base intro="none" theme="light" foot="film" loader="wait" title={`${experience.title} | ${site.name}`} description={experience.description}>
-  <section class="xp" id="xp" aria-label={experience.title} style={`--units:${SCENES.length}`}>
+  {/* (data-foot-auto: at the film's end the foot opens by itself, on this page only: foot.js) */}
+  <section class="xp" id="xp" aria-label={experience.title} style={`--units:${SCENES.length}`} data-foot-auto>
     <canvas class="xp-canvas" aria-hidden="true"></canvas>
     <div class="xp-track">
       <div class="xp-stage">
@@ -47,14 +53,14 @@ const fulls = practices.list.map(p => p.full);
           {SCENES.map((s, i) => {
             const w = words[i], Tag = i === 0 ? 'h1' : 'h2';
             return (
-              <article class="xp-scene" id={s.id === 'practices' ? 'practices' : undefined} data-scene={s.id} data-light={s.light ? 'day' : 'night'} data-layout={s.layout || 'right'}>
+              <article class="xp-scene" id={anchorOf(s, i)} data-scene={s.id} data-light={s.light ? 'day' : 'night'} data-layout={s.layout || 'right'}>
                 <div class="xp-col xp-col-a">
                   <p class="xp-kicker"><span class="sr-only">{w.kicker}</span><span class="xp-kick" aria-hidden="true">{w.kicker}</span></p>
                   <Tag class="xp-title"><span class="sr-only">{w.title}</span><span aria-hidden="true">{letters(w.title).map((word, wi) => <>{wi > 0 && ' '}<span class="w">{word.map(l => <span class="c" style={`--d:${l.d}`}>{l.ch}</span>)}</span></>)}</span></Tag>
                 </div>
                 <div class="xp-col xp-col-b">
                   <p class="xp-text">{w.text}</p>
-                  {w.lead && <p class="xp-lead"><Image class="xp-face" src={portrait} alt="" width={96} height={96} />{w.lead}</p>}
+                  {w.lead && <a class="xp-lead" href={href('/leadership/hetal-shah/')}><Image class="xp-face" src={portrait} alt="" width={96} height={96} /><span>{w.lead} <b aria-hidden="true">→</b></span></a>}
                   {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map((f, j) => {
                     // the figure, and its count up (experience.js): the running count over an unseen copy
                     const v = f.value.replace(/\+$/, '');
@@ -64,7 +70,7 @@ const fulls = practices.list.map(p => p.full);
                   {w.hint && <p class="xp-pickhint">{w.hint}</p>}
                   {w.docs && <ul class="xp-docs" aria-label="What it covers">{w.docs.map(d => <li>{d}</li>)}</ul>}
                   {w.hub && <>
-                    <div class="btn-row xp-cta"><button class="btn btn-primary xp-explore" type="button">Explore all five <b aria-hidden="true">{'→'}</b></button></div>
+                    <div class="btn-row xp-cta"><button class="btn btn-primary xp-explore" type="button">Explore all five</button></div>
                     {/* each practice a tile: its number, its shape (the 3D, set in the tile's art by experience.js), its name and what it covers; on phones a sixth tile goes to all five */}
                     <ol class="xp-tiles" aria-label="The five practices">
                       {CHAPTERS.map((c, j) => <li><button class="xp-tile" type="button" data-practice={j}><span class="n">{pad(j)}</span><span class="xp-tile-art" aria-hidden="true"></span><span class="t">{c}</span><span class="f">{fulls[j]}</span><b aria-hidden="true">{'→'}</b></button></li>)}

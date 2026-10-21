@@ -1,0 +1,12 @@
+/* the way back from an inner page (src/components/BackLink.astro): an outlined pill at the top of the
+   page's words, large enough to find and tap at once, quiet enough not to compete with the page */
+.bk{display:inline-flex;align-items:center;gap:10px;min-height:42px;margin:0 0 16px;padding:0 18px 0 14px;border-radius:999px;border:1.5px solid rgba(28,52,114,.32);
+  font:600 .92rem/1 var(--sans);color:#1C3472;text-decoration:none;transition:background-color .25s,border-color .25s,color .25s}
+.bk-arrow{display:inline-block;font-size:1.1rem;transition:transform .25s ease}
+@media (hover:hover){.bk:hover{border-color:#1C3472;background:rgba(28,52,114,.06)}.bk:hover .bk-arrow{transform:translateX(-3px)}}
+.bk:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
+/* on a dark ground */
+.bk-dark{border-color:rgba(242,245,252,.3);color:#F2F5FC}
+@media (hover:hover){.bk-dark:hover{border-color:rgba(242,245,252,.7);background:rgba(255,255,255,.08)}}
+.bk-dark:focus-visible{outline-color:#F2A65A}
+@media (max-width:899.98px),(pointer:coarse){.bk{min-height:46px;padding:0 20px 0 16px}}

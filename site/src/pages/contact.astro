@@ -7,6 +7,7 @@
 // scripts the form still sends, as an email from the visitor's mail app.
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import BackLink from '../components/BackLink.astro';
 import { contact, office, maps, formEndpoint } from '../data/site';
 import { CHAPTERS } from '../scripts/xp/scenes.js';
 import '../styles/contact.css';
@@ -15,10 +16,10 @@ const ext = { target: '_blank', rel: 'noopener' };
 const action = formEndpoint || `mailto:${contact.email}`;
 ---
 <Base title="Contact | MeWriT" description="Write, call or message MeWriT, or send an enquiry: regulatory writing, scientific publications, medical communications, training and AI/ML advisory. Satellite, Ahmedabad." foot="film" page="contact">
-  {/* (data-foot-stay: the foot does not open by itself at the page's end, where it would rise over the form) */}
-  <div class="ct" data-foot-stay>
+  <div class="ct">
     <section class="ct-reach" aria-labelledby="ct-title">
       <div class="ct-in">
+        <div><BackLink dark /></div>
         <p class="ct-kicker">Contact</p>
         <h1 class="ct-title" id="ct-title">Let’s talk</h1>
         <p class="ct-line">Write, call or message, whichever suits you best.</p>
@@ -66,7 +67,7 @@ const action = formEndpoint || `mailto:${contact.email}`;
         </div>
         <label class="ct-field ct-msg"><span>Message</span><textarea name="message" rows="4" required placeholder="The document or training, the timeline, anything we should know"></textarea></label>
         <div class="ct-send">
-          <button class="btn btn-primary" type="submit">Send enquiry <b aria-hidden="true">→</b></button>
+          <button class="btn btn-primary" type="submit">Send enquiry</button>
           <p class="ct-status" role="status" aria-live="polite"></p>
         </div>
         <p class="ct-note">Your details are used only to reply to you.</p>

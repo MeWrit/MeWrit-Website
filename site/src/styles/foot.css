@@ -12,6 +12,10 @@ html[data-foot="film"]::-webkit-scrollbar{display:none}
 /* (and no room kept at the page's end for the phones' contact bar, which these pages do not have: the
    foot's bar is fixed, and each page keeps clear of it itself) */
 html[data-foot="film"] body{padding-bottom:0}
+/* Dr Hetal's profile (leadership/hetal-shah.astro) in the film's frame: on the site's paper, and clear of
+   the foot's bar at its end */
+html[data-page="profile"],html[data-page="profile"] body{background:#FCF6EE}
+html[data-page="profile"] main{padding-bottom:var(--foot-gap)}
 .sf{position:fixed;left:0;right:0;bottom:0;z-index:45;color:#FCF6EE;
   --sf-bg:#1A1B3B;--sf-soft:rgba(252,246,238,.74);--sf-line:rgba(252,246,238,.14);--sf-accent:#F2A65A}
 .sf-bar{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:var(--foot-gap);padding:0 clamp(16px,4vw,48px) env(safe-area-inset-bottom,0px);
@@ -25,6 +29,16 @@ html[data-foot="film"] body{padding-bottom:0}
   font:italic 400 .95rem/1 var(--serif);color:#FCF6EE;cursor:pointer}
 .sf-toggle i{width:6px;height:6px;border-left:1.5px solid currentColor;border-top:1.5px solid currentColor;transform:translateY(2px) rotate(45deg);transition:transform .4s ease}
 .sf[data-open="true"] .sf-toggle i{transform:translateY(-2px) rotate(225deg)}
+/* back to the top (the home page's film shows it once past its opening, experience.js): just left of
+   Open, an outlined pill in the same italic, easy to find and tap (the user, 2026-10-21) */
+.sf-top{display:none;align-items:center;gap:8px;min-height:32px;margin-left:auto;padding:0 14px 0 12px;border-radius:999px;border:1px solid rgba(252,246,238,.32);background:none;
+  font:italic 400 .95rem/1 var(--serif);color:#FCF6EE;cursor:pointer;transition:background-color .2s,border-color .2s}
+.sf-top i{width:7px;height:7px;border-left:1.5px solid #F2A65A;border-top:1.5px solid #F2A65A;transform:translateY(2px) rotate(45deg)}
+.sf-top.on{display:inline-flex;animation:sfIn .4s ease both}
+.sf-top.on ~ .sf-toggle{margin-left:18px}
+@media (hover:hover){.sf-top:hover{border-color:rgba(252,246,238,.7);background:rgba(255,255,255,.08)}}
+.sf-top:focus-visible{outline:2px solid var(--sf-accent);outline-offset:3px}
+@keyframes sfIn{from{opacity:0}}
 .sf-close,.sf[data-open="true"] .sf-open{display:none}
 .sf[data-open="true"] .sf-close{display:inline}
 .sf-toggle:focus-visible,.sf a:focus-visible{outline:2px solid var(--sf-accent);outline-offset:3px}
@@ -60,6 +74,19 @@ html[data-foot="film"] body{padding-bottom:0}
 .sf-colophon{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;max-width:1180px;margin:26px auto 0;padding-top:14px;border-top:1px solid var(--sf-line);font:400 .8rem/1.4 var(--sans);color:var(--sf-soft)}
 .sf-colophon a{color:#FCF6EE;text-decoration:none;box-shadow:inset 0 -1px 0 var(--sf-accent)}
 .sf-heart{color:var(--sf-accent)}
+/* larger screens: the bar and its words step up with the header's (the user, 2026-10-21) */
+@media (min-width:1280px){
+  :root{--foot-h:48px}
+  .sf-bar{font-size:.88rem}
+  .sf-brand{font-size:1.04rem}
+  .sf-toggle,.sf-top{font-size:1.02rem}
+}
+@media (min-width:1680px){
+  :root{--foot-h:52px}
+  .sf-bar{font-size:.94rem}
+  .sf-brand{font-size:1.1rem}
+  .sf-toggle,.sf-top{font-size:1.08rem}
+}
 /* phones: the line says less (the brand, Contact, Open); the colophon is a sheet from the bottom */
 @media (max-width:760px){
   :root{--foot-h:46px}
@@ -69,33 +96,155 @@ html[data-foot="film"] body{padding-bottom:0}
   .sf-cols{grid-template-columns:1fr;gap:22px}
   .sf-card img{width:170px}
   .sf-map{height:170px}
+  .sf-top.on ~ .sf-toggle{margin-left:14px}
 }
+/* fingers (the user, 2026-10-21): on phones and touch screens the bar is a little taller and everything
+   in it and in the colophon is at least 44px to tap */
+@media (max-width:760px),(pointer:coarse){
+  :root{--foot-h:54px}
+  .sf-bar a,.sf-brand{display:inline-flex;align-items:center;min-height:44px}
+  .sf-toggle{min-height:44px}
+  .sf-top{min-height:40px;padding:0 16px 0 14px}
+  .sf-col ul{gap:0}
+  .sf-col a{display:inline-flex;align-items:center;min-height:44px}
+  .sf-addr{padding:6px 0}
+  .sf-colophon a{display:inline-block;padding:14px 0;margin:-14px 0}
+}
+/* (the bar's links above made flex keep to their own widths: the phone and email beside the brand only
+   where there is room, Contact only on phones) */
+@media (max-width:760px){.sf-bar .sf-wide{display:none}}
+@media (min-width:760.02px){.sf-bar .sf-narrow{display:none}}
 @media (prefers-reduced-motion:reduce){.sf-panel,.sf-toggle i{transition:none}}
 
 /* ---------------- the header on the film's pages ----------------
    A flat bar across the top of the screen (the user, 2026-10-21: not the floating capsule, which the
    site's loader looked bad folding into; the loader's paper now folds up into this bar,
-   site-loader.js), its words in line with the film's (the same gutter). In a soft light tone (--hd-bg),
-   not glaring white (the user, 2026-10-17) and not dark either: the logo sits on it as it is, with no
-   plate of its own (a light patch on a dark bar looked stuck on). A little translucent, so the scene
-   shows faintly through it at night and it settles into the cream by day. Its links in the site's
-   navy, Get in touch in the orange. It stays on screen through the film, the same size all the way
-   (elsewhere it slips away on the way down). */
-html[data-foot="film"]{--hd-bg:rgba(222,227,238,.9);--header-h:68px}   /* a pale mist from the navy's own hue: of the light tones tried (parchment, stone, mist) the calmest over the night */
+   site-loader.js), its words in line with the film's (the same gutter). Light, not glaring white (the
+   user, 2026-10-17) and not dark either: the logo sits on it as it is, with no plate of its own (a light
+   patch on a dark bar looked stuck on). The logo at the left; at the right, one cluster: the menu
+   (Practices, About, Academy) and Get in touch. It stays on screen through the film (elsewhere it slips
+   away on the way down), and steps up in size on larger screens. */
+/* the bar's shade: the paper's cream (2026-10-21, the user: the pale mist "just doesnt seem to work"; of
+   mist, paper, porcelain, ivory and linen side by side over the night, the dusk and the day, the logo
+   reads cleanest and warmest on the paper, as on the white it was drawn on, without white's glare).
+   Opaque, so the logo stands on one even colour. It is the loader's paper too (site-loader.css), which
+   folds up into it, and the day's sky, which it settles into */
+html[data-foot="film"]{--hd-bg:#FCF6EE;--header-h:68px}
+/* (review switch ?hd=: the other shades tried) */
+html[data-foot="film"][data-hd="mist"]{--hd-bg:rgba(222,227,238,.9)}
+html[data-foot="film"][data-hd="porcelain"]{--hd-bg:#F7F6F2}
+html[data-foot="film"][data-hd="ivory"]{--hd-bg:#FFFCF7}
+html[data-foot="film"][data-hd="linen"]{--hd-bg:#F4EEE5}
+/* (no backdrop blur: the bar is opaque, and a blur would make it the frame its menu's panels are placed
+   in, below) */
 html[data-foot="film"] .site-header,html[data-foot="film"] .site-header.is-solid{top:0;pointer-events:auto;background-color:var(--hd-bg);background-image:none;
-  -webkit-backdrop-filter:blur(12px) saturate(1.1);backdrop-filter:blur(12px) saturate(1.1);border-bottom:1px solid rgba(19,35,76,.12);box-shadow:0 6px 18px rgba(6,8,24,.12)}
+  -webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:1px solid rgba(19,35,76,.12);box-shadow:0 6px 18px rgba(6,8,24,.12)}
 html[data-foot="film"] .site-header.is-hidden{transform:none}
 html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{width:100%;max-width:none;height:var(--header-h);margin:0;padding:0 clamp(20px,6vw,104px);border-radius:0}
 html[data-foot="film"] .site-header .wrap::before,html[data-foot="film"] .site-header .wrap::after{display:none}
 html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:42px}
-@media (max-width:899.98px){
+/* below 1100px (phones, tablets, small laptops: the five entries and Get in touch need about 1100px in a
+   row) the bar is the logo, Get in touch and the menu button, which opens the tiled menu (SiteMenu.astro) */
+@media (max-width:1099.98px){
   html[data-foot="film"]{--header-h:60px}
   html[data-foot="film"] .site-header{padding-top:env(safe-area-inset-top)}
-  html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{padding:0 10px 0 16px}
+  html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{justify-content:flex-start;gap:8px;padding:0 10px 0 16px}
   html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:34px}
+  html[data-foot="film"] .nav-desktop{display:none}
+  /* on phones too, Get in touch is always there (the user, 2026-10-21): beside the menu button, which
+     is its icon only */
+  html[data-foot="film"] .header-cta{display:inline-flex;align-items:center;margin-left:auto;min-height:44px;padding:0 16px;font-size:.88rem;white-space:nowrap;box-shadow:none}
+  html[data-foot="film"] .header-cta::after{display:none}   /* (compact here: no nib, buttons.css) */
+  html[data-foot="film"] .site-header .menu-btn{display:grid;place-items:center;width:48px;height:48px;margin:0;color:#13234C}
 }
-@media (min-width:900px){
+/* (tablets and small laptops: the bar a little taller, its logo and button a little larger) */
+@media (min-width:760px) and (max-width:1099.98px){
+  html[data-foot="film"]{--header-h:68px}
+  html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{padding:0 clamp(16px,4vw,40px)}
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:40px}
+  html[data-foot="film"] .header-cta{min-height:46px;padding:0 20px;font-size:.95rem}
+}
+@media (max-width:379.98px){
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:30px}
+  html[data-foot="film"] .header-cta{padding:0 13px;font-size:.84rem}
+}
+@media (max-width:339.98px){
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:25px}
+  html[data-foot="film"] .site-header .wrap{gap:6px;padding:0 8px 0 12px}
+  html[data-foot="film"] .header-cta{padding:0 11px}
+  html[data-foot="film"] .site-header .menu-btn{width:44px}
+}
+@media (max-width:299.98px){
+  html[data-foot="film"] .header-cta .cta-l{display:none}
+  html[data-foot="film"] .header-cta .cta-s{display:inline}
+}
+@media (min-width:1100px){
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){text-shadow:none}
+  /* the entry for where the reader is (a part of the film, experience.js; or a page of its own): an orange
+     line under it, as the pointer's lens draws (the user, 2026-10-21) */
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){position:relative}
+  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{content:"";position:absolute;left:16px;right:16px;top:50%;height:2px;margin-top:15px;border-radius:2px;background:#E07A1F}
+  /* Practices leads to the five practices; its panel opens on the pointer (a chevron says so), and goes
+     once a practice in it is chosen (dd-off, site-nav.js) */
+  html[data-foot="film"] .dd-top::after{content:"";width:7px;height:7px;margin-left:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+  html[data-foot="film"] .has-dd.dd-off .dd{opacity:0;visibility:hidden;transform:translateY(-8px)}
+  /* in the panel, the practice the reader is in (experience.js): its rule orange, its number full */
+  html[data-foot="film"] .dd a[aria-current="location"]{border-top-color:#F2A65A;border-top-width:2px;padding-top:17px}
+  html[data-foot="film"] .dd a[aria-current="location"] strong{color:#fff}
+  /* the menu at the right, one cluster with Get in touch (centred in so wide a bar it stood apart from
+     both); each entry the bar's full height, so the pointer keeps its panel open on the way down to it */
+  html[data-foot="film"] .nav-desktop{margin-left:auto;margin-right:clamp(10px,1.4vw,26px)}
+  html[data-foot="film"] .nav-desktop > ul{gap:0}
+  html[data-foot="film"] .nav-desktop > ul > li{display:flex;align-items:center;height:var(--header-h)}
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){min-height:44px;padding:0 16px;font-size:1rem;font-weight:500;color:#13234C;background:none}
+  html[data-foot="film"] .nav-desktop .ext{margin-left:5px;font-size:.86em;color:#AC571D}
+  /* Get in touch with the site's nib (buttons.css), the same size scrolled or not */
+  html[data-foot="film"] .site-header .header-cta,html[data-foot="film"] .site-header.is-solid .header-cta{min-height:46px;padding:0 8px 0 20px;gap:12px}
+  /* pointing at an entry: an orange line under it, gliding from entry to entry (the lens, nav-variants.js) */
+  html[data-foot="film"] .cap-lens{height:2px;margin-top:15px;left:calc(var(--l,0px) + 16px);right:calc(var(--r,100%) + 16px);border-radius:2px;background:#E07A1F;box-shadow:none}
+  /* the practices' panel: a sheet of dusk indigo dropping from under the bar, the width of the screen, in
+     the film's own colours (the frosted glass card it was, the only glass on the site, looked out of place:
+     the user, 2026-10-21). The practices numbered, in five columns. Each entry a tall target: its name,
+     its line and an arrow, a rule over it that turns orange when pointed at */
+  html[data-foot="film"] .dd{position:fixed;left:0;right:0;top:var(--header-h);width:auto;min-width:0;max-width:none;margin:0;
+    padding:clamp(20px,3.4vh,34px) clamp(20px,6vw,104px) clamp(24px,4vh,40px);border:0;border-radius:0;
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 clamp(16px,2.2vw,40px);transform:translateY(-8px);
+    background:linear-gradient(170deg,#34315D 0%,#272552 55%,#1A1B3B 100%);-webkit-backdrop-filter:none;backdrop-filter:none;
+    box-shadow:0 28px 60px rgba(6,8,24,.34);transition:opacity .22s ease,visibility .22s,transform .3s cubic-bezier(.2,.7,.2,1)}
+  html[data-foot="film"] .has-dd:hover .dd,html[data-foot="film"] .has-dd:focus-within .dd,html[data-foot="film"] .has-dd button[aria-expanded="true"] + .dd{transform:none}
+  html[data-foot="film"] .dd a{display:grid;grid-template-columns:none;grid-template-rows:none;align-content:start;gap:8px;min-height:116px;padding:18px 4px 10px;border-radius:0;
+    border-top:1px solid rgba(242,245,252,.16);background:none;box-shadow:none;color:#F2F5FC;transition:border-color .25s}
+  html[data-foot="film"] .dd-art{display:none}
+  html[data-foot="film"] .dd strong{align-self:auto;font:500 clamp(1.1rem,.9rem + .4vw,1.3rem)/1.2 var(--serif);color:#F2F5FC}
+  html[data-foot="film"] .dd a > span:last-child{align-self:auto;font-size:.88rem;line-height:1.45;color:rgba(214,224,246,.78)}
+  html[data-foot="film"] .dd a::after{content:"→";margin-top:2px;color:#F2A65A;transition:transform .25s ease}
+  html[data-foot="film"] .dd a:is(:hover,:focus-visible){border-top-color:#F2A65A;background:none;box-shadow:none}
+  html[data-foot="film"] .dd a:is(:hover,:focus-visible)::after{transform:translateX(5px)}
+  html[data-foot="film"] .dd a:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
+  html[data-foot="film"] #dd-practices{counter-reset:dd}
+  html[data-foot="film"] #dd-practices a{counter-increment:dd}
+  html[data-foot="film"] #dd-practices a::before{content:counter(dd,decimal-leading-zero);font:600 .74rem/1 var(--sans);letter-spacing:.1em;color:#F2A65A}
+}
+/* larger screens: the bar, its logo and its words step up, so they keep their weight beside the film's
+   large type (the user, 2026-10-21: "so miniscule ... in PC"). In whole px, which experience.js reads */
+@media (min-width:1280px){
+  html[data-foot="film"]{--header-h:76px}
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:48px}
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){font-size:1.06rem}
+}
+@media (min-width:1680px){
+  html[data-foot="film"]{--header-h:84px}
+  html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:54px}
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){font-size:1.12rem;padding:0 18px}
+  html[data-foot="film"] .cap-lens{left:calc(var(--l,0px) + 18px);right:calc(var(--r,100%) + 18px)}
+  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{left:18px;right:18px}
+}
+/* (1100 to 1280px: the entries a little closer, so all five and Get in touch keep one row) */
+@media (min-width:1100px) and (max-width:1279.98px){
+  html[data-foot="film"] .nav-desktop{margin-right:8px}
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){padding:0 11px;font-size:.96rem}
+  html[data-foot="film"] .cap-lens{left:calc(var(--l,0px) + 11px);right:calc(var(--r,100%) + 11px)}
+  html[data-foot="film"] .nav-desktop > ul > li > [aria-current]:not([aria-current="false"])::before{left:11px;right:11px}
 }
 /* without scripts: the foot is the page's last block, open */
 html:not(.js) .sf{position:static}

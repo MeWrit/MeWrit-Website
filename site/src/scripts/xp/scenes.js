@@ -150,8 +150,10 @@ export const SCENES = [
   {
     id: 'close', form: F.GLOBE, chapter: -1, idle: { mode: 'pass', range: [.04, .86], every: 7, take: 3 },
     a: [[0, 2.82, 23.83], [0, 0, 0], 41, .22, -.15], b: [[0, 6.19, 25.57], [0, 1.5, 0], 39, .21, -.06],
-    // the globe, centred behind the words (the arcs to the far cities run past its box)
-    box: { c: [0, .4, 0], size: [10.6, 10.6, 10.6] }, target: { x: .3, y: .1, w: .62, h: .78 }, over: true,
+    // the globe, centred behind the words, fitted with its arcs to the far cities (they rise to 6.45 above
+    // its centre, and as it turns reach 7.27 from its axis: scratchpad globe_box.mjs), so no arc runs off
+    // the top of the screen and the globe sits low enough to stand level with the words
+    box: { c: [0, 1, 0], size: [14.6, 11.6, 14.6] }, target: { x: .3, y: .1, w: .62, h: .78 }, over: true,
     spin: .03, spinFrom: -1.27, bg: DEEP, glow: ['#1C3472', .75], orbit: 1,
     callouts: [{ at: 'home', label: 'Ahmedabad', min: 0 }, ...['London', 'Boston', 'Singapore', 'Tokyo', 'Sydney'].map((c, j) => ({ at: c, label: c, min: .5, side: j % 2 ? 'l' : 'r', facing: true }))],
     readout: [['Working with', 'Sponsors, CROs, clinicians'], ['Based in', 'Ahmedabad, India'], ['Reach', 'Global']],

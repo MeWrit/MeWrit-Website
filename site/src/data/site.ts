@@ -20,29 +20,33 @@ export const contact = {
 // `art` picks the small illustration a link gets in the floating capsule's rich panels;
 // `key` ties a top-level entry to the page section it leads to (for the nav that follows
 // where you are reading)
-export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string };
-export type NavItem = NavLink | { label: string; id: string; key?: string; items: NavLink[] };
+export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string; ext?: boolean };
+export type NavItem = NavLink | { label: string; id: string; key?: string; href?: string; items: NavLink[] };
 
-// desktop navigation (dropdowns show a short note under each link)
+// desktop navigation (the practices' dropdown shows a short note under each), in the home page's own
+// order: who we are, why MeWriT, the five practices, then the leadership and the Academy's courses; Get
+// in touch is the header's button, so no Contact link beside it (2026-10-21, the user: the old menu was
+// "redundant and a lot in the wrong place": Trainings repeated the Training practice, Contact the button;
+// then: Who we are and Why MeWriT as items of their own, not in a dropdown; Practices itself leads to the
+// five practices, its panel opening on the pointer only; Leadership for Dr Hetal and Dr Amit). Its places
+// in the home page's film (/#who, /#practices, /#regulatory-writing ...) are the ids index.astro gives
+// those scenes: experience.js opens the film there, or goes there at once on the home page, and marks
+// the item for the part of the film on screen (`key`). The phone menu (SiteMenu.astro) follows the same
+// order
 export const nav: NavItem[] = [
+  { label: 'Who we are', href: '/#who', key: 'who' },
+  { label: 'Why MeWriT', href: '/#why', key: 'why' },
   {
-    label: 'About', id: 'dd-about', key: 'about', items: [
-      { label: 'Our Leadership', note: 'Dr Hetal Shah and team', href: '/#founder', art: 'person' },
-      { label: 'Therapeutic Areas', note: '17 areas of experience', href: '/#areas', art: 'chips' },
-      { label: 'Publications', note: 'Papers, chapters, acknowledgements', href: '#', art: 'paper' },
+    label: 'Practices', id: 'dd-practices', key: 'practices', href: '/#practices', items: [
+      { label: 'Regulatory writing', note: 'Clinical trial and regulatory documentation', href: '/#regulatory-writing', art: 'protocol' },
+      { label: 'Scientific publications', note: 'Manuscripts, reviews and congress materials', href: '/#scientific-publications', art: 'chart' },
+      { label: 'Medical communications', note: 'Strategic medical communications', href: '/#medical-communications', art: 'slides' },
+      { label: 'Training', note: 'Structured workshops and the MeWriT Academy', href: '/#training', art: 'person' },
+      { label: 'AI/ML advisory', note: 'Domain expertise for AI and ML in medical writing', href: '/#ai-ml-advisory', art: 'chips' },
     ],
   },
-  {
-    label: 'Services', id: 'dd-svc', key: 'services', items: [
-      { label: 'Regulatory Documentation', note: 'Protocols, CSRs, CTD modules', href: '/#services', art: 'protocol' },
-      { label: 'Scientific Publications', note: 'Manuscripts, abstracts, posters', href: '/#services', art: 'chart' },
-      { label: 'Medical Communications', note: 'Slide decks, leaflets, grants', href: '/#services', art: 'slides' },
-      { label: 'Research Support', note: 'EC/IRB support, expert referrals', href: '/#services', art: 'check' },
-    ],
-  },
-  { label: 'Trainings', href: '/#trainings', key: 'trainings' },
-  { label: 'Gallery', href: '#' },
-  { label: 'Contact', href: '/contact/', key: 'contact' },
+  { label: 'Leadership', href: '/leadership/', key: 'leadership' },
+  { label: 'Academy', href: contact.academy, key: 'academy', ext: true },
 ];
 
 // the nav lab's experimental layouts (spine, tabs, dock, comments, corners) use these entries;

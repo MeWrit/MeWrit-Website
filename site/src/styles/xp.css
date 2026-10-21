@@ -33,7 +33,10 @@ html.xp-lock .xp-stage{opacity:0}
 .xp-nogl .xp-stage{background:radial-gradient(60% 55% at 64% 48%,#13244F 0%,#060E26 55%,#030817 100%)}
 
 /* the words of each scene, stacked in one place; the scene on screen is .on, the one leaving .was */
-.xp-scenes{position:absolute;inset:0;display:grid;align-items:center;padding:calc(var(--header-h) + 24px) clamp(24px,6vw,104px) 110px;pointer-events:none}
+/* (all the scenes share one column, which never grows past the screen: sized by its content, the column
+   took the widest of any scene's unbreakable parts, and on a narrow phone every scene ran off the right
+   edge) */
+.xp-scenes{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;padding:calc(var(--header-h) + 24px) clamp(24px,6vw,104px) 110px;pointer-events:none}
 .xp-scene{grid-area:1 / 1;justify-self:start;max-width:min(620px,46vw);opacity:0;transform:translateY(22px);transition:opacity .45s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
 .xp-scene.on{opacity:1;transform:none;pointer-events:auto;transition-delay:.12s}
 .xp-scene.was{transform:translateY(-22px)}
@@ -228,6 +231,11 @@ html.xp-day .xp-canvas{background:#FCF6EE}
    unseen copy of the figure, which keeps its room, and the plus comes in as the count lands (these
    delays go with experience.js: COUNT, and its 420 ms and 180 ms) */
 .xp-lead{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:.92rem;line-height:1.5;color:var(--xp-soft)}
+/* (the line is the way to Dr Hetal's page: an arrow after it, and pointing at it brightens it) */
+a.xp-lead{text-decoration:none;border-radius:8px;transition:color .25s}
+a.xp-lead b{display:inline-block;font-weight:400;color:#F2A65A;transition:transform .25s ease}
+@media (hover:hover){a.xp-lead:hover{color:var(--xp-ink)}a.xp-lead:hover b{transform:translateX(4px)}}
+a.xp-lead:focus-visible{outline:2px solid #F2A65A;outline-offset:4px}
 .xp-face{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 18%;box-shadow:0 0 0 2px rgba(242,245,252,.22)}
 .xp-figs{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px;margin-top:22px}
 .xp-figs li{position:relative;padding-top:12px}
@@ -293,7 +301,6 @@ html.xp-day .xp-canvas{background:#FCF6EE}
 /* the sixth tile, to all five (phones): warm, its words and arrow only */
 .xp-tile-all{display:none}
 .xp-tile-all .xp-tile{justify-content:flex-end;border-color:rgba(242,166,90,.45);background:linear-gradient(180deg,rgba(242,166,90,.06),rgba(242,166,90,.16))}
-.xp-explore b{margin-left:.35em}
 /* (no shade on this screen: the tiles are the ground for their words, and the shade would dim the shapes
    on one side) */
 .xp-stage[data-scene="practices"]:has(.xp-scene[data-layout="tiles"]) .xp-shade{opacity:0}
@@ -312,10 +319,14 @@ html.xp-day .xp-canvas{background:#FCF6EE}
 }
 
 /* Know more: to the practice's own page */
-.xp-more{display:inline-flex;align-items:center;gap:10px;margin-top:22px;min-height:44px;padding:0 20px;border:1.5px solid currentColor;border-radius:999px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:none;transition:background-color .25s,color .25s,border-color .25s}
-.xp-more b{transition:transform .25s ease}
+/* (an outlined pill with the site's nib at its end, buttons.css: a navy nib by day, a cream one by night;
+   its arrow runs out of the nib and back in when pointed at) */
+.xp-more{display:inline-flex;align-items:center;gap:12px;margin-top:22px;min-height:44px;padding:0 7px 0 20px;border:1.5px solid currentColor;border-radius:999px;font:600 .92rem/1 var(--sans);color:var(--xp-ink);text-decoration:none;transition:background-color .25s,color .25s,border-color .25s}
+.xp-more b{display:none}
+.xp-more::after{content:"";flex:none;width:30px;height:30px;border-radius:50%;background:var(--nib,#FCF6EE) var(--ar,var(--ar-navy)) 50% 50%/15px no-repeat}
+.xp-scene[data-light="day"] .xp-more{--nib:#1C3472;--ar:var(--ar-cream)}
 .xp-scene[data-light="day"] .xp-more{color:#1C3472}
-@media (hover:hover){.xp-scene[data-light="day"] .xp-more:hover{background:#1C3472;border-color:#1C3472;color:#fff}.xp-more:hover b{transform:translateX(3px)}}
+@media (hover:hover){.xp-scene[data-light="day"] .xp-more:hover{background:rgba(28,52,114,.07)}.xp-more:hover::after{animation:btnNib .55s cubic-bezier(.5,0,.2,1)}}
 .xp-more:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
 /* the practices' bar: only among the practices */
 .xp-railnav{opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
@@ -359,6 +370,12 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-tile-all .xp-tile .t{padding-right:34px}
 }
 
+/* very narrow phones (a folding phone's cover screen, 280px): the titles a step smaller, so a long word
+   like "Submission-ready," fits, and a list's items may wrap inside themselves (their dot still ends them) */
+@media (max-width:339.98px){
+  .xp-title,.xp-scene[data-scene="open"] .xp-title{font-size:clamp(1.7rem,1.1rem + 4.4vw,2.2rem)}
+  .xp-docs li{white-space:normal}
+}
 /* phones on their side (short and wide): the words have about 300px under the header, so the type steps
    down and the practices' bar at the foot goes (the header's menu has them) */
 @media (max-height:520px) and (min-aspect-ratio:4/3){
@@ -388,7 +405,7 @@ html.xp-day .xp-canvas{background:#FCF6EE}
   .xp-points .d{display:none}
   .xp-cta .btn{min-height:34px;padding:7px 16px;font-size:.82rem}
   .xp-docs,html.xp-day .xp-docs{display:none}   /* (the paragraph names them) */
-  .xp-more{margin-top:8px;min-height:34px;padding:0 14px;font-size:.8rem}
+  .xp-more{margin-top:8px;min-height:34px;padding:0 5px 0 14px;font-size:.8rem}
 }
 
 /* the practices' tiles on a phone on its side: the title and the Explore button in one row, the five
@@ -408,6 +425,19 @@ html.xp-day .xp-canvas{background:#FCF6EE}
 /* without the 3D (or without scripts) the tiles are their words */
 :is(.xp-nogl,html:not(.js) .xp) .xp-tile-art{display:none}
 html:not(.js) .xp-scene[data-layout="tiles"]{height:auto}
+
+/* fingers (the user, 2026-10-21: a finger is fatter than a pointer): on phones and touch screens every
+   thing to tap is at least 44 to 48px tall, its look unchanged where it can be (the practices' bar stays
+   a thin line, its buttons taller around it) */
+@media (max-width:899.98px),(pointer:coarse){
+  .xp-more{min-height:48px;padding:0 9px 0 22px}
+  .xp-cta .btn{min-height:48px}
+  .xp-rail button{padding-top:16px;padding-bottom:16px}
+}
+@media (max-height:520px) and (min-aspect-ratio:4/3){
+  .xp-more{min-height:44px}
+  .xp-cta .btn{min-height:44px}
+}
 
 /* without scripts: the words in order, as a normal page */
 html:not(.js) .xp{background:#030817}

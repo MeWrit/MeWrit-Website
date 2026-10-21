@@ -1,0 +1,88 @@
+/* ---------------- the phone menu on the film's pages (src/components/SiteMenu.astro, src/scripts/site-menu.js) ----------------
+   A sheet over the whole screen. Its top is the header itself (the same bar, logo and Get in touch; the
+   menu button turned into Close), and under it, on dusk indigo, the menu drops down as tiles a finger
+   finds at once (the user, 2026-10-21: no little links): Who we are and Why MeWriT; the five practices
+   (each goes straight to its place in the film) and all five; Dr Hetal Shah and the Academy; at the foot
+   the quick ways to reach us: call, WhatsApp and email. Large targets, few words. */
+.sm{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;background:none;color:#F2F5FC;overflow:hidden}
+.sm[open]{display:flex;flex-direction:column}
+.sm::backdrop{background:transparent}
+.sm-top{flex:none;display:flex;align-items:center;gap:8px;height:calc(var(--header-h) + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 10px 0 16px;
+  background:var(--hd-bg,#FCF6EE);border-bottom:1px solid rgba(19,35,76,.12)}
+.sm-top .sm-logo{display:flex;align-items:center;min-height:48px}
+.sm-top .sm-logo img{display:block;height:34px;width:auto}
+.sm-top .btn{margin-left:auto;min-height:44px;padding:0 16px;font-size:.88rem;box-shadow:none}
+.sm-top .btn::after{display:none}   /* (compact, as the header's on phones: no nib, buttons.css) */
+.sm-close{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;color:#13234C}
+.sm-close svg{width:22px;height:22px}
+.sm-close:focus-visible{outline:2px solid #AC571D;outline-offset:2px}
+.sm-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:18px;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px));
+  background:radial-gradient(90% 60% at 15% 0%,rgba(75,68,123,.6),rgba(75,68,123,0) 70%),linear-gradient(170deg,#34315D 0%,#272552 50%,#1A1B3B 100%)}
+.sm-h{margin:0 0 10px 2px;font:600 .72rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#F2A65A}
+/* the tiles: dark glass of the film's dusk, a hairline edge, the name in the serif and an arrow in the
+   corner; at least 60px tall, the practices taller with their number over their name */
+.sm-tiles{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sm-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sm-tile{position:relative;display:flex;flex-direction:column;justify-content:center;gap:6px;height:100%;min-height:60px;padding:12px 34px 12px 14px;border-radius:16px;
+  border:1px solid rgba(242,245,252,.14);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.085));color:#F2F5FC;text-decoration:none;
+  transition:border-color .2s,background-color .2s}
+.sm-tile .t{font:500 1.04rem/1.2 var(--serif)}
+.sm-tile .n{font:600 .7rem/1 var(--sans);letter-spacing:.08em;color:#F2A65A}
+.sm-tile b{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-weight:400;color:#F2A65A;transition:transform .2s ease}
+/* (the practices' arrow beside their number, so a long name has the tile's whole width) */
+.sm-practices .sm-tile{min-height:78px;justify-content:space-between;padding-right:14px}
+.sm-practices .sm-tile b{top:9px;transform:none}
+.sm-all{border-color:rgba(242,166,90,.45);background:linear-gradient(180deg,rgba(242,166,90,.06),rgba(242,166,90,.17))}
+.sm-tile:active{background-color:rgba(255,255,255,.08);border-color:rgba(242,166,90,.6)}
+/* the tile for where the reader is (a part of the film, experience.js, or this page): an orange edge and
+   a line under its name, as the header marks it */
+.sm-tile[aria-current]{border-color:rgba(242,166,90,.75);background:linear-gradient(180deg,rgba(242,166,90,.07),rgba(242,166,90,.14))}
+.sm-tile[aria-current] .t{text-decoration:underline;text-decoration-color:#E07A1F;text-decoration-thickness:2px;text-underline-offset:5px}
+/* the quick ways to reach us, at the foot (Get in touch is in the bar above): three equal tiles */
+.sm-reach{margin-top:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sm-q{display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 8px;border-radius:16px;border:1px solid rgba(242,245,252,.18);background:rgba(255,255,255,.06);color:#F2F5FC;text-decoration:none;font:500 .9rem/1 var(--sans)}
+.sm-q svg{flex:none;color:#F2A65A}
+.sm a:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
+@media (hover:hover){.sm-tile:hover{border-color:rgba(242,166,90,.55)}.sm-q:hover{background:rgba(255,255,255,.12)}}
+/* opening: the menu drops down from under the bar, its groups following one after another; closing, it
+   rises back */
+@keyframes smDrop{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes smRise{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(0 0 100% 0)}}
+@keyframes smRow{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  .sm[open] .sm-body{animation:smDrop .42s cubic-bezier(.2,.7,.2,1) both}
+  .sm[open] .sm-body > *{animation:smRow .5s cubic-bezier(.2,.7,.2,1) both}
+  .sm[open] .sm-body > :nth-child(2){animation-delay:.05s}
+  .sm[open] .sm-body > :nth-child(3){animation-delay:.1s}
+  .sm[open] .sm-body > :nth-child(4){animation-delay:.15s}
+  .sm.closing .sm-body{animation:smRise .3s cubic-bezier(.4,0,.6,1) both}
+  .sm.closing .sm-body > *{animation:none}
+}
+/* small phones: the logo and the bar's button a little smaller, exactly as in the header (foot.css) */
+@media (max-width:379.98px){
+  .sm-top .sm-logo img{height:30px}
+  .sm-top .btn{padding:0 13px;font-size:.84rem}
+  .sm-tile .t{font-size:.98rem}
+}
+@media (max-width:339.98px){
+  .sm-top{gap:6px;padding:env(safe-area-inset-top,0px) 8px 0 12px}
+  .sm-top .sm-logo img{height:25px}
+  .sm-top .btn{padding:0 11px;font-size:.84rem}
+  .sm-close{width:44px}
+  .sm-body{padding-left:12px;padding-right:12px}
+  .sm-tile{padding:10px 28px 10px 11px}
+  .sm-practices .sm-tile{padding-right:11px}
+  .sm-tile b{right:10px}
+  .sm-tile .t{font-size:.92rem}
+  .sm-q span{display:none}
+}
+@media (max-width:299.98px){
+  .sm-top .cta-l{display:none}
+  .sm-top .cta-s{display:inline}
+}
+/* on its side, the practices in three columns, so the sheet scrolls less */
+@media (max-height:520px) and (min-aspect-ratio:4/3){
+  .sm-practices{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sm-practices .sm-tile{min-height:64px}
+  .sm-body{gap:14px}
+}

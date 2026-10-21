@@ -2,20 +2,35 @@
 *{margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h) + 16px);background:var(--page)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-/* moving between pages: the page fades across and rises a little, the capsule stays put, and Dr
-   Hetal's photo moves from the home page to her profile. Browsers without view transitions simply
-   change page. */
+/* moving between pages: a whoosh through the film's dawn (the user, 2026-10-21: "like it happens when
+   scrolling the hero"). The page swept up and away, blurring as it goes, while the sky rises behind it
+   from the night through the twilight and the dawn's pastels to the cream, and the new page sweeps up
+   into place out of it. The header and the foot's bar stay put, as they do through the film. (Dr
+   Hetal's photo no longer moves between pages on its own: the home page has no founder's photo now,
+   and alone it floated in over the page being left.) Browsers without view transitions simply change
+   page; with reduced motion there is no transition. */
 @media (prefers-reduced-motion:no-preference){
   @view-transition{navigation:auto}
-  ::view-transition-old(root){animation:.26s ease both vtOut}
-  ::view-transition-new(root){animation:.42s cubic-bezier(.2,.7,.2,1) both vtIn}
+  ::view-transition-group(root){animation-duration:1s}
+  ::view-transition-image-pair(root){
+    background:linear-gradient(to bottom,#030817 0%,#1A1B3B 18%,#3D4177 36%,#B37078 52%,#F8C4A8 66%,#FAE3D1 80%,#FCF6EE 100%);
+    background-size:100% 340%;animation:vtSky 1s cubic-bezier(.55,0,.25,1) both}
+  ::view-transition-old(root){animation:vtUp .5s cubic-bezier(.6,0,.85,.35) both}
+  ::view-transition-new(root){animation:vtIn .62s cubic-bezier(.16,.84,.24,1) .38s both}
   /* named only while a transition runs: a named element is a backdrop root, so a permanent name
-     kept the capsule's glass from blurring the page behind it */
-  html:active-view-transition .site-header{view-transition-name:capsule}
-  .founder-photo,.profile-photo{view-transition-name:founder-photo}
+     kept the capsule's glass from blurring the page behind it. Not on a page arriving under the site's
+     loader (sl-on): there the loader's paper covers them, so they go with the page (named, they stood
+     over the paper until the transition ended, then vanished) */
+  html:active-view-transition:not(.sl-on) .site-header{view-transition-name:capsule}
+  html:active-view-transition:not(.sl-on) .sf{view-transition-name:foot}
 }
-@keyframes vtOut{to{opacity:0}}
-@keyframes vtIn{from{opacity:0;transform:translateY(12px)}}
+/* (review switch ?vtslow on the page arrived at: four times slower) */
+html.vt-slow::view-transition-group(root),html.vt-slow::view-transition-image-pair(root){animation-duration:4s}
+html.vt-slow::view-transition-old(root){animation-duration:2s}
+html.vt-slow::view-transition-new(root){animation-duration:2.48s;animation-delay:1.52s}
+@keyframes vtSky{from{background-position:0 0}to{background-position:0 100%}}
+@keyframes vtUp{to{opacity:0;transform:translateY(-16vh) scale(.985);filter:blur(10px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(14vh) scale(.99);filter:blur(12px)}}
 body{font-family:var(--sans);font-size:1rem;line-height:1.6;color:var(--body);background:var(--page);
   padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom))}
 img,svg,canvas{display:block;max-width:100%}

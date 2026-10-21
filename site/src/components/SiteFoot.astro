@@ -22,6 +22,7 @@ const ext = { target: '_blank', rel: 'noopener' };
     <span class="sf-sep sf-wide" aria-hidden="true">·</span><a class="sf-wide" href={contact.phoneHref}>{contact.phoneDisplay}</a>
     <span class="sf-sep sf-wide" aria-hidden="true">·</span><a class="sf-wide" href={`mailto:${contact.email}`}>{contact.email}</a>
     <span class="sf-sep sf-narrow" aria-hidden="true">·</span><a class="sf-narrow" href={href('/contact/')}>Contact</a>
+    <button class="sf-top" type="button" aria-label="Back to the top"><i aria-hidden="true"></i><span aria-hidden="true">Top</span></button>
     <button class="sf-toggle" type="button" aria-expanded="false" aria-controls="sf-panel"><span class="sf-open">Open</span><span class="sf-close">Close</span><i aria-hidden="true"></i></button>
   </div>
   <div class="sf-panel" id="sf-panel" inert>
@@ -37,7 +38,7 @@ const ext = { target: '_blank', rel: 'noopener' };
       <div class="sf-col">
         <h3>MeWriT</h3>
         <ul>
-          <li><a href={href('/leadership/hetal-shah/')}>Dr Hetal Shah</a></li>
+          <li><a href={href('/leadership/')}>Leadership</a></li>
           <li><a href={contact.academy} {...ext}>MeWriT Academy <span aria-hidden="true">↗</span></a></li>
           <li><a href={contact.linkedin} {...ext}>LinkedIn <span aria-hidden="true">↗</span></a></li>
         </ul>

@@ -18,7 +18,7 @@ if (location.pathname !== home) document.querySelectorAll('a[href*="#"]').forEac
 // With the floating capsule on phones the capsule opens its own card instead (nav-variants.js).
 const menu = $('menu');
 $('menuOpen').addEventListener('click', () => {
-  if (root.dataset.phone === 'capsule') return;
+  if (root.dataset.phone === 'capsule' || root.dataset.phone === 'sheet') return;   // (the film's pages: site-menu.js)
   menu.showModal(); root.style.overflow = 'hidden';
 });
 const closeMenu = () => { if (menu.open) menu.close(); };

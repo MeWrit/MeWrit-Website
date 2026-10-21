@@ -73,7 +73,7 @@
 .ct-field.bad :is(input,textarea){border-color:#B42318;box-shadow:0 0 0 3px rgba(180,35,24,.1)}
 .ct-err{font:500 .78rem/1.3 var(--sans);color:#B42318}
 .ct-send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:clamp(14px,2.2vh,20px)}
-.ct-send .btn b{margin-left:.35em}
+
 .ct-status{margin:0;font-size:.88rem;line-height:1.45;color:#45506A}
 .ct-status a{color:#1C3472;font-weight:600}
 .ct-note{margin:12px 0 0;font-size:.78rem;color:#6B7183}
@@ -112,7 +112,7 @@
   .ct-way{grid-template-columns:38px auto minmax(0,1fr);align-items:center;justify-items:start;gap:0 12px;min-height:60px;padding:10px 54px 10px 12px;text-align:left}
   .ct-k{margin:0}
   .ct-v{display:block;justify-self:end;font-size:.86rem;text-align:right}
-  .ct-copy{display:grid;top:50%;right:12px;margin-top:-16px}
+  .ct-copy{display:grid;top:50%;right:10px;margin-top:-22px}
   .ct-row{grid-template-columns:1fr;gap:12px;margin-bottom:12px}
   .ct-row.ct-pair{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ct-pair .ct-field > span{font-size:.74rem}
@@ -121,6 +121,13 @@
   .ct-needs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   .ct-needs legend{grid-column:1 / -1}
   .ct-chip span{width:100%;min-height:40px;justify-content:center;padding:6px 8px;border-radius:12px;line-height:1.2;text-align:center}
+}
+/* fingers (the user, 2026-10-21): on phones and touch screens every thing to tap is at least 44px */
+@media (max-width:1023.98px),(pointer:coarse){
+  .ct-chip span{min-height:44px}
+  .ct-copy{width:44px;height:44px}
+  .ct-more{gap:0 22px}
+  .ct-more a{min-height:44px}
 }
 /* (the page's own ground, under and past its panels, is the cream) */
 html[data-page="contact"],html[data-page="contact"] body{background:#FCF6EE}

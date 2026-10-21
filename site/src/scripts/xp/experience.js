@@ -22,6 +22,23 @@ function start() {
   const articles = SCENES.map(s => sec.querySelector(`.xp-scene[data-scene="${s.id}"]`));
   const rail = [...sec.querySelectorAll('.xp-rail button')];
   const readout = sec.querySelector('.xp-readout'), note = sec.querySelector('.xp-note'), hint = sec.querySelector('.xp-hint'), callLayer = sec.querySelector('.xp-callouts');
+  // where the reader is, in the menus: the header's entry for the part of the film on screen (Who we are,
+  // Why MeWriT, Practices: data-nav-key) and, in the practices' panel and the phone menu, the practice
+  // itself (data-nav-practice), each marked aria-current="location" (styled in foot.css, site-menu.css)
+  const navKeys = [...document.querySelectorAll('[data-nav-key]')], navPractices = [...document.querySelectorAll('[data-nav-practice]')];
+  function markNav(i) {
+    const s = SCENES[i], key = s.id === 'who' || s.id === 'why' ? s.id : s.id === 'practices' || s.chapter >= 0 ? 'practices' : '';
+    navKeys.forEach(a => {
+      if (a.dataset.navKey === key) a.setAttribute('aria-current', 'location');
+      else if (a.getAttribute('aria-current') === 'location') a.removeAttribute('aria-current');
+    });
+    navPractices.forEach(a => { if (+a.dataset.navPractice === s.chapter) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+  }
+  // the foot's way back to the top (SiteFoot.astro), shown once past the opening; it goes there through
+  // the film, as a choice in the practices' list does (warpTo)
+  const topBtn = document.querySelector('.sf-top');
+  let topOn = false;
+  if (topBtn) topBtn.addEventListener('click', () => warpTo(0, 0));
   const S = SCENES.length, W = .2;   // W: half the width of a change of shape, in scenes
   const OPEN = 0, PICK = SCENES.findIndex(s => s.form === F.CHOICE);
   // the practices along the foot: the one on screen fills as its scenes go by, then empties toward
@@ -50,11 +67,11 @@ function start() {
   // a jump straight to a scene (the practices' list): the scroll goes there at once, and the film plays
   // the change on time instead (frame(): the shape becomes the scene's, the light passes through the
   // dawn, the words swap halfway, the camera flies between the two shots). Scrolling on ends it there
+  // (it lands in the scene's middle, where its shape is whole, or at P1: the top is 0)
   let warp = null;
-  function warpTo(i) {
+  function warpTo(i, P1 = i + .5) {
     if (i < 0) return;
     if (window.mewritFoot) window.mewritFoot.close();
-    const P1 = i + .5;
     if (REDUCE || !world || !loaderOut) { window.scrollTo({ top: Math.round(scrollFor(P1)), behavior: 'auto' }); return; }
     warp = { a: active >= 0 ? active : 0, b: i, P0: Pr, P1, t0: performance.now(), dur: 1800 };
     window.scrollTo({ top: Math.round(scrollFor(P1)), behavior: 'instant' });
@@ -298,6 +315,7 @@ function start() {
     articles.forEach((el, j) => { if (!el) return; el.classList.toggle('on', j === i); el.classList.toggle('was', j === prev); });
     stage.dataset.scene = SCENES[i].id;   // the close's words stand over its globe, on a stronger shade (xp.css)
     stage.dataset.sec = SCENES[i].chapter >= 0 ? 'services' : 'intro';   // the practices' bar shows only among the practices (xp.css)
+    markNav(i);
     decodeAt = performance.now();
     const ch = chapterOf(i);
     rail.forEach((b, j) => b.setAttribute('aria-current', j === ch ? 'true' : 'false'));
@@ -434,12 +452,26 @@ function start() {
   // covers the page the film waits at the top, the scroll locked; as it lifts ('mewrit:loaderout') the
   // film is put where the reader was at once (no flight from the top) and shows itself there: the dust
   // gathers into that scene's shape, and on the opening the page writes itself
+  // A link to a place in the film (/#who, /#training: the menus' links; index.astro gives those scenes
+  // their ids) opens the film there; on this page it goes there at once, through the film
+  const anchors = new Map();
+  articles.forEach((a, i) => { if (a && a.id) anchors.set(a.id, i); });
+  const sceneOf = hash => { const i = anchors.get(decodeURIComponent((hash || '').slice(1))); return i === undefined ? -1 : i; };
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[href*="#"]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const u = new URL(a.href, location.href), i = sceneOf(u.hash);
+    if (u.origin !== location.origin || u.pathname !== location.pathname || i < 0) return;
+    e.preventDefault();
+    warpTo(i);
+  });
   const PLACE = 'mewrit-home-place';
   let backTo = 0;
   try {
     const nav = ((performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {}).type;
     const s = JSON.parse(sessionStorage.getItem(PLACE) || 'null');
     if ((nav === 'reload' || nav === 'back_forward') && s && s.P > .02 && Date.now() - s.t < 1800000) backTo = Math.min(S + 1, s.P);
+    else if (sceneOf(location.hash) >= 0) backTo = sceneOf(location.hash) + .5;
   } catch (e) { /* storage off */ }
   addEventListener('pagehide', () => { try { sessionStorage.setItem(PLACE, JSON.stringify({ P: loaderOut ? Pr : backTo, t: Date.now() })); } catch (e) { /* storage off */ } });
   function loaderLifts() {
@@ -489,6 +521,7 @@ function start() {
     const rev = revAt(k, wt >= 0 && k === warp.b ? warp.P1 : P, now);
     updateWords(now, rev);
     if (hint) hint.classList.toggle('gone', Pr > .15);
+    if (topBtn && (Pr > .9) !== topOn) { topOn = Pr > .9; topBtn.classList.toggle('on', topOn); }   // (the foot's way back to the top, once past the opening)
     fills.forEach((f, j) => {
       if (!f) return;
       const [s0, s1] = spans[j], out = P >= s1;

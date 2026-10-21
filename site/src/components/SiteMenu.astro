@@ -1,0 +1,51 @@
+---
+// The phone menu on the film's pages (Base.astro renders it where foot is "film"; styles
+// src/styles/site-menu.css, script src/scripts/site-menu.js). Its top is the header (the logo, Get in
+// touch, and Close where the menu button is); under it, on dusk indigo, everything is a tile a finger
+// finds at once (the user, 2026-10-21: no little links), in the header's order: Who we are and Why
+// MeWriT; the five practices, each going straight to its place in the film (/#regulatory-writing ...:
+// experience.js), and all five; Dr Hetal Shah and the Academy; then call, WhatsApp and email.
+import Icon from './Icon.astro';
+import { contact } from '../data/site';
+import { practicePages } from '../data/experience';
+import { CHAPTERS } from '../scripts/xp/scenes.js';
+import { href } from '../lib/url';
+import '../styles/site-menu.css';
+
+const pad = (j: number) => String(j + 1).padStart(2, '0');
+const ext = { target: '_blank', rel: 'noopener' };
+const here = Astro.url.pathname;
+---
+<dialog class="sm" id="siteMenu" aria-label="Menu">
+  <div class="sm-top">
+    <a class="sm-logo" href={href('/')}><img src={href('/brand/logo-original.png')} alt="MeWriT home" width="1112" height="230"></a>
+    <a class="btn btn-primary" href={href('/contact/')}><span class="cta-l">Get in touch</span><span class="cta-s">Contact</span></a>
+    <button class="sm-close" type="button" aria-label="Close the menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <nav class="sm-body" aria-label="Menu">
+    <ul class="sm-tiles sm-two">
+      <li><a class="sm-tile" href={href('/#who')} data-nav-key="who"><span class="t">Who we are</span><b aria-hidden="true">→</b></a></li>
+      <li><a class="sm-tile" href={href('/#why')} data-nav-key="why"><span class="t">Why MeWriT</span><b aria-hidden="true">→</b></a></li>
+    </ul>
+    <div>
+      <p class="sm-h">The practices</p>
+      <ol class="sm-tiles sm-two sm-practices">
+        {CHAPTERS.map((c, j) => <li><a class="sm-tile" href={href(`/#${practicePages[j]}`)} data-nav-practice={j}><span class="n">{pad(j)}</span><span class="t">{c}</span><b aria-hidden="true">→</b></a></li>)}
+        <li><a class="sm-tile sm-all" href={href('/#practices')}><span class="n">01 to 05</span><span class="t">All five</span><b aria-hidden="true">→</b></a></li>
+      </ol>
+    </div>
+    <ul class="sm-tiles sm-two">
+      <li><a class="sm-tile" href={href('/leadership/')} aria-current={here.startsWith(href('/leadership/')) ? 'page' : undefined}><span class="t">Leadership</span><b aria-hidden="true">→</b></a></li>
+      <li><a class="sm-tile" href={contact.academy} {...ext}><span class="t">MeWriT Academy</span><b aria-hidden="true">↗</b></a></li>
+    </ul>
+    <div class="sm-reach">
+      <a class="sm-q" href={contact.phoneHref} aria-label={`Call ${contact.phoneDisplay}`}><Icon name="phone" size={18} /><span>Call</span></a>
+      <a class="sm-q" href={contact.whatsapp} {...ext} aria-label="WhatsApp"><Icon name="whatsapp" size={19} /><span>WhatsApp</span></a>
+      <a class="sm-q" href={`mailto:${contact.email}`} aria-label={`Email ${contact.email}`}><Icon name="mail" size={18} /><span>Email</span></a>
+    </div>
+  </nav>
+</dialog>
+<script>
+  import '../scripts/site-menu.js';
+  import '../scripts/site-nav.js';
+</script>
