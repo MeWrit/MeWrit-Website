@@ -1,17 +1,16 @@
-/* The experience (src/pages/experience.astro): a tall track whose stage stays pinned while the scroll
+/* The home page's film (src/pages/index.astro): a tall track whose stage stays pinned while the scroll
    carries one cloud of particles through the scenes (scenes.js): the opening, the five practices as
-   shapes to pick from, each practice standing on its own, the close, and past it a tail where the
-   shapes dissolve into dust that keeps drifting behind the rest of the page (the canvas is the
-   page's backdrop). This file runs the loading screen (the dust gathers into the opening's blank
-   page and its outline draws itself with the counter; as the screen lifts, the page writes itself),
-   maps the scroll to the scenes, flies the camera along a smooth path through every scene's shots,
-   swaps the words, pins the labels and the practices' buttons to the shapes and keeps the figures in
-   the corner. The 3D is world.js, loaded on its own so the words never wait for it; without WebGL
-   the words still follow the scroll, over a plain background.
-   Review switches: ?static skips the loading screen. Test hook: window.mewritXp. */
+   tiles to pick from, each practice standing on its own, the close. This file reports the film's
+   loading to the site's loader (SiteLoader.astro) and, as the loader lifts, puts the reader back
+   where they were (a refresh) or at the start (the dust gathers into the opening's page, which writes
+   itself); it maps the scroll to the scenes, flies the camera along a smooth path through every
+   scene's shots, swaps the words and pins the labels to the shapes. The 3D is world.js, loaded on its
+   own so the words never wait for it; without WebGL the words still follow the scroll, over a plain
+   background.
+   Review switches: ?static skips the loader. Test hook: window.mewritXp. */
 import { clamp, easeOut, scramble, REDUCE, STATIC } from '../shared.js';
 import { SCENES, TAIL } from './scenes.js';
-import { F, OUTLINE } from './formations.js';
+import { F } from './formations.js';
 
 const sec = document.getElementById('xp');
 if (sec) start();
@@ -73,11 +72,11 @@ function start() {
   const runStart = SCENES.map((s, i) => { let r = i; while (r > 0 && SCENES[r - 1].form === s.form) r--; return r; });
   // (drawn by the scene's middle, so a reader who stops there sees it whole, and its action at rest)
   const revealOf = (i, P) => { const r = runStart[i], s0 = r + (r ? W : 0), s1 = r + 1 - W; return clamp((P - s0) / ((s1 - s0) * .5)); };
-  // except the opening's page: its outline draws itself with the loading counter (keys up to
-  // OUTLINE), and as the loading screen lifts it writes itself, on time rather than scroll; the
-  // reveal runs on past 1 so the pen's glow leaves the last strokes
-  const WRITE = 3800;
-  const writeOf = now => !loaderOut ? shown / 100 * OUTLINE : !outAt || !motion ? 1.12 : OUTLINE + (1.12 - OUTLINE) * clamp((now - outAt - 250) / WRITE);
+  // except the opening's page: as the site's loader lifts it writes itself, on time rather than
+  // scroll, its outline first and then its lines; the reveal runs on past 1 so the pen's glow
+  // leaves the last strokes
+  const WRITE = 4600;
+  const writeOf = now => !loaderOut ? 0 : !outAt || !motion ? 1.12 : 1.12 * clamp((now - outAt - 350) / WRITE);
   const revAt = (i, P, now) => i === OPEN ? writeOf(now) : revealOf(i, P);
 
   // ---------- the camera: every shape fitted to its frame, on a smooth path through the scenes ----------
@@ -380,10 +379,15 @@ function start() {
 
   // ---------- the 3D world, loaded on its own ----------
   let world = null, W2 = 0, H2 = 0, CW = 0, CH = 0;   // the stage (the frame the shots are framed for), and the canvas (as tall as the screen gets)
-  const loader = document.getElementById('xpLoader');
-  let progress = 6, shown = 0, loaderOut = !loader || STATIC, outAt = 0;
-  const t0 = performance.now(), MIN = REDUCE ? 600 : 2600;
-  const setProgress = v => { progress = Math.max(progress, v); };
+  // the site's loader (SiteLoader.astro, Base's loader="wait") covers the page while the film gets
+  // ready: the film reports its progress to it and says when it is ready, and shows itself as it lifts
+  // (none with ?static: the film shows at once)
+  const SL = window.mewritLoader;
+  let progress = 6, loaderOut = !SL || STATIC, outAt = 0;
+  const setProgress = v => {
+    progress = Math.max(progress, v);
+    if (SL) { SL.p = progress / 100; if (progress >= 100) SL.ready = true; }
+  };
   function sizeUp() {
     W2 = stage.clientWidth; H2 = stage.clientHeight; CW = canvas.clientWidth || W2; CH = canvas.clientHeight || H2;
     buildKeys(W2, H2);
@@ -419,45 +423,37 @@ function start() {
     setProgress(70);
     requestAnimationFrame(() => {   // compile the shaders and draw once while the loading screen still covers the page
       try { frame(0, performance.now()); world && world.compile(); } catch (err) { console.warn('[xp]', err); }
-      if (loader) loader.classList.add('lit');   // the particles are drawn: the loading screen's own night can go
       warmReady = true;
       setProgress(75);
     });
   }).catch(err => { console.warn('[xp] no 3D:', err); world = null; sec.classList.add('xp-nogl'); setProgress(100); });
 
-  // ---------- the loading screen ----------
-  const STEPS = ['Loading', 'Regulatory writing', 'Scientific publications', 'Medical communications', 'Training', 'AI/ML advisory', 'Ready'];
-  function exitLoader() {
+  // ---------- where the reader comes back to ----------
+  // A refresh (or coming back with the browser's back and forward) returns to where the reader was in
+  // the film, kept in this tab for half an hour; any other arrival starts at the top. While the loader
+  // covers the page the film waits at the top, the scroll locked; as it lifts ('mewrit:loaderout') the
+  // film is put where the reader was at once (no flight from the top) and shows itself there: the dust
+  // gathers into that scene's shape, and on the opening the page writes itself
+  const PLACE = 'mewrit-home-place';
+  let backTo = 0;
+  try {
+    const nav = ((performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {}).type;
+    const s = JSON.parse(sessionStorage.getItem(PLACE) || 'null');
+    if ((nav === 'reload' || nav === 'back_forward') && s && s.P > .02 && Date.now() - s.t < 1800000) backTo = Math.min(S + 1, s.P);
+  } catch (e) { /* storage off */ }
+  addEventListener('pagehide', () => { try { sessionStorage.setItem(PLACE, JSON.stringify({ P: loaderOut ? Pr : backTo, t: Date.now() })); } catch (e) { /* storage off */ } });
+  function loaderLifts() {
     if (loaderOut) return;
-    loaderOut = true; outAt = performance.now(); rockFrom = time;
-    loader.classList.add('out');
     root.classList.remove('xp-lock');
-    // the rest of the page's frame (the site's header and the like) was under the particles while
-    // loading: it comes in with the words (the stage fades in by its own transition, xp.css)
-    [...document.body.children].forEach(el => {
-      if (el.contains(sec) || el.matches('script, dialog, .skip') || !el.animate) return;
-      el.animate({ opacity: [0, 1] }, { duration: REDUCE ? 200 : 800, delay: 150, easing: 'ease', fill: 'backwards' });
-    });
-    setTimeout(() => { loader.hidden = true; }, 1400);
+    if (backTo > 0) window.scrollTo({ top: Math.round(scrollFor(backTo)), behavior: 'instant' });
+    Pr = targetP();
+    loaderOut = true; outAt = performance.now();
   }
-  if (loader && !STATIC) {
+  if (!loaderOut) {
     root.classList.add('xp-lock');
-    try { history.scrollRestoration = 'manual'; } catch (e) { /* older browsers */ }
     window.scrollTo(0, 0);
-    const num = loader.querySelector('.xp-load-num'), label = loader.querySelector('.xp-load-label'), bar = loader.querySelector('.xp-load-bar i');
-    const tick = now => {
-      if (loaderOut) return;
-      const due = clamp((now - t0) / MIN) * 100;   // never faster than MIN, so the page's outline has time to draw with it
-      shown = Math.min(progress, due, shown + Math.max(.6, (Math.min(progress, due) - shown) * .12));
-      num.textContent = String(Math.floor(shown)).padStart(3, '0');
-      label.textContent = STEPS[Math.min(STEPS.length - 1, Math.floor(shown / 100 * STEPS.length))];
-      bar.style.transform = `scaleX(${(shown / 100).toFixed(3)})`;
-      if (shown >= 100) { label.textContent = 'Ready'; setTimeout(exitLoader, REDUCE ? 0 : 350); return; }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-    setTimeout(exitLoader, 11000);   // whatever happens, the page never stays covered
-  } else if (loader) { loader.hidden = true; }
+    document.addEventListener('mewrit:loaderout', loaderLifts);
+  }
 
   // ---------- the pointer, anywhere on the page (the canvas is behind all of it) ----------
   const ptr = { x: 0, y: 0, on: 0, s: 0, px: 0, py: 0 };
@@ -467,7 +463,7 @@ function start() {
   }
 
   // ---------- every frame ----------
-  let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '', dayCss = '', idleScene = -1, idleFrom = 0;
+  let Pr = 0, time = 0, last = 0, raf = 0, tailNow = 0, faded = '', dayCss = '', idleScene = -1, idleFrom = 0;
   const spinAcc = new Float64Array(Object.keys(F).length), pt = [0, 0, 0];   // how far each formation has turned
   const inPair = new Uint8Array(spinAcc.length);   // which formations were on screen last frame
   const st8 = {};
@@ -516,10 +512,10 @@ function start() {
     const ia = same ? k : a, ib = same ? k : b;
     let from = A.form, to = B.form, morph = same ? 0 : m, rf = revAt(a, P, now), rt = revAt(b, wt >= 0 ? warp.P1 : P, now), sf = spinOf(ia), stt = spinOf(ib), flow = 1.6;
     if (same) { from = to = A.form; rf = rt = rev; }
-    // the opening: the dust gathers into the page while the loading screen is up
-    if (!firstAt) firstAt = now;
-    const gather = loaderOut && !outAt ? 1 : clamp((now - firstAt - 200) / 1200);
-    if (gather < 1 && a === OPEN && b === OPEN) { from = F.DUST; to = SCENES[OPEN].form; morph = motion ? ease(gather) : gather > .3 ? 1 : 0; rf = 1; rt = writeOf(now); flow = 2.6; }
+    // as the site's loader lifts, the dust gathers into the shape of the scene on screen (the opening's
+    // page, or wherever the reader came back to); under the loader it waits as dust
+    const gather = !loaderOut ? 0 : !outAt || !motion ? 1 : clamp((now - outAt - 100) / 1300);
+    if (gather < 1 && a === b && wt < 0) { from = F.DUST; to = SCENES[a].form; morph = motion ? ease(gather) : gather > .3 ? 1 : 0; rf = 1; rt = revAt(a, P, now); flow = 2.6; }
     // past the close, the tail: the globe dissolves into the dust, which stays
     if (tail > 0) { from = SCENES[S - 1].form; to = F.DUST; morph = tail; rf = rev; rt = 1; stt = 0; }
     world.setPair(from, to, F.STREAMS);
@@ -527,10 +523,6 @@ function start() {
     // the camera, with a slow sway and a little parallax from the pointer
     // (in a jump, from the shot the reader left to the one the jump lands on)
     const v = wt >= 0 ? (() => { const va = camAt(warp.P0), vb = camAt(warp.P1), e = ease(wt); return va.map((x, j) => x + (vb[j] - x) * e); })() : camAt(P), kk = ease(m), te = ease(tail);
-    // while loading the page stands in the middle of the screen, the camera aimed at its centre (the
-    // words are not there yet), and it moves aside for them as they come
-    const hand = !loaderOut ? 0 : !outAt || !motion ? 1 : ease(clamp((now - outAt) / 1600));
-    if (hand < 1) { const q = 1 - hand; for (let j = 0; j < 3; j++) { v[j] -= v[j + 3] * q; v[j + 3] -= v[j + 3] * q; } v[7] *= hand; v[8] *= hand; }
     // in the tail it eases back, and up a little, and the picture comes to the middle
     if (te > 0) {
       const dx = v[0] - v[3], dy = v[1] - v[4], dz = v[2] - v[5], d = Math.hypot(dx, dy, dz) || 1;

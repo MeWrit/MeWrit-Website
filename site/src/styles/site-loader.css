@@ -1,0 +1,16 @@
+/* ---------------- the site's loader (src/components/SiteLoader.astro, src/scripts/site-loader.js) ----------------
+   A sheet of paper over the page while it gets ready: the logo written on it by the pen, a hairline
+   under it filling with the page's progress. Then the logo glides into its place in the header while
+   the paper lifts away like a sheet; the logo, outside the paper, glides on. The header's own logo
+   waits hidden under the paper until the loader's logo lands on it. */
+.sl{position:fixed;inset:0;z-index:300;display:none}
+html.sl-on{overflow:hidden}
+html.sl-on .sl{display:block}
+html.sl-on #headerLogo{opacity:0}
+/* (the paper's shadow shows only as it lifts away, along its foot) */
+.sl-paper{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 42%,#FFFBF5 0%,#FCF6EE 55%,#F3E9DD 100%);box-shadow:0 18px 60px rgba(3,8,23,.32);will-change:transform}
+.sl-mid{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:clamp(24px,4vh,40px);padding:24px}
+.sl-logo{width:min(600px,80vw);transform-origin:0 0;will-change:transform}
+.sl-bar{display:block;width:min(200px,42vw);height:1px;background:rgba(28,52,114,.14);overflow:hidden}
+.sl-bar b{display:block;height:100%;background:#E07A1F;transform-origin:left center;transform:scaleX(0);transition:transform .45s ease}
+@media (prefers-reduced-motion:reduce){.sl-bar b{transition:none}}

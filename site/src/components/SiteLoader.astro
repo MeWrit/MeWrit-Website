@@ -1,0 +1,38 @@
+---
+// The site's loader, for any page that asks for it (Base.astro: loader): a sheet of paper over the
+// page while it gets ready, the logo written on it by the pen (version B's drawing, LogoDraw), a
+// hairline under it filling with the page's progress; then the logo glides into the header and the
+// paper fades (src/scripts/site-loader.js). It is not bound to what the page shows: the page reports
+// its progress and says when it is ready (wait), or the loader waits for the page's own load. The
+// first script below runs before the first paint, so the paper is there from the start (not with
+// ?static, for screenshots).
+import LogoDraw from './LogoDraw.astro';
+import '../styles/logo-draw.css';
+import '../styles/site-loader.css';
+
+interface Props { wait?: boolean }
+const { wait = false } = Astro.props;
+---
+<script is:inline define:vars={{ wait }}>
+(function () {
+  var d = document.documentElement;
+  if (/[?&]static\b/.test(location.search)) return;
+  d.classList.add('sl-on');
+  // (the page puts the reader back where they were itself, once it is ready: the browser's own
+  // restoring would move the page under the paper)
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+  // shared with the page: its progress (0 to 1) and whether it is ready (wait: the page says so itself);
+  // the loader reads them, and sets out when it lifts
+  window.mewritLoader = { p: 0, ready: false, out: false, wait: wait };
+})();
+</script>
+<div class="sl" id="siteLoader" aria-hidden="true">
+  <div class="sl-paper"></div>
+  <div class="sl-mid">
+    <LogoDraw class="sl-logo ld-first" alt="" />
+    <i class="sl-bar"><b></b></i>
+  </div>
+</div>
+<script>
+  import '../scripts/site-loader.js';
+</script>

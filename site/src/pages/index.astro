@@ -1,6 +1,7 @@
 ---
-// The home page: one film. While it loads, the dust gathers into a blank page and its outline draws
-// itself with the counter; as the loading screen lifts the page writes itself, then one cloud of
+// The home page: one film. While it loads, the site's loader writes the logo on paper (Base's
+// loader="wait": SiteLoader.astro); as it lifts the film is where the reader was (a refresh) or at
+// the start, where the dust gathers into a blank page that writes itself. Then one cloud of
 // particles takes a shape for each scene as you scroll: three screens at night that say what MeWriT
 // is, who writes and why it is chosen (the figures among them); the five practices to choose from, on
 // dusk indigo, as five tiles with their shapes in them; each practice by day, reached through a dawn
@@ -33,16 +34,7 @@ const letters = (t: string) => t.split(' ').map(word => [...word].map(ch => ({ c
 const pad = (j: number) => String(j + 1).padStart(2, '0');
 const fulls = practices.list.map(p => p.full);
 ---
-<Base intro="none" theme="light" foot="film" title={`${experience.title} | ${site.name}`} description={experience.description}>
-  <div class="xp-loader" id="xpLoader" aria-hidden="true">
-    <p class="xp-load-brand">MeWriT · Medical writing</p>
-    <div class="xp-load-foot">
-      <p class="xp-load-label">Loading</p>
-      <p class="xp-load-num">000</p>
-      <div class="xp-load-bar"><i></i></div>
-    </div>
-  </div>
-
+<Base intro="none" theme="light" foot="film" loader="wait" title={`${experience.title} | ${site.name}`} description={experience.description}>
   <section class="xp" id="xp" aria-label={experience.title} style={`--units:${SCENES.length}`}>
     <canvas class="xp-canvas" aria-hidden="true"></canvas>
     <div class="xp-track">

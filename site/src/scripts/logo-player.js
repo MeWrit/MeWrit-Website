@@ -116,5 +116,8 @@ export function createLogoPlayer(el, { write = { rot: 46, scale: .76 }, speed = 
     el.classList.add('ld-first'); el.classList.remove('drawing');
     if (ink) { measure(); renderAt(0); }
   }
-  return { play, settle, reset, ready: makeInk, measure, get playing() { return playing; }, duration: T.end / speed };
+  // three times as fast from now on (a loader the reader taps or scrolls through), once
+  let hurried = false;
+  const hurry = () => { if (!hurried) { hurried = true; speed *= 3; } };
+  return { play, settle, reset, hurry, ready: makeInk, measure, get playing() { return playing; }, duration: T.end / speed };
 }

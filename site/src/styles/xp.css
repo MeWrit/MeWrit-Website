@@ -1,6 +1,6 @@
-/* ---------------- the experience page (src/pages/experience.astro) ----------------
-   A loading screen (the brand line, the step, a counter and a bar, over the particles gathering into
-   the opening's page), then a tall track whose stage stays pinned: a shade for the words, the labels
+/* ---------------- the home page's film (src/pages/index.astro) ----------------
+   Under the site's loader (SiteLoader.astro, while the film gets ready), a tall track whose stage
+   stays pinned: a shade for the words, the labels
    pinned to the shapes, the words of each scene, and the HUD (the figures in the corner, the scroll
    hint, the five practices along the foot). The 3D canvas is not in the stage: it is fixed behind the
    whole page (z-index -1: over the page's background, under everything else), so the dust it ends on
@@ -22,9 +22,7 @@ html.xp-lock{overflow:hidden;scrollbar-gutter:stable}
 .xp-stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate;transition:opacity .8s ease .15s}
 /* as tall as the screen can get (lvh), so a phone's bars coming and going never resize it */
 .xp-canvas{position:fixed;inset:0;width:100%;height:100vh;height:100lvh;z-index:-1;display:block;pointer-events:none;background:#030817}
-/* while loading, the canvas covers the page (the loading screen's words sit over it) and the stage
-   waits, to fade in with the words */
-html.xp-lock .xp-canvas{z-index:150}
+/* while the site's loader covers the page (site-loader.css) the stage waits, to fade in with the words */
 html.xp-lock .xp-stage{opacity:0}
 .xp-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,23,.8) 0%,rgba(3,8,23,.44) 34%,rgba(3,8,23,0) 58%)}
 /* the close: the globe stands behind the words, so the shade is deeper and reaches further */
@@ -111,21 +109,6 @@ html.xp-lock .xp-stage{opacity:0}
    it takes the pointer */
 .xp-stage.xp-gone *{pointer-events:none}
 
-/* the loading screen: the brand line, the step, the counter and the bar, over the particles (the
-   canvas, raised under it while loading); a plain night behind them until the first frame is drawn */
-.xp-loader{position:fixed;inset:0;z-index:200;color:#C9D8FF;transition:opacity .9s ease .3s,visibility 0s linear 1.3s}
-.xp-loader::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 46%,#0B1838 0%,#040A1C 70%);transition:opacity .7s ease}
-.xp-loader.lit::before{opacity:0}
-.xp-loader.out{opacity:0;visibility:hidden}
-.xp-loader[hidden]{display:none}
-.xp-load-brand{position:absolute;top:30px;left:clamp(20px,4vw,48px);font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,216,255,.72)}
-.xp-load-foot{position:absolute;left:clamp(20px,4vw,48px);right:clamp(20px,4vw,48px);bottom:clamp(24px,5vh,48px);display:grid;grid-template-columns:1fr auto;align-items:end;gap:14px 24px}
-.xp-load-label{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
-.xp-load-num{font-family:var(--mono);font-weight:500;font-size:clamp(3rem,2rem + 4vw,6rem);line-height:.86;letter-spacing:-.03em;color:#F2F5FC;font-variant-numeric:tabular-nums}
-.xp-load-bar{grid-column:1 / -1;height:1px;background:rgba(201,216,255,.18);overflow:hidden}
-.xp-load-bar i{display:block;height:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0)}
-.xp-load-foot,.xp-load-brand{transition:opacity .5s ease,transform .6s ease}
-.xp-loader.out .xp-load-foot,.xp-loader.out .xp-load-brand{opacity:0;transform:translateY(12px)}
 
 /* phones, narrow windows and tall ones (a tablet held upright): the picture in the upper part, the
    words at the foot, the practices as a row of short bars under the header (experience.js picks
@@ -433,7 +416,7 @@ html:not(.js) .xp-stage{position:static;height:auto;padding:calc(var(--header-h)
 html:not(.js) .xp-scenes{position:static;display:block}
 html:not(.js) .xp-scene{opacity:1;transform:none;margin-bottom:72px;max-width:none}
 html:not(.js) .xp-title .c{opacity:1;filter:none;transform:none}
-html:not(.js) .xp-loader,html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
+html:not(.js) .xp-hud,html:not(.js) .xp-canvas{display:none}
 
 @media (prefers-reduced-motion:reduce){
   .xp-title .c{opacity:1;filter:none;transform:none;animation:none !important}

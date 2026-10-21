@@ -21,6 +21,7 @@ import '../styles/nav-variants.css';
 import '../styles/nav-experiments.css';
 import '../styles/theme-dark.css';
 import Intro from '../components/Intro.astro';
+import SiteLoader from '../components/SiteLoader.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import SiteFooter from '../components/SiteFooter.astro';
@@ -39,13 +40,16 @@ interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
   nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners';
   phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean; theme?: 'light' | 'dark'; page?: string;
-  foot?: 'site' | 'film';
+  foot?: 'site' | 'film'; loader?: boolean | 'wait';
 }
 // `page` names a page that styles the shell itself (data-page on <html>), e.g. "lamp" for the
 // lamplight film, which carries its own footer
 // `foot` "film": the film's foot (SiteFoot.astro: a bar along the bottom that opens into the colophon)
 // in place of the site's footer and the phones' contact bar
-const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page, foot = 'site' } = Astro.props;
+// `loader`: the site's loader over the page while it gets ready (SiteLoader.astro: the logo written
+// on paper, then gliding into the header); "wait": the page reports its progress and says when it is
+// ready (window.mewritLoader), otherwise the loader waits for the page's own load
+const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page, foot = 'site', loader } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.includes('/archive/');   // previews and the archive stay out of search results
 ---
@@ -105,13 +109,14 @@ const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.incl
   window.mewritFailsafe(8400);
 })();
 </script>
-{intro !== 'none' && <>
+{(intro !== 'none' || loader) && <>
 <link rel="preload" as="image" href={href('/brand/logo-base.png')}>
 <link rel="preload" as="image" href={href('/brand/pen-cutout.png')}>
 <link rel="preload" as="image" href={href('/brand/logo-original.png')}>
 </>}
 </head>
 <body>
+{loader && <SiteLoader wait={loader === 'wait'} />}
 <a class="skip" href="#main">Skip to content</a>
 {intro === 'overlay' && <Intro />}
 <SiteHeader />
