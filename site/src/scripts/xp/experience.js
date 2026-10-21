@@ -321,6 +321,15 @@ function start() {
     callLayer.append(el); callouts.push({ ...c, el, i, on: false });
   }));
   const spinY = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return [c * p[0] + s * p[2], p[1], -s * p[0] + c * p[2]]; };
+  // p turned by a about the unit axis q through the origin (world.js turn; about the upright it is spinY)
+  const UP = [0, 1, 0];
+  const turn = (p, a, q = UP) => {
+    const c = Math.cos(a), s = Math.sin(a), d = (q[0] * p[0] + q[1] * p[1] + q[2] * p[2]) * (1 - c);
+    return [p[0] * c + (q[1] * p[2] - q[2] * p[1]) * s + q[0] * d, p[1] * c + (q[2] * p[0] - q[0] * p[2]) * s + q[1] * d, p[2] * c + (q[0] * p[1] - q[1] * p[0]) * s + q[2] * d];
+  };
+  // and about the point o (a scene's pivot: the shape's own centre where it does not stand on the origin)
+  const ORIGIN = [0, 0, 0];
+  const turnAbout = (p, a, q, o = ORIGIN) => { const t = turn([p[0] - o[0], p[1] - o[1], p[2] - o[2]], a, q); return [t[0] + o[0], t[1] + o[1], t[2] + o[2]]; };
 
   // the practices' buttons, one above each of their shapes, and an invisible hit area over each
   // shape itself: a click on either goes to the practice, the pointer or the focus on one
@@ -446,6 +455,7 @@ function start() {
   // ---------- every frame ----------
   let Pr = 0, time = 0, last = 0, raf = 0, rockFrom = loaderOut ? 0 : 1e9, firstAt = 0, tailNow = 0, faded = '', dayCss = '', idleScene = -1, idleFrom = 0;
   const spinAcc = new Float64Array(Object.keys(F).length), pt = [0, 0, 0];   // how far each formation has turned
+  const inPair = new Uint8Array(spinAcc.length);   // which formations were on screen last frame
   const st8 = {};
   // what the tail fades away (the canvas stays: its dust is the backdrop from here on)
   const fading = ['.xp-hud', '.xp-callouts', '.xp-scenes', '.xp-shade', '.xp-frame'].map(q => sec.querySelector(q)).filter(Boolean);
@@ -483,10 +493,14 @@ function start() {
 
     // the shapes: which two, how far between them, how far revealed, how they turn
     const A = SCENES[a], B = SCENES[b], same = A.form === B.form;
+    // a shape that comes on screen starts as it was framed (unturned), whatever it turned the last time
+    for (let f = 0; f < inPair.length; f++) { const on = f === A.form || f === B.form ? 1 : 0; if (on && !inPair[f]) spinAcc[f] = 0; inPair[f] = on; }
     [A.form, B.form].forEach((f, j) => { if (j && same) return; const sa = A.form === f ? A.spin || 0 : null, sb = B.form === f ? B.spin || 0 : null; spinAcc[f] += dt * motion * (sa === null ? sb : sb === null ? sa : mix(sa, sb, m)); });
-    // a shape that turns (spin) turns slowly on its own; nothing rocks or turns with the scroll
+    // a shape that turns (spin) turns slowly on its own, always the same way, about the upright or the
+    // axis its scene names (axis); nothing rocks or turns with the scroll
     const spinOf = i => { const s = SCENES[i]; return spinAcc[s.form] + (s.spinFrom || 0); };
-    let from = A.form, to = B.form, morph = same ? 0 : m, rf = revAt(a, P, now), rt = revAt(b, wt >= 0 ? warp.P1 : P, now), sf = spinOf(same ? k : a), stt = spinOf(same ? k : b), flow = 1.6;
+    const ia = same ? k : a, ib = same ? k : b;
+    let from = A.form, to = B.form, morph = same ? 0 : m, rf = revAt(a, P, now), rt = revAt(b, wt >= 0 ? warp.P1 : P, now), sf = spinOf(ia), stt = spinOf(ib), flow = 1.6;
     if (same) { from = to = A.form; rf = rt = rev; }
     // the opening: the dust gathers into the page while the loading screen is up
     if (!firstAt) firstAt = now;
@@ -521,6 +535,7 @@ function start() {
     const pickOn = from === F.CHOICE && to === F.CHOICE && m === 0 && tail === 0;
     Object.assign(st8, {
       time, motion, flow, morph, trails: Math.max(motion * (gather < 1 ? .8 * (1 - gather) : .82 * surge), speed * .72), aberr: .012 + surge * .045 + speed * .03, revealFrom: rf, revealTo: rt, spinFrom: sf, spinTo: stt,
+      axisFrom: SCENES[ia].axis || UP, axisTo: SCENES[ib].axis || UP, pivotFrom: SCENES[ia].pivot || ORIGIN, pivotTo: SCENES[ib].pivot || ORIGIN,
       size: (big ? .056 : .07) * mix(A.size || 1, B.size || 1, kk) * mix(1, TAIL.size, te), gain: (big ? .52 : .78) * mix(A.gain || 1, B.gain || 1, kk) * mix(1, TAIL.gain, te),
       k: lk, bgA: A.bg, bgB, glowA: A.glow, glowB, glow: mix(A.glow[1], glowB[1], lk), glowAt: [.5 + v[7], 1 - H2 * (.5 - v[8]) / (CH || H2)], grid: mix(A.grid || 0, B.grid || 0, kk) * (1 - te),
       floor: mix(A.floor ? A.floor[1] : 0, B.floor ? B.floor[1] : 0, kk), floorY: mix((A.floor || B.floor || [-2.2])[0], (B.floor || A.floor || [-2.2])[0], kk),
@@ -574,7 +589,7 @@ function start() {
       if (on || c.on) {
         const s = SCENES[c.i], anchor = world.anchors(s.form)[c.at];
         if (anchor) {
-          const p = spinY(anchor, spinOf(c.i));
+          const p = turnAbout(anchor, spinOf(c.i), s.axis, s.pivot);
           if (c.facing && !world.facing(p)) on = false;
           world.project(p, pt);
           if (pt[2] > 1 || pt[0] < 24 || pt[0] > W2 - 24 || pt[1] < headPx + 16 || pt[1] > H2 - 70) on = false;   // off the stage, or under the header or the practices

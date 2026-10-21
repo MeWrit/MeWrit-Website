@@ -24,6 +24,8 @@ const PARTICLE_VS = /* glsl */`
 uniform float uTime, uMorph, uRevealFrom, uRevealTo, uSpinFrom, uSpinTo, uStreamFrom, uStreamTo, uGhostFrom, uGhostTo;
 uniform float uScale, uSize, uMouse, uMotion, uFlow, uGain, uPick, uPickOn, uDust;
 uniform vec3 uMouseO, uMouseD;
+uniform vec3 uAxisFrom, uAxisTo;   // the axis each of the two shapes turns about (unit; the upright unless a scene names one)
+uniform vec3 uPivotFrom, uPivotTo;   // and the point it turns about (the origin unless a scene names one)
 uniform vec4 uIdle;   // the scene's small action at rest: [from, to] of the drawing order, the pen's place, how far faded
 uniform float uIdleOn;
 attribute vec3 aFrom, aTo, aColFrom, aColTo;
@@ -41,15 +43,17 @@ vec3 streamAt(float u, float side, float ang, float rad) {
   return vec3(x + cos(ang) * r, y + sin(ang) * r * .55, z);
 }
 vec3 spinY(vec3 p, float a) { float c = cos(a), s = sin(a); return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z); }
+// p turned by a about the unit axis k through the origin (about the upright it is spinY)
+vec3 turn(vec3 p, float a, vec3 k) { float c = cos(a), s = sin(a); return p * c + cross(k, p) * s + k * dot(k, p) * (1. - c); }
 vec3 flow(vec3 p, float t) {
   return vec3(sin(p.y * .55 + t) + sin(p.z * .8 - t * .7),
               sin(p.z * .45 + t * .8) + sin(p.x * .65 + t * .3),
               sin(p.x * .4 - t * .6) + sin(p.y * .75 + t * .9)) * .5;
 }
 // a particle's place in one formation: dust drifts, the rivers flow, the rest turn with their shape
-vec3 placeOf(vec3 p, float key, float spin, float stream, out float fade) {
+vec3 placeOf(vec3 p, float key, float spin, vec3 axis, vec3 pivot, float stream, out float fade) {
   float f = 1.;
-  vec3 o = spinY(p, spin);
+  vec3 o = turn(p - pivot, spin, axis) + pivot;
   if (key < -.5) {
     // the dust: round the shape and up through the scene, slowly and always the same way (motes in a
     // beam of light), whether or not the reader scrolls; a mote that leaves at the top comes back at
@@ -79,8 +83,8 @@ vec3 shade(vec3 c, float key, float reveal, float ghostK) {
 }
 void main() {
   float fa, fb;
-  vec3 a = placeOf(aFrom, aKeyFrom, uSpinFrom, uStreamFrom, fa);
-  vec3 b = placeOf(aTo, aKeyTo, uSpinTo, uStreamTo, fb);
+  vec3 a = placeOf(aFrom, aKeyFrom, uSpinFrom, uAxisFrom, uPivotFrom, uStreamFrom, fa);
+  vec3 b = placeOf(aTo, aKeyTo, uSpinTo, uAxisTo, uPivotTo, uStreamTo, fb);
   // each particle leaves at its own moment, so shapes dissolve and reform rather than slide
   float d = aRand.z * .45;
   float m = clamp((uMorph - d) / .55, 0., 1.);
@@ -299,6 +303,8 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
     uPick: { value: -1 }, uPickOn: { value: 0 }, uDust: { value: 1 }, uMouseO: { value: new THREE.Vector3() }, uMouseD: { value: new THREE.Vector3(0, 0, -1) },
     uDay, uInkC: { value: new THREE.Color(pal.inkColor || '#1C3472') },
     uIdle: { value: new THREE.Vector4(0, 0, -1, 0) }, uIdleOn: { value: 0 },
+    uAxisFrom: { value: new THREE.Vector3(0, 1, 0) }, uAxisTo: { value: new THREE.Vector3(0, 1, 0) },
+    uPivotFrom: { value: new THREE.Vector3() }, uPivotTo: { value: new THREE.Vector3() },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: PARTICLE_VS, fragmentShader: PARTICLE_FS, uniforms: U, transparent: true, depthWrite: false, depthTest: false, ...PREMULT });
   const points = new THREE.Points(geo, mat);
@@ -375,6 +381,10 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
       uDay.value = d;
       U.uTime.value = s.time; U.uMorph.value = s.morph; U.uRevealFrom.value = s.revealFrom; U.uRevealTo.value = s.revealTo;
       U.uSpinFrom.value = s.spinFrom; U.uSpinTo.value = s.spinTo; U.uMotion.value = s.motion; U.uFlow.value = s.flow;
+      if (s.axisFrom) U.uAxisFrom.value.fromArray(s.axisFrom);
+      if (s.axisTo) U.uAxisTo.value.fromArray(s.axisTo);
+      if (s.pivotFrom) U.uPivotFrom.value.fromArray(s.pivotFrom);
+      if (s.pivotTo) U.uPivotTo.value.fromArray(s.pivotTo);
       U.uSize.value = s.size; U.uGain.value = s.gain; U.uPick.value = s.pick; U.uPickOn.value = s.pickOn;
       if (s.idle) U.uIdle.value.set(s.idle[0], s.idle[1], s.idle[2], s.idle[3]);
       U.uIdleOn.value = s.idleOn || 0;

@@ -9,7 +9,9 @@
    corner, counting up with the reveal where they have a `to` (a third value shows once the reveal
    is complete). The figures are MeWriT's own; a scene whose picture or figures are only
    illustrative says so in its `note`, shown under them. A shape may turn slowly on its own (spin,
-   radians a second); nothing rocks, and within a scene the camera only glides one way with the
+   radians a second, always the same way), about the upright or about the axis the scene names (axis,
+   a unit vector through the shape's centre), and comes on screen unturned each time; nothing rocks,
+   and within a scene the camera only glides one way with the
    scroll, round the shape and a little closer (experience.js: ORB, PUSH; the user found back-and-forth
    movement nauseating and wanted calm motion tied to the scroll, 2026-10-13 to 17). layout:
    'center' stands the shape between the words' two columns, 'strata' across the middle of the screen
@@ -56,8 +58,10 @@ export const SCENES = [
   {
     // who writes: a molecule (the science behind the words), large across the middle of the screen, the
     // words above it and the figures along the foot (layout strata). Fitted by its atoms (box): its
-    // faint cloud reaches about half as far again, and fitting that would draw the atoms small
-    id: 'who', form: F.MOLECULE, chapter: -1, layout: 'strata', box: { c: [0, 0, 0], size: [10.2, 4.4, 1.6] },
+    // faint cloud reaches about half as far again, and fitting that would draw the atoms small. It turns
+    // slowly about its long axis, coming on screen face on, so it keeps its width in its band (the user
+    // tried it turning about the upright too, and chose this)
+    id: 'who', form: F.MOLECULE, chapter: -1, layout: 'strata', box: { c: [0, 0, 0], size: [10.2, 4.4, 1.6] }, spin: .12, axis: [1, 0, 0],
     a: [[1.6, .9, 12], [0, 0, 0], 36, 0, 0], b: [[-1.8, 1.3, 11.6], [0, .1, 0], 36, 0, 0],
     bg: NAVY, glow: ['#1C3472', .5],
   },
@@ -109,8 +113,14 @@ export const SCENES = [
     readout: [['Guidelines', 'ICMJE, GPP'], ['Congress presentations', { to: 30 }, '30'], ['Status', 'In review', 'Accepted']],
   },
   {
+    // the evidence as a terrain, turning slowly on its centre like a relief map on a table (pivot: it
+    // stands 9 back from the origin). The fit (box) is the square it sweeps as it turns, set low (its
+    // near corner comes down toward the camera), in a wider target that runs from the words to the
+    // screen's edge, so no corner reaches the words, the edge or the bar (measured over a whole turn on
+    // three screens: scratchpad terrain_fit.mjs); face on it stands about 90% as wide as unturned
     id: 'med-evidence', form: F.LANDSCAPE, chapter: 2, light: 1, idle: { mode: 'pass', range: [.02, .97], every: 9, take: 4.5 },
     a: [[-12, 16.34, 17.67], [0, -1, -9], 67, .21, -.01], b: [[14.07, 20.11, 12.11], [0, -1, -9], 65, .24, .01],
+    spin: .07, pivot: [0, 0, -9], box: { c: [0, -2, -9], size: [32, 4.9, 32] }, target: { x: .39, y: .13, w: .59, h: .68 },
     size: 2, gain: 1.6, bg: DEEP, glow: ['#1C3472', .4], floor: [-2.75, .35], grid: .5,
     callouts: [{ at: 'peak', label: 'Primary outcome', min: .6, side: 'l' }, { at: 'second', label: 'Secondary outcome', min: .4 }, { at: 'near', label: 'Subgroup', min: .1, side: 'l' }],
     readout: [['Evidence', 'Real-world'], ['Readers', 'Clinicians, payers, regulators'], ['Formats', 'Papers, statements, reports']],
