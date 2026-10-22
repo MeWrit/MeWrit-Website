@@ -1,4 +1,4 @@
-/* Dr Hetal Shah's card (src/pages/hetal/index.astro): Share, the QR code, Save contact, and the question.
+/* Dr Hetal Shah's profile (src/pages/hetal/index.astro): Share, the QR code, Save contact, and the question.
    Save contact opens her contact file (./Dr-Hetal-Shah.vcf): on an iPhone the Add Contact screen with
    everything filled in, saved with one tap; on Android the file downloads and opens in Contacts (no website
    can add a contact without the visitor's tap), so a short line says what to do on the device in hand.
@@ -6,8 +6,9 @@
    on a web page on average), a sheet asks whether they would like to reach out (call, WhatsApp, email)
    and whether to save her contact (yes opens the contact file). It is not asked of someone who has saved
    her contact, and not again for 30 days after a no, or after they reached out (kept in this browser).
-   Each Save contact also sends the event "nb:sign" (src/scripts/band.js), which signs a night band's page
-   again where one stands (none behind her card for now). */
+   Each Save contact also sends the event "nb:sign": the page's script traces her signature again with the
+   film's pen (src/pages/hetal/index.astro), and a night band showing the film's page signs it again
+   (src/scripts/band.js). */
 const page = document.querySelector('.cd-page');
 if (page) {
   // the cross-industry average time on a web page: 54 s (Contentsquare, 2021 Digital Experience Benchmark,
@@ -63,7 +64,7 @@ if (page) {
   if (shareBtn) shareBtn.addEventListener('click', async () => {
     const data = { title: document.title, text: 'Dr Hetal Shah, Founder & Director, MeWriT', url };
     if (navigator.share) { try { await navigator.share(data); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
-    say(await copy(url) ? 'Link to her card copied' : url);
+    say(await copy(url) ? 'Link to her profile copied' : url);
   });
 
   // the dialogs: closed by their x, Done, the backdrop, or Esc
@@ -77,7 +78,7 @@ if (page) {
   const qrBtn = document.querySelector('[data-qr]');
   if (qrBtn) qrBtn.addEventListener('click', () => open(qrDlg));
   const copyBtn = document.querySelector('[data-copy]');
-  if (copyBtn) copyBtn.addEventListener('click', async () => say(await copy(url) ? 'Link to her card copied' : url));
+  if (copyBtn) copyBtn.addEventListener('click', async () => say(await copy(url) ? 'Link to her profile copied' : url));
 
   // the question, after the average time on a page, with the page on screen
   if (ask && !state.saved && !recent(state.dismissed) && !recent(state.reached)) {

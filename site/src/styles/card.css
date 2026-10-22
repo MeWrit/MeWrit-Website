@@ -1,73 +1,85 @@
 /* ---------------- Dr Hetal Shah's profile (src/pages/hetal/index.astro, src/scripts/card.js) ----------------
-   Phones first (it is opened by tapping her NFC card on someone's phone). The first screen is her card, in
-   the film's night (src/styles/band.css): the way back; her photo and, beside it, her name in the serif,
-   her degree, her role in the logo's orange, her city; one line on what she does; five round buttons to
-   reach her; Save contact, the site's primary button with her card in its nib, and Share and the QR code
-   beside it. Behind it, for now, only the film's dust (the user did not like the film's page there,
-   2026-10-22; what stands there is still to be chosen). Then the site's cream, in the home page's idiom
-   (a kicker with an orange rule, a serif title, numbered rows between hairlines): who she is, in a large serif line and two short paragraphs; what she is
-   known for; then on the practices' dusk indigo her honours as tiles (a row to swipe on a phone) and one
-   client's words; back on the cream, where she serves now beside her recent talks, three papers as the
-   Publications page's cards, and every way to reach her (with the QR code on a computer). The two
-   dialogs (the QR code large; the question asked after a while) rise from the foot on a phone. */
+   Laid out as a partner profile the user shared (2026-10-22), phones first (it is opened by tapping her NFC
+   card on someone's phone). First, a strip of the film's night with its blue dust across the top
+   (src/styles/band.css): her photograph and, beside it (under it on a phone), her name in the serif, her
+   signature traced in light by the film's pen, her degree, her role in the logo's orange, her city. Under
+   it, on the site's cream: Save contact, the site's primary button with her card in its nib, and four
+   square buttons to reach her; her phone, email and office; Share and the QR code; and About beside them
+   on a computer. Then, in the home page's idiom (a kicker with an orange rule, a serif title, rows between
+   hairlines): her honours as tiles (a row to swipe on a phone) and one client's words on the practices'
+   dusk indigo; back on the cream, her career as a path down the years, her talks (the earlier ones folded
+   away), where she serves now beside her memberships, the areas she has written in beside her degrees and
+   languages, three papers as the Publications page's cards, and every way to reach her (with the QR code
+   on a computer). The two dialogs (the QR code large; the question asked after a while) rise from the
+   foot on a phone. Class names: pv- for the profile's own parts, cd- for those kept from her first card. */
 html[data-page="card"],html[data-page="card"] body{background:#FCF6EE}
-.cd-hero,.cd-page,.cd-dusk{--gut:clamp(20px,6vw,104px)}
+.cd-page,.cd-dusk,.pv-band{--gut:clamp(20px,6vw,104px)}
 
-/* ---- the card ---- */
-.cd-hero .nb-words{justify-content:flex-start;max-width:none;padding:calc(var(--header-h) + 12px) var(--gut) clamp(40px,7vh,72px)}
-/* (on a phone, for now, the band only as tall as the card: nothing stands below it yet) */
-@media (max-width:899.98px){.cd-hero.nb-hero{min-height:0}}
-.cd-hero .nb-back{margin:0;padding:0}
-/* (the night dimmed under the card's words, as for a shape behind them) */
-.cd-hero .nb-shade{background:linear-gradient(180deg,rgba(3,8,23,.5) 0,rgba(3,8,23,.66) 260px,rgba(3,8,23,.6) 470px,rgba(3,8,23,0) 600px)}
-.cd-id{display:flex;align-items:center;gap:16px;margin-top:20px}
-.cd-photo{flex:none;width:112px;aspect-ratio:14 / 17;border-radius:18px;overflow:hidden;background:#3A2E2A;
-  box-shadow:0 0 0 1px rgba(242,245,252,.2),0 18px 40px rgba(0,0,0,.45)}
-.cd-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 24%}
-.cd-who{min-width:0}
-.cd-name{margin:0;font:500 1.95rem/1.04 var(--serif);letter-spacing:-.015em;color:#FCF6EE}
-.cd-cred{margin:8px 0 0;font:600 .68rem/1.25 var(--sans);letter-spacing:.15em;text-transform:uppercase;color:rgba(242,245,252,.66)}
-.cd-role{margin:8px 0 0;font:600 .95rem/1.3 var(--sans);color:#F2A65A}
-.cd-place{display:flex;align-items:center;gap:6px;margin:6px 0 0;font-size:.82rem;color:rgba(242,245,252,.7)}
-.cd-place svg{flex:none}
-.cd-line{margin:18px 0 0;max-width:46ch;font-size:.98rem;line-height:1.55;color:rgba(214,224,246,.9)}
-.cd-acts{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin:18px -6px 0;padding:0}
-.cd-acts a{display:grid;justify-items:center;gap:6px;padding:2px 0 4px;color:#F2F5FC;text-decoration:none;font:500 .72rem/1.1 var(--sans);border-radius:14px}
-.cd-ic{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(242,245,252,.22);
-  transition:background-color .2s,border-color .2s}
-.cd-acts a:active .cd-ic{background:rgba(242,166,90,.25);border-color:rgba(242,166,90,.7)}
-@media (hover:hover){.cd-acts a:hover .cd-ic{background:rgba(255,255,255,.16);border-color:rgba(242,166,90,.7)}}
-/* Save contact, then Share and the QR code (round on a phone, with their names on a computer) */
-.cd-saverow{display:flex;align-items:center;gap:10px;margin-top:18px}
-/* Save contact: the site's primary button, her card (a person with a plus) in its nib */
+/* ---- the strip of the film's night across the top: her photograph and, beside it, her name, her
+   signature traced in light, her degree, role and city (one column, centred, on a phone) ---- */
+.pv-band.nb-page{min-height:0}
+.pv-band .nb-words{display:block;max-width:none;padding:calc(var(--header-h) + 14px) 0 30px}
+.pv-band.nb .nb-shade{background:radial-gradient(75% 65% at 50% 55%,rgba(3,8,23,.5) 0%,rgba(3,8,23,0) 78%)}
+.pv-band-in{width:min(1232px,calc(100% - 2 * var(--gut)));margin:0 auto}
+.pv-back-ph{margin-bottom:8px}
+.pv-id{display:flex;flex-direction:column;align-items:center;text-align:center}
+.pv-face{flex:none;width:124px;aspect-ratio:4 / 5;margin:0;border-radius:18px;overflow:hidden;background:#1B2A55;
+  box-shadow:0 0 0 1px rgba(242,245,252,.22),0 18px 40px rgba(0,0,0,.45)}
+.pv-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.pv-who{display:flex;flex-direction:column;align-items:center;min-width:0}
+.pv-name{margin:16px 0 0;font:500 2.5rem/1.02 var(--serif);letter-spacing:-.02em;color:#FCF6EE;text-wrap:balance}
+/* her signature, under the printed name toward its end, as a hand signs below a typed name: its ink shown
+   only where the pen's strokes have passed (the mask's strokes, drawn on by the page's script), its glow
+   drawn after the mask so that it is not cut, the pen's tip a glowing point */
+.pv-sig{display:block;width:min(180px,50%);height:auto;margin:2px 0 0 28%;overflow:visible}
+.pv-ink{fill:#F2A65A}
+.pv-glow{filter:drop-shadow(0 0 5px rgba(242,166,90,.45))}
+.pv-front{fill:#F2A65A;filter:drop-shadow(0 0 6px rgba(242,166,90,.95)) drop-shadow(0 0 14px rgba(224,122,31,.6));opacity:0}
+.pv-wait .pv-st{visibility:hidden}
+.pv-wait .pv-all{opacity:0}
+.pv-cred{margin:10px 0 0;font:600 .7rem/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:rgba(242,245,252,.62)}
+.pv-role{margin:6px 0 0;font:600 1rem/1.35 var(--sans);color:#F2A65A}
+.pv-place{display:flex;align-items:center;justify-content:center;gap:6px;margin:6px 0 0;font-size:.86rem;color:rgba(242,245,252,.72)}
+.pv-place svg{flex:none}
+.pv-band a:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
+
+/* ---- under it, on the cream: Save contact and four square buttons to reach her, her details, Share and
+   the QR code; About beside them on a computer ---- */
+.pv-top{display:grid;gap:34px;padding:24px 0 clamp(44px,7vh,64px)}
+.pv-back-dk{display:none}
+.pv-reach{display:grid;gap:18px;align-content:start}
+.pv-acts{display:grid;gap:10px}
+/* Save contact: the site's primary button, her card (a person with a plus) in its nib; here a rectangle
+   with rounded corners, as the buttons beside it (the user, 2026-10-22) */
 .cd-save{--ar:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A34D09' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='8' r='4'/%3E%3Cpath d='M3 21v-1a6 6 0 016-6h2a6 6 0 016 6v1M19 8v6M16 11h6'/%3E%3C/svg%3E");
   min-height:54px;font-size:1.02rem}
-.cd-hero .cd-save{flex:1 1 auto}
 .cd-save:hover::after{animation:none !important}
-.cd-tool{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:54px;height:54px;border-radius:999px;border:1px solid rgba(242,245,252,.26);
-  background:rgba(255,255,255,.05);color:#F2F5FC;font:600 .9rem/1 var(--sans);transition:background-color .2s,border-color .2s}
-.cd-tool span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.cd-tool:active{background:rgba(255,255,255,.14)}
-@media (hover:hover){.cd-tool:hover{background:rgba(255,255,255,.1);border-color:rgba(242,166,90,.7)}}
-.cd-hero a:focus-visible,.cd-hero button:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
-/* (a narrower phone: Save contact without its nib, and Share and the QR code a little smaller, so the row fits) */
-@media (max-width:389.98px){
-  .cd-hero .cd-save{padding:0 18px}
-  .cd-hero .cd-save::after{display:none}
-  .cd-saverow{gap:8px}
-  .cd-tool{width:48px;height:48px}
-}
-@media (max-width:299.98px){
-  .cd-hero .cd-save{padding:0 14px;font-size:.95rem}
-  .cd-saverow{gap:6px}
-  .cd-tool{width:44px;height:44px}
-}
-@media (max-width:359.98px){
-  .cd-photo{width:96px}
-  .cd-name{font-size:1.85rem}
-  .cd-ic{width:46px;height:46px}
-  .cd-acts a{font-size:.64rem}
-}
+.pv-acts .cd-save{width:100%;justify-content:space-between;border-radius:16px}
+/* (Call, WhatsApp, Email and LinkedIn: square, the icon over its name) */
+.pv-btns{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0;padding:0}
+.pv-btns a{display:grid;justify-items:center;align-content:center;gap:7px;height:100%;min-height:66px;padding:8px 2px;border-radius:16px;
+  border:1px solid rgba(19,35,76,.16);background:rgba(255,253,249,.72);color:#13234C;text-decoration:none;font:600 .8rem/1.1 var(--sans);
+  transition:border-color .2s,background-color .2s}
+.pv-btns svg{color:#A34D09}
+.pv-btns a:active{background:rgba(242,166,90,.16);border-color:rgba(224,122,31,.6)}
+@media (hover:hover){.pv-btns a:hover{background:#FFFDF9;border-color:rgba(224,122,31,.6)}}
+.pv-dl{display:grid;gap:10px;margin:0;padding-top:16px;border-top:1px solid rgba(19,35,76,.12)}
+.pv-dl div{display:grid;grid-template-columns:62px minmax(0,1fr);column-gap:14px;align-items:baseline}
+.pv-dl dt{font-size:.86rem;color:#5E6884}
+.pv-dl dd{margin:0;font-size:.95rem;line-height:1.45;color:#13234C}
+.pv-dl a{color:inherit;text-decoration:none;overflow-wrap:anywhere}
+@media (hover:hover){.pv-dl a:hover{text-decoration:underline;text-decoration-color:#E07A1F;text-underline-offset:4px}}
+.pv-tools{display:flex;flex-wrap:wrap;gap:0 22px;margin-top:-6px}
+.pv-tools button{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0;border:0;background:none;color:#1C3472;font:600 .9rem/1 var(--sans);cursor:pointer}
+.pv-tools svg{color:#A34D09}
+@media (hover:hover){.pv-tools button:hover{color:#A34D09}}
+.pv-top :is(a,button):focus-visible{outline:2px solid #AC571D;outline-offset:3px}
+.pv-about .cd-k{margin-bottom:16px}
+.pv-about p{margin:0;max-width:62ch;font-size:clamp(1rem,.95rem + .2vw,1.1rem);line-height:1.7;color:#2F3A57;text-wrap:pretty}
+.pv-about p + p{margin-top:14px}
+.pv-about p:first-of-type{color:#13234C}
+/* (the narrowest phones: the four buttons two by two) */
+@media (max-width:339.98px){.pv-btns{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* ---- the cream: a column as wide as the header's, sections between hairlines ---- */
 .cd-page{width:min(1232px,calc(100% - 2 * var(--gut)));margin:0 auto;color:#13234C}
@@ -78,26 +90,6 @@ html[data-page="card"],html[data-page="card"] body{background:#FCF6EE}
 .cd-head{margin-bottom:clamp(18px,3vh,30px)}
 .cd-head h2{margin:12px 0 0;font:500 clamp(1.7rem,1.2rem + 1.6vw,2.6rem)/1.08 var(--serif);letter-spacing:-.015em;color:#13234C;text-wrap:balance}
 .cd-head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 24px;flex-wrap:wrap}
-
-/* who she is: the serif line large, its middle in orange italics, and two short paragraphs */
-.cd-intro{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:clamp(30px,6vh,72px) 0 clamp(34px,6vh,64px)}
-/* (small enough on the narrowest phones for "pharmacologist" to stand whole on its line) */
-.cd-lede{margin:0;font:400 clamp(2.1rem,1.2rem + 4.4vw,4.8rem)/1.02 var(--serif);letter-spacing:-.028em;color:#13234C;text-wrap:balance}
-.cd-lede em{font-style:italic;color:#C2651A}
-.cd-intro-t{display:grid;gap:12px;max-width:60ch}
-.cd-intro-t p{margin:0;font-size:clamp(1rem,.95rem + .2vw,1.12rem);line-height:1.65;color:#2F3A57}
-
-/* what she is known for: numbered rows (as the home page's reasons), each leading to its practice */
-.cd-known{list-style:none;margin:0;padding:0;display:grid}
-.cd-known a{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:10px;padding:18px 0;border-top:1px solid rgba(19,35,76,.12);color:inherit;text-decoration:none}
-.cd-known li:first-child a{border-top:0;padding-top:4px}
-.cd-num{grid-row:1 / span 3;font:600 .92rem/1.75 var(--sans);color:#C2651A}
-.cd-known h3{margin:0;font:500 1.38rem/1.2 var(--serif);color:#13234C}
-.cd-known p{margin:6px 0 0;font-size:.95rem;line-height:1.55;color:#45506A}
-.cd-go{margin-top:10px;font:600 .86rem/1 var(--sans);color:#1C3472}
-.cd-go span{color:#C2651A}
-@media (hover:hover){.cd-known a:hover h3{text-decoration:underline;text-decoration-color:#E07A1F;text-decoration-thickness:2px;text-underline-offset:5px}}
-.cd-known a:focus-visible{outline:2px solid #AC571D;outline-offset:4px;border-radius:6px}
 
 /* ---- her honours and a client's words, on the practices' dusk indigo ---- */
 .cd-dusk{position:relative;color:#F2F5FC;
@@ -125,7 +117,17 @@ a.cd-hon:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
 .cd-quote figcaption{display:flex;align-items:center;gap:12px;margin-top:18px;font:600 .72rem/1.35 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:rgba(242,245,252,.66)}
 .cd-quote figcaption::before{content:"";flex:none;width:26px;height:1px;background:#E07A1F}
 
-/* ---- where she serves now, and her recent talks ---- */
+/* ---- her career, a path down the years, the latest first ---- */
+.pv-first{border-top:0}
+.pv-path{list-style:none;margin:0;padding:0;display:grid}
+.pv-path li{position:relative;display:grid;gap:4px;padding:0 0 22px 22px;border-left:2px solid rgba(19,35,76,.14)}
+.pv-path li:last-child{padding-bottom:0;border-left-color:transparent}
+.pv-path li::before{content:"";position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:#FCF6EE;border:2px solid #E07A1F}
+.pv-path .pv-when{font:600 .7rem/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#AC571D}
+.pv-path b{font:500 1.14rem/1.3 var(--serif);color:#13234C}
+.pv-path span:last-child{font-size:.92rem;line-height:1.5;color:#45506A}
+
+/* ---- rows between hairlines: her talks, where she serves now, her memberships, her degrees ---- */
 .cd-two{display:grid}
 .cd-rows{list-style:none;margin:0;padding:0;display:grid}
 .cd-rows li{display:grid;gap:4px;padding:16px 0;border-top:1px solid rgba(19,35,76,.1)}
@@ -134,7 +136,27 @@ a.cd-hon:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
 .cd-rows span{font-size:.9rem;line-height:1.5;color:#45506A}
 .cd-rows .cd-where{font:600 .88rem/1.4 var(--sans);color:#1C3472}
 .cd-rows .cd-when{font:600 .7rem/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#AC571D}
+/* (two lists side by side share their row's height: each keeps its rows at the top, not spread out) */
+.cd-two .cd-rows,.cd-two .cd-rows li{align-content:start}
 .cd-talks b{font-style:italic}
+/* talks and workshops: the latest, then the earlier ones folded away */
+.pv-sub{margin:12px 0 0;max-width:60ch;font-size:1rem;line-height:1.6;color:#2F3A57}
+.pv-more{margin-top:6px;border-top:1px solid rgba(19,35,76,.1)}
+.pv-more summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;cursor:pointer;list-style:none;font:600 .92rem/1.2 var(--sans);color:#1C3472}
+.pv-more summary::-webkit-details-marker{display:none}
+.pv-more summary span{font-size:1.3rem;color:#C2651A;transition:transform .2s}
+.pv-more[open] summary span{transform:rotate(45deg)}
+.pv-more summary:focus-visible{outline:2px solid #AC571D;outline-offset:2px;border-radius:6px}
+/* the areas she has written in, her degrees and languages */
+.pv-areas-in{display:grid;gap:16px;align-content:start}
+.pv-areas{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
+.pv-areas li{padding:7px 13px;border-radius:999px;background:#FFFDF9;border:1px solid rgba(19,35,76,.12);font:500 .86rem/1.2 var(--sans);color:#13234C}
+.pv-link{justify-self:start;font:600 .9rem/1.3 var(--sans);color:#1C3472;text-decoration:none}
+.pv-link span{color:#C2651A}
+@media (hover:hover){.pv-link:hover{text-decoration:underline;text-decoration-color:#E07A1F;text-underline-offset:4px}}
+.pv-edu span:last-child{font-size:.9rem}
+.pv-langs{margin:16px 0 0;padding-top:14px;border-top:1px solid rgba(19,35,76,.1);font-size:.92rem;line-height:1.55;color:#45506A}
+.pv-langs b{display:block;margin-bottom:4px;font:600 .7rem/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#AC571D}
 
 /* ---- three papers: the Publications page's cards ---- */
 .cd-papers{list-style:none;margin:0;padding:0;display:grid;gap:14px}
@@ -206,34 +228,29 @@ a.cd-hon:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
   .cd-paper{box-shadow:0 8px 22px rgba(19,35,76,.05)}
 }
 
-/* ---- a computer: the card's words at the left of the night, the page writing itself at the right ---- */
+/* ---- a computer: her photograph at the left of the strip, her name beside it; under it two columns,
+   the ways to reach her and About; the sections below laid out wider ---- */
 @media (min-width:900px){
-  .cd-hero .nb-words{max-width:min(760px,56vw);padding-bottom:clamp(120px,17vh,170px)}
-  .cd-hero .nb-shade{background:linear-gradient(90deg,rgba(3,8,23,.7) 0%,rgba(3,8,23,.4) 34%,rgba(3,8,23,0) 56%)}
-  .cd-hero .nb-back{margin-bottom:auto}
-  .cd-saverow{margin-bottom:auto}
-  .cd-tool{width:auto;padding:0 18px}
-  .cd-tool span{position:static;width:auto;height:auto;overflow:visible;clip:auto}
-  .cd-id{gap:clamp(22px,2.2vw,32px);margin-top:28px}
-  .cd-photo{width:clamp(150px,12.5vw,200px);border-radius:24px}
-  .cd-name{font-size:clamp(2.8rem,1.4rem + 2.6vw,4.3rem)}
-  .cd-cred{font-size:.72rem;margin-top:12px}
-  .cd-role{font-size:1.08rem;margin-top:10px}
-  .cd-place{font-size:.9rem}
-  .cd-line{font-size:1.1rem;margin-top:26px}
-  .cd-acts{display:flex;gap:14px;margin:24px 0 0}
-  .cd-acts a{width:68px;font-size:.76rem}
-  .cd-ic{width:56px;height:56px}
-  .cd-saverow{margin-top:22px}
-  .cd-hero .cd-save{flex:none;min-width:230px}
-  .cd-intro{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:clamp(32px,5vw,88px);align-items:end}
-  .cd-intro .cd-k{grid-column:1 / -1}
-  .cd-intro-t{padding-bottom:8px}
-  .cd-known{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,44px)}
-  .cd-known a{display:flex;flex-direction:column;height:100%;padding:18px 0 0;border-top:2px solid rgba(19,35,76,.85)}
-  .cd-known li:first-child a{border-top:2px solid rgba(19,35,76,.85);padding-top:18px}
-  .cd-num{margin-bottom:26px;line-height:1}
-  .cd-go{margin-top:auto;padding-top:16px}
+  .pv-back-ph{display:none}
+  .pv-band .nb-words{padding:calc(var(--header-h) + clamp(30px,5vh,50px)) 0 clamp(30px,5vh,50px)}
+  .pv-band.nb .nb-shade{background:linear-gradient(90deg,rgba(3,8,23,.62) 0%,rgba(3,8,23,.34) 38%,rgba(3,8,23,0) 66%)}
+  .pv-id{flex-direction:row;text-align:left;gap:clamp(30px,3.2vw,48px)}
+  .pv-face{width:clamp(176px,15vw,220px);border-radius:16px}
+  .pv-who{align-items:flex-start}
+  .pv-name{margin:0;font-size:clamp(3rem,1.5rem + 2.7vw,4.4rem)}
+  .pv-sig{width:min(230px,70%);margin:0 0 0 clamp(70px,8vw,140px)}
+  .pv-cred{margin-top:12px;font-size:.74rem}
+  .pv-role{margin-top:8px;font-size:1.12rem}
+  .pv-place{justify-content:flex-start;font-size:.94rem}
+  .pv-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(40px,5vw,88px);row-gap:26px;padding:30px 0 clamp(56px,9vh,96px)}
+  .pv-back-dk{display:block;grid-column:1 / -1}
+  .pv-honours{grid-template-columns:repeat(4,minmax(0,1fr))}
+  /* (her career: its heading at the left, held as the path goes by at the right) */
+  .pv-career{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:clamp(32px,5vw,88px);align-items:start}
+  .pv-career .cd-head{position:sticky;top:calc(var(--header-h) + 32px)}
+  .pv-talks{column-count:2;column-gap:clamp(32px,5vw,88px);display:block}
+  .pv-talks li{break-inside:avoid}
+  .pv-talks li:first-child{padding-top:16px;border-top:1px solid rgba(19,35,76,.1)}
   /* (the two side by side, their lists starting level whatever their titles' lengths) */
   .cd-two{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;column-gap:clamp(32px,5vw,88px)}
   .cd-two > .cd-sec{display:grid;grid-row:span 2;grid-template-rows:subgrid}
@@ -245,9 +262,16 @@ a.cd-hon:focus-visible{outline:2px solid #F2A65A;outline-offset:3px}
   .cd-qr-inline figcaption{font-size:.88rem;line-height:1.45;color:#45506A}
   .cd-dlg{margin:auto;border-radius:24px;padding:28px 26px 24px}
 }
+/* (wide enough: Save contact and the four buttons in one row, all as tall) */
+@media (min-width:1240px){
+  .pv-acts{grid-template-columns:minmax(196px,1fr) minmax(0,1.6fr);gap:10px}
+  .pv-acts .cd-save{min-height:62px}
+  .pv-btns a{min-height:62px;gap:6px;padding:6px 2px}
+}
 @media (prefers-reduced-motion:reduce){
   .cd-dlg[open]{animation:none}
   .cd-toast{transition:none}
   .cd-hon,.cd-paper{transition:none}
   a.cd-hon:hover,.cd-paper.has-link:hover{transform:none}
+  .pv-more summary span{transition:none}
 }

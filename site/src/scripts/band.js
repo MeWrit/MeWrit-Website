@@ -18,8 +18,8 @@ import { F } from './xp/formations.js';
 import { fitShot, sceneDir, norm, sub } from './xp/fit.js';
 
 const UP = [0, 1, 0], ORIGIN = [0, 0, 0];
-// scene "dust": no shape, only the film's dust drifting in the night (her profile, for now: the user did not
-// like the page there, 2026-10-22)
+// scene "dust": no shape, only the film's dust drifting in the night (the strip across the top of her
+// profile: the user did not like the film's page there, and chose the dust field, 2026-10-22)
 // (brought up and a little larger, as the film's own tail shows it: scenes.js TAIL)
 const DUST = { id: 'dust', form: F.DUST, a: [[0, 0, 30], [0, 0, 0], 40, 0, 0], b: [[0, 0, 30], [0, 0, 0], 40, 0, 0], bg: ['#0B1A42', '#030817'], glow: ['#1C3472', .5], dust: 6, size: 1.5, gain: .6, bloom: .35 };
 // the page's signature and seal written again (the voices scene's strokes; scratchpad page_keys.mjs)

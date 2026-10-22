@@ -1,20 +1,21 @@
 ---
-// Dr Hetal Shah's profile, at a short address that stays put (/hetal/: the link on her NFC card; the old
-// profile address leads here). Not her CV (the user, 2026-10-22: "profiles are not literal copies of CVs";
-// they chose a curated profile): her visiting card on the first screen, in the film's night, then who she
-// is in a few lines and a few chosen things, on the site's cream.
-// The card, made for the phone a card is tapped on: her photo, name and role; one tap to call, WhatsApp,
-// email, LinkedIn or the website; Save contact (her contact file); Share and a QR code. Behind it, for now,
-// only the film's dust drifting in the night (src/components/NightBand.astro, scene "dust": the user did not
-// like the film's page there, 2026-10-22; what stands there instead is still to be decided with them).
-// Then: who she is (a serif line and two short paragraphs); what she is known for (three practices, each
-// to its place in the film); her honours and a client's words, on the practices' dusk indigo; where she
-// serves now and three recent talks; three of her papers (all of them on the Publications page); and
-// every way to reach her. After a reader has spent as long on the page as people spend on a page on
-// average, it asks whether they would like to reach out, and to save her contact (src/scripts/card.js).
-// Words: src/data/profile.ts (from her CV); papers: src/data/publications.json; the client's words: the
-// home page's testimonials (src/data/experience.ts); contact file: ./Dr-Hetal-Shah.vcf.ts; styles:
-// src/styles/card.css.
+// Dr Hetal Shah's profile, at a short address that stays put (/hetal/: the link on her NFC card, and where
+// Full profile leads from the Leadership and home pages; the old profile address leads here). Laid out as a
+// partner profile the user shared (2026-10-22: "i like the way this is organised"), and fuller than the
+// pages that lead here ("make this more verbose").
+// First, a strip of the film's night with its blue dust across the top: her photograph and, beside it, her
+// name, her signature traced in light by the film's pen (stroke by stroke; src/data/signature.ts), her
+// degree, role and city. Under it, on the site's cream: Save contact (her contact file) with four square
+// buttons to call, WhatsApp, email her or open her LinkedIn; her phone, email and office; Share and a QR
+// code; and About, a paragraph and a half. Then her honours and a client's words, on the practices' dusk
+// indigo; her career; her talks and workshops (the earlier ones folded away); where she serves now and
+// her memberships; the therapeutic areas she has written in; her degrees and languages; three of her
+// papers (all of them on the Publications page); and every way to reach her. After a reader has spent as
+// long on the page as people spend on a page on average, it asks whether they would like to reach out,
+// and to save her contact (src/scripts/card.js).
+// Words: src/data/profile.ts (from her CV; employers, clients and the institutions she trained not named);
+// papers: src/data/publications.json; the client's words: the home page's testimonials
+// (src/data/experience.ts); contact file: ./Dr-Hetal-Shah.vcf.ts; styles: src/styles/card.css.
 import { Image } from 'astro:assets';
 import QRCode from 'qrcode';
 import Base from '../../layouts/Base.astro';
@@ -22,6 +23,7 @@ import BackLink from '../../components/BackLink.astro';
 import NightBand from '../../components/NightBand.astro';
 import Icon from '../../components/Icon.astro';
 import { profile } from '../../data/profile';
+import { signature } from '../../data/signature';
 import { experience } from '../../data/experience';
 import pubs from '../../data/publications.json';
 import { maps, site } from '../../data/site';
@@ -33,7 +35,7 @@ const home = new URL(href('/'), Astro.site).href;
 const cardUrl = new URL(href('/hetal/'), Astro.site).href;
 const vcf = href('/hetal/Dr-Hetal-Shah.vcf');
 const ogImage = new URL(href('/og/hetal-shah.jpg'), Astro.site).href;
-// the QR code of this card's address, drawn at build (navy on transparent)
+// the QR code of this page's address, drawn at build (navy on transparent)
 const qr = await QRCode.toString(cardUrl, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#13234C', light: '#0000' } });
 const ext = { target: '_blank', rel: 'noopener' };
 // her three papers (profile.selected), by the start of their titles; a title that matches none stops the build
@@ -49,66 +51,80 @@ const papers = profile.selected.map(t => {
 const quote = (experience.scenes.find(s => s.id === 'voices')?.quotes || []).find(q => q.quote.startsWith(profile.quote));
 if (!quote) throw new Error(`profile.quote: no testimonial starts "${profile.quote}"`);
 const site0 = profile.website.replace(/^https?:\/\//, '');
-const n2 = (j: number) => String(j + 1).padStart(2, '0');
+const recent = profile.speaking.filter(s => !s.earlier), earlier = profile.speaking.filter(s => s.earlier);
 ---
 <Base title={`${profile.name}, ${profile.credentials} | ${site.name}`} description={`${profile.name}, ${profile.role}. ${profile.subtitle}. ${profile.line}`} foot="film" page="card" image={ogImage}>
-  {/* the card, in the film's night */}
-  <NightBand scene="dust" size="hero" class="cd-hero" label={`${profile.name}'s card`}>
-    <div class="nb-back"><BackLink dark /></div>
-    <div class="cd-id" data-nb-from>
-      <div class="cd-photo"><Image src={portrait} alt={profile.name} widths={[240, 360, 480]} sizes="(min-width: 900px) 200px, 112px" loading="eager" /></div>
-      <div class="cd-who">
-        <h1 class="cd-name">{profile.name}</h1>
-        <p class="cd-cred">{profile.credentials}</p>
-        <p class="cd-role">{profile.role}</p>
-        <p class="cd-place"><Icon name="pin" size={15} stroke={1.8} />{profile.place}</p>
+  {/* the strip of the film's night: her photograph, her name and signature, her degree, role and city */}
+  <NightBand scene="dust" size="page" class="pv-band" label={`${profile.name}'s card`}>
+    <div class="pv-band-in">
+      {/* (the way back: at the top of the strip on a phone, as on the other pages; under it on a computer) */}
+      <div class="pv-back-ph"><BackLink dark /></div>
+      <div class="pv-id">
+        <figure class="pv-face"><Image src={portrait} alt={profile.name} widths={[240, 360, 480]} sizes="(min-width: 900px) 220px, 124px" loading="eager" /></figure>
+        <div class="pv-who">
+          <h1 class="pv-name">{profile.name}</h1>
+          {/* her signature: its ink shown only where the pen's strokes have passed */}
+          <svg class="pv-sig" viewBox={signature.viewBox} role="img" aria-label={`Signed, ${profile.signature}`}>
+            <defs>
+              <mask id="pv-m">
+                {signature.strokes.map(s => <path class="pv-st" d={s.d} fill="none" stroke="#fff" stroke-width={s.w} stroke-linecap="round" stroke-linejoin="round" />)}
+                <rect class="pv-all" x="-50%" y="-50%" width="200%" height="200%" fill="#fff" />
+              </mask>
+            </defs>
+            <g class="pv-glow"><path class="pv-ink" d={signature.ink} fill-rule="evenodd" mask="url(#pv-m)" /></g>
+            <circle class="pv-front" r="4.5" cx="0" cy="0" />
+          </svg>
+          <script is:inline>
+            // (the ink waits for the pen where scripts run and motion is welcome; else it stands written)
+            (function () {
+              if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.currentScript.previousElementSibling.classList.add('pv-wait');
+            })();
+          </script>
+          <p class="pv-cred">{profile.credentials}</p>
+          <p class="pv-role">{profile.role}</p>
+          <p class="pv-place"><Icon name="pin" size={15} stroke={1.8} />{profile.place}</p>
+        </div>
       </div>
-    </div>
-    <p class="cd-line">{profile.line}</p>
-    <ul class="cd-acts" aria-label="Contact">
-      <li><a href={profile.phoneHref} data-reach><span class="cd-ic"><Icon name="phone" size={21} stroke={1.8} /></span><span>Call</span></a></li>
-      <li><a href={profile.whatsapp} {...ext} data-reach><span class="cd-ic"><Icon name="whatsapp" size={22} stroke={1.8} /></span><span>WhatsApp</span></a></li>
-      <li><a href={`mailto:${profile.email}`} data-reach><span class="cd-ic"><Icon name="mail" size={21} stroke={1.8} /></span><span>Email</span></a></li>
-      <li><a href={profile.linkedin} {...ext}><span class="cd-ic"><Icon name="linkedin" size={19} /></span><span>LinkedIn</span></a></li>
-      <li><a href={home}><span class="cd-ic"><Icon name="globe" size={21} stroke={1.8} /></span><span>Website</span></a></li>
-    </ul>
-    <div class="cd-saverow">
-      <a class="btn btn-primary cd-save" href={vcf} data-save>Save contact</a>
-      <button class="cd-tool" type="button" data-share><Icon name="share" size={20} stroke={1.9} /><span>Share</span></button>
-      <button class="cd-tool" type="button" data-qr><Icon name="qr" size={20} stroke={1.9} /><span>QR code</span></button>
     </div>
   </NightBand>
 
   <div class="cd-page">
-    {/* who she is */}
-    <section class="cd-intro" aria-labelledby="cd-intro-h">
-      <p class="cd-k">Dr Hetal Shah</p>
-      <h2 id="cd-intro-h" class="cd-lede">{profile.intro.lede[0]}<em>{profile.intro.lede[1]}</em>{profile.intro.lede[2]}</h2>
-      <div class="cd-intro-t">{profile.intro.text.map(p => <p>{p}</p>)}</div>
-    </section>
-
-    {/* what she is known for: the three practices she leads, each to its place in the film */}
-    <section class="cd-sec" aria-labelledby="cd-known-h">
-      <header class="cd-head"><p class="cd-k">Known for</p><h2 id="cd-known-h">Three practices, one standard</h2></header>
-      <ol class="cd-known">
-        {profile.knownFor.map((k, j) => (
-          <li><a href={href(`/#${k.anchor}`)}>
-            <span class="cd-num">{n2(j)}</span>
-            <h3>{k.title}</h3>
-            <p>{k.text}</p>
-            <span class="cd-go">The practice <span aria-hidden="true">→</span></span>
-          </a></li>
-        ))}
-      </ol>
-    </section>
+    {/* under it: Save contact, the ways to reach her and her details at the left; who she is at the right */}
+    <div class="pv-top">
+      <div class="pv-back-dk"><BackLink /></div>
+      <div class="pv-reach">
+        <div class="pv-acts">
+          <a class="btn btn-primary cd-save" href={vcf} data-save>Save contact</a>
+          <ul class="pv-btns" aria-label="Contact">
+            <li><a href={profile.phoneHref} data-reach><Icon name="phone" size={19} stroke={1.8} />Call</a></li>
+            <li><a href={profile.whatsapp} {...ext} data-reach><Icon name="whatsapp" size={19} stroke={1.8} />WhatsApp</a></li>
+            <li><a href={`mailto:${profile.email}`} data-reach><Icon name="mail" size={19} stroke={1.8} />Email</a></li>
+            <li><a href={profile.linkedin} {...ext}><Icon name="linkedin" size={17} />LinkedIn</a></li>
+          </ul>
+        </div>
+        <dl class="pv-dl">
+          <div><dt>Phone</dt><dd><a href={profile.phoneHref} data-reach>{profile.phone}</a></dd></div>
+          <div><dt>Email</dt><dd><a href={`mailto:${profile.email}`} data-reach>{profile.email}</a></dd></div>
+          <div><dt>Office</dt><dd><a href={maps.directions} {...ext}>{profile.office.join(', ')}</a></dd></div>
+        </dl>
+        <div class="pv-tools">
+          <button type="button" data-share><Icon name="share" size={17} stroke={1.8} />Share this profile</button>
+          <button type="button" data-qr><Icon name="qr" size={17} stroke={1.8} />QR code</button>
+        </div>
+      </div>
+      <section class="pv-about" aria-labelledby="pv-about-h">
+        <h2 id="pv-about-h" class="cd-k">About</h2>
+        {profile.about.map(p => <p>{p}</p>)}
+      </section>
+    </div>
   </div>
 
-  {/* her honours, and a client's words, on the practices' dusk indigo */}
-  <section class="cd-dusk" aria-labelledby="cd-hon-h">
+  {/* her honours and a client's words, under the About, on the practices' dusk indigo */}
+  <section class="cd-dusk" aria-labelledby="pv-hon-h">
     <div class="cd-dusk-in">
-      <header class="cd-head"><p class="cd-k">Recognition</p><h2 id="cd-hon-h">Recognised in science and in business</h2></header>
-      <ul class="cd-honours">
-        {profile.honours.map(r => {
+      <header class="cd-head"><p class="cd-k">Recognition</p><h2 id="pv-hon-h">Recognised in science and in business</h2></header>
+      <ul class="cd-honours pv-honours">
+        {profile.recognition.map(r => {
           const inner = <>
             <span class="cd-hon-ic" aria-hidden="true"><Icon name={r.icon} size={22} stroke={1.7} /></span>
             <span class="cd-when">{r.year}</span>
@@ -128,26 +144,68 @@ const n2 = (j: number) => String(j + 1).padStart(2, '0');
   </section>
 
   <div class="cd-page">
-    {/* where she serves now, and where she has spoken lately */}
+    {/* her path */}
+    <section class="cd-sec pv-first pv-career" aria-labelledby="pv-path-h">
+      <header class="cd-head"><p class="cd-k">Career</p><h2 id="pv-path-h">From the clinic to the page</h2></header>
+      <ol class="pv-path">
+        {profile.career.map(c => <li><span class="pv-when">{c.when}</span><b>{c.title}</b><span>{c.where}</span></li>)}
+      </ol>
+    </section>
+
+    {/* talks and workshops: the latest, then the earlier ones folded away */}
+    <section class="cd-sec" aria-labelledby="pv-talks-h">
+      <header class="cd-head"><p class="cd-k">Speaking and training</p><h2 id="pv-talks-h">Talks, workshops and panels</h2><p class="pv-sub">{profile.trained}</p></header>
+      <ul class="cd-rows cd-talks pv-talks">
+        {recent.map(t => <li><span class="cd-when">{t.when}</span><b>“{t.title}”</b><span>{t.role}, {t.where}</span></li>)}
+      </ul>
+      <details class="pv-more">
+        <summary>Earlier talks and workshops <span aria-hidden="true">+</span></summary>
+        <ul class="cd-rows cd-talks pv-talks">
+          {earlier.map(t => <li><span class="cd-when">{t.when}</span><b>“{t.title}”</b><span>{t.role}, {t.where}</span></li>)}
+        </ul>
+      </details>
+    </section>
+
+    {/* where she serves now, and her memberships */}
     <div class="cd-two">
-      <section class="cd-sec" aria-labelledby="cd-now-h">
-        <header class="cd-head"><p class="cd-k">Now</p><h2 id="cd-now-h">Editor, council member, mentor</h2></header>
+      <section class="cd-sec" aria-labelledby="pv-now-h">
+        <header class="cd-head"><p class="cd-k">Now</p><h2 id="pv-now-h">Editor, council member, mentor</h2></header>
         <ul class="cd-rows">
           {profile.now.map(r => <li><b>{r.title}</b><span class="cd-where">{r.where}</span><span>{r.text}</span></li>)}
         </ul>
       </section>
-      <section class="cd-sec" aria-labelledby="cd-talks-h">
-        <header class="cd-head"><p class="cd-k">Speaking</p><h2 id="cd-talks-h">Recent talks</h2></header>
-        <ul class="cd-rows cd-talks">
-          {profile.talks.map(t => <li><span class="cd-when">{t.when}</span><b>“{t.title}”</b><span>{t.role}, {t.where}</span></li>)}
+      <section class="cd-sec" aria-labelledby="pv-mem-h">
+        <header class="cd-head"><p class="cd-k">Memberships</p><h2 id="pv-mem-h">Societies and registration</h2></header>
+        <ul class="cd-rows">
+          {profile.memberships.map(m => <li><b>{m.title}</b><span>{m.text}</span></li>)}
         </ul>
       </section>
     </div>
 
+    {/* the areas she has written in, and her degrees and languages */}
+    <div class="cd-two">
+      <section class="cd-sec" aria-labelledby="pv-areas-h">
+        <header class="cd-head"><p class="cd-k">Therapeutic areas</p><h2 id="pv-areas-h">Where she has written</h2></header>
+        <div class="pv-areas-in">
+          <ul class="pv-areas">{profile.areas.map(a => <li>{a}</li>)}</ul>
+          <a class="pv-link" href={href('/therapeutic-areas/')}>The therapeutic areas MeWriT covers <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+      <section class="cd-sec" aria-labelledby="pv-edu-h">
+        <header class="cd-head"><p class="cd-k">Education</p><h2 id="pv-edu-h">Degrees and languages</h2></header>
+        <div>
+          <ul class="cd-rows pv-edu">
+            {profile.education.map(e => <li><span class="cd-when">{e.when}</span><b>{e.degree}</b>{e.note && <span>{e.note}</span>}</li>)}
+          </ul>
+          <p class="pv-langs"><b>Languages</b> {profile.languages.join(' · ')}</p>
+        </div>
+      </section>
+    </div>
+
     {/* three of her papers, and the way to them all */}
-    <section class="cd-sec" aria-labelledby="cd-papers-h">
+    <section class="cd-sec" aria-labelledby="pv-papers-h">
       <header class="cd-head cd-head-row">
-        <div><p class="cd-k">Selected writing</p><h2 id="cd-papers-h">Three of her papers</h2></div>
+        <div><p class="cd-k">Selected writing</p><h2 id="pv-papers-h">Three of her papers</h2></div>
         <a class="btn btn-outline cd-all" href={href('/publications/')}>All publications</a>
       </header>
       <ul class="cd-papers">
@@ -163,8 +221,8 @@ const n2 = (j: number) => String(j + 1).padStart(2, '0');
     </section>
 
     {/* every way to reach her */}
-    <section class="cd-sec cd-reach" aria-labelledby="cd-reach-h">
-      <header class="cd-head"><p class="cd-k">Get in touch</p><h2 id="cd-reach-h">Write to her, call, or meet her in Ahmedabad</h2></header>
+    <section class="cd-sec cd-reach" aria-labelledby="pv-reach-h">
+      <header class="cd-head"><p class="cd-k">Get in touch</p><h2 id="pv-reach-h">Write to her, call, or meet her in Ahmedabad</h2></header>
       <div class="cd-reach-in">
         <ul class="cd-reach-list">
           <li><a href={profile.phoneHref} data-reach><Icon name="phone" size={18} stroke={1.8} /><span>{profile.phone}</span></a></li>
@@ -177,8 +235,8 @@ const n2 = (j: number) => String(j + 1).padStart(2, '0');
         </ul>
         <div class="cd-reach-card">
           <a class="btn btn-primary cd-save" href={vcf} data-save>Save contact</a>
-          {/* (on a computer: scan it to open this card on a phone) */}
-          <figure class="cd-qr-inline" aria-hidden="true"><span set:html={qr} /><figcaption>Scan to open this card on your phone</figcaption></figure>
+          {/* (on a computer: scan it to open this page on a phone) */}
+          <figure class="cd-qr-inline" aria-hidden="true"><span set:html={qr} /><figcaption>Scan to open this profile on your phone</figcaption></figure>
         </div>
       </div>
     </section>
@@ -187,7 +245,7 @@ const n2 = (j: number) => String(j + 1).padStart(2, '0');
   {/* the QR code, large, for someone to scan off her phone */}
   <dialog class="cd-dlg cd-qrdlg" aria-labelledby="cd-qr-h">
     <button class="cd-x" type="button" data-close aria-label="Close">×</button>
-    <h2 id="cd-qr-h" tabindex="-1" autofocus>Scan to open this card</h2>
+    <h2 id="cd-qr-h" tabindex="-1" autofocus>Scan to open this profile</h2>
     <div class="cd-qr" set:html={qr} />
     <p class="cd-url">{cardUrl.replace(/^https?:\/\//, '')}</p>
     <button class="cd-btn" type="button" data-copy><Icon name="copy" size={17} stroke={1.9} />Copy link</button>
@@ -220,4 +278,68 @@ const n2 = (j: number) => String(j + 1).padStart(2, '0');
 
 <script>
   import '../../scripts/card.js';
+</script>
+<script>
+  // her signature traced by the film's pen: stroke by stroke in the order a hand writes them, the ink shown
+  // only where the pen's glowing tip has passed; slower as the pen sets down and lifts, and between strokes
+  // the tip lifts (dimmer) and moves on to the next. Once as the page opens, and again whenever someone saves
+  // her contact (card.js sends "nb:sign"). With reduced motion it stands written.
+  const svg = document.querySelector<SVGSVGElement>('.pv-sig');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0;
+  function sign() {
+    if (!svg || reduce) return;
+    const st = [...svg.querySelectorAll<SVGPathElement>('.pv-st')];
+    const whole = svg.querySelector('.pv-all') as SVGRectElement, tip = svg.querySelector('.pv-front') as SVGCircleElement;
+    if (!st.length || !whole || !tip) return;
+    const len = st.map(p => p.getTotalLength());
+    cancelAnimationFrame(raf);
+    st.forEach((p, i) => { p.style.visibility = 'hidden'; p.style.strokeDasharray = `${len[i] + 1} ${len[i] + 2}`; p.style.strokeDashoffset = String(len[i] + 1); });
+    whole.style.opacity = '0';
+    svg.classList.remove('pv-wait');
+    // (the pace: every stroke in 2.1 s; a lift quicker the nearer the next stroke starts)
+    const pace = len.reduce((a, b) => a + b, 0) / 2100;
+    type Seg = { i: number; t0: number; t1: number; a?: DOMPoint; b?: DOMPoint };
+    const plan: Seg[] = [];
+    let t = 0;
+    st.forEach((p, i) => {
+      if (i) {
+        const a = st[i - 1].getPointAtLength(len[i - 1]), b = p.getPointAtLength(0);
+        const lift = 60 + Math.hypot(b.x - a.x, b.y - a.y) / (pace * 2.5);
+        plan.push({ i: -1, t0: t, t1: t + lift, a, b });
+        t += lift;
+      }
+      const dur = Math.max(90, len[i] / pace);
+      plan.push({ i, t0: t, t1: t + dur });
+      t += dur;
+    });
+    const T = t, FADE = 280, end = st[st.length - 1].getPointAtLength(len[len.length - 1]);
+    const ease = (x: number) => .5 - .5 * Math.cos(Math.PI * x);
+    let t0 = 0;
+    const frame = (now: number) => {
+      if (!t0) t0 = now;
+      const e = now - t0;
+      let x = end.x, y = end.y, o = 0;
+      for (const s of plan) {
+        const on = e >= s.t0 && e < s.t1, k = e <= s.t0 ? 0 : e >= s.t1 ? 1 : ease((e - s.t0) / (s.t1 - s.t0));
+        if (s.i < 0) {
+          if (on && s.a && s.b) { x = s.a.x + (s.b.x - s.a.x) * k; y = s.a.y + (s.b.y - s.a.y) * k; o = .4; }
+          continue;
+        }
+        const p = st[s.i], L = len[s.i];
+        if (e >= s.t0) p.style.visibility = 'visible';
+        p.style.strokeDashoffset = String((L + 1) * (1 - k));
+        if (on) { const q = p.getPointAtLength(L * k); x = q.x; y = q.y; o = 1; }
+      }
+      // (written: whatever ink the strokes missed is shown, and the pen leaves)
+      if (e >= T) { const f = Math.min(1, (e - T) / FADE); whole.style.opacity = String(f); o = 1 - f; }
+      tip.setAttribute('cx', String(x));
+      tip.setAttribute('cy', String(y));
+      tip.style.opacity = String(o);
+      if (e < T + FADE) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+  }
+  setTimeout(sign, 450);
+  document.addEventListener('nb:sign', () => sign());
 </script>
