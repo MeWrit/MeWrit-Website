@@ -40,7 +40,7 @@ export const founder = {
   role: 'Founder & Director',
   bio: `A PhD Pharmacologist and Gold (Double) Medalist with more than ${YEARS} years in clinical research and medical writing across clinical sites and CROs.`,
   chips: ['Section Editor, PICR', 'ISCR life member', 'DIA Global Mentor', 'GCP trained'],
-  link: { label: 'Read full profile', href: '/leadership/hetal-shah/' },
+  link: { label: 'Read full profile', href: '/hetal/' },
   // the honours roll on her profile; `home` marks the few named in one line on the home page.
   // `detail` names the body behind each one (checked on iscr.org, nsrcel.org, goldmansachs.com and
   // wep.gov.in); years can be added once Dr Hetal confirms them

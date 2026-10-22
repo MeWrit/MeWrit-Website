@@ -19,7 +19,7 @@ export const leadership = {
   leaders: [
     {
       id: 'hetal-shah', name: founder.name, role: founder.role, bio: [founder.bio], chips: founder.chips,
-      photo: true, profile: '/leadership/hetal-shah/',
+      photo: true, profile: '/hetal/',
     },
     {
       id: 'amit-shah', name: 'Dr Amit Shah', role: 'Chief Medical Expert', initials: 'AS', photo: true,

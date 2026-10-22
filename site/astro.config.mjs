@@ -23,5 +23,7 @@ export default defineConfig({
     '/lamplight/board': B + '/archive/lamplight/board/',
     '/lamplight/regulatory-writing': B + '/archive/lamplight/regulatory-writing/',
     '/lamplight/worlds': B + '/archive/lamplight/worlds/',
+    // Dr Hetal's profile became her card, at a short address that stays put (the link on her NFC card)
+    '/leadership/hetal-shah': B + '/hetal/',
   },
 });

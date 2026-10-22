@@ -1,12 +1,6 @@
 {
  "source": "MeWriT Website Text for Editing.docx, Page 4 (the current mewrit.com publications page): the citations, and each acknowledgement’s sentences naming Dr Hetal Shah or MeWriT, word for word, company names withheld",
- "omitted": [
-  {
-   "kind": "papers",
-   "n": 5,
-   "why": "the source cuts its title off (\"Effect of Metoprolol CR/XL on Pulmonary Artery Pressure in\")"
-  }
- ],
+ "omitted": [],
  "kinds": [
   {
    "id": "acknowledgements",
@@ -263,6 +257,13 @@
      "source": "Ind Heart J 2008; 60: 101-9",
      "year": 2008,
      "url": "https://www.researchgate.net/publication/24011878_Efficacy_of_PercuSurge_in_acute_myocardial_infarction_patients_undergoing_revascularization_with_a_special_emphasis_on_procedural_time"
+    },
+    {
+     "authors": "Parikh KH, Shah HA, Chag MC, Shah UG, Baxi HA, Chandarana AH, Naik AM, Goyal RK, Rozenman Y, Hjalmarson A",
+     "title": "Effect of Metoprolol CR/XL on Pulmonary Artery Pressure in Chronic Heart Failure Patients Assessed by an Implanted Ultrasonic Device with Special Emphasis on Diurnal Variation and Exercise Capacity",
+     "source": "Ind Heart J 2009; 61(1): 34-9",
+     "year": 2009,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/19729686/"
     }
    ]
   },
@@ -306,6 +307,13 @@
    "label": "Review articles",
    "line": "Reviews",
    "items": [
+    {
+     "authors": "Shah H, Banerjee P, Das N",
+     "title": "Accountability or acknowledgment? Untangling authorship and medical writing support in scientific publishing",
+     "source": "Perspect Clin Res. 2026 Apr-Jun;17(2):108-114. Epub 2026 Jan 28",
+     "year": 2026,
+     "url": "https://pubmed.ncbi.nlm.nih.gov/42137508/"
+    },
     {
      "authors": "Goyal RK, Parikh KH, Shah HA",
      "title": "First-in-man Clinical Trials in India",

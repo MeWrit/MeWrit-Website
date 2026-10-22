@@ -6,6 +6,7 @@
 // are's "17 therapeutic areas" leads here.
 import Base from '../layouts/Base.astro';
 import BackLink from '../components/BackLink.astro';
+import NightBand from '../components/NightBand.astro';
 import { areas, SOURCES } from '../data/areas';
 import { areaIcons } from '../data/area-icons';
 import { site } from '../data/site';
@@ -15,14 +16,15 @@ import '../styles/areas.css';
 const pad = (j: number) => String(j + 1).padStart(2, '0');
 ---
 <Base title={`${areas.title} | ${site.name}`} description={`Medical writing across ${areas.list.length} therapeutic areas: ${areas.list.slice(0, 6).map(a => a.name).join(', ').toLowerCase()} and more.`} foot="film" page="areas">
+  {/* the head in the film's night: Who we are's molecule (the science behind the words) turning beside it */}
+  <NightBand scene="who" label={areas.title}>
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">Expertise</p>
+    <h1 class="nb-title">{areas.title}</h1>
+    <p class="nb-line">{areas.line}</p>
+    <p class="nb-note">{areas.note}</p>
+  </NightBand>
   <div class="ta-page">
-    <header class="ta-head">
-      <div><BackLink /></div>
-      <p class="ta-kicker">Expertise</p>
-      <h1 class="ta-title">{areas.title}</h1>
-      <p class="ta-line">{areas.line}</p>
-      <p class="ta-note">{areas.note}</p>
-    </header>
     <ul class="ta-grid" aria-label={`${areas.list.length} therapeutic areas`}>
       {/* (each tile one link as a whole: the size a finger finds is the tile's) */}
       {areas.list.map((a, j) => (

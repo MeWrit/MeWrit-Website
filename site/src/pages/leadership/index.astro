@@ -6,6 +6,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import BackLink from '../../components/BackLink.astro';
+import NightBand from '../../components/NightBand.astro';
 import { leadership } from '../../data/leadership';
 import { site } from '../../data/site';
 import hetal from '../../assets/hetal-shah.png';
@@ -18,13 +19,14 @@ import '../../styles/leadership.css';
 const photos: Record<string, { src: ImageMetadata; small?: boolean }> = { 'hetal-shah': { src: hetal }, 'amit-shah': { src: amit, small: true } };
 ---
 <Base title={`${leadership.title} | ${site.name}`} description="Dr Hetal Shah, Founder and Director, and Dr Amit Shah, Chief Medical Expert: the people who lead MeWriT's medical writing, training and healthcare consulting." foot="film" page="leadership">
+  {/* the head in the film's night: the close's globe, routes leaving Ahmedabad for the world */}
+  <NightBand scene="close" label={leadership.title}>
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">MeWriT</p>
+    <h1 class="nb-title">{leadership.title}</h1>
+    <p class="nb-line">{leadership.line}</p>
+  </NightBand>
   <div class="ld-page">
-    <header class="ld-head">
-      <div><BackLink /></div>
-      <p class="ld-kicker">MeWriT</p>
-      <h1 class="ld-title">{leadership.title}</h1>
-      <p class="ld-line">{leadership.line}</p>
-    </header>
     <div class="ld-list">
       {leadership.leaders.map(l => (
         <article class="ld-card" id={l.id} aria-labelledby={`${l.id}-name`}>

@@ -251,7 +251,9 @@ const PREMULT = { blending: THREE.CustomBlending, blendEquation: THREE.AddEquati
 
 // day: when set (the review switches ?day and ?ink), the whole film by day; look (review switches):
 // paper [top, bottom] for the cream, inkColor, toneMapping for the frame (none by default)
-export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false, day: allDay = false, look: pal = {} }) {
+// only: the shapes to build (F values), for an inner page's night band (src/scripts/band.js); the film
+// builds them all
+export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails = false, compact = false, day: allDay = false, look: pal = {}, only = null }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false });
   renderer.setPixelRatio(dpr);
   const TM = { aces: THREE.ACESFilmicToneMapping, neutral: THREE.NeutralToneMapping, agx: THREE.AgXToneMapping };
@@ -292,7 +294,7 @@ export function createWorld(canvas, { N, dpr, bloomScale = 1, trails: withTrails
 
   // the particles: every formation's places, colours and keys as attributes, two of them bound at a
   // time; and, for every particle, which of the practices' shapes it belongs to (aPick)
-  const { list, stream, pick } = buildFormations(N, undefined, { compact });
+  const { list, stream, pick } = buildFormations(N, undefined, { compact, only });
   const attrs = list.map(fm => ({ pos: new THREE.BufferAttribute(fm.pos, 3), col: new THREE.BufferAttribute(fm.col, 3), key: new THREE.BufferAttribute(fm.key, 1) }));
   const R = random(77), rnd = new Float32Array(N * 4);
   for (let i = 0; i < N; i++) {

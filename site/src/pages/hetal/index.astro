@@ -1,0 +1,223 @@
+---
+// Dr Hetal Shah's profile, at a short address that stays put (/hetal/: the link on her NFC card; the old
+// profile address leads here). Not her CV (the user, 2026-10-22: "profiles are not literal copies of CVs";
+// they chose a curated profile): her visiting card on the first screen, in the film's night, then who she
+// is in a few lines and a few chosen things, on the site's cream.
+// The card, made for the phone a card is tapped on: her photo, name and role; one tap to call, WhatsApp,
+// email, LinkedIn or the website; Save contact (her contact file); Share and a QR code. Behind it, for now,
+// only the film's dust drifting in the night (src/components/NightBand.astro, scene "dust": the user did not
+// like the film's page there, 2026-10-22; what stands there instead is still to be decided with them).
+// Then: who she is (a serif line and two short paragraphs); what she is known for (three practices, each
+// to its place in the film); her honours and a client's words, on the practices' dusk indigo; where she
+// serves now and three recent talks; three of her papers (all of them on the Publications page); and
+// every way to reach her. After a reader has spent as long on the page as people spend on a page on
+// average, it asks whether they would like to reach out, and to save her contact (src/scripts/card.js).
+// Words: src/data/profile.ts (from her CV); papers: src/data/publications.json; the client's words: the
+// home page's testimonials (src/data/experience.ts); contact file: ./Dr-Hetal-Shah.vcf.ts; styles:
+// src/styles/card.css.
+import { Image } from 'astro:assets';
+import QRCode from 'qrcode';
+import Base from '../../layouts/Base.astro';
+import BackLink from '../../components/BackLink.astro';
+import NightBand from '../../components/NightBand.astro';
+import Icon from '../../components/Icon.astro';
+import { profile } from '../../data/profile';
+import { experience } from '../../data/experience';
+import pubs from '../../data/publications.json';
+import { maps, site } from '../../data/site';
+import portrait from '../../assets/hetal-shah.png';
+import { href } from '../../lib/url';
+import '../../styles/card.css';
+
+const home = new URL(href('/'), Astro.site).href;
+const cardUrl = new URL(href('/hetal/'), Astro.site).href;
+const vcf = href('/hetal/Dr-Hetal-Shah.vcf');
+const ogImage = new URL(href('/og/hetal-shah.jpg'), Astro.site).href;
+// the QR code of this card's address, drawn at build (navy on transparent)
+const qr = await QRCode.toString(cardUrl, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#13234C', light: '#0000' } });
+const ext = { target: '_blank', rel: 'noopener' };
+// her three papers (profile.selected), by the start of their titles; a title that matches none stops the build
+type Pub = { authors: string; title: string; source: string; year: number | null; url: string | null };
+const KIND: Record<string, string> = { papers: 'Research paper', reviews: 'Review article', chapters: 'Book chapter', congress: 'Congress presentation', acknowledgements: 'Acknowledged' };
+const all = pubs.kinds.flatMap(k => (k.items as Pub[]).map(p => ({ ...p, kind: KIND[k.id] || k.label })));
+const papers = profile.selected.map(t => {
+  const p = all.find(x => x.title.startsWith(t));
+  if (!p) throw new Error(`profile.selected: no publication's title starts "${t}"`);
+  return p;
+});
+// one client's words, from the home page's testimonials
+const quote = (experience.scenes.find(s => s.id === 'voices')?.quotes || []).find(q => q.quote.startsWith(profile.quote));
+if (!quote) throw new Error(`profile.quote: no testimonial starts "${profile.quote}"`);
+const site0 = profile.website.replace(/^https?:\/\//, '');
+const n2 = (j: number) => String(j + 1).padStart(2, '0');
+---
+<Base title={`${profile.name}, ${profile.credentials} | ${site.name}`} description={`${profile.name}, ${profile.role}. ${profile.subtitle}. ${profile.line}`} foot="film" page="card" image={ogImage}>
+  {/* the card, in the film's night */}
+  <NightBand scene="dust" size="hero" class="cd-hero" label={`${profile.name}'s card`}>
+    <div class="nb-back"><BackLink dark /></div>
+    <div class="cd-id" data-nb-from>
+      <div class="cd-photo"><Image src={portrait} alt={profile.name} widths={[240, 360, 480]} sizes="(min-width: 900px) 200px, 112px" loading="eager" /></div>
+      <div class="cd-who">
+        <h1 class="cd-name">{profile.name}</h1>
+        <p class="cd-cred">{profile.credentials}</p>
+        <p class="cd-role">{profile.role}</p>
+        <p class="cd-place"><Icon name="pin" size={15} stroke={1.8} />{profile.place}</p>
+      </div>
+    </div>
+    <p class="cd-line">{profile.line}</p>
+    <ul class="cd-acts" aria-label="Contact">
+      <li><a href={profile.phoneHref} data-reach><span class="cd-ic"><Icon name="phone" size={21} stroke={1.8} /></span><span>Call</span></a></li>
+      <li><a href={profile.whatsapp} {...ext} data-reach><span class="cd-ic"><Icon name="whatsapp" size={22} stroke={1.8} /></span><span>WhatsApp</span></a></li>
+      <li><a href={`mailto:${profile.email}`} data-reach><span class="cd-ic"><Icon name="mail" size={21} stroke={1.8} /></span><span>Email</span></a></li>
+      <li><a href={profile.linkedin} {...ext}><span class="cd-ic"><Icon name="linkedin" size={19} /></span><span>LinkedIn</span></a></li>
+      <li><a href={home}><span class="cd-ic"><Icon name="globe" size={21} stroke={1.8} /></span><span>Website</span></a></li>
+    </ul>
+    <div class="cd-saverow">
+      <a class="btn btn-primary cd-save" href={vcf} data-save>Save contact</a>
+      <button class="cd-tool" type="button" data-share><Icon name="share" size={20} stroke={1.9} /><span>Share</span></button>
+      <button class="cd-tool" type="button" data-qr><Icon name="qr" size={20} stroke={1.9} /><span>QR code</span></button>
+    </div>
+  </NightBand>
+
+  <div class="cd-page">
+    {/* who she is */}
+    <section class="cd-intro" aria-labelledby="cd-intro-h">
+      <p class="cd-k">Dr Hetal Shah</p>
+      <h2 id="cd-intro-h" class="cd-lede">{profile.intro.lede[0]}<em>{profile.intro.lede[1]}</em>{profile.intro.lede[2]}</h2>
+      <div class="cd-intro-t">{profile.intro.text.map(p => <p>{p}</p>)}</div>
+    </section>
+
+    {/* what she is known for: the three practices she leads, each to its place in the film */}
+    <section class="cd-sec" aria-labelledby="cd-known-h">
+      <header class="cd-head"><p class="cd-k">Known for</p><h2 id="cd-known-h">Three practices, one standard</h2></header>
+      <ol class="cd-known">
+        {profile.knownFor.map((k, j) => (
+          <li><a href={href(`/#${k.anchor}`)}>
+            <span class="cd-num">{n2(j)}</span>
+            <h3>{k.title}</h3>
+            <p>{k.text}</p>
+            <span class="cd-go">The practice <span aria-hidden="true">→</span></span>
+          </a></li>
+        ))}
+      </ol>
+    </section>
+  </div>
+
+  {/* her honours, and a client's words, on the practices' dusk indigo */}
+  <section class="cd-dusk" aria-labelledby="cd-hon-h">
+    <div class="cd-dusk-in">
+      <header class="cd-head"><p class="cd-k">Recognition</p><h2 id="cd-hon-h">Recognised in science and in business</h2></header>
+      <ul class="cd-honours">
+        {profile.honours.map(r => {
+          const inner = <>
+            <span class="cd-hon-ic" aria-hidden="true"><Icon name={r.icon} size={22} stroke={1.7} /></span>
+            <span class="cd-when">{r.year}</span>
+            <b>{r.title}</b>
+            <span class="cd-hon-x">{r.text}</span>
+            {r.url && <span class="cd-hon-go">{r.link} <span aria-hidden="true">{r.internal ? '→' : '↗'}</span></span>}
+          </>;
+          return <li>{r.url ? <a class="cd-hon" href={r.internal ? href(r.url) : r.url} {...(r.internal ? {} : ext)}>{inner}</a> : <div class="cd-hon">{inner}</div>}</li>;
+        })}
+      </ul>
+      <figure class="cd-quote">
+        <Icon name="quote" size={34} />
+        <blockquote><p>{quote.quote}</p></blockquote>
+        <figcaption>{quote.by}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="cd-page">
+    {/* where she serves now, and where she has spoken lately */}
+    <div class="cd-two">
+      <section class="cd-sec" aria-labelledby="cd-now-h">
+        <header class="cd-head"><p class="cd-k">Now</p><h2 id="cd-now-h">Editor, council member, mentor</h2></header>
+        <ul class="cd-rows">
+          {profile.now.map(r => <li><b>{r.title}</b><span class="cd-where">{r.where}</span><span>{r.text}</span></li>)}
+        </ul>
+      </section>
+      <section class="cd-sec" aria-labelledby="cd-talks-h">
+        <header class="cd-head"><p class="cd-k">Speaking</p><h2 id="cd-talks-h">Recent talks</h2></header>
+        <ul class="cd-rows cd-talks">
+          {profile.talks.map(t => <li><span class="cd-when">{t.when}</span><b>“{t.title}”</b><span>{t.role}, {t.where}</span></li>)}
+        </ul>
+      </section>
+    </div>
+
+    {/* three of her papers, and the way to them all */}
+    <section class="cd-sec" aria-labelledby="cd-papers-h">
+      <header class="cd-head cd-head-row">
+        <div><p class="cd-k">Selected writing</p><h2 id="cd-papers-h">Three of her papers</h2></div>
+        <a class="btn btn-outline cd-all" href={href('/publications/')}>All publications</a>
+      </header>
+      <ul class="cd-papers">
+        {papers.map(p => (
+          <li class:list={['cd-paper', { 'has-link': p.url }]}>
+            <p class="cd-meta"><span>{p.kind}</span>{p.year && <span class="cd-yr">{p.year}</span>}</p>
+            <h3>{p.url ? <a class="cd-hit" href={p.url} {...ext}>{p.title}</a> : p.title}</h3>
+            <p class="cd-src">{p.source}</p>
+            {p.url && <span class="cd-pgo" aria-hidden="true">Read ↗</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {/* every way to reach her */}
+    <section class="cd-sec cd-reach" aria-labelledby="cd-reach-h">
+      <header class="cd-head"><p class="cd-k">Get in touch</p><h2 id="cd-reach-h">Write to her, call, or meet her in Ahmedabad</h2></header>
+      <div class="cd-reach-in">
+        <ul class="cd-reach-list">
+          <li><a href={profile.phoneHref} data-reach><Icon name="phone" size={18} stroke={1.8} /><span>{profile.phone}</span></a></li>
+          <li><a href={`mailto:${profile.email}`} data-reach><Icon name="mail" size={18} stroke={1.8} /><span>{profile.email}</span></a></li>
+          <li><a href={profile.whatsapp} {...ext} data-reach><Icon name="whatsapp" size={18} stroke={1.8} /><span>WhatsApp</span></a></li>
+          <li><a href={profile.linkedin} {...ext}><Icon name="linkedin" size={16} /><span>linkedin.com/in/drhetalshah</span></a></li>
+          <li><a href={profile.linkedinMewrit} {...ext}><Icon name="linkedin" size={16} /><span>MeWriT on LinkedIn</span></a></li>
+          <li><a href={home}><Icon name="globe" size={18} stroke={1.8} /><span>{site0}</span></a></li>
+          <li><a href={maps.directions} {...ext}><Icon name="pin" size={18} stroke={1.8} /><span>{profile.office.join(', ')}</span></a></li>
+        </ul>
+        <div class="cd-reach-card">
+          <a class="btn btn-primary cd-save" href={vcf} data-save>Save contact</a>
+          {/* (on a computer: scan it to open this card on a phone) */}
+          <figure class="cd-qr-inline" aria-hidden="true"><span set:html={qr} /><figcaption>Scan to open this card on your phone</figcaption></figure>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  {/* the QR code, large, for someone to scan off her phone */}
+  <dialog class="cd-dlg cd-qrdlg" aria-labelledby="cd-qr-h">
+    <button class="cd-x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="cd-qr-h" tabindex="-1" autofocus>Scan to open this card</h2>
+    <div class="cd-qr" set:html={qr} />
+    <p class="cd-url">{cardUrl.replace(/^https?:\/\//, '')}</p>
+    <button class="cd-btn" type="button" data-copy><Icon name="copy" size={17} stroke={1.9} />Copy link</button>
+  </dialog>
+
+  {/* asked once the reader has spent the average time on the page (card.js) */}
+  <dialog class="cd-dlg cd-ask" aria-labelledby="cd-ask-h">
+    <button class="cd-x" type="button" data-close aria-label="Close">×</button>
+    <div class="cd-ask-q" data-step="ask">
+      <h2 id="cd-ask-h" tabindex="-1" autofocus>Would you like to reach out to Dr Hetal?</h2>
+      <ul class="cd-ask-reach">
+        <li><a href={profile.phoneHref} data-reach><Icon name="phone" size={19} stroke={1.8} />Call</a></li>
+        <li><a href={profile.whatsapp} {...ext} data-reach><Icon name="whatsapp" size={20} stroke={1.8} />WhatsApp</a></li>
+        <li><a href={`mailto:${profile.email}`} data-reach><Icon name="mail" size={19} stroke={1.8} />Email</a></li>
+      </ul>
+      <p class="cd-ask-save">Do you want to save her contact to your device?</p>
+      <div class="cd-ask-yn">
+        <a class="cd-btn cd-yes" href={vcf} data-save data-yes><Icon name="user-plus" size={18} stroke={1.9} />Yes, save</a>
+        <button class="cd-btn cd-no" type="button" data-no>No, thanks</button>
+      </div>
+    </div>
+    <div class="cd-ask-done" data-step="done" hidden>
+      <h2 tabindex="-1">Her contact is on its way</h2>
+      <p class="cd-hint" data-hint></p>
+      <button class="cd-btn" type="button" data-close>Done</button>
+    </div>
+  </dialog>
+  <p class="cd-toast" role="status" aria-live="polite"></p>
+</Base>
+
+<script>
+  import '../../scripts/card.js';
+</script>

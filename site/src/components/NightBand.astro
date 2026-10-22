@@ -1,0 +1,23 @@
+---
+// A band of the film's night at the head of an inner page (the user, 2026-10-22: the inner pages lacked the
+// film's particles): one of the film's shapes draws itself in it (scene: the scene of scenes.js it takes its
+// shape and look from; src/scripts/band.js draws it), beside the page's words on a computer, above them on a
+// phone (phone "behind": behind them, for words that fill the band); it meets the page's cream on a clean
+// edge. The page under it carries the film's dust (src/scripts/dust.js). Styles:
+// src/styles/band.css. shot "a" or "b": the camera's direction from that one of the scene's shots (else the
+// middle of the two). size "hero": the whole first screen (her profile); "page": a page's head. The way
+// back goes first among the words, in a .nb-back (on a phone it stands at the top, the rest at the foot).
+import '../styles/band.css';
+
+interface Props { scene: string; phone?: 'above' | 'behind'; shot?: 'a' | 'b'; size?: 'page' | 'hero'; label?: string; class?: string }
+const { scene, phone = 'above', shot, size = 'page', label, class: extra } = Astro.props;
+---
+<section class:list={['nb', `nb-${size}`, extra]} data-scene={scene} data-phone={phone} data-shot={shot} aria-label={label}>
+  <canvas class="nb-canvas" aria-hidden="true"></canvas>
+  <div class="nb-shade" aria-hidden="true"></div>
+  <div class="nb-words"><slot /></div>
+</section>
+<script>
+  import '../scripts/band.js';
+  import '../scripts/dust.js';
+</script>

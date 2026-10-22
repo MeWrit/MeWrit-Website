@@ -655,14 +655,18 @@ function choice(N, R, dust, compact = false) {
 }
 
 // all of them, in the order of F (a new one goes last, so the shapes before it keep their random draws).
-// compact: the phone layout of the practices' shapes (two rows)
-export function buildFormations(N, seed = 1104, { compact = false } = {}) {
+// compact: the phone layout of the practices' shapes (two rows). only: the shapes to build (F values; the
+// dust always), the rest left as dust: an inner page's night band shows one shape and need not build
+// thirteen (its shape then takes other random draws than the film's, which no one can tell); without it,
+// every shape, exactly as the film has always had them
+export function buildFormations(N, seed = 1104, { compact = false, only = null } = {}) {
   const R = random(seed), dust = makeDust(N, random(seed + 7)), sp = streamParams(N, random(seed + 3));
-  const list = [former(N, dust).done(), molecule(N, R, dust), crowd(N, R, dust), streams(N, R, dust, sp), papers(N, R, dust),
-    landscape(N, R, dust), curves(N, R, dust), dossier(N, R, dust), manuscript(N, R, dust), globe(N, R, dust), network(N, R, dust),
-    page(N, R, dust), choice(N, R, dust, compact)];
+  const make = [() => former(N, dust).done(), () => molecule(N, R, dust), () => crowd(N, R, dust), () => streams(N, R, dust, sp), () => papers(N, R, dust),
+    () => landscape(N, R, dust), () => curves(N, R, dust), () => dossier(N, R, dust), () => manuscript(N, R, dust), () => globe(N, R, dust), () => network(N, R, dust),
+    () => page(N, R, dust), () => choice(N, R, dust, compact)];
+  const list = make.map((build, f) => (!only || f === F.DUST || only.includes(f) ? build() : former(N, dust).done()));
   list.forEach(fm => { fm.box = boxOf(fm); });
-  return { list, stream: sp, pick: list[F.CHOICE].group };
+  return { list, stream: sp, pick: list[F.CHOICE].group || new Float32Array(N).fill(-1) };
 }
 
 // the box a formation fills, from its placed particles (key 0 or more; the dust is left out):

@@ -12,6 +12,7 @@
 // Dr Hetal approves naming them; links checked before publishing. Under the header's Expertise.
 import Base from '../layouts/Base.astro';
 import BackLink from '../components/BackLink.astro';
+import NightBand from '../components/NightBand.astro';
 import data from '../data/publications.json';
 import { site } from '../data/site';
 import '../styles/publications.css';
@@ -41,13 +42,14 @@ const linkLabel = (u: string) => /pubmed/.test(u) ? 'PubMed' : /doi\.org/.test(u
 const ext = { target: '_blank', rel: 'noopener' };
 ---
 <Base title={`Publications | ${site.name}`} description={`Published work acknowledging Dr Hetal Shah's and MeWriT's medical writing support, and her own research papers, reviews, book chapters and congress presentations: ${total} in all.`} foot="film" page="publications">
+  {/* the head in the film's night: the literature review's stack of papers draws itself beside it */}
+  <NightBand scene="pub-literature" shot="b" label="Publications">
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">Expertise</p>
+    <h1 class="nb-title">Publications</h1>
+    <p class="nb-line">The published work our medical writing supported, as its authors acknowledge, and Dr Hetal Shah's own papers, reviews, book chapters and congress presentations.</p>
+  </NightBand>
   <div class="pb-page">
-    <header class="pb-head">
-      <div><BackLink /></div>
-      <p class="pb-kicker">Expertise</p>
-      <h1 class="pb-title-page">Publications</h1>
-      <p class="pb-line">The published work our medical writing supported, as its authors acknowledge, and Dr Hetal Shah's own papers, reviews, book chapters and congress presentations.</p>
-    </header>
     <div class="pb-filters" role="search" aria-label="Filter the publications">
       <ul class="pb-kinds" aria-label="Kinds">
         <li><button class="pb-kind-btn" type="button" data-kind="all" aria-pressed="true">All <b>{total}</b></button></li>

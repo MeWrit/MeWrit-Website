@@ -60,7 +60,7 @@ const anchorOf = (s: { id: string; chapter: number }, i: number) =>
                 </div>
                 <div class="xp-col xp-col-b">
                   <p class="xp-text">{w.text}</p>
-                  {w.lead && <a class="xp-lead" href={href('/leadership/hetal-shah/')}><Image class="xp-face" src={portrait} alt="" width={96} height={96} /><span>{w.lead} <b aria-hidden="true">→</b></span></a>}
+                  {w.lead && <a class="xp-lead" href={href('/hetal/')}><Image class="xp-face" src={portrait} alt="" width={96} height={96} /><span>{w.lead} <b aria-hidden="true">→</b></span></a>}
                   {w.figures && <ul class="xp-figs" aria-label="MeWriT in figures">{w.figures.map((f, j) => {
                     // the figure, and its count up (experience.js): the running count over an unseen copy; a
                     // figure with a page of its own (the publications, the therapeutic areas) is the way there

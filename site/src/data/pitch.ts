@@ -164,7 +164,7 @@ export const credentials = {
   title: `A principal consultant with ${YEARS} years in clinical research`,
   // (the trial she led the writing of is named once permission is given: in the repository's history)
   text: `MeWriT's principal consultant, Dr Hetal Shah, PhD (Pharmacology), has worked across clinical sites, CROs and medical writing since 2003. She is Section Editor for Medical Writing at Perspectives in Clinical Research, a member of the ISCR Medical Writing Council (Hall of Fame 2021 to 2023), a DIA global mentor and subject-matter expert, and Scientific Programme Co-chair of DIA India's Medical Writing and Scientific Communication Conference 2026. Projects draw on an extended team of medical writers, therapeutic-area experts and biostatisticians.`,
-  link: { label: 'Full profile', href: href('/leadership/hetal-shah/') } as PitchLink,
+  link: { label: 'Full profile', href: href('/hetal/') } as PitchLink,
   values: ['Scientific rigour', 'Participant centricity', 'Quality and excellence', 'Integrity', 'Confidentiality', 'Trust and collaboration'],
 };
 

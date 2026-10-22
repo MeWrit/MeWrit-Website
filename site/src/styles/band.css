@@ -1,0 +1,40 @@
+/* ---------------- the inner pages' night bands (src/components/NightBand.astro, src/scripts/band.js) and
+   the film's dust behind their cream (src/scripts/dust.js) ----------------
+   A band of the film's night under the header: its shape drawn on a canvas filling the band, a shade behind
+   the words (from the left on a computer, from the foot on a phone, as in the film), the words in the film's
+   colours (the kicker in the logo's orange lightened, the title in the serif), and a clean edge where it
+   meets the page's cream. Without WebGL the night is a plain gradient with the same glow. On a phone the
+   way back stands at the top, the words at the foot, the shape between them. */
+.nb{position:relative;overflow:hidden;isolation:isolate;color:#F2F5FC;
+  background:radial-gradient(60% 75% at 72% 48%,#13244F 0%,#060E26 58%,#030817 100%)}
+.nb-page{min-height:clamp(460px,64svh,660px)}
+.nb-hero{min-height:clamp(600px,100svh,980px)}
+.nb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
+.nb.nb-on .nb-canvas{opacity:1}
+.nb-nogl .nb-canvas{display:none}
+.nb-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,23,.82) 0%,rgba(3,8,23,.5) 30%,rgba(3,8,23,0) 58%)}
+/* (it meets the cream on a clean edge: the user, 2026-10-22, did not like a coloured dawn stripe there) */
+.nb-words{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;min-height:inherit;
+  padding:calc(var(--header-h) + clamp(18px,3vh,32px)) clamp(16px,6vw,104px) clamp(48px,8vh,88px);max-width:min(720px,52vw)}
+.nb-back{margin-bottom:clamp(14px,2.4vh,26px)}
+.nb-kicker{margin:0 0 12px;font:600 .74rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#F2A65A}
+.nb-title{margin:0 0 14px;font:500 clamp(2.6rem,1.3rem + 3.4vw,5rem)/1 var(--serif);letter-spacing:-.022em;color:#F2F5FC;text-wrap:balance}
+.nb-line{margin:0;max-width:52ch;font-size:clamp(1rem,.92rem + .25vw,1.14rem);line-height:1.6;color:rgba(214,224,246,.86)}
+.nb-note{margin:10px 0 0;max-width:56ch;font-size:.88rem;line-height:1.5;color:rgba(214,224,246,.62)}
+/* a phone: the way back at the top, the words at the foot over a shade rising from it, the shape between */
+@media (max-width:759.98px),(max-aspect-ratio:4/5){
+  .nb-page{min-height:clamp(500px,76svh,640px)}
+  .nb-shade{background:linear-gradient(0deg,rgba(3,8,23,.9) 0%,rgba(3,8,23,.66) 34%,rgba(3,8,23,0) 58%)}
+  .nb-behind .nb-shade{background:linear-gradient(0deg,rgba(3,8,23,.92) 0%,rgba(3,8,23,.74) 48%,rgba(3,8,23,.36) 100%)}
+  .nb-words{justify-content:flex-end;max-width:none;padding:calc(var(--header-h) + 12px) 20px clamp(40px,6svh,56px)}
+  /* (room kept for the shape between the way back and the words; the band grows to keep it) */
+  .nb-back{margin-bottom:auto;padding-bottom:min(180px,22svh)}
+  .nb-note{display:none}
+  .nb-title{font-size:clamp(2.3rem,1.5rem + 4.4vw,3rem)}
+  .nb-line{font-size:.98rem}
+}
+@media (prefers-reduced-motion:reduce){.nb-canvas{transition:none}}
+
+/* the film's dust behind the page's cream: the canvas fixed behind everything the page holds */
+.dust{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+html:has(.dust) main{position:relative;z-index:1}

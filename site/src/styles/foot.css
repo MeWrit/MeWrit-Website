@@ -12,8 +12,8 @@ html[data-foot="film"]::-webkit-scrollbar{display:none}
 /* (and no room kept at the page's end for the phones' contact bar, which these pages do not have: the
    foot's bar is fixed, and each page keeps clear of it itself) */
 html[data-foot="film"] body{padding-bottom:0}
-/* Dr Hetal's profile (leadership/hetal-shah.astro) in the film's frame: on the site's paper, and clear of
-   the foot's bar at its end */
+/* (Dr Hetal's old profile page, in the film's frame: on the site's paper, and clear of the foot's bar at its
+   end. The page is her card now, src/pages/hetal/, styled in card.css; kept for any page that asks for it) */
 html[data-page="profile"],html[data-page="profile"] body{background:#FCF6EE}
 html[data-page="profile"] main{padding-bottom:var(--foot-gap)}
 .sf{position:fixed;left:0;right:0;bottom:0;z-index:45;color:#FCF6EE;

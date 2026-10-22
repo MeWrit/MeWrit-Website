@@ -42,8 +42,11 @@ interface Props {
   title?: string; description?: string; intro?: 'overlay' | 'header' | 'none';
   nav?: 'classic' | 'rail' | 'capsule' | 'spine' | 'tabs' | 'dock' | 'ask' | 'comments' | 'corners';
   phone?: 'capsule' | 'menu' | 'dock'; lab?: boolean; theme?: 'light' | 'dark'; page?: string;
-  foot?: 'site' | 'film'; loader?: boolean | 'wait';
+  foot?: 'site' | 'film'; loader?: boolean | 'wait'; image?: string;
 }
+// `image`: the picture a link to the page shows when it is shared (WhatsApp, LinkedIn, Messages...: Open
+// Graph), as a full address; every page gets its title and description there, a page with a picture of
+// its own (Dr Hetal's card) its picture too
 // `page` names a page that styles the shell itself (data-page on <html>), e.g. "lamp" for the
 // lamplight film, which carries its own footer
 // `foot` "film": the film's foot (SiteFoot.astro: a bar along the bottom that opens into the colophon)
@@ -51,7 +54,7 @@ interface Props {
 // `loader`: the site's loader over the page while it gets ready (SiteLoader.astro: the logo written
 // on paper, then gliding into the header); "wait": the page reports its progress and says when it is
 // ready (window.mewritLoader), otherwise the loader waits for the page's own load
-const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page, foot = 'site', loader } = Astro.props;
+const { title = site.title, description = site.description, intro = 'none', nav = 'capsule', phone = 'capsule', lab = false, theme = 'light', page, foot = 'site', loader, image } = Astro.props;
 // the film's pages have their own phone menu (SiteMenu.astro: data-phone "sheet"), unless a page asks otherwise
 const phoneV = foot === 'film' && !Astro.props.phone ? 'sheet' : phone;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -67,6 +70,13 @@ const noindex = Astro.site?.hostname !== 'mewrit.com' || Astro.url.pathname.incl
 <meta name="description" content={description}>
 {noindex && <meta name="robots" content="noindex">}
 <link rel="canonical" href={canonical}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={site.name}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonical}>
+{image && <meta property="og:image" content={image}>}
+<meta name="twitter:card" content="summary">
 <link rel="icon" href={href('/favicon.png')} type="image/png">
 <link rel="apple-touch-icon" href={href('/apple-touch-icon.png')}>
 <script is:inline>
