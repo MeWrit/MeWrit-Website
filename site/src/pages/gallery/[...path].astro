@@ -1,0 +1,93 @@
+---
+// The Gallery, under the header's Showcase (the user, 2026-10-23, chose a timeline): Dr Hetal's photo
+// albums from the current site, newest first, down a line of years; each album a row with its date and
+// kind, its name and words, a strip of its photos (opening over the screen to go through them all:
+// PhotoViewer), and a way to its event; a filter by kind. Built only where the albums are
+// (src/data/showcase.ts: on this computer, until Dr Hetal approves the names and photos in them); elsewhere
+// nothing is built here, and the header marks the Gallery Soon.
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import BackLink from '../../components/BackLink.astro';
+import NightBand from '../../components/NightBand.astro';
+import PhotoViewer from '../../components/PhotoViewer.astro';
+import GalleryReview from '../../components/showcase/GalleryReview.astro';
+import { albums, hasGallery, albumPhotos, eventById, dateLabel, yearOf, ALBUM_KIND } from '../../data/showcase';
+import { site } from '../../data/site';
+import { href } from '../../lib/url';
+import '../../styles/showcase.css';
+
+// (and, on the dev server only, the review page for the photos cut from the collages: /gallery/review/)
+export function getStaticPaths() {
+  if (!hasGallery) return [];
+  return [{ params: { path: undefined } }, ...(import.meta.env.DEV ? [{ params: { path: 'review' } }] : [])];
+}
+const review = Astro.params.path === 'review';
+const SHOW = 4;   // photos in an album's strip; the rest open with them, and the last shown says how many more
+// (each collage shown as the photos cut from it: albumPhotos)
+const rows = review ? [] : await Promise.all(albums.map(async a => {
+  const shown = albumPhotos(a);
+  return {
+    a, ev: eventById(a.event),
+    photos: await Promise.all(shown.map(async ({ src }, j) => {
+      const full = await getImage({ src, width: Math.min(src.width, 1800), format: 'webp' });
+      return { src, full: full.src, alt: `${a.title}, photo ${j + 1} of ${shown.length}` };
+    })),
+  };
+}));
+const years = [...new Set(albums.map(a => yearOf(a.date)))];
+const total = rows.reduce((s, r) => s + r.photos.length, 0);
+const since = Math.min(...years);
+// the filters: talks and panels together
+const filters: [string, string][] = [['all', 'All'], ['workshop', 'Workshops'], ['talk', 'Talks and panels'], ['award', 'Awards'], ['mewrit', 'MeWriT events']];
+const count = (k: string) => k === 'all' ? albums.length : albums.filter(a => (k === 'talk' ? ['talk', 'panel'].includes(a.kind) : a.kind === k)).length;
+---
+{review ? <GalleryReview /> : <Base title={`Gallery | ${site.name}`} description={`Photos from the workshops, talks, panels and awards Dr Hetal Shah and MeWriT have been part of since ${since}.`} foot="film" page="gallery">
+  {/* the head in the film's night: the literature review's papers, laid out like prints */}
+  <NightBand scene="pub-literature" shot="a" label="Gallery">
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">Showcase</p>
+    <h1 class="nb-title">Gallery</h1>
+    <p class="nb-line">The workshops, talks, panels and awards of the years since {since}: {albums.length} albums, {total} photos.</p>
+  </NightBand>
+  <div class="sc-page ga-page">
+    <div class="ga-filters" role="group" aria-label="Show">
+      {filters.map(([k, label], j) => <button class="ev-kind" type="button" data-kind={k} aria-pressed={j === 0 ? 'true' : 'false'}>{label} <b>{count(k)}</b></button>)}
+    </div>
+    <div class="ga-line">
+      {years.map(y => (
+        <section class="ga-year" aria-labelledby={`ga-y${y}`}>
+          <h2 class="ga-y" id={`ga-y${y}`}>{y}</h2>
+          <ol class="ga-albums">
+            {rows.filter(r => yearOf(r.a.date) === y).map(({ a, ev, photos }) => (
+              <li class="ga-album" id={a.id} data-kind={a.kind}>
+                <div class="ga-meta">
+                  <p class="ga-date">{dateLabel(a.date)}<em class="ev-tag">{ALBUM_KIND[a.kind]}</em></p>
+                  <h3>{a.title}</h3>
+                  <p class="ga-cap">{a.text || a.caption}</p>
+                  {ev && <a class="ga-ev" href={href(`/events/${ev.id}/`)}>About the event <span aria-hidden="true">→</span></a>}
+                </div>
+                <ul class="ga-strip" data-vw-set>
+                  {photos.map((p, j) => (
+                    <li class:list={{ 'ga-more': j >= SHOW }}>
+                      <a href={p.full} data-vw data-vw-cap={a.caption} data-vw-ev={ev ? href(`/events/${ev.id}/`) : undefined} data-vw-alt={p.alt}>
+                        <Image src={p.src} alt={p.alt} widths={[240, 360, 480]} sizes="(min-width: 1100px) 200px, (min-width: 700px) 20vw, 44vw" loading="lazy" />
+                        {j === SHOW - 1 && photos.length > SHOW && <span class="ga-plus" aria-hidden="true">+{photos.length - SHOW}</span>}
+                        {/* (a phone shows three in a row: the third says how many more there) */}
+                        {j === 2 && photos.length > 3 && <span class="ga-plus ga-plus-ph" aria-hidden="true">+{photos.length - 3}</span>}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+    <p class="ev-empty" hidden>No albums of this kind yet.</p>
+  </div>
+  <PhotoViewer />
+</Base>}
+<script>
+  import '../../scripts/gallery.js';
+</script>

@@ -1,0 +1,156 @@
+---
+// Events (src/pages/events/[...path].astro): the next open workshop by MeWriT as a large card, or, while
+// none is announced, the most recent one with a way to hear of the next (the user, 2026-10-23: option
+// "next up, then the record", "Notify me"); beside it a small month calendar with the days of the record
+// marked ("some sort of calendar ... but not as a very big element"); a way to bring a workshop in-house;
+// then the record, everything from Dr Hetal's CV and the current site (the user: "Everything"), year by
+// year, filtered by kind, each row leading to its own page. Registration is the event's own outside link
+// (the user: "Outside registration link"). Script: src/scripts/events.js (the filters, the calendar, and
+// a last check that a "next" workshop has not passed in the visitor's own calendar).
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import BackLink from '../BackLink.astro';
+import NightBand from '../NightBand.astro';
+import Icon from '../Icon.astro';
+import { events, albumsOf, albumPhotos, photoOf, dateLabel, shortDate, yearOf, weekday, isComing, KIND, type EventKind } from '../../data/showcase';
+import { site, contact } from '../../data/site';
+import { href } from '../../lib/url';
+import '../../styles/showcase.css';
+
+const today = new Date().toISOString().slice(0, 10);
+const coming = events.filter(e => isComing(e, today)).reverse();   // (soonest first)
+const ours = events.filter(e => e.mewrit && e.start.length === 10);
+const next = coming[0] || null;
+const feature = next || ours[0];
+const others = coming.slice(1);
+const urlOf = (id: string) => href(`/events/${id}/`);
+const years = [...new Set(events.map(e => yearOf(e.start)))];
+const since = Math.min(...years);
+const counts = (k: EventKind) => events.filter(e => e.kind === k).length;
+const kinds: [string, string, number][] = [['all', 'All', events.length], ['workshop', 'Workshops', counts('workshop')], ['talk', 'Talks', counts('talk')], ['panel', 'Panels', counts('panel')], ['organising', 'Organising', counts('organising')], ['mewrit', 'MeWriT’s own', events.filter(e => e.mewrit).length]];
+// the calendar's marks: every event with a full date, from its first day to its last
+const marks = events.filter(e => e.start.length === 10).map(e => ({ s: e.start, e: e.end && e.end.length === 10 ? e.end : e.start, t: e.title, u: urlOf(e.id), m: e.mewrit ? 1 : 0 }));
+const poster = feature?.poster?.[0] ? photoOf('events', feature.poster[0]) : undefined;
+const mapOf = (v: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}`;
+const train = 'training@mewrit.com';
+const notifyWa = `${contact.whatsapp}&text=${encodeURIComponent('Hello MeWriT, please tell me when your next workshop is announced.')}`;
+const notifyMail = `mailto:${train}?subject=${encodeURIComponent('Please tell me about your next workshop')}`;
+const ext = { target: '_blank', rel: 'noopener' };
+---
+<Base title={`Events | ${site.name}`} description={`MeWriT's open workshops, and the workshops, talks and panels Dr Hetal Shah has led since ${since}.`} foot="film" page="events">
+  {/* the head in the film's night: the training's room of people, inked in one by one */}
+  <NightBand scene="training" label="Events">
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">Showcase</p>
+    <h1 class="nb-title">Events</h1>
+    <p class="nb-line">MeWriT’s open workshops, and the workshops, talks and panels Dr Hetal Shah has led for hospitals, universities, companies and conferences since {since}.</p>
+  </NightBand>
+  <div class="sc-page">
+    <section class="ev-top" aria-label="The next workshop">
+      {feature && (
+        <article class:list={['ev-next', { 'ev-past': !next }]} data-last={feature.end || feature.start}>
+          <div class="ev-next-copy">
+            <p class="sc-k">{next ? 'Next workshop' : 'Our most recent workshop'}</p>
+            <h2><a href={urlOf(feature.id)}>{feature.title}</a></h2>
+            <ul class="ev-facts">
+              <li><Icon name="calendar" size={17} stroke={1.8} /><span>{weekday(feature.start) && `${weekday(feature.start)}, `}{dateLabel(feature.start, feature.end)}{feature.time && `, ${feature.time}`}</span></li>
+              {(feature.venue || feature.place) && <li><Icon name="pin" size={17} stroke={1.8} /><a href={mapOf(feature.venue || feature.place || '')} {...ext}>{feature.venue || feature.place}</a></li>}
+              {feature.mode && <li><Icon name="people" size={17} stroke={1.8} /><span>{feature.mode === 'online' ? 'Online' : 'In person'}{feature.audience && `, ${feature.audience.toLowerCase()}`}</span></li>}
+            </ul>
+            {feature.summary && <p class="ev-sum">{feature.summary}</p>}
+            {feature.attend && <ul class="ev-chips" aria-label="Who should attend">{feature.attend.slice(0, 4).map(a => <li>{a}</li>)}</ul>}
+            {feature.fee && <p class="ev-fee">Fee <b>{feature.fee.full}</b>{feature.fee.fullNote && ` (${feature.fee.fullNote})`}{feature.fee.early && <>; early bird <b>{feature.fee.early}</b></>}</p>}
+            <div class="ev-acts">
+              {next
+                ? (feature.register
+                  ? <a class="btn btn-primary" href={feature.register} {...ext}>Register</a>
+                  : <a class="btn btn-primary" href={`mailto:${feature.email || train}?subject=${encodeURIComponent(`Registration: ${feature.title}`)}`}>Register</a>)
+                : <span class="ev-closed">Registration closed</span>}
+              <a class="btn btn-outline" href={urlOf(feature.id)}>Details</a>
+            </div>
+          </div>
+          {poster && <a class="ev-poster" href={urlOf(feature.id)} tabindex="-1" aria-hidden="true"><Image src={poster} alt="" widths={[280, 420, 560]} sizes="(min-width: 1100px) 260px, (min-width: 700px) 32vw, 70vw" /></a>}
+        </article>
+      )}
+      <aside class="ev-side">
+        <div class="ev-cal" data-marks={JSON.stringify(marks)} data-start={next ? next.start.slice(0, 7) : ''}>
+          <div class="ev-cal-head">
+            <button class="ev-cal-go" type="button" data-go="-1" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <p class="ev-cal-m" aria-live="polite"></p>
+            <button class="ev-cal-go" type="button" data-go="1" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+          <div class="ev-cal-grid"></div>
+          <ul class="ev-cal-list" aria-live="polite"></ul>
+        </div>
+        <div class="ev-notify">
+          <p class="ev-notify-t">Hear about the next workshop</p>
+          <p>We will tell you when the next one is announced.</p>
+          <div class="ev-notify-row">
+            <a class="ev-q" href={notifyWa} {...ext}><Icon name="whatsapp" size={18} /><span>WhatsApp</span></a>
+            <a class="ev-q" href={notifyMail}><Icon name="mail" size={17} /><span>Email</span></a>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    {others.length > 0 && (
+      <section class="sc-sec" aria-labelledby="ev-more">
+        <p class="sc-k">Also coming</p>
+        <h2 class="sc-h" id="ev-more">More on the calendar</h2>
+        <ul class="ev-cards">
+          {others.map(e => <li><a class="ev-card" href={urlOf(e.id)}><span class="ev-card-d">{dateLabel(e.start, e.end)}</span><strong>{e.title}</strong><span>{e.mode === 'online' ? 'Online' : e.place}</span></a></li>)}
+        </ul>
+      </section>
+    )}
+
+    <section class="ev-inhouse" aria-label="A workshop for your team">
+      <p><strong>A workshop for your team?</strong> We run them in-house, from half a day to three days, tailored to who is attending.</p>
+      <div class="ev-inhouse-acts">
+        <a class="btn btn-primary" href={href(`/contact/?about=${encodeURIComponent('Training')}`)}>Plan a training</a>
+        <a class="ev-acad" href={contact.academy} {...ext}>MeWriT Academy <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="sc-sec ev-rec" aria-labelledby="ev-rec">
+      <p class="sc-k">The record</p>
+      <h2 class="sc-h" id="ev-rec">Every workshop, talk and panel</h2>
+      <div class="ev-filters" role="group" aria-label="Show">
+        {kinds.map(([k, label, n], j) => <button class="ev-kind" type="button" data-kind={k} aria-pressed={j === 0 ? 'true' : 'false'}>{label} <b>{n}</b></button>)}
+      </div>
+      <div class="ev-years">
+        {years.map(y => {
+          const list = events.filter(e => yearOf(e.start) === y);
+          return (
+            <div class="ev-year">
+              <h3 class="ev-y">{y}</h3>
+              <ol class="ev-rows">
+                {list.map(e => {
+                  const photos = albumsOf(e.id).reduce((s, a) => s + albumPhotos(a).length, 0);
+                  return (
+                    <li class="ev-row" data-kind={e.kind} data-mewrit={e.mewrit ? '1' : undefined}>
+                      <a href={urlOf(e.id)}>
+                        <span class="ev-d">{shortDate(e.start) || y}</span>
+                        <span class="ev-m"><strong>{e.title}</strong><span>{e.role}{e.host && e.host !== 'MeWriT' ? `, ${e.host}` : ''}</span></span>
+                        <span class="ev-w">{e.mode === 'online' ? 'Online' : e.place || ''}</span>
+                        <span class="ev-tags">
+                          <em class="ev-tag">{KIND[e.kind]}</em>
+                          {e.mewrit && <em class="ev-tag ev-ours">MeWriT</em>}
+                          {photos > 0 && <em class="ev-tag ev-ph"><Icon name="camera" size={13} stroke={1.9} />{photos} photo{photos > 1 ? 's' : ''}</em>}
+                        </span>
+                        <b aria-hidden="true">→</b>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          );
+        })}
+      </div>
+      <p class="ev-empty" hidden>Nothing of this kind yet.</p>
+    </section>
+  </div>
+</Base>
+<script>
+  import '../../scripts/events.js';
+</script>

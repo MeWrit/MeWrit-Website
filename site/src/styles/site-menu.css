@@ -1,10 +1,10 @@
 /* ---------------- the phone menu on the film's pages (src/components/SiteMenu.astro, src/scripts/site-menu.js) ----------------
    A sheet over the whole screen. Its top is the header itself (the same bar, logo and Get in touch; the
    menu button turned into Close), and under it, on dusk indigo, the menu drops down as tiles a finger
-   finds at once (the user, 2026-10-21: no little links): Who we are and Why MeWriT; the five practices
-   (each goes straight to its place in the film) and all five; the expertise (Publications, Therapeutic
-   areas); Leadership and the Academy; at the foot
-   the quick ways to reach us: call, WhatsApp and email. Large targets, few words. */
+   finds at once (the user, 2026-10-21: no little links): Home; About (Who we are, Why MeWriT, Leadership);
+   the five practices (each goes straight to its place in the film) and all five; the expertise (Publications,
+   Therapeutic areas); the showcase (Events and Gallery, marked Soon); the Academy; at the foot the quick
+   ways to reach us: call, WhatsApp and email. Large targets, few words. */
 .sm{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;background:none;color:#F2F5FC;overflow:hidden}
 .sm[open]{display:flex;flex-direction:column}
 .sm::backdrop{background:transparent}
@@ -30,10 +30,20 @@
 .sm-tile .t{font:500 1.04rem/1.2 var(--serif)}
 .sm-tile .n{font:600 .7rem/1 var(--sans);letter-spacing:.08em;color:#F2A65A}
 .sm-tile b{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-weight:400;color:#F2A65A;transition:transform .2s ease}
+/* (About's three: Who we are and Why MeWriT side by side, Leadership the width of both under them) */
+.sm-about li:last-child{grid-column:1 / -1}
 /* (the practices' arrow beside their number, so a long name has the tile's whole width) */
 .sm-practices .sm-tile{min-height:78px;justify-content:space-between;padding-right:14px}
 .sm-practices .sm-tile b{top:9px;transform:none}
 .sm-all{border-color:rgba(242,166,90,.45);background:linear-gradient(180deg,rgba(242,166,90,.06),rgba(242,166,90,.17))}
+/* (Events and Gallery: marked Soon, not links, until their pages exist) */
+.sm-soon{cursor:default;border-style:dashed;border-color:rgba(242,245,252,.2);background:none}
+.sm-soon .t{color:rgba(242,245,252,.74)}
+.sm-badge{align-self:flex-start;padding:3px 8px;border-radius:999px;border:1px solid rgba(242,166,90,.55);font:600 .62rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:#F2A65A}
+/* (the Academy, its own site: a tile the width of the menu, its mortarboard before its name) */
+.sm-one{grid-template-columns:minmax(0,1fr)}
+.sm-academy{flex-direction:row;align-items:center;justify-content:flex-start;gap:10px}
+.sm-academy svg{flex:none;color:#F2A65A}
 .sm-tile:active{background-color:rgba(255,255,255,.08);border-color:rgba(242,166,90,.6)}
 /* the tile for where the reader is (a part of the film, experience.js, or this page): an orange edge and
    a line under its name, as the header marks it */
@@ -58,6 +68,7 @@
   .sm[open] .sm-body > :nth-child(4){animation-delay:.15s}
   .sm[open] .sm-body > :nth-child(5){animation-delay:.2s}
   .sm[open] .sm-body > :nth-child(6){animation-delay:.25s}
+  .sm[open] .sm-body > :nth-child(7){animation-delay:.3s}
   .sm.closing .sm-body{animation:smRise .3s cubic-bezier(.4,0,.6,1) both}
   .sm.closing .sm-body > *{animation:none}
 }
@@ -83,9 +94,10 @@
   .sm-top .cta-l{display:none}
   .sm-top .cta-s{display:inline}
 }
-/* on its side, the practices in three columns, so the sheet scrolls less */
+/* on its side, the practices and About's three in three columns, so the sheet scrolls less */
 @media (max-height:520px) and (min-aspect-ratio:4/3){
-  .sm-practices{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sm-practices,.sm-about{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sm-about li:last-child{grid-column:auto}
   .sm-practices .sm-tile{min-height:64px}
   .sm-body{gap:14px}
 }

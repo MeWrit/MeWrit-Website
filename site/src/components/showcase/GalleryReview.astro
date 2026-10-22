@@ -1,0 +1,67 @@
+---
+// The gallery's review page, on the dev server only (/gallery/review/; never in a build): every album image
+// with the photos found in it outlined and numbered (the scratchpad's collage_split.js, which works on this
+// computer alone: the user, 2026-10-23, wants none of these photos sent to an outside service). For each
+// image the user says Right, Keep whole, or draws the photos as boxes; Copy changes gives the image names
+// and box positions as text, for collage_split.js to apply (src/private/pieces-overrides.json). Script:
+// src/scripts/gallery-review.js; styles: src/styles/showcase.css (rv-).
+import { getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { albums, cuts, photoOf, dateLabel } from '../../data/showcase';
+import '../../styles/showcase.css';
+
+const items = await Promise.all(albums.flatMap(a => a.photos.map(f => ({ a, f }))).map(async ({ a, f }) => {
+  const src = photoOf('gallery', f), c = cuts[f];
+  if (!src) return null;
+  const shown = await getImage({ src, width: Math.min(src.width, 1100), format: 'webp' });
+  const W = c?.W || src.width, H = c?.H || src.height;
+  const check = !!c && (c.method === 'seam' || c.flags.length > 0);
+  return { a, f, url: shown.src, W, H, c, check };
+})).then(l => l.filter(i => i !== null));
+const counts = { all: items.length, check: items.filter(i => i.check).length, cut: items.filter(i => i.c && i.c.pieces.length).length, whole: items.filter(i => !i.c || !i.c.pieces.length).length };
+const how: Record<string, string> = { gutter: 'cut at its gutters', seam: 'cut at seams: check', manual: 'drawn by hand', whole: 'kept whole' };
+---
+<Base title="Gallery review | MeWriT" description="Checking the photos cut from the gallery's collages (dev server only)." foot="film" page="gallery">
+  <div class="sc-page rv">
+    <header class="rv-head">
+      <p class="sc-k">Gallery review, on this computer only</p>
+      <h1>Are the photos cut right?</h1>
+      <p>Each album image below has the photos found in it outlined and numbered. For each one choose <b>Right</b>, <b>Keep whole</b>, or <b>Draw</b> and drag a box round each photo in it. Your marks stay in this browser. When you are done, press <b>Copy changes</b> and paste the text to Claude: it holds only the image names and box positions, never a photo.</p>
+    </header>
+    <div class="rv-bar">
+      <div class="ga-filters" role="group" aria-label="Show">
+        <button class="ev-kind" type="button" data-show="all" aria-pressed="true">All <b>{counts.all}</b></button>
+        <button class="ev-kind" type="button" data-show="check" aria-pressed="false">To check <b>{counts.check}</b></button>
+        <button class="ev-kind" type="button" data-show="cut" aria-pressed="false">Cut <b>{counts.cut}</b></button>
+        <button class="ev-kind" type="button" data-show="whole" aria-pressed="false">Whole <b>{counts.whole}</b></button>
+      </div>
+      <p class="rv-progress" aria-live="polite"></p>
+      <button class="btn btn-primary rv-copy" type="button">Copy changes</button>
+    </div>
+    <textarea class="rv-out" readonly hidden aria-label="Your changes, to paste to Claude"></textarea>
+    <ol class="rv-list">
+      {items.map(({ a, f, url, W, H, c, check }) => (
+        <li class="rv-item" data-file={f} data-w={W} data-h={H} data-check={check ? '1' : undefined} data-cut={c && c.pieces.length ? '1' : undefined}>
+          <div class="rv-meta">
+            <p class="rv-file"><b>{f}</b> {W} x {H} · {a.title}, {dateLabel(a.date)}</p>
+            <p class="rv-how">{c ? `${c.pieces.length ? `${c.pieces.length} photos, ` : ''}${c.by.startsWith('confirmed') ? 'as found, confirmed by you' : c.by.startsWith('review') || c.by === 'hand' ? (c.pieces.length ? 'drawn by you' : 'kept whole by you') : how[c.method] || c.method}` : 'not looked at yet'}{c && c.flags.length > 0 && <em> · {c.flags.join('; ')}</em>}</p>
+          </div>
+          <div class="rv-pic" data-boxes={JSON.stringify((c?.pieces || []).map(p => [p.x, p.y, p.w, p.h]))}>
+            <img src={url} alt="" width={W} height={H} loading="lazy" draggable="false" />
+            <div class="rv-layer"></div>
+          </div>
+          <div class="rv-acts">
+            <button type="button" class="rv-b" data-act="right">Right</button>
+            <button type="button" class="rv-b" data-act="whole">Keep whole</button>
+            <button type="button" class="rv-b" data-act="draw">Draw</button>
+            <button type="button" class="rv-b rv-quiet" data-act="reset">Reset</button>
+            <span class="rv-state"></span>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Base>
+<script>
+  import '../../scripts/gallery-review.js';
+</script>

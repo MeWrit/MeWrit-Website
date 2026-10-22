@@ -16,6 +16,8 @@
 .intro-on:not(.logo-landed) .site-header .logo img{opacity:0}
 .menu-btn{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;margin-right:-6px}
 .nav-desktop,.header-cta{display:none}
+/* (the Academy's button beside Get in touch: on the film's pages only, on a computer: foot.css) */
+.header-academy{display:none}
 
 /* ---------------- mobile menu (dialog) ---------------- */
 .menu-sheet{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;border:0;padding:0;background:var(--page);color:var(--body)}

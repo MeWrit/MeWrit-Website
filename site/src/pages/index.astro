@@ -15,6 +15,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { experience, practicePages } from '../data/experience';
 import { practices } from '../data/pitch';
+import { practiceSlugs } from '../data/practices';
 import { SCENES, CHAPTERS } from '../scripts/xp/scenes.js';
 import { site, contact } from '../data/site';
 import { href } from '../lib/url';
@@ -96,9 +97,16 @@ const anchorOf = (s: { id: string; chapter: number }, i: number) =>
                       <li class="xp-tile-all"><button class="xp-tile xp-explore" type="button"><span class="t">Explore all five</span><b aria-hidden="true">{'→'}</b></button></li>
                     </ol>
                   </>}
-                  {/* (the practices' own pages are not built yet: each practice leads to the contact page for now) */}
+                  {/* a practice with a page of its own leads there (Know more: src/pages/practices/), and to the
+                      contact page with it already chosen; Training, whose home is the MeWriT Academy for now,
+                      plans a training */}
                   {w.more && <div class="xp-morerow">
-                    <a class="xp-more" href={href('/contact/')}>{w.academy ? 'Plan a training' : 'Discuss your project'}<span class="sr-only">: {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>
+                    {practiceSlugs.includes(w.more)
+                      ? <>
+                        <a class="xp-more" href={href(`/practices/${w.more}/`)}>Know more<span class="sr-only">: {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>
+                        <a class="xp-acad" href={href(`/contact/?about=${encodeURIComponent(CHAPTERS[s.chapter])}`)}>Discuss your project</a>
+                      </>
+                      : <a class="xp-more" href={href(`/contact/?about=${encodeURIComponent(CHAPTERS[s.chapter])}`)}>{w.academy ? 'Plan a training' : 'Discuss your project'}<span class="sr-only">: {CHAPTERS[s.chapter]}</span> <b aria-hidden="true">{'→'}</b></a>}
                     {/* (training: the Academy's open workshops and courses, from the practice itself) */}
                     {w.academy && <a class="xp-acad" href={contact.academy} target="_blank" rel="noopener">MeWriT Academy <span aria-hidden="true">↗</span></a>}
                   </div>}

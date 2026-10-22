@@ -17,7 +17,8 @@ export type XpScene = {
 };
 
 // the practices' slugs: each practice's place in the film (/#regulatory-writing ...: the menus and the
-// foot link there), and the address its own page will have (/services/<slug>/), not built yet
+// foot link there), and its own page's address (/practices/<slug>/: src/data/practices.ts; Training has
+// none, the MeWriT Academy being its home for now)
 export const practicePages = ['regulatory-writing', 'scientific-publications', 'medical-communications', 'training', 'ai-ml-advisory'];
 
 export const experience = {

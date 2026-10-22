@@ -7,15 +7,19 @@
    way back stands at the top, the words at the foot, the shape between them. */
 .nb{position:relative;overflow:hidden;isolation:isolate;color:#F2F5FC;
   background:radial-gradient(60% 75% at 72% 48%,#13244F 0%,#060E26 58%,#030817 100%)}
-.nb-page{min-height:clamp(460px,64svh,660px)}
+/* (a page's band lower than it was, the user, 2026-10-22: "make these blue upper sections smaller in height
+   on the inner pages"; it grows with its words where they need more) */
+.nb-page{min-height:clamp(320px,40svh,440px)}
 .nb-hero{min-height:clamp(600px,100svh,980px)}
 .nb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
 .nb.nb-on .nb-canvas{opacity:1}
 .nb-nogl .nb-canvas{display:none}
+/* (a phone with too little room between the way back and the words: the shape stays out, band.js) */
+.nb-out .nb-canvas{display:none}
 .nb-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,23,.82) 0%,rgba(3,8,23,.5) 30%,rgba(3,8,23,0) 58%)}
 /* (it meets the cream on a clean edge: the user, 2026-10-22, did not like a coloured dawn stripe there) */
 .nb-words{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;min-height:inherit;
-  padding:calc(var(--header-h) + clamp(18px,3vh,32px)) clamp(16px,6vw,104px) clamp(48px,8vh,88px);max-width:min(720px,52vw)}
+  padding:calc(var(--header-h) + clamp(18px,3vh,32px)) clamp(16px,6vw,104px) clamp(36px,5.5vh,60px);max-width:min(720px,52vw)}
 .nb-back{margin-bottom:clamp(14px,2.4vh,26px)}
 .nb-kicker{margin:0 0 12px;font:600 .74rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#F2A65A}
 .nb-title{margin:0 0 14px;font:500 clamp(2.6rem,1.3rem + 3.4vw,5rem)/1 var(--serif);letter-spacing:-.022em;color:#F2F5FC;text-wrap:balance}
@@ -23,12 +27,13 @@
 .nb-note{margin:10px 0 0;max-width:56ch;font-size:.88rem;line-height:1.5;color:rgba(214,224,246,.62)}
 /* a phone: the way back at the top, the words at the foot over a shade rising from it, the shape between */
 @media (max-width:759.98px),(max-aspect-ratio:4/5){
-  .nb-page{min-height:clamp(500px,76svh,640px)}
+  .nb-page{min-height:clamp(460px,66svh,580px)}
   .nb-shade{background:linear-gradient(0deg,rgba(3,8,23,.9) 0%,rgba(3,8,23,.66) 34%,rgba(3,8,23,0) 58%)}
   .nb-behind .nb-shade{background:linear-gradient(0deg,rgba(3,8,23,.92) 0%,rgba(3,8,23,.74) 48%,rgba(3,8,23,.36) 100%)}
   .nb-words{justify-content:flex-end;max-width:none;padding:calc(var(--header-h) + 12px) 20px clamp(40px,6svh,56px)}
-  /* (room kept for the shape between the way back and the words; the band grows to keep it) */
-  .nb-back{margin-bottom:auto;padding-bottom:min(180px,22svh)}
+  /* (room kept for the shape between the way back and the words, and the band grows to keep it; under the
+     120px band.js needs, the shape stays out) */
+  .nb-back{margin-bottom:auto;padding-bottom:min(170px,22svh)}
   .nb-note{display:none}
   .nb-title{font-size:clamp(2.3rem,1.5rem + 4.4vw,3rem)}
   .nb-line{font-size:.98rem}

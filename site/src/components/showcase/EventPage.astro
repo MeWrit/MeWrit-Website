@@ -1,0 +1,132 @@
+---
+// One event of the record (src/pages/events/[...path].astro; the user, 2026-10-23: "A page per event",
+// "Album and event links"): what it was, when and where, and her part in it; for MeWriT's own workshops
+// the poster's detail (what it covers, who should attend, what is included, the fee), with registration,
+// a calendar entry and sharing while it is still to come; its photos, which open over the screen
+// (PhotoViewer), and a way to them in the Gallery; the events either side of it. Google is told it is an
+// event (schema.org Event), where its date and place are known.
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Icon from '../Icon.astro';
+import PhotoViewer from '../PhotoViewer.astro';
+import { events, albumsOf, albumPhotos, photoOf, dateLabel, weekday, isComing, KIND, type MewritEvent } from '../../data/showcase';
+import { site, contact } from '../../data/site';
+import { href } from '../../lib/url';
+import '../../styles/showcase.css';
+
+interface Props { e: MewritEvent }
+const { e } = Astro.props;
+const coming = isComing(e);
+const albums = albumsOf(e.id);
+// the photos (each collage as the photos cut from it), each with its full size for the viewer (no larger
+// than the photo itself)
+const photos = await Promise.all(albums.flatMap(a => { const shown = albumPhotos(a); return shown.map((s, j) => ({ a, src: s.src, j, n: shown.length })); }).map(async ({ a, src, j, n }) => {
+  const full = await getImage({ src, width: Math.min(src.width, 1800), format: 'webp' });
+  return { a, src, full: full.src, alt: `${a.title}, photo ${j + 1} of ${n}` };
+}));
+const posters = (await Promise.all((e.poster || []).map(async f => {
+  const src = photoOf('events', f);
+  if (!src) return null;
+  const full = await getImage({ src, width: Math.min(src.width, 1600), format: 'webp' });
+  return { src, full: full.src };
+}))).filter(p => p !== null);
+const i = events.indexOf(e), newer = events[i - 1], older = events[i + 1];
+const urlOf = (id: string) => href(`/events/${id}/`);
+const where = e.venue || e.place;
+const mapOf = (v: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}`;
+const ext = { target: '_blank', rel: 'noopener' };
+const pageUrl = new URL(Astro.url.pathname, Astro.site || Astro.url).href;
+const shareWa = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${e.title}, ${dateLabel(e.start, e.end)}: ${pageUrl}`)}`;
+const regMail = `mailto:${e.email || 'training@mewrit.com'}?subject=${encodeURIComponent(`Registration: ${e.title}`)}`;
+// a calendar entry for an event still to come: all day, from its first day to the day after its last
+const day = (d: string) => d.replace(/-/g, '');
+const after = (d: string) => { const t = new Date(`${d}T00:00:00Z`); t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
+const ics = coming ? ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MeWriT//Events//EN', 'BEGIN:VEVENT', `UID:${e.id}@mewrit.com`,
+  `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`, `DTSTART;VALUE=DATE:${day(e.start)}`, `DTEND;VALUE=DATE:${day(after(e.end || e.start))}`,
+  `SUMMARY:${e.title}`, where ? `LOCATION:${where.replace(/,/g, '\\,')}` : '', `URL:${pageUrl}`, 'END:VEVENT', 'END:VCALENDAR'].filter(Boolean).join('\r\n') : '';
+// for Google: an event with a full date and a place (or online)
+const price = e.fee ? e.fee.full.replace(/[^\d.]/g, '') : '';
+const ld = e.start.length === 10 && (where || e.mode === 'online') ? {
+  '@context': 'https://schema.org', '@type': 'Event', name: e.title, startDate: e.start, endDate: e.end || e.start,
+  eventAttendanceMode: e.mode === 'online' ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  location: e.mode === 'online' ? { '@type': 'VirtualLocation', url: pageUrl } : { '@type': 'Place', name: where, address: where },
+  organizer: { '@type': 'Organization', name: e.host || site.name },
+  performer: { '@type': 'Person', name: 'Dr Hetal Shah' },
+  description: e.summary || e.note || `${e.role}${e.host ? `, ${e.host}` : ''}`,
+  ...(posters[0] ? { image: [new URL(posters[0].full, pageUrl).href] } : {}),
+  ...(price ? { offers: { '@type': 'Offer', price, priceCurrency: 'INR', url: e.register || pageUrl, availability: coming ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut' } } : {}),
+} : null;
+const kicker = [KIND[e.kind], e.mewrit ? 'by MeWriT' : '', e.series || ''].filter(Boolean).join(' · ');
+// (an event known only by its facts and photos has no body: none is drawn, and its photos follow the head)
+const hasBody = !!(e.summary || e.note || e.sessions || e.highlights || e.attend || e.includes || e.fee || e.email);
+---
+<Base title={`${e.title} | Events | ${site.name}`} description={e.summary || `${e.role}${e.host ? `, ${e.host}` : ''}, ${dateLabel(e.start, e.end)}.`} foot="film" page="event">
+  <div class="sc-page ep">
+    <a class="ep-back" href={href('/events/')}><span aria-hidden="true">←</span> All events</a>
+    <div class="ep-top">
+      <header class="ep-head">
+        <p class="sc-k">{kicker}</p>
+        <h1>{e.title}</h1>
+        <ul class="ep-facts">
+          <li><Icon name="calendar" size={18} stroke={1.8} /><span>{weekday(e.start) && !e.end && `${weekday(e.start)}, `}{dateLabel(e.start, e.end)}</span></li>
+          {e.time && <li><Icon name="clock" size={18} stroke={1.8} /><span>{e.time}</span></li>}
+          {where && <li><Icon name="pin" size={18} stroke={1.8} /><a href={mapOf(where)} {...ext}>{where}</a></li>}
+          {e.mode && <li><Icon name="globe" size={18} stroke={1.8} /><span>{e.mode === 'online' ? 'Online' : 'In person'}</span></li>}
+          <li><Icon name="mortarboard" size={18} stroke={1.8} /><span>Dr Hetal Shah: {e.role.charAt(0).toLowerCase() + e.role.slice(1)}{e.host && e.host !== 'MeWriT' && <>, {e.host}</>}</span></li>
+          {e.audience && <li><Icon name="people" size={18} stroke={1.8} /><span>{e.audience}</span></li>}
+        </ul>
+        {coming
+          ? <div class="ev-acts">
+              <a class="btn btn-primary" href={e.register || regMail} {...(e.register ? ext : {})}>Register</a>
+              <a class="btn btn-outline" href={`data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`} download={`${e.id}.ics`}>Add to calendar</a>
+              <a class="ev-q ev-q-light" href={shareWa} {...ext}><Icon name="whatsapp" size={18} /><span>Share</span></a>
+            </div>
+          : e.mewrit && <p class="ev-closed">This workshop has taken place</p>}
+      </header>
+      {posters.length > 0 && (
+        <div class="ep-posters" data-vw-set>
+          {posters.map((p, j) => <a class="ep-poster" href={p.full} data-vw data-vw-cap={`${e.title}: poster ${j + 1} of ${posters.length}`} data-vw-alt={`The workshop's poster, ${j + 1} of ${posters.length}`}><Image src={p.src} alt={`The workshop's poster, ${j + 1} of ${posters.length}`} widths={[240, 360, 480]} sizes="(min-width: 900px) 220px, 44vw" /></a>)}
+        </div>
+      )}
+    </div>
+
+    {hasBody && <div class="ep-body">
+      {e.summary && <p class="ep-lede">{e.summary}</p>}
+      {e.note && <p class="ep-note">{e.note}.</p>}
+      {e.sessions && <section class="ep-sec"><h2>{e.sessions.length > 1 ? 'Her sessions' : 'Her session'}</h2><ul class="ep-list">{e.sessions.map(s => <li>{s}</li>)}</ul></section>}
+      {e.highlights && <section class="ep-sec"><h2>What it covers</h2><ul class="ep-list">{e.highlights.map(s => <li>{s}</li>)}</ul></section>}
+      {e.attend && <section class="ep-sec"><h2>Who should attend</h2><ul class="ev-chips">{e.attend.map(s => <li>{s}</li>)}</ul></section>}
+      {e.includes && <section class="ep-sec"><h2>What you get</h2><ul class="ev-chips">{e.includes.map(s => <li>{s}</li>)}</ul></section>}
+      {e.fee && (
+        <section class="ep-sec ep-fee">
+          <h2>Fees</h2>
+          <p><b>{e.fee.full}</b> {e.fee.fullNote}</p>
+          {e.fee.early && <p>Early bird: <b>{e.fee.early}</b>, {e.fee.earlyNote}</p>}
+          {e.fee.group && <p>{e.fee.group}.</p>}
+          {e.fee.covers && <p class="ep-small">The fee covers: {e.fee.covers}.</p>}
+        </section>
+      )}
+      {e.email && <p class="ep-small">Group registrations and questions: <a href={`mailto:${e.email}`}>{e.email}</a></p>}
+    </div>}
+
+    {photos.length > 0 && (
+      <section class="ep-photos" aria-labelledby="ep-ph">
+        <div class="ep-photos-head">
+          <h2 id="ep-ph">Photos</h2>
+          <a class="ep-gal" href={href(`/gallery/#${albums[0].id}`)}>In the Gallery <span aria-hidden="true">→</span></a>
+        </div>
+        <ul class="ep-grid" data-vw-set>
+          {photos.map(p => <li><a href={p.full} data-vw data-vw-cap={p.a.caption} data-vw-alt={p.alt}><Image src={p.src} alt={p.alt} widths={[320, 480, 640]} sizes="(min-width: 1100px) 300px, (min-width: 700px) 30vw, 46vw" /></a></li>)}
+        </ul>
+      </section>
+    )}
+
+    <nav class="ep-nav" aria-label="More events">
+      {newer ? <a class="ep-nav-a" href={urlOf(newer.id)}><span>Newer</span><strong>{newer.title}</strong></a> : <span></span>}
+      {older && <a class="ep-nav-a ep-older" href={urlOf(older.id)}><span>Older</span><strong>{older.title}</strong></a>}
+    </nav>
+  </div>
+  <PhotoViewer />
+  {ld && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
+</Base>

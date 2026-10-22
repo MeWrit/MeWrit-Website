@@ -20,24 +20,33 @@ export const contact = {
 // `art` picks the small illustration a link gets in the floating capsule's rich panels;
 // `key` ties a top-level entry to the page section it leads to (for the nav that follows
 // where you are reading)
-export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string; ext?: boolean };
+// `soon`: a page still to come, shown marked Soon and not as a link
+export type NavLink = { label: string; href: string; note?: string; art?: string; key?: string; ext?: boolean; soon?: boolean };
 export type NavItem = NavLink | { label: string; id: string; key?: string; href?: string; items: NavLink[] };
 
-// desktop navigation (the dropdowns show a short note under each), in the home page's own order: who we
-// are, why MeWriT, the five practices, the expertise behind them (publications, therapeutic areas), then
-// the leadership; Get in touch is the header's button, so no Contact link beside it (2026-10-21, the
-// user: the old menu was "redundant and a lot in the wrong place": Trainings repeated the Training
-// practice, Contact the button; then: Who we are and Why MeWriT as items of their own, not in a dropdown;
-// Practices itself leads to the five practices, its panel opening on the pointer only; Leadership for Dr
-// Hetal and Dr Amit; Expertise for the publications and the therapeutic areas, the Academy moving to the
-// Training practice, the phone menu and the foot so the header keeps five entries). Its places
-// in the home page's film (/#who, /#practices, /#regulatory-writing ...) are the ids index.astro gives
-// those scenes: experience.js opens the film there, or goes there at once on the home page, and marks
-// the item for the part of the film on screen (`key`). The phone menu (SiteMenu.astro) follows the same
-// order
+// desktop navigation (the dropdowns show a short note under each): Home; About (who we are, why MeWriT,
+// the leadership); the five practices; the expertise behind them (publications, therapeutic areas); the
+// showcase (events and the gallery). Get in touch is the header's button, so no Contact link beside it,
+// and the Academy a second, quieter button beside it (SiteHeader.astro). The user, 2026-10-21: the old
+// menu was "redundant and a lot in the wrong place": Trainings repeated the Training practice, Contact the
+// button; Practices itself leads to the five practices, its panel opening on the pointer only; Leadership
+// for Dr Hetal and Dr Amit; Expertise for the publications and the therapeutic areas. 2026-10-22: a Home
+// item, the Academy as a button "not the same as get in touch", Events and Gallery "under a showcase menu
+// dropdown", shown now and marked Soon until their pages exist, then "who we are, why mewrit and
+// leadership in an about dropdown". Its places in the home page's film (/#who, /#practices,
+// /#regulatory-writing ...) are the ids index.astro gives those scenes: experience.js opens the film
+// there, or goes there at once on the home page, and marks the entry for the part of the film on screen
+// (`key`; a dropdown's entry answers to its items' keys too, so About is marked for who we are and why
+// MeWriT). The phone menu (SiteMenu.astro) holds the same entries as tiles
 export const nav: NavItem[] = [
-  { label: 'Who we are', href: '/#who', key: 'who' },
-  { label: 'Why MeWriT', href: '/#why', key: 'why' },
+  { label: 'Home', href: '/' },
+  {
+    label: 'About', id: 'dd-about', key: 'about', items: [
+      { label: 'Who we are', note: 'Medical writers, therapeutic-area experts and biostatisticians', href: '/#who', key: 'who' },
+      { label: 'Why MeWriT', note: 'Scientific rigour, guideline discipline, and what clients say', href: '/#why', key: 'why' },
+      { label: 'Leadership', note: 'Dr Hetal Shah and Dr Amit Shah, who lead MeWriT', href: '/leadership/', key: 'leadership' },
+    ],
+  },
   {
     label: 'Practices', id: 'dd-practices', key: 'practices', href: '/#practices', items: [
       { label: 'Regulatory writing', note: 'Clinical trial and regulatory documentation', href: '/#regulatory-writing', art: 'protocol' },
@@ -53,7 +62,13 @@ export const nav: NavItem[] = [
       { label: 'Therapeutic areas', note: 'From oncology and cardiology to vaccines and medical devices', href: '/therapeutic-areas/', art: 'chips' },
     ],
   },
-  { label: 'Leadership', href: '/leadership/', key: 'leadership' },
+  {
+    label: 'Showcase', id: 'dd-showcase', key: 'showcase', items: [
+      // (Soon wherever their record is not built: src/data/showcase.ts)
+      { label: 'Events', note: 'Workshops, conferences and webinars', href: '/events/', soon: true },
+      { label: 'Gallery', note: 'Pictures from the workshops and conferences', href: '/gallery/', soon: true },
+    ],
+  },
 ];
 
 // the nav lab's experimental layouts (spine, tabs, dock, comments, corners) use these entries;

@@ -34,6 +34,10 @@ export const icons = {
   star: { body: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>' },
   bulb: { body: '<path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0012 3z"/>' },
   'heart-pulse': { body: '<path d="M20.5 8.5c0-2.8-2.2-5-4.9-5-1.6 0-3 .8-3.6 2-.6-1.2-2-2-3.6-2C5.7 3.5 3.5 5.7 3.5 8.5c0 5.6 8.5 11.5 8.5 11.5s8.5-5.9 8.5-11.5z"/><path d="M3.5 11h4l1.5-2.5 2.5 5 2-3.5 1.5 1h5"/>' },
+  // events and the gallery: a date, a clock, photos
+  calendar: { body: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>' },
+  clock: { body: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>' },
+  camera: { body: '<path d="M4 7h3l2-3h6l2 3h3a1 1 0 011 1v11a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z"/><circle cx="12" cy="13" r="3.6"/>' },
 } as const;
 
 export type IconName = keyof typeof icons;

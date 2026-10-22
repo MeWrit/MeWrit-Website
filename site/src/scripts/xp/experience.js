@@ -22,15 +22,16 @@ function start() {
   const articles = SCENES.map(s => sec.querySelector(`.xp-scene[data-scene="${s.id}"]`));
   const rail = [...sec.querySelectorAll('.xp-rail button')];
   const readout = sec.querySelector('.xp-readout'), note = sec.querySelector('.xp-note'), hint = sec.querySelector('.xp-hint'), callLayer = sec.querySelector('.xp-callouts');
-  // where the reader is, in the menus: the header's entry for the part of the film on screen (Who we are,
-  // Why MeWriT, Practices: data-nav-key) and, in the practices' panel and the phone menu, the practice
-  // itself (data-nav-practice), each marked aria-current="location" (styled in foot.css, site-menu.css);
-  // the clients' testimonials (voices) are part of Why MeWriT
+  // where the reader is, in the menus: the header's entry for the part of the film on screen (About for
+  // who we are and why MeWriT, Practices: data-nav-key, which lists several keys on a dropdown's entry)
+  // and, in the panels and the phone menu, the item itself (Who we are, Why MeWriT; the practice:
+  // data-nav-practice), each marked aria-current="location" (styled in foot.css, site-menu.css); the
+  // clients' testimonials (voices) are part of Why MeWriT
   const navKeys = [...document.querySelectorAll('[data-nav-key]')], navPractices = [...document.querySelectorAll('[data-nav-practice]')];
   function markNav(i) {
     const s = SCENES[i], key = s.id === 'who' || s.id === 'why' ? s.id : s.id === 'voices' ? 'why' : s.id === 'practices' || s.chapter >= 0 ? 'practices' : '';
     navKeys.forEach(a => {
-      if (a.dataset.navKey === key) a.setAttribute('aria-current', 'location');
+      if (key && a.dataset.navKey.split(' ').includes(key)) a.setAttribute('aria-current', 'location');
       else if (a.getAttribute('aria-current') === 'location') a.removeAttribute('aria-current');
     });
     navPractices.forEach(a => { if (+a.dataset.navPractice === s.chapter) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });

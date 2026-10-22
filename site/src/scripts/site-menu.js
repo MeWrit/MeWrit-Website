@@ -27,6 +27,6 @@ if (menu && btn) {
     clearTimeout(rising); rising = 0; menu.classList.remove('closing');
     root.style.overflow = ''; btn.setAttribute('aria-expanded', 'false');
   });
-  // grown past 1100px (a window made wider, a tablet turned): the header's own links take over (foot.css)
-  matchMedia('(max-width: 1099.98px)').addEventListener('change', e => { if (!e.matches) done(); });
+  // grown past 1280px (a window made wider, a tablet turned): the header's own links take over (foot.css)
+  matchMedia('(max-width: 1279.98px)').addEventListener('change', e => { if (!e.matches) done(); });
 }

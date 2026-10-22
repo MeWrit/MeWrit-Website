@@ -2,13 +2,15 @@
 // The phone menu on the film's pages (Base.astro renders it where foot is "film"; styles
 // src/styles/site-menu.css, script src/scripts/site-menu.js). Its top is the header (the logo, Get in
 // touch, and Close where the menu button is); under it, on dusk indigo, everything is a tile a finger
-// finds at once (the user, 2026-10-21: no little links), in the header's order: Who we are and Why
-// MeWriT; the five practices, each going straight to its place in the film (/#regulatory-writing ...:
-// experience.js), and all five; the expertise (Publications, Therapeutic areas); Leadership and the
-// Academy; then call, WhatsApp and email.
+// finds at once (the user, 2026-10-21: no little links), holding the header's entries: Home; About (Who
+// we are, Why MeWriT, Leadership); the five practices, each going straight to its place in the film
+// (/#regulatory-writing ...: experience.js), and all five; the expertise (Publications, Therapeutic areas);
+// the showcase (Events and Gallery, marked Soon until their pages exist); the Academy, the width of the
+// menu; then call, WhatsApp and email.
 import Icon from './Icon.astro';
 import { contact } from '../data/site';
 import { practicePages } from '../data/experience';
+import { hasEvents, hasGallery } from '../data/showcase';
 import { CHAPTERS } from '../scripts/xp/scenes.js';
 import { href } from '../lib/url';
 import '../styles/site-menu.css';
@@ -24,10 +26,17 @@ const here = Astro.url.pathname;
     <button class="sm-close" type="button" aria-label="Close the menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <nav class="sm-body" aria-label="Menu">
-    <ul class="sm-tiles sm-two">
-      <li><a class="sm-tile" href={href('/#who')} data-nav-key="who"><span class="t">Who we are</span><b aria-hidden="true">→</b></a></li>
-      <li><a class="sm-tile" href={href('/#why')} data-nav-key="why"><span class="t">Why MeWriT</span><b aria-hidden="true">→</b></a></li>
+    <ul class="sm-tiles sm-one">
+      <li><a class="sm-tile" href={href('/')}><span class="t">Home</span><b aria-hidden="true">→</b></a></li>
     </ul>
+    <div>
+      <p class="sm-h">About</p>
+      <ul class="sm-tiles sm-two sm-about">
+        <li><a class="sm-tile" href={href('/#who')} data-nav-key="who"><span class="t">Who we are</span><b aria-hidden="true">→</b></a></li>
+        <li><a class="sm-tile" href={href('/#why')} data-nav-key="why"><span class="t">Why MeWriT</span><b aria-hidden="true">→</b></a></li>
+        <li><a class="sm-tile" href={href('/leadership/')} aria-current={here.startsWith(href('/leadership/')) ? 'page' : undefined}><span class="t">Leadership</span><b aria-hidden="true">→</b></a></li>
+      </ul>
+    </div>
     <div>
       <p class="sm-h">The practices</p>
       <ol class="sm-tiles sm-two sm-practices">
@@ -42,9 +51,20 @@ const here = Astro.url.pathname;
         <li><a class="sm-tile" href={href('/therapeutic-areas/')} aria-current={here.startsWith(href('/therapeutic-areas/')) ? 'page' : undefined}><span class="t">Therapeutic areas</span><b aria-hidden="true">→</b></a></li>
       </ul>
     </div>
-    <ul class="sm-tiles sm-two">
-      <li><a class="sm-tile" href={href('/leadership/')} aria-current={here.startsWith(href('/leadership/')) ? 'page' : undefined}><span class="t">Leadership</span><b aria-hidden="true">→</b></a></li>
-      <li><a class="sm-tile" href={contact.academy} {...ext}><span class="t">MeWriT Academy</span><b aria-hidden="true">↗</b></a></li>
+    <div>
+      <p class="sm-h">Showcase</p>
+      <ul class="sm-tiles sm-two">
+        {/* (each a link where its record is built, src/data/showcase.ts; otherwise marked Soon) */}
+        <li>{hasEvents
+          ? <a class="sm-tile" href={href('/events/')} aria-current={here.startsWith(href('/events/')) ? 'page' : undefined}><span class="t">Events</span><b aria-hidden="true">→</b></a>
+          : <span class="sm-tile sm-soon" aria-disabled="true"><span class="t">Events</span><em class="sm-badge">Soon</em></span>}</li>
+        <li>{hasGallery
+          ? <a class="sm-tile" href={href('/gallery/')} aria-current={here.startsWith(href('/gallery/')) ? 'page' : undefined}><span class="t">Gallery</span><b aria-hidden="true">→</b></a>
+          : <span class="sm-tile sm-soon" aria-disabled="true"><span class="t">Gallery</span><em class="sm-badge">Soon</em></span>}</li>
+      </ul>
+    </div>
+    <ul class="sm-tiles sm-one">
+      <li><a class="sm-tile sm-academy" href={contact.academy} {...ext}><Icon name="mortarboard" size={19} stroke={1.8} /><span class="t">MeWriT Academy</span><b aria-hidden="true">↗</b></a></li>
     </ul>
     <div class="sm-reach">
       <a class="sm-q" href={contact.phoneHref} aria-label={`Call ${contact.phoneDisplay}`}><Icon name="phone" size={18} /><span>Call</span></a>

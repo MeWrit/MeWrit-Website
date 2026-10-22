@@ -9,8 +9,8 @@
    draws only while it is on screen, at half the rate on a phone once settled; with reduced motion, once
    and still; without WebGL, its night stays a plain gradient (band.css).
    Where the shape stands: on a computer beside the words (from their right edge to the screen's); on a
-   phone above them, between the way back and the words (or, with too little room there, or data-phone
-   "behind", behind the words, fitted to the whole band). data-shot "a" or "b" takes the camera's direction
+   phone above them, between the way back and the words (with too little room there, not at all; with
+   data-phone "behind", behind the words, fitted to the whole band). data-shot "a" or "b" takes the camera's direction
    from one of the scene's two shots instead of the middle of them (the papers from above, say). */
 import { clamp, REDUCE, STATIC } from './shared.js';
 import { SCENES } from './xp/scenes.js';
@@ -43,10 +43,11 @@ async function start(band, s) {
   const shot = band.dataset.shot, behindAlways = band.dataset.phone === 'behind';
   const dir = shot === 'a' ? norm(sub(s.a[0], s.a[1])) : shot === 'b' ? norm(sub(s.b[0], s.b[1])) : sceneDir(s);
   const fov = shot === 'a' ? s.a[2] : shot === 'b' ? s.b[2] : (s.a[2] + s.b[2]) / 2;
-  let W = 0, H = 0, v = [0, 0, 30, 0, 0, 0, 40, 0, 0], behind = false;
+  let W = 0, H = 0, v = [0, 0, 30, 0, 0, 0, 40, 0, 0], behind = false, out = false;
 
   // the shape fitted to its room (in fractions of the band): beside the words on a computer; on a phone
-  // between the way back and the words, or behind the words where that leaves too little room
+  // between the way back and the words, or, where that leaves too little room, not shown at all (never
+  // behind the words or the way back on a phone: the user, 2026-10-22)
   function fit() {
     W = band.clientWidth; H = band.clientHeight;
     if (!W || !H) return;
@@ -60,20 +61,24 @@ async function start(band, s) {
     const foot = 1 - 32 / H;   // (a little above the band's edge)
     let t;
     if (phone) {
-      // (from the way back's own foot: its wrapper holds the room kept for the shape, band.css)
-      const y0 = back ? rel((back.lastElementChild || back).getBoundingClientRect())[3] + 14 / H : (head + 14) / H;
+      // (from the foot of the way back's link, not of its wrapper's last child, which is the link's own
+      // little script and has no box; the wrapper holds the room kept for the shape, band.css)
+      const link = back && back.querySelector('a');
+      const y0 = link ? rel(link.getBoundingClientRect())[3] + 14 / H : (head + 14) / H;
       const y1 = first ? rel(first.getBoundingClientRect())[1] - 16 / H : .5;
-      behind = behindAlways || (y1 - y0) * H < 120;
-      // (behind: from the element marked data-nb-from, or the band's top, to the horizon)
+      behind = behindAlways;
+      out = s !== DUST && !behindAlways && (y1 - y0) * H < 120;   // (the dust alone needs no room)
+      // (behind, where a page asks for it: from the element marked data-nb-from, or the band's top, to the horizon)
       const from = words.querySelector('[data-nb-from]');
       const yb = from ? rel(from.getBoundingClientRect())[1] : (head + 14) / H;
-      t = behind ? { x: .07, y: yb, w: .86, h: Math.max(.2, foot - yb) } : { x: .08, y: y0, w: .84, h: y1 - y0 };
+      t = behind ? { x: .07, y: yb, w: .86, h: Math.max(.2, foot - yb) } : { x: .08, y: y0, w: .84, h: Math.max(.05, y1 - y0) };
     } else {
-      behind = false;
+      behind = false; out = false;
       const x0 = Math.min(.66, Math.max(.44, right + 56 / W));
       t = { x: x0, y: (head + 22) / H, w: .95 - x0, h: Math.max(.3, foot - (head + 22) / H) };
     }
     band.classList.toggle('nb-behind', behind);
+    band.classList.toggle('nb-out', out);
     // (the dust alone fills the band from a fixed place; a shape is fitted to its room)
     v = s === DUST ? [0, 0, 30, 0, 0, 0, 40, 0, 0] : fitShot(s.box || world.box(s.form), dir, fov, t, W / H);
     world.camera([v[0], v[1], v[2]], [v[3], v[4], v[5]], v[6], v[7], v[8], H);
@@ -99,7 +104,7 @@ async function start(band, s) {
   }
   function frame(now) {
     raf = 0;
-    if (!seen || document.hidden || !W) return;
+    if (!seen || document.hidden || !W || out) return;
     if (!t0) t0 = now;
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016;
     last = now;

@@ -143,9 +143,19 @@ html[data-foot="film"] .site-header.is-hidden{transform:none}
 html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{width:100%;max-width:none;height:var(--header-h);margin:0;padding:0 clamp(20px,6vw,104px);border-radius:0}
 html[data-foot="film"] .site-header .wrap::before,html[data-foot="film"] .site-header .wrap::after{display:none}
 html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:42px}
-/* below 1100px (phones, tablets, small laptops: the five entries and Get in touch need about 1100px in a
-   row) the bar is the logo, Get in touch and the menu button, which opens the tiled menu (SiteMenu.astro) */
-@media (max-width:1099.98px){
+/* the Academy (its own site, so it opens apart): an outlined button with a mortarboard, beside Get in touch
+   and quieter than it (the user, 2026-10-22: "academy as a second button but like not the same as get in
+   touch"); from 760px wide (on a phone it is a tile in the menu, SiteMenu.astro) */
+html[data-foot="film"] .header-academy{align-items:center;gap:8px;flex:none;min-height:46px;margin:0 10px 0 0;padding:0 15px 0 13px;border-radius:999px;
+  border:1.5px solid rgba(28,52,114,.32);background:rgba(255,255,255,.5);color:#1C3472;font:600 .95rem/1 var(--sans);text-decoration:none;white-space:nowrap;transition:border-color .2s,background-color .2s}
+html[data-foot="film"] .header-academy svg{flex:none;color:#C2651A}
+html[data-foot="film"] .header-academy .ext{font-size:.86em;color:#AC571D}
+@media (hover:hover){html[data-foot="film"] .header-academy:hover{border-color:#1C3472;background:rgba(28,52,114,.06)}}
+html[data-foot="film"] .header-academy:focus-visible{outline:2px solid #AC571D;outline-offset:3px}
+/* below 1280px (phones, tablets, small laptops: the five entries, the Academy and Get in touch need about
+   1280px in a row) the bar is the logo, the Academy (from 760px), Get in touch and the menu button, which
+   opens the tiled menu (SiteMenu.astro) */
+@media (max-width:1279.98px){
   html[data-foot="film"]{--header-h:60px}
   html[data-foot="film"] .site-header{padding-top:env(safe-area-inset-top)}
   html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{justify-content:flex-start;gap:8px;padding:0 10px 0 16px}
@@ -157,12 +167,15 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   html[data-foot="film"] .header-cta::after{display:none}   /* (compact here: no nib, buttons.css) */
   html[data-foot="film"] .site-header .menu-btn{display:grid;place-items:center;width:48px;height:48px;margin:0;color:#13234C}
 }
-/* (tablets and small laptops: the bar a little taller, its logo and button a little larger) */
-@media (min-width:760px) and (max-width:1099.98px){
+/* (tablets and small laptops: the bar a little taller, its logo and buttons a little larger, the
+   Academy's button beside Get in touch) */
+@media (min-width:760px) and (max-width:1279.98px){
   html[data-foot="film"]{--header-h:68px}
   html[data-foot="film"] .site-header .wrap,html[data-foot="film"] .site-header.is-solid .wrap{padding:0 clamp(16px,4vw,40px)}
   html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:40px}
   html[data-foot="film"] .header-cta{min-height:46px;padding:0 20px;font-size:.95rem}
+  html[data-foot="film"] .header-academy{display:inline-flex;margin-left:auto;margin-right:0}
+  html[data-foot="film"] .header-academy + .header-cta{margin-left:0}
 }
 @media (max-width:379.98px){
   html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:30px}
@@ -178,7 +191,8 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   html[data-foot="film"] .header-cta .cta-l{display:none}
   html[data-foot="film"] .header-cta .cta-s{display:inline}
 }
-@media (min-width:1100px){
+@media (min-width:1280px){
+  html[data-foot="film"] .header-academy{display:inline-flex}
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){text-shadow:none}
   /* one orange line under the menu (the user, 2026-10-21): under the entry for where the reader is (a part
      of the film, experience.js; or a page of its own), gliding to the entry pointed at and back, and from
@@ -200,6 +214,14 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   /* Expertise's panel: its two entries side by side, at the right under the menu (across the whole sheet
      they stood far from the entry that opened them) */
   html[data-foot="film"] #dd-expertise{grid-template-columns:repeat(2,minmax(0,330px));justify-content:end}
+  /* Showcase's panel likewise: Events and Gallery, each marked Soon (not a link) until its page exists */
+  html[data-foot="film"] #dd-showcase{grid-template-columns:repeat(2,minmax(0,330px));justify-content:end}
+  /* About's: Who we are, Why MeWriT and Leadership side by side, at the right likewise */
+  html[data-foot="film"] #dd-about{grid-template-columns:repeat(3,minmax(0,330px));justify-content:end}
+  html[data-foot="film"] .dd .dd-soon{display:grid;align-content:start;gap:8px;min-height:116px;padding:18px 4px 10px;border-top:1px solid rgba(242,245,252,.12);cursor:default}
+  html[data-foot="film"] .dd .dd-soon strong{color:rgba(242,245,252,.74)}
+  html[data-foot="film"] .dd .dd-soon > span:not(.dd-art){font-size:.88rem;line-height:1.45;color:rgba(214,224,246,.62)}
+  html[data-foot="film"] .dd-badge{justify-self:start;margin-top:2px;padding:4px 9px;border-radius:999px;border:1px solid rgba(242,166,90,.55);font:600 .64rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:#F2A65A}
   html[data-foot="film"] .dd a[aria-current="location"] strong{color:#fff}
   /* the menu at the right, one cluster with Get in touch (centred in so wide a bar it stood apart from
      both); each entry the bar's full height, so the pointer keeps its panel open on the way down to it */
@@ -220,6 +242,15 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
     background:linear-gradient(170deg,#34315D 0%,#272552 55%,#1A1B3B 100%);-webkit-backdrop-filter:none;backdrop-filter:none;
     box-shadow:0 28px 60px rgba(6,8,24,.34);transition:opacity .22s ease,visibility .22s,transform .3s cubic-bezier(.2,.7,.2,1)}
   html[data-foot="film"] .has-dd:hover .dd,html[data-foot="film"] .has-dd:focus-within .dd,html[data-foot="film"] .has-dd button[aria-expanded="true"] + .dd{transform:none}
+  /* with a mouse the panels are the pointer's alone (the user, 2026-10-23: "make all header dropdowns hover
+     only ... the menu should disappear always after the mouse stops hovering over it"): pressing an entry
+     does not hold its panel open, and a panel closes as the pointer leaves the entry and the panel. From
+     the keyboard a panel opens while the focus is in it. A touch screen has no hover: there a tap still
+     opens a panel and a tap elsewhere closes it (page.js, site-nav.js) */
+  @media (hover:hover){
+    html[data-foot="film"] .has-dd:not(:hover) .dd{opacity:0;visibility:hidden;transform:translateY(-8px)}
+    html[data-foot="film"] .has-dd:has(:focus-visible) .dd{opacity:1;visibility:visible;transform:none}
+  }
   html[data-foot="film"] .dd a{display:grid;grid-template-columns:none;grid-template-rows:none;align-content:start;gap:8px;min-height:116px;padding:18px 4px 10px;border-radius:0;
     border-top:1px solid rgba(242,245,252,.16);background:none;box-shadow:none;color:#F2F5FC;transition:border-color .25s}
   html[data-foot="film"] .dd-art{display:none}
@@ -245,10 +276,10 @@ html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-heade
   html[data-foot="film"] .site-header .logo img,html[data-foot="film"] .site-header.is-solid .logo img{height:54px}
   html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){font-size:1.12rem;padding:0 18px}
 }
-/* (1100 to 1280px: the entries a little closer, so all five and Get in touch keep one row) */
-@media (min-width:1100px) and (max-width:1279.98px){
-  html[data-foot="film"] .nav-desktop{margin-right:8px}
-  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){padding:0 11px;font-size:.96rem}
+/* (1280 to 1440px: the entries a little closer, so all five, the Academy and Get in touch keep one row) */
+@media (min-width:1280px) and (max-width:1439.98px){
+  html[data-foot="film"] .nav-desktop{margin-right:12px}
+  html[data-foot="film"] .nav-desktop > ul > li > :is(a,button){padding:0 11px;font-size:1rem}
 }
 /* without scripts: the foot is the page's last block, open */
 html:not(.js) .sf{position:static}

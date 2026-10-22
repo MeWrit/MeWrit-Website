@@ -1,0 +1,135 @@
+---
+// A practice's own page: where its section of the home page's film leads (Know more), for a reader who
+// wants the detail. The film's night at the head, the practice's own shape drawing itself in it; then, on
+// cream: what the practice is and who asks for it; what we write, group by group, each kind of document
+// with what it covers; for Regulatory writing, the expert review and research support beside it; the
+// standards it is written to; working with the client's team; the clients' words; related pages; and a way
+// to start. One page for each practice that has one (src/data/practices.ts: not Training, whose home is the
+// MeWriT Academy for now). Styles: src/styles/practice.css.
+import Base from '../../layouts/Base.astro';
+import BackLink from '../../components/BackLink.astro';
+import NightBand from '../../components/NightBand.astro';
+import Icon from '../../components/Icon.astro';
+import { practices, type Practice } from '../../data/practices';
+import { site, contact } from '../../data/site';
+import { href } from '../../lib/url';
+import '../../styles/practice.css';
+
+export function getStaticPaths() {
+  return practices.map(p => ({ params: { slug: p.slug }, props: { p } }));
+}
+const { p } = Astro.props as { p: Practice };
+const ext = { target: '_blank', rel: 'noopener' };
+// the contact page with this practice already chosen in its "What is it about?" (contact.js)
+const ask = href(`/contact/?about=${encodeURIComponent(p.name)}`);
+const wa = `${contact.whatsapp}&text=${encodeURIComponent(`Hello MeWriT, I would like to discuss ${p.name}.`)}`;
+const mail = `mailto:${contact.email}?subject=${encodeURIComponent(`Enquiry: ${p.name}`)}`;
+---
+<Base title={`${p.name} | ${site.name}`} description={p.line} foot="film" page="practice">
+  <NightBand scene={p.scene} shot={p.shot} label={p.name}>
+    <div class="nb-back"><BackLink dark /></div>
+    <p class="nb-kicker">Practice {p.n}</p>
+    <h1 class="nb-title">{p.name}</h1>
+    <p class="nb-line">{p.line}</p>
+  </NightBand>
+  <div class="pr-page">
+    <section class="pr-open" aria-label={`About ${p.name}`}>
+      <p class="pr-intro">{p.intro}</p>
+      <div class="pr-who">
+        <h2 class="pr-k">Who asks for it</h2>
+        <ul class="pr-chips">{p.who.map(w => <li>{w}</li>)}</ul>
+      </div>
+    </section>
+
+    {/* what we write: each group's name and line at the left (held in view on a computer while its items
+        pass), its kinds of document at the right, each with what it covers */}
+    <section class="pr-sec" aria-labelledby="pr-write">
+      <p class="pr-k">{p.write.kicker}</p>
+      <h2 class="pr-h" id="pr-write">{p.write.title}</h2>
+      <div class="pr-groups">
+        {p.write.groups.map(g => (
+          <div class="pr-group">
+            <div class="pr-group-head"><h3>{g.title}</h3><p>{g.line}</p></div>
+            <dl class:list={['pr-items', { 'pr-one': g.items.length === 1 }]}>
+              {g.items.map(it => <div class="pr-item"><dt>{it.name}</dt><dd>{it.text}</dd></div>)}
+            </dl>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {p.support && (
+      <section class="pr-support" aria-labelledby="pr-support">
+        <div class="pr-support-head">
+          <p class="pr-k">{p.support.kicker}</p>
+          <h2 class="pr-h" id="pr-support">{p.support.title}</h2>
+          <p class="pr-lede">{p.support.line}</p>
+        </div>
+        <ul class="pr-support-list">{p.support.items.map(s => <li>{s}</li>)}</ul>
+      </section>
+    )}
+
+    {p.standards && (
+      <section class="pr-sec" aria-labelledby="pr-std">
+        <p class="pr-k">{p.standards.kicker}</p>
+        <h2 class="pr-h" id="pr-std">{p.standards.title}</h2>
+        <div class:list={['pr-sets', { 'pr-one': p.standards.sets.length === 1 }]}>
+          {p.standards.sets.map(s => (
+            <div class="pr-set">
+              <h3>{s.label}</h3>
+              <ul class="pr-chips pr-std">{s.items.map(i => <li>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="pr-sec" aria-labelledby="pr-team">
+      <p class="pr-k">{p.team.kicker}</p>
+      <h2 class="pr-h" id="pr-team">{p.team.title}</h2>
+      <ul class:list={['pr-notes', `pr-n${p.team.notes.length}`]}>
+        {p.team.notes.map(n => <li class="pr-note"><h3>{n.title}</h3><p>{n.text}</p></li>)}
+      </ul>
+    </section>
+
+    {p.quotes.length > 0 && (
+      <section class="pr-sec" aria-labelledby="pr-voices">
+        <p class="pr-k">In their words</p>
+        <h2 class="pr-h" id="pr-voices">What clients say</h2>
+        <div class:list={['pr-quotes', `pr-q${Math.min(p.quotes.length, 3)}`]}>
+          {p.quotes.map(q => (
+            <figure class="pr-quote">
+              <Icon name="quote" size={26} stroke={1.6} />
+              <blockquote><p>“{q.quote}”</p></blockquote>
+              <figcaption>{q.by}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="pr-sec" aria-labelledby="pr-related">
+      <p class="pr-k">Related</p>
+      <h2 class="pr-h" id="pr-related">Read on</h2>
+      <ul class="pr-related">
+        {p.related.map(r => (
+          <li><a class="pr-rel" href={href(r.href)}><strong>{r.label}</strong><span>{r.note}</span><b aria-hidden="true">→</b></a></li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  {/* a way to start, on the dusk of the film's practices */}
+  <section class="pr-close" aria-labelledby="pr-close-t">
+    <div class="pr-close-in">
+      <p class="pr-close-k">{p.name}</p>
+      <h2 id="pr-close-t">Tell us what you need</h2>
+      <p class="pr-close-line">Write, call or message, and we will take it from there.</p>
+      <div class="pr-close-row">
+        <a class="btn btn-primary" href={ask}>Discuss your project</a>
+        <a class="pr-q" href={wa} {...ext}><Icon name="whatsapp" size={19} /><span>WhatsApp</span></a>
+        <a class="pr-q" href={mail}><Icon name="mail" size={18} /><span>Email</span></a>
+      </div>
+    </div>
+  </section>
+</Base>

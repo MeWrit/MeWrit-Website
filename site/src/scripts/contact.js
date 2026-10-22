@@ -1,4 +1,5 @@
-/* The contact page (src/pages/contact.astro): the enquiry form and the copy buttons.
+/* The contact page (src/pages/contact.astro): the enquiry form and the copy buttons. A link may choose
+   what the enquiry is about (?about=, from a practice's page).
    The form checks what it needs (a name, an email that looks like one, a message), each trouble shown
    under its field and read out, then sends: to the form service when there is one (data-endpoint,
    site.ts formEndpoint), and says so; otherwise it writes the enquiry out as an email in the visitor's
@@ -9,6 +10,9 @@ if (form) start();
 
 function start() {
   const status = form.querySelector('.ct-status'), endpoint = form.dataset.endpoint || '', to = form.dataset.email, wa = form.dataset.wa;
+  // a practice's page sends its name along (?about=Regulatory writing): that practice comes already chosen
+  const about = new URLSearchParams(location.search).get('about');
+  if (about) form.querySelectorAll('input[name="about"]').forEach(i => { if (i.value === about) i.checked = true; });
   const val = n => String(new FormData(form).get(n) || '').trim();
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // a field's trouble, shown under it and read out (or cleared)

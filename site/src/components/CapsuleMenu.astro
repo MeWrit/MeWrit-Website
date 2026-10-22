@@ -5,6 +5,7 @@
 // data-phone="capsule" on <html> (src/styles/nav-variants.css, src/scripts/nav-variants.js).
 import Icon from './Icon.astro';
 import { nav, contact } from '../data/site';
+import { navSoon } from '../data/showcase';
 import { href } from '../lib/url';
 ---
 <dialog class="cap-menu" id="capMenu" aria-label="Menu">
@@ -16,11 +17,12 @@ import { href } from '../lib/url';
     </button>
   </div>
   <nav class="cap-body" aria-label="Mobile">
-    {nav.map(item => 'items' in item ? (
+    {/* (an entry still to come is left out, and a group with nothing ready with it) */}
+    {nav.map(item => 'items' in item ? (item.items.some(l => !navSoon(l)) &&
       <details class="cap-group" name="cap-group">
         <summary data-key={item.key}><span>{item.label}</span></summary>
         <div class="cap-cards">
-          {item.items.map(link => (
+          {item.items.filter(l => !navSoon(l)).map(link => (
             <a href={href(link.href)}>
               <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
               <strong>{link.label}</strong><span>{link.note}</span>

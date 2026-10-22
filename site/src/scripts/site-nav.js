@@ -1,13 +1,15 @@
 /* The header's menu on the film's pages (SiteHeader.astro; styles in foot.css).
-   Practices' panel opens on the pointer, and goes the moment a practice in it (or Practices itself) is
-   chosen, staying gone until the pointer has left the entry (the user, 2026-10-21: "should disappear when
-   the user clicks any of the practices"); the link chosen gives up its focus, which would otherwise hold
-   the panel open.
+   Every panel opens on the pointer alone and closes as the pointer leaves (the user, 2026-10-23: "make
+   all header dropdowns hover only"); pressing an entry holds nothing open. A panel goes the moment a link
+   in it (or Practices itself) is chosen, staying gone until the pointer has left the entry (the user,
+   2026-10-21: "should disappear when the user clicks any of the practices"); the link chosen gives up its
+   focus, which would otherwise hold the panel open.
    One orange line under the menu (the user, 2026-10-21: "have the underlines flow smoothly between the
    elements"): it rests under the entry for where the reader is (aria-current: set by experience.js as the
    film moves, or by the page for a page of its own), glides to an entry pointed at or focused and back
    when the pointer leaves, and glides from entry to entry as the reader moves through the film. It spans
    the entry's words (its box less its padding); it appears and goes by fading, in place. */
+const hoverable = matchMedia('(hover: hover)');
 document.querySelectorAll('.nav-desktop .has-dd').forEach(li => {
   li.addEventListener('click', e => {
     const a = e.target.closest('a');
@@ -18,12 +20,24 @@ document.querySelectorAll('.nav-desktop .has-dd').forEach(li => {
   li.addEventListener('pointerleave', () => li.classList.remove('dd-off'));
   // (from the keyboard the panel opens again once its entry has the focus anew)
   li.addEventListener('focusin', e => { if (e.target.matches('.dd-top, button')) li.classList.remove('dd-off'); });
+  // an entry that is a button (About, Expertise, Showcase): with a mouse its panel is the pointer's alone
+  // (the user, 2026-10-23: hover only, foot.css), so pressing it holds nothing open (page.js's toggle is
+  // stopped before it), and it says its panel is open while the pointer or the keyboard's focus is in it.
+  // A touch screen keeps page.js's tap to open
+  const top = li.querySelector(':scope > button');
+  if (!top) return;
+  const say = on => top.setAttribute('aria-expanded', on ? 'true' : 'false');
+  li.addEventListener('click', e => { if (hoverable.matches && top.contains(e.target)) e.stopPropagation(); }, true);
+  li.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') say(true); });
+  li.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') say(false); });
+  li.addEventListener('focusin', () => { if (hoverable.matches && li.querySelector(':focus-visible')) say(true); });
+  li.addEventListener('focusout', e => { if (hoverable.matches && !li.contains(e.relatedTarget)) say(false); });
 });
 
 const navEl = document.querySelector('.nav-desktop'), line = navEl && navEl.querySelector('.nav-line');
 if (line && document.documentElement.dataset.foot === 'film') {
   const items = [...navEl.querySelectorAll(':scope > ul > li > :is(a,button)')];
-  const wide = matchMedia('(min-width: 1100px)');
+  const wide = matchMedia('(min-width: 1280px)');   // (where the menu stands in the bar: foot.css)
   let hover = null;
   const current = () => items.find(a => a.hasAttribute('aria-current') && a.getAttribute('aria-current') !== 'false') || null;
   function place(a, jump = false) {

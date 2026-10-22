@@ -1,19 +1,24 @@
 ---
-// Fixed header: logo, desktop navigation with dropdowns, call to action, phone menu button.
-// The logo can draw itself in place (src/scripts/header-logo.js, src/styles/header-logo.css):
+// Fixed header: logo, desktop navigation with dropdowns, the Academy's button, call to action, phone menu
+// button. The logo can draw itself in place (src/scripts/header-logo.js, src/styles/header-logo.css):
 // on load on version B, and now and then on every page. Its layers, hidden until a drawing
 // plays, sit over the real logo image, which takes over when the drawing is done. They are made
 // from the logo's own images, unchanged.
 import AskBar from './AskBar.astro';
-import { nav } from '../data/site';
+import Icon from './Icon.astro';
+import { nav, contact } from '../data/site';
+// (a page still to come stays marked Soon; Events and the Gallery are built only where their record is)
+import { navSoon } from '../data/showcase';
 import { href } from '../lib/url';
 
 const logoBase = href('/brand/logo-base.png');
-// an item that is a page of its own (Leadership) is marked on that page and the pages under it; the
-// film's places (/#who ...) are marked by experience.js as the reader comes to them (data-nav-key)
+// an item that is a page of its own (Leadership, Publications ...) is marked, with the dropdown holding
+// it, on that page and the pages under it; the film's places (/#who ...) are marked by experience.js as
+// the reader comes to them (data-nav-key: a dropdown's entry lists its items' keys too, so About is
+// marked for Who we are and Why MeWriT)
 const here = Astro.url.pathname;
 const isHere = (to?: string) => !!to && !to.includes('#') && /^\//.test(to) && to !== '/' && here.startsWith(href(to));
-const ext = { target: '_blank', rel: 'noopener' };
+const keysOf = (item: { key?: string; items: { key?: string }[] }) => [item.key, ...item.items.map(l => l.key)].filter(Boolean).join(' ') || undefined;const ext = { target: '_blank', rel: 'noopener' };
 ---
 <header class="site-header" id="siteHeader">
   <div class="wrap">
@@ -41,11 +46,17 @@ const ext = { target: '_blank', rel: 'noopener' };
             {/* (an entry with a place of its own leads there, its panel opening on the pointer; one without
                 opens its panel when pressed) */}
             {item.href
-              ? <a class="dd-top" href={href(item.href)} data-nav-key={item.key}>{item.label}</a>
-              : <button aria-expanded="false" aria-controls={item.id} data-nav-key={item.key} aria-current={item.items.some(l => isHere(l.href)) ? 'page' : undefined}>{item.label}</button>}
+              ? <a class="dd-top" href={href(item.href)} data-nav-key={keysOf(item)}>{item.label}</a>
+              : <button aria-expanded="false" aria-controls={item.id} data-nav-key={keysOf(item)} aria-current={item.items.some(l => isHere(l.href)) ? 'page' : undefined}>{item.label}</button>}
             <div class="dd" id={item.id}>
-              {item.items.map((link, j) => (
-                <a href={href(link.href)} data-nav-practice={item.id === 'dd-practices' ? j : undefined} aria-current={isHere(link.href) ? 'page' : undefined}>
+              {item.items.map((link, j) => navSoon(link) ? (
+                // (a page still to come: its name and line, marked Soon, not a link)
+                <span class="dd-soon" aria-disabled="true">
+                  <span class="dd-art" aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+                  <strong>{link.label}</strong><span>{link.note}</span><em class="dd-badge">Soon</em>
+                </span>
+              ) : (
+                <a href={href(link.href)} data-nav-key={link.key} data-nav-practice={item.id === 'dd-practices' ? j : undefined} aria-current={isHere(link.href) ? 'page' : undefined}>
                   <span class="dd-art" data-art={link.art} aria-hidden="true"><i></i><i></i><i></i><b></b></span>
                   <strong>{link.label}</strong><span>{link.note}</span>
                 </a>
@@ -61,6 +72,9 @@ const ext = { target: '_blank', rel: 'noopener' };
       <img class="rail-pen" src={href('/brand/pen-cutout.png')} alt="" aria-hidden="true">
     </nav>
     <AskBar />
+    {/* the Academy, its own site: a second, quieter button beside Get in touch (on a computer; on a phone it
+        is a tile in the menu) */}
+    <a class="header-academy" href={contact.academy} {...ext}><Icon name="mortarboard" size={18} stroke={1.8} />Academy<span class="ext" aria-hidden="true">↗</span></a>
     <a class="btn btn-primary header-cta" href={href('/contact/')}><span class="cta-l">Get in touch</span><span class="cta-s">Contact</span></a>
     <button class="menu-btn" id="menuOpen" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
