@@ -1,7 +1,7 @@
 ---
 // Events, under the header's Showcase: the page (/events/) and a page for each event of the record
-// (/events/<id>/). Built only where the record is (src/data/showcase.ts: on this computer, until Dr Hetal
-// approves the names in it); elsewhere nothing is built here, and the header marks Events Soon.
+// (/events/<id>/). Built where the record is (src/private/, read by src/data/showcase.ts); without it
+// nothing is built here, and the header marks Events Soon.
 import EventsIndex from '../../components/showcase/EventsIndex.astro';
 import EventPage from '../../components/showcase/EventPage.astro';
 import { events, hasEvents } from '../../data/showcase';

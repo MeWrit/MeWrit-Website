@@ -11,10 +11,6 @@ npm-debug.log*
 .env.*
 !.env.example
 
-# Dr Hetal's named record and photos (Events, Gallery): local only until she approves naming the
-# institutions in them, as the repo is public (src/data/showcase.ts reads them where they exist)
-src/private/
-
 # editors and OS
 .vscode/*
 !.vscode/extensions.json

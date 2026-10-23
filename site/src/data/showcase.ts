@@ -1,11 +1,11 @@
 // Events and the Gallery (src/pages/events/, src/pages/gallery/, under the header's Showcase): Dr Hetal's
 // record of workshops, talks, panels and conference roles (from her CV, August 2026, and the current site),
 // and her photo albums (the current site's Gallery). They name the hospitals, universities, companies and
-// societies involved, so until Dr Hetal approves naming them they stay in src/private/, which git leaves
-// out, the repo being public (the user, 2026-10-23: "Build now, publish on her OK"). Where the folder is
-// present, on this computer, the pages are built and the header leads to them; where it is not (the public
-// build), they are not built, and the header shows Events and Gallery marked Soon. MEWRIT_PUBLIC=1 builds
-// as the public site would, to check that. Each album belongs to an event (its `event`); an event's
+// societies involved, and live in src/private/: kept out of git at first, the repo being public, then
+// committed and published on the user's word (2026-10-23: "push all that too, everything"; "we can git
+// rebase later if we want to remove from history"). Where the folder is present the pages are built and
+// the header leads to them; without it they are not, and the header marks Events and Gallery Soon
+// (MEWRIT_PUBLIC=1 builds as if it were absent). Each album belongs to an event (its `event`); an event's
 // albums are found from them.
 import type { ImageMetadata } from 'astro';
 

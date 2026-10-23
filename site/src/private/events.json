@@ -1,0 +1,454 @@
+{
+  "_about": "Dr Hetal Shah's record of workshops, talks, panels and conference roles, newest first: from her CV (August 2026, section 8.2) and the current site's Events and Gallery pages (mewrit.com). Names the institutions and companies involved, so it stays local (site/.gitignore) until she approves naming them. kind: workshop | talk | panel | organising; mewrit: run by MeWriT. Albums link here from gallery.json (event).",
+  "events": [
+    {
+      "id": "2026-09-26-clinical-study-protocol-writing-workshop", "start": "2026-09-26",
+      "title": "Clinical Study Protocol Writing Workshop", "kind": "workshop", "mewrit": true,
+      "role": "Workshop lead trainer", "host": "MeWriT", "place": "Ahmedabad", "mode": "in person",
+      "venue": "Ahmedabad Management Association (AMA), Atira Campus, Dr. Vikram Sarabhai Marg, Ahmedabad, Gujarat 380009",
+      "time": "9 am to 5 pm",
+      "summary": "A full-day, hands-on, in-person workshop: understanding ICH E6 (R3) and M11, and the QbD and CtQ principles, for phase I to IV clinical trials, BA/BE studies, RWE and investigator-initiated study protocols.",
+      "highlights": [
+        "In-depth training based on ICH E6 (R3), M11 and TransCelerate's Common Protocol Template, and other protocol guidance",
+        "An overview of QbD and CtQ concepts and their relevance to protocol drafting",
+        "Protocol templates: structure, content, and adaptation for phase I to IV clinical trials, BA/BE, RWE, investigator-initiated and other study designs",
+        "Concept sheet to protocol: a step-by-step approach to drafting and finalisation",
+        "Hands-on assignments on key protocol sections, tailored to various study designs",
+        "Exploring AI/ML automation in protocol writing"
+      ],
+      "attend": [
+        "Medical writers, at all levels",
+        "Clinical trial (phase I to IV) protocol writing teams",
+        "BA/BE and RWE study writing teams",
+        "Medical affairs teams and clinical operations professionals",
+        "Clinicians and investigators conducting research",
+        "Academics and students interested in protocol writing"
+      ],
+      "includes": ["Assignment workbook", "Hands-on training", "Participation certificate", "Focused learning, limited seats", "Group discussions"],
+      "fee": {
+        "full": "₹8,260", "fullNote": "₹7,000 plus 18% GST, all inclusive",
+        "early": "₹6,490", "earlyNote": "₹5,500 plus 18% GST, all inclusive, for the first 15 paid registrations",
+        "group": "Group discounts for four or more participants from the same organisation",
+        "covers": "Course content, assignment workbooks, lunch and refreshments; a certificate for every participant"
+      },
+      "register": null, "email": "training@mewrit.com",
+      "poster": ["events33.jpg", "events333.jpg"]
+    },
+    {
+      "id": "2026-07-10-dia-medical-writing-conference-2026", "start": "2026-07-10", "end": "2026-07-11",
+      "title": "DIA Medical Writing and Scientific Communication Conference 2026", "kind": "organising",
+      "role": "Scientific programme co-chair and session chair", "host": "DIA India", "place": "Bengaluru", "mode": "in person",
+      "sessions": ["Session chair: Communicating Real-world and Clinical Evidence: from Data to Decision-ready Narratives"]
+    },
+    {
+      "id": "2026-06-09-eprotocol-webinar", "start": "2026-06-09", "end": "2026-06-10",
+      "title": "Understanding the Clinical Trial Blueprint: Protocol Writing Practices Today", "kind": "talk",
+      "role": "Keynote speaker and AI/ML domain expert", "host": "Clinion", "mode": "online",
+      "note": "At the eProtocol webinar"
+    },
+    {
+      "id": "2026-03-29-scientific-writing-excellence", "start": "2026-03-29",
+      "title": "Scientific Writing Excellence: Structured Workflow, Publication Strategy, and AI Use", "kind": "workshop",
+      "role": "Workshop trainer", "host": "Allergan Aesthetics and IQVIA",
+      "note": "At a scientific publication workshop for clinicians"
+    },
+    {
+      "id": "2026-03-06-essentials-of-medical-writing", "start": "2026-03-06",
+      "title": "Essentials of Medical Writing", "kind": "workshop",
+      "role": "Workshop lead trainer", "host": "GCS Medical College, with MeWriT, MANTRA and Renovare",
+      "note": "At an interactive workshop on medical affairs and medical writing"
+    },
+    {
+      "id": "2025-11-29-principles-of-ich-gcp", "start": "2025-11-29",
+      "title": "Principles of ICH GCP", "kind": "talk",
+      "role": "Invited expert", "host": "Sumandeep Vidyapeeth, with ISCR",
+      "note": "At a workshop on ICH GCP E6 (R3) and the NDCT Rules 2019 updates"
+    },
+    {
+      "id": "2025-11-15-gcp-for-medical-writers", "start": "2025-11-15", "end": "2025-11-18",
+      "title": "GCP for Medical Writers", "kind": "workshop", "mewrit": true,
+      "role": "Workshop lead trainer", "host": "MeWriT", "mode": "online",
+      "audience": "About 30 medical writing professionals from across India",
+      "note": "A virtual workshop in two sessions, on 15 and 18 November"
+    },
+    {
+      "id": "2025-11-06-science-and-storytelling", "start": "2025-11-06",
+      "title": "The Science and Storytelling in Medical Writing: Pharma and Healthcare Industry Insights", "kind": "talk",
+      "role": "Invited expert", "host": "The Society of Clinical Research and Medical Professionals (SCRMP), Gujarat Chapter", "mode": "online"
+    },
+    {
+      "id": "2025-09-13-scientific-publication-writing", "start": "2025-09-13",
+      "title": "Scientific Publication Writing", "kind": "workshop", "mewrit": true,
+      "role": "Workshop lead trainer", "host": "MeWriT", "place": "Ahmedabad", "mode": "in person",
+      "venue": "Ahmedabad Management Association (AMA), Ahmedabad",
+      "audience": "About 30 medical writing professionals from across India",
+      "note": "A one-day open workshop"
+    },
+    {
+      "id": "2025-09-12-clinical-study-report-writing", "start": "2025-09-12",
+      "title": "Clinical Study Report Writing", "kind": "workshop", "mewrit": true,
+      "role": "Workshop lead trainer", "host": "MeWriT", "place": "Ahmedabad", "mode": "in person",
+      "venue": "Ahmedabad Management Association (AMA), Ahmedabad",
+      "audience": "About 50 medical writing professionals from across India",
+      "note": "A one-day open workshop"
+    },
+    {
+      "id": "2025-08-29-clinical-trial-blueprints", "start": "2025-08-29",
+      "title": "Clinical Trial Blueprints", "kind": "talk",
+      "role": "Invited expert", "host": "School of Pharmacy, Indrashil University", "place": "Kalol", "mode": "in person",
+      "note": "At the National Conference on Advancing in Clinical Trials and ADR Reporting"
+    },
+    {
+      "id": "2025-07-11-dia-medical-writing-conference-2025", "start": "2025-07-11", "end": "2025-07-12",
+      "title": "DIA Medical Writing Conference 2025", "kind": "panel",
+      "role": "Invited panelist", "host": "DIA India", "place": "Bengaluru", "mode": "in person",
+      "sessions": ["Acknowledging Medical Writers in Journal Publications: Recognition, Reality and Reform", "Shaping Your Career and Brand Identity in a Changing Medical Writing Landscape"]
+    },
+    {
+      "id": "2025-03-11-deciphering-the-icmje-guidance", "start": "2025-03-11",
+      "title": "Deciphering the ICMJE Guidance for Writing Your Research Paper", "kind": "talk",
+      "role": "Invited expert", "host": "MedMarvels Medisage", "mode": "online",
+      "audience": "A PG pharmacology forum of about 1,900 MD students"
+    },
+    {
+      "id": "2025-02-28-leveraging-ai-real-world-impact", "start": "2025-02-28",
+      "title": "Leveraging AI to Transform Data into Real-World Impact: Opportunities and Challenges", "kind": "talk",
+      "role": "Invited speaker", "host": "DIA India", "place": "Mumbai", "mode": "in person",
+      "note": "At the DIA workshop 'Journey of Clinical Trial Data from Regulatory Submissions to Real-world Application: Crafting Documents That Impact Clinical Practice'"
+    },
+    {
+      "id": "2025-02-11-medical-writing-industry-perspective", "start": "2025-02-11",
+      "title": "Medical Writing in Pharma and Healthcare: Industry Perspective and Career Prospects", "kind": "talk",
+      "role": "Expert speaker", "host": "Indus Institute of Pharmacy and Research, Indus University", "place": "Ahmedabad", "mode": "in person"
+    },
+    {
+      "id": "2025-01-31-iscr-annual-conference-2025", "start": "2025-01-31", "end": "2025-02-02",
+      "title": "ISCR Annual Conference 2025", "kind": "organising",
+      "role": "Session chair, and member of the local and scientific organising committees", "host": "Indian Society for Clinical Research (ISCR)", "place": "Mumbai", "mode": "in person",
+      "sessions": ["Session chair, medical writing track: Accelerating Submissions: Elevating the Role of Medical Writers (31 January)"]
+    },
+    {
+      "id": "2025-01-03-overview-of-medical-writing", "start": "2025-01-03",
+      "title": "Overview of Medical Writing and Scientific Publications", "kind": "talk",
+      "role": "Expert speaker", "host": "Anand Pharmacy College", "place": "Anand, Gujarat", "mode": "in person"
+    },
+    {
+      "id": "2024-10-19-work-life-balance-for-women", "start": "2024-10-19",
+      "title": "Work-Life Balance for Women", "kind": "panel",
+      "role": "Invited expert and panelist", "host": "Gujarat Technological University, Vidushi Gargi Center for Women Development", "place": "Ahmedabad", "mode": "in person"
+    },
+    {
+      "id": "2024-09-27-mw-symposium-2024", "start": "2024-09-27",
+      "title": "MW Symposium 2024: Essentials, Advances and Opportunities", "kind": "organising",
+      "role": "Organising team", "host": "ISCR Medical Writing Council", "place": "Bengaluru", "mode": "in person"
+    },
+    {
+      "id": "2024-09-16-conduct-matters-ba-be", "start": "2024-09-16", "end": "2024-09-17",
+      "title": "Conduct Matters: Regulatory Perspectives in the Design and Execution of BA/BE Studies for Generic Drugs", "kind": "organising",
+      "role": "Emcee", "host": "ISCR and the USFDA", "place": "Ahmedabad", "mode": "in person",
+      "note": "A workshop"
+    },
+    {
+      "id": "2024-07-25-writing-your-research-publications", "start": "2024-07-25",
+      "title": "Writing Your Research Publications", "kind": "talk",
+      "role": "Expert speaker", "host": "ISCR Western Chapter", "mode": "online",
+      "note": "At a virtual boot camp"
+    },
+    {
+      "id": "2024-02-01-iscr-annual-conference-2024", "start": "2024-02-01", "end": "2024-02-03",
+      "title": "ISCR Annual Conference 2024", "kind": "talk",
+      "role": "Speaker, medical writing track", "host": "Indian Society for Clinical Research (ISCR)", "place": "Hyderabad", "mode": "in person",
+      "sessions": ["Pre-conference workshop: Collaboration between CDM, Biostatistics and Medical Writing", "Continued Professional Development for Medical Writers: One Size Does Not Fit All"]
+    },
+    {
+      "id": "2024-01-06-essentials-of-biomedical-publications", "start": "2024-01-06",
+      "title": "Essentials of Biomedical Publications", "kind": "talk",
+      "role": "Speaker", "host": "Institute of Pharmacy, Nirma University", "place": "Ahmedabad", "mode": "in person",
+      "note": "At a scientific writing workshop"
+    },
+    {
+      "id": "2023-11-03-medical-writing-and-research-publications", "start": "2023-11-03", "end": "2023-11-04",
+      "title": "Medical Writing and Research Publications", "kind": "workshop",
+      "role": "Workshop leader", "host": "TatvaCare at Zydus Wellness", "place": "Ahmedabad", "mode": "in person",
+      "note": "A two-day programme conducted by MeWriT"
+    },
+    {
+      "id": "2023-mewrit-open-house-2023", "start": "2023",
+      "title": "MeWriT Open House 2023", "kind": "organising", "mewrit": true,
+      "role": "Organiser", "host": "MeWriT",
+      "note": "An open event under the aegis of MeWriT, with three invited experts' sessions",
+      "sessions": ["The spectrum of medical communications", "Phase 1 clinical trials", "An overview of PV documents"]
+    },
+    {
+      "id": "2023-10-07-clinical-research-conclave-2023", "start": "2023-10-07",
+      "title": "Clinical Research Conclave 2023", "kind": "panel",
+      "role": "Emcee and panelist", "host": "Indian Society for Clinical Research (ISCR)", "place": "Ahmedabad", "mode": "in person",
+      "sessions": ["Panel: Changing Landscape of Career Prospects in Clinical Research with Digitization and AI/ML: Skills for Today versus the Future"]
+    },
+    {
+      "id": "2023-08-25-original-research-publication-writing", "start": "2023-08-25",
+      "title": "Original Research Publication Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "NovoBliss Research", "place": "Ahmedabad", "mode": "in person",
+      "note": "A one-day programme conducted by MeWriT"
+    },
+    {
+      "id": "2023-06-28-scientific-writing-style", "start": "2023-06-28", "end": "2023-06-29",
+      "title": "Scientific Writing Style", "kind": "workshop",
+      "role": "Workshop leader", "host": "Alceon MedTech Consulting", "place": "Vadodara", "mode": "in person",
+      "note": "A two-day programme conducted by MeWriT"
+    },
+    {
+      "id": "2023-05-31-essentials-of-scientific-writing", "start": "2023-05-31",
+      "title": "Essentials of Scientific Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "Cliantha Research", "place": "Ahmedabad", "mode": "in person",
+      "note": "A one-day programme conducted by MeWriT"
+    },
+    {
+      "id": "2023-04-03-clinical-study-reports", "start": "2023-04-03", "end": "2023-04-04",
+      "title": "Clinical Study Reports", "kind": "workshop",
+      "role": "Workshop leader", "host": "Veeda Clinical Research", "place": "Ahmedabad", "mode": "in person",
+      "note": "A two-day programme conducted by MeWriT"
+    },
+    {
+      "id": "2023-02-25-iscr-annual-conference-2023", "start": "2023-02-25", "end": "2023-02-26",
+      "title": "ISCR Annual Conference 2023", "kind": "talk",
+      "role": "Faculty, medical writing track", "host": "Indian Society for Clinical Research (ISCR)", "place": "Delhi", "mode": "in person",
+      "sessions": ["Speaker: Independent Medical Writing Providers: Finding Your Niche!", "Panel moderator: Cross-functional Collaboration: Challenges and Opportunities for Medical Writers"]
+    },
+    {
+      "id": "2022-03-11-iscr-annual-conference-2022", "start": "2022-03-11",
+      "title": "ISCR Annual Conference 2022", "kind": "panel",
+      "role": "Panelist, and member of the local organising committee", "host": "Indian Society for Clinical Research (ISCR)", "mode": "online",
+      "note": "Held virtually, February to March 2022",
+      "sessions": ["Panel: Freelancing in Medical Writing and Work-From-Home Opportunities in the New Changed Scenario (11 March)"]
+    },
+    {
+      "id": "2022-03-08-international-womens-day-session", "start": "2022-03-08",
+      "title": "Expert Session on International Women's Day", "kind": "talk",
+      "role": "Resource person", "host": "L. M. College of Pharmacy", "place": "Ahmedabad"
+    },
+    {
+      "id": "2022-01-22-introduction-to-clinical-research-and-careers", "start": "2022-01-22",
+      "title": "Introduction to Clinical Research and Careers", "kind": "talk",
+      "role": "Expert speaker", "host": "ISCR and KLE College of Pharmacy, Belagavi", "mode": "online",
+      "note": "A virtual education programme"
+    },
+    {
+      "id": "2021-11-29-medical-writing-for-clinical-project-managers", "start": "2021-11-29",
+      "title": "Insights into Medical Writing for Clinical Project Managers", "kind": "workshop",
+      "role": "Workshop leader", "host": "A clinical research organisation's team", "mode": "online"
+    },
+    {
+      "id": "2021-08-27-iscr-workshop-on-clinical-study-protocols", "start": "2021-08-27", "end": "2021-08-28",
+      "title": "ISCR Workshop on Clinical Study Protocols", "kind": "organising",
+      "role": "Organising committee", "host": "Indian Society for Clinical Research (ISCR)", "mode": "online"
+    },
+    {
+      "id": "2021-07-15-women-leaders-in-pharma", "start": "2021-07-15",
+      "title": "Women Leaders in Pharma", "kind": "talk",
+      "role": "Keynote speaker", "host": "United Conferences", "mode": "online",
+      "note": "An international conference"
+    },
+    {
+      "id": "2021-05-08-publication-writing-essentials", "start": "2021-05-08",
+      "title": "Publication Writing Essentials", "kind": "workshop", "mewrit": true,
+      "role": "Workshop leader", "host": "MeWriT", "mode": "online",
+      "series": "MeWriT Mini-Workshop Series 2021, no. 4"
+    },
+    {
+      "id": "2021-04-22-medical-writing-and-scientific-publication", "start": "2021-04-22",
+      "title": "Medical Writing and Scientific Publication", "kind": "workshop",
+      "role": "Workshop leader", "host": "TSRMC, Chennai", "mode": "online",
+      "note": "For a closed group of clinical experts in reproductive medicine"
+    },
+    {
+      "id": "2021-04-10-guidelines-recommendations-and-ethics", "start": "2021-04-10",
+      "title": "Guidelines, Recommendations and Ethical Considerations in Writing", "kind": "workshop", "mewrit": true,
+      "role": "Workshop leader", "host": "MeWriT", "mode": "online",
+      "series": "MeWriT Mini-Workshop Series 2021, no. 3"
+    },
+    {
+      "id": "2021-03-19-iscr-annual-conference-2021", "start": "2021-03-19", "end": "2021-03-20",
+      "title": "ISCR Annual Conference 2021", "kind": "organising",
+      "role": "Organising committee", "host": "Indian Society for Clinical Research (ISCR)", "mode": "online"
+    },
+    {
+      "id": "2021-03-12-effective-authoring-of-csrs", "start": "2021-03-12",
+      "title": "Effective Authoring of Clinical Study Reports in the Evolving Landscape of Data Transparency", "kind": "workshop",
+      "role": "Workshop lead and faculty", "host": "Indian Society for Clinical Research (ISCR)", "mode": "online",
+      "note": "The pre-conference medical writing workshop of ISCR 2021",
+      "sessions": ["Critical Appraisal and Practical Implementation of CSR Guidances"]
+    },
+    {
+      "id": "2021-02-20-searching-and-citing-the-literature", "start": "2021-02-20",
+      "title": "Searching and Citing the Biomedical Literature", "kind": "workshop", "mewrit": true,
+      "role": "Workshop leader", "host": "MeWriT", "mode": "online",
+      "series": "MeWriT Mini-Workshop Series 2021, no. 2"
+    },
+    {
+      "id": "2021-01-23-scientific-writing-style", "start": "2021-01-23",
+      "title": "Scientific Writing Style", "kind": "workshop", "mewrit": true,
+      "role": "Workshop leader", "host": "MeWriT", "mode": "online",
+      "series": "MeWriT Mini-Workshop Series 2021, no. 1"
+    },
+    {
+      "id": "2020-12-19-mewrit-first-open-house", "start": "2020-12-19",
+      "title": "MeWriT's First Open House", "kind": "organising", "mewrit": true,
+      "role": "Organiser", "host": "MeWriT"
+    },
+    {
+      "id": "2020-12-12-publication-writing", "start": "2020-12-12",
+      "title": "Publication Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "Tata Memorial Hospital, Mumbai", "mode": "online",
+      "note": "For a closed group of healthcare professionals"
+    },
+    {
+      "id": "2020-10-24-medical-writing", "start": "2020-10-24",
+      "title": "Medical Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "Tata Memorial Hospital, Mumbai", "mode": "online",
+      "note": "For a closed group of clinicians"
+    },
+    {
+      "id": "2020-10-03-clinical-trials-past-present-future", "start": "2020-10-03",
+      "title": "Clinical Trials: Past, Present and Future", "kind": "panel",
+      "role": "Panelist", "host": "School of Bio Science and Technology, Vellore Institute of Technology", "mode": "online",
+      "note": "At INCRES2020, an international virtual conference on clinical research"
+    },
+    {
+      "id": "2020-06-20-essentials-of-medical-writing", "start": "2020-06-20", "end": "2020-06-21",
+      "title": "Essentials of Medical Writing", "kind": "workshop",
+      "role": "Workshop leader and organiser", "host": "With CTQuest, for a medical communications team in Pune", "mode": "online",
+      "note": "A two-day online programme"
+    },
+    {
+      "id": "2020-03-11-essentials-of-medical-writing", "start": "2020-03-11",
+      "title": "Essentials of Medical Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "A multinational pharma team", "place": "Mumbai", "mode": "in person",
+      "note": "For a mostly non-writing audience"
+    },
+    {
+      "id": "2020-01-24-iscr-annual-conference-2020", "start": "2020-01-24", "end": "2020-01-25",
+      "title": "ISCR Annual Conference 2020", "kind": "talk",
+      "role": "Speaker", "host": "Indian Society for Clinical Research (ISCR)", "place": "Mumbai", "mode": "in person",
+      "sessions": ["Importance of Continuing Medical Education for Medical Writers, in the Careers and Competencies in Medical Writing forum"]
+    },
+    {
+      "id": "2019-11-11-core-reference-disclosure-friendly-csrs", "start": "2019-11-11",
+      "title": "Adopting the CORE Reference for Writing Disclosure-friendly CSRs", "kind": "workshop",
+      "role": "Workshop faculty", "host": "Indian Society for Clinical Research (ISCR)", "place": "Noida", "mode": "in person",
+      "note": "A national workshop"
+    },
+    {
+      "id": "2019-10-18-research-manuscript-writing", "start": "2019-10-18", "end": "2019-10-19",
+      "title": "Research Manuscript Writing", "kind": "workshop",
+      "role": "Workshop faculty", "host": "Indian Society for Clinical Research (ISCR)", "place": "Ahmedabad", "mode": "in person",
+      "note": "A national workshop"
+    },
+    {
+      "id": "2019-09-24-essentials-of-scientific-writing-skills", "start": "2019-09-24", "end": "2019-09-25",
+      "title": "Essentials of Scientific Writing Skills", "kind": "workshop",
+      "role": "Workshop leader and organiser", "host": "A corporate team of bioanalytical scientists", "place": "Bengaluru", "mode": "in person",
+      "note": "A two-day programme"
+    },
+    {
+      "id": "2019-09-06-medical-writing-industry-perspective-lpu", "start": "2019-09-06",
+      "title": "Medical Writing: The Pharma and Healthcare Industry Perspective and Prospects", "kind": "talk",
+      "role": "Expert faculty", "host": "Lovely Professional University (LPU)", "place": "Jalandhar, Punjab", "mode": "in person",
+      "note": "A scientific session for research scholars and students"
+    },
+    {
+      "id": "2019-04-27-medical-writing-workshop-bengaluru", "start": "2019-04-27",
+      "title": "Medical Writing Workshop", "kind": "workshop",
+      "role": "Workshop leader", "host": "Sri Jayadeva Institute of Cardiovascular Sciences, with IQVIA and Merck", "place": "Bengaluru", "mode": "in person"
+    },
+    {
+      "id": "2019-02-14-medical-writing-industry-perspective-dpsru", "start": "2019-02-14",
+      "title": "Medical Writing: The Pharma and Healthcare Industry Perspective and Prospects", "kind": "talk",
+      "role": "Expert faculty", "host": "Delhi Pharmaceutical Sciences and Research University (DPSRU)", "place": "Delhi", "mode": "in person",
+      "note": "A scientific session for faculty and students"
+    },
+    {
+      "id": "2019-01-12-startup-and-investment-opportunities", "start": "2019-01-12",
+      "title": "Startup and Investment Opportunities in Pharma and Healthcare", "kind": "panel",
+      "role": "Expert industry panelist", "host": "L. M. College of Pharmacy, alumni meet", "place": "Ahmedabad", "mode": "in person"
+    },
+    {
+      "id": "2018-12-art-and-science-of-publication-writing-online", "start": "2018-12",
+      "title": "The Art and Science of Publication Writing: Online Training Module", "kind": "workshop",
+      "role": "Workshop leader", "mode": "online",
+      "note": "Over two weekends, for a mix of industry and academic professionals and students from the US, Nepal and India"
+    },
+    {
+      "id": "2018-11-essence-of-medical-writing", "start": "2018-11",
+      "title": "Essence of Medical Writing", "kind": "workshop",
+      "role": "Workshop co-leader", "host": "Indian Society for Clinical Research (ISCR)", "place": "Bengaluru", "mode": "in person",
+      "note": "A two-day national workshop",
+      "sessions": ["External Medical Communications"]
+    },
+    {
+      "id": "2018-10-26-art-and-science-of-publication-writing", "start": "2018-10-26",
+      "title": "The Art and Science of Publication Writing", "kind": "workshop",
+      "role": "Workshop leader", "host": "CTQuest", "place": "Pune", "mode": "in person"
+    },
+    {
+      "id": "2018-10-12-medical-writing-workshop-udaipur", "start": "2018-10-12",
+      "title": "Medical Writing Workshop", "kind": "workshop",
+      "role": "Workshop leader", "host": "Indira IVF Centre, with IQVIA and Merck", "place": "Udaipur, Rajasthan", "mode": "in person"
+    },
+    {
+      "id": "2018-10-10-medical-writing-workshop-kathmandu", "start": "2018-10-10",
+      "title": "Medical Writing Workshop", "kind": "workshop",
+      "role": "Workshop leader", "host": "Nepal Cancer Hospital, with IQVIA and Merck", "place": "Kathmandu, Nepal", "mode": "in person"
+    },
+    {
+      "id": "2018-03-09-scientific-writing-and-ebccon-2018", "start": "2018-03-09", "end": "2018-03-10",
+      "title": "National Workshop on Scientific Writing, and EBCCON 2018", "kind": "workshop",
+      "role": "Workshop faculty and conference resource person", "host": "SRM Medical College, with the Medical Pharmacologists Society of India and ISCR", "place": "Chennai", "mode": "in person",
+      "note": "The workshop before the Evidence Based Medicine and Clinical Research Conference",
+      "sessions": ["Scientific Abstracts", "Narrative Literature Reviews", "Chair of the conference session on registries", "Judge of the poster session"]
+    },
+    {
+      "id": "2018-01-13-medical-writing-and-literature-search", "start": "2018-01-13",
+      "title": "Medical Writing and Literature Search Training", "kind": "workshop",
+      "role": "Medical writing trainer", "host": "Meril Life Sciences", "place": "Vapi", "mode": "in person"
+    },
+    {
+      "id": "2017-06-medical-writing-workshop-ahmedabad", "start": "2017-06",
+      "title": "Medical Writing Workshop", "kind": "workshop",
+      "role": "Workshop leader", "host": "Arkus Research", "place": "Ahmedabad", "mode": "in person",
+      "note": "A two-day workshop at the AMA campus"
+    },
+    {
+      "id": "2017-writing-reports-bioanalytica", "start": "2017",
+      "title": "Writing Reports: A Medical Writer's Perspective", "kind": "talk",
+      "role": "Speaker", "host": "Bioanalytica 2017, organised by ABC Biologics", "place": "Hyderabad", "mode": "in person",
+      "note": "A forum on regulated bioanalysis"
+    },
+    {
+      "id": "2016-03-clinical-trials-visiting-faculty", "start": "2016-03", "end": "2016-06",
+      "title": "Clinical Trials", "kind": "talk",
+      "role": "Visiting external expert faculty", "host": "Institute of Pharmacy, Nirma University", "place": "Ahmedabad", "mode": "in person"
+    },
+    {
+      "id": "2014-12-narrative-literature-reviews", "start": "2014-12",
+      "title": "Narrative Literature Reviews", "kind": "workshop",
+      "role": "Workshop leader", "host": "BMS", "place": "Mumbai", "mode": "in person"
+    },
+    {
+      "id": "2014-06-writing-overviews-eu-context", "start": "2014-06",
+      "title": "Writing Overviews: Modules 2.4 and 2.5 in the EU Context", "kind": "talk",
+      "role": "Web tutorial", "host": "DIA India, Medical Writing working group", "mode": "online"
+    },
+    {
+      "id": "2013-11-15-basic-and-advanced-medical-writing", "start": "2013-11-15", "end": "2013-11-16",
+      "title": "Basic and Advanced Medical Writing Workshop", "kind": "workshop",
+      "role": "Workshop facilitator and coordinator", "host": "ISPE", "place": "Ahmedabad", "mode": "in person",
+      "note": "A two-day workshop at the AMA, for academia and industry"
+    },
+    {
+      "id": "2008-06-poster-presentation-workshop", "start": "2008-06",
+      "title": "Poster Presentation Workshop", "kind": "workshop",
+      "role": "Workshop leader", "host": "All India Medical Writers' Association", "place": "Bengaluru", "mode": "in person"
+    }
+  ]
+}

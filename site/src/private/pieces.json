@@ -1,0 +1,1699 @@
+{
+ "made": "2026-10-22T20:52:54.226Z",
+ "files": {
+  "ev1.jpeg": {
+   "W": 960,
+   "H": 960,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "ev2.jpeg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve10.jpeg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve100.jpg": {
+   "W": 800,
+   "H": 450,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve100-1.jpg",
+     "x": 14,
+     "y": 3,
+     "w": 464,
+     "h": 444
+    },
+    {
+     "file": "eve100-2.jpg",
+     "x": 478,
+     "y": 3,
+     "w": 300,
+     "h": 308
+    },
+    {
+     "file": "eve100-3.jpg",
+     "x": 478,
+     "y": 311,
+     "w": 300,
+     "h": 136
+    }
+   ],
+   "flags": []
+  },
+  "eve101.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve101-1.jpg",
+     "x": 36,
+     "y": 37,
+     "w": 1209,
+     "h": 731
+    },
+    {
+     "file": "eve101-2.jpg",
+     "x": 36,
+     "y": 784,
+     "w": 1205,
+     "h": 460
+    }
+   ],
+   "flags": []
+  },
+  "eve102.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve102-1.jpg",
+     "x": 40,
+     "y": 40,
+     "w": 1200,
+     "h": 569
+    },
+    {
+     "file": "eve102-2.jpg",
+     "x": 40,
+     "y": 636,
+     "w": 1200,
+     "h": 604
+    }
+   ],
+   "flags": []
+  },
+  "eve103.jpg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve103-1.jpg",
+     "x": 24,
+     "y": 315,
+     "w": 246,
+     "h": 463
+    },
+    {
+     "file": "eve103-2.jpg",
+     "x": 20,
+     "y": 24,
+     "w": 516,
+     "h": 276
+    },
+    {
+     "file": "eve103-3.jpg",
+     "x": 554,
+     "y": 25,
+     "w": 220,
+     "h": 537
+    },
+    {
+     "file": "eve103-4.jpg",
+     "x": 282,
+     "y": 314,
+     "w": 259,
+     "h": 250
+    },
+    {
+     "file": "eve103-5.jpg",
+     "x": 283,
+     "y": 576,
+     "w": 493,
+     "h": 202
+    }
+   ],
+   "flags": []
+  },
+  "eve104.jpg": {
+   "W": 800,
+   "H": 337,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve105.jpg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve105-1.jpg",
+     "x": 25,
+     "y": 25,
+     "w": 750,
+     "h": 367
+    },
+    {
+     "file": "eve105-2.jpg",
+     "x": 25,
+     "y": 409,
+     "w": 248,
+     "h": 366
+    },
+    {
+     "file": "eve105-3.jpg",
+     "x": 289,
+     "y": 409,
+     "w": 486,
+     "h": 278
+    }
+   ],
+   "flags": []
+  },
+  "eve11.jpeg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve12.jpeg": {
+   "W": 1024,
+   "H": 951,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve13.jpeg": {
+   "W": 855,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve14.jpg": {
+   "W": 2144,
+   "H": 1424,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve15.jpg": {
+   "W": 2144,
+   "H": 1424,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve16.jpg": {
+   "W": 2144,
+   "H": 1424,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve17.jpg": {
+   "W": 2144,
+   "H": 1424,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve18.jpg": {
+   "W": 888,
+   "H": 588,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve19.jpg": {
+   "W": 888,
+   "H": 588,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve20.jpg": {
+   "W": 888,
+   "H": 588,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve21.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve22.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve23.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve24.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve25.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve26.jpg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve27.jpg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve28.jpg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve29.jpg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve3.jpeg": {
+   "W": 1024,
+   "H": 683,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve30.jpg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve31.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve32.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve33.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve34.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve35.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve36.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve37.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve38.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve39.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve4.jpeg": {
+   "W": 960,
+   "H": 640,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve40.jpg": {
+   "W": 1040,
+   "H": 780,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve41.jpg": {
+   "W": 1040,
+   "H": 780,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve42.jpg": {
+   "W": 750,
+   "H": 608,
+   "method": "whole",
+   "by": "review 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve43.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve44.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve45.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve46.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve47.jpg": {
+   "W": 1500,
+   "H": 1500,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve47-1.jpg",
+     "x": 54,
+     "y": 53,
+     "w": 682,
+     "h": 914
+    },
+    {
+     "file": "eve47-2.jpg",
+     "x": 770,
+     "y": 53,
+     "w": 684,
+     "h": 914
+    },
+    {
+     "file": "eve47-3.jpg",
+     "x": 54,
+     "y": 999,
+     "w": 679,
+     "h": 456
+    },
+    {
+     "file": "eve47-4.jpg",
+     "x": 767,
+     "y": 1001,
+     "w": 677,
+     "h": 454
+    }
+   ],
+   "flags": []
+  },
+  "eve48.jpg": {
+   "W": 2016,
+   "H": 1512,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve49.jpg": {
+   "W": 1280,
+   "H": 720,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve5.jpeg": {
+   "W": 960,
+   "H": 960,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve5-1.jpg",
+     "x": 25,
+     "y": 26,
+     "w": 446,
+     "h": 597
+    },
+    {
+     "file": "eve5-2.jpg",
+     "x": 489,
+     "y": 26,
+     "w": 446,
+     "h": 597
+    },
+    {
+     "file": "eve5-3.jpg",
+     "x": 25,
+     "y": 640,
+     "w": 295,
+     "h": 295
+    },
+    {
+     "file": "eve5-4.jpg",
+     "x": 337,
+     "y": 640,
+     "w": 286,
+     "h": 295
+    },
+    {
+     "file": "eve5-5.jpg",
+     "x": 640,
+     "y": 640,
+     "w": 295,
+     "h": 295
+    }
+   ],
+   "flags": []
+  },
+  "eve50.jpg": {
+   "W": 1280,
+   "H": 720,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve51.jpg": {
+   "W": 1280,
+   "H": 720,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve52.jpg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve53.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve54.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve55.jpg": {
+   "W": 755,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve56.jpg": {
+   "W": 4032,
+   "H": 3024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve57.jpg": {
+   "W": 4032,
+   "H": 3024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve58.jpg": {
+   "W": 3024,
+   "H": 3024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve59.jpg": {
+   "W": 4032,
+   "H": 3024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve6.jpeg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve60.jpg": {
+   "W": 1280,
+   "H": 720,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve61.jpg": {
+   "W": 1152,
+   "H": 864,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve62.jpg": {
+   "W": 1280,
+   "H": 960,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve63.jpg": {
+   "W": 864,
+   "H": 1152,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve64.jpg": {
+   "W": 3024,
+   "H": 4032,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve65.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve65-1.jpg",
+     "x": 41,
+     "y": 38,
+     "w": 558,
+     "h": 716
+    },
+    {
+     "file": "eve65-2.jpg",
+     "x": 684,
+     "y": 38,
+     "w": 556,
+     "h": 478
+    },
+    {
+     "file": "eve65-3.jpg",
+     "x": 39,
+     "y": 763,
+     "w": 556,
+     "h": 478
+    },
+    {
+     "file": "eve65-4.jpg",
+     "x": 673,
+     "y": 527,
+     "w": 569,
+     "h": 718
+    }
+   ],
+   "flags": []
+  },
+  "eve66.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve67.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve67-1.jpg",
+     "x": 41,
+     "y": 41,
+     "w": 586,
+     "h": 830
+    },
+    {
+     "file": "eve67-2.jpg",
+     "x": 653,
+     "y": 41,
+     "w": 586,
+     "h": 830
+    },
+    {
+     "file": "eve67-3.jpg",
+     "x": 41,
+     "y": 898,
+     "w": 1198,
+     "h": 341
+    }
+   ],
+   "flags": []
+  },
+  "eve68.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve68-1.jpg",
+     "x": 41,
+     "y": 41,
+     "w": 692,
+     "h": 466
+    },
+    {
+     "file": "eve68-2.jpg",
+     "x": 41,
+     "y": 533,
+     "w": 692,
+     "h": 706
+    },
+    {
+     "file": "eve68-3.jpg",
+     "x": 760,
+     "y": 41,
+     "w": 479,
+     "h": 624
+    },
+    {
+     "file": "eve68-4.jpg",
+     "x": 760,
+     "y": 692,
+     "w": 479,
+     "h": 547
+    }
+   ],
+   "flags": []
+  },
+  "eve69.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve69-1.jpg",
+     "x": 41,
+     "y": 41,
+     "w": 471,
+     "h": 517
+    },
+    {
+     "file": "eve69-2.jpg",
+     "x": 41,
+     "y": 584,
+     "w": 471,
+     "h": 655
+    },
+    {
+     "file": "eve69-3.jpg",
+     "x": 539,
+     "y": 41,
+     "w": 700,
+     "h": 1198
+    }
+   ],
+   "flags": []
+  },
+  "eve7.jpeg": {
+   "W": 1024,
+   "H": 768,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve70.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve70-1.jpg",
+     "x": 15,
+     "y": 15,
+     "w": 1250,
+     "h": 473
+    },
+    {
+     "file": "eve70-2.jpg",
+     "x": 15,
+     "y": 513,
+     "w": 1250,
+     "h": 412
+    },
+    {
+     "file": "eve70-3.jpg",
+     "x": 15,
+     "y": 950,
+     "w": 1250,
+     "h": 315
+    }
+   ],
+   "flags": []
+  },
+  "eve71.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve71-1.jpg",
+     "x": 15,
+     "y": 15,
+     "w": 1250,
+     "h": 668
+    },
+    {
+     "file": "eve71-2.jpg",
+     "x": 15,
+     "y": 708,
+     "w": 673,
+     "h": 557
+    },
+    {
+     "file": "eve71-3.jpg",
+     "x": 713,
+     "y": 708,
+     "w": 552,
+     "h": 557
+    }
+   ],
+   "flags": []
+  },
+  "eve72.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve72-1.jpg",
+     "x": 31,
+     "y": 31,
+     "w": 1218,
+     "h": 597
+    },
+    {
+     "file": "eve72-2.jpg",
+     "x": 31,
+     "y": 652,
+     "w": 597,
+     "h": 597
+    },
+    {
+     "file": "eve72-3.jpg",
+     "x": 652,
+     "y": 652,
+     "w": 597,
+     "h": 597
+    }
+   ],
+   "flags": []
+  },
+  "eve73.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve73-1.jpg",
+     "x": 31,
+     "y": 31,
+     "w": 773,
+     "h": 640
+    },
+    {
+     "file": "eve73-2.jpg",
+     "x": 829,
+     "y": 31,
+     "w": 420,
+     "h": 640
+    },
+    {
+     "file": "eve73-3.jpg",
+     "x": 31,
+     "y": 696,
+     "w": 773,
+     "h": 553
+    },
+    {
+     "file": "eve73-4.jpg",
+     "x": 829,
+     "y": 696,
+     "w": 420,
+     "h": 553
+    }
+   ],
+   "flags": []
+  },
+  "eve74.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve74-1.jpg",
+     "x": 41,
+     "y": 41,
+     "w": 1198,
+     "h": 445
+    },
+    {
+     "file": "eve74-2.jpg",
+     "x": 41,
+     "y": 513,
+     "w": 638,
+     "h": 726
+    },
+    {
+     "file": "eve74-3.jpg",
+     "x": 705,
+     "y": 513,
+     "w": 534,
+     "h": 726
+    }
+   ],
+   "flags": []
+  },
+  "eve75.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve75-1.jpg",
+     "x": 42,
+     "y": 41,
+     "w": 554,
+     "h": 714
+    },
+    {
+     "file": "eve75-2.jpg",
+     "x": 684,
+     "y": 37,
+     "w": 558,
+     "h": 476
+    },
+    {
+     "file": "eve75-3.jpg",
+     "x": 39,
+     "y": 761,
+     "w": 556,
+     "h": 482
+    },
+    {
+     "file": "eve75-4.jpg",
+     "x": 684,
+     "y": 530,
+     "w": 556,
+     "h": 712
+    }
+   ],
+   "flags": []
+  },
+  "eve76.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve76-1.jpg",
+     "x": 41,
+     "y": 41,
+     "w": 566,
+     "h": 1198
+    },
+    {
+     "file": "eve76-2.jpg",
+     "x": 634,
+     "y": 41,
+     "w": 605,
+     "h": 619
+    },
+    {
+     "file": "eve76-3.jpg",
+     "x": 634,
+     "y": 687,
+     "w": 605,
+     "h": 552
+    }
+   ],
+   "flags": []
+  },
+  "eve77.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve77-1.jpg",
+     "x": 23,
+     "y": 24,
+     "w": 454,
+     "h": 1233
+    },
+    {
+     "file": "eve77-2.jpg",
+     "x": 490,
+     "y": 23,
+     "w": 767,
+     "h": 345
+    },
+    {
+     "file": "eve77-3.jpg",
+     "x": 490,
+     "y": 380,
+     "w": 767,
+     "h": 561
+    },
+    {
+     "file": "eve77-4.jpg",
+     "x": 490,
+     "y": 953,
+     "w": 766,
+     "h": 304
+    }
+   ],
+   "flags": []
+  },
+  "eve78.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "whole",
+   "by": "review 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve79.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve79-1.jpg",
+     "x": 26,
+     "y": 26,
+     "w": 1228,
+     "h": 601
+    },
+    {
+     "file": "eve79-2.jpg",
+     "x": 26,
+     "y": 653,
+     "w": 1228,
+     "h": 601
+    }
+   ],
+   "flags": []
+  },
+  "eve8.jpeg": {
+   "W": 737,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve80.jpeg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve81.jpeg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve81-1.jpg",
+     "x": 11,
+     "y": 10,
+     "w": 778,
+     "h": 417
+    },
+    {
+     "file": "eve81-2.jpg",
+     "x": 12,
+     "y": 433,
+     "w": 351,
+     "h": 358
+    },
+    {
+     "file": "eve81-3.jpg",
+     "x": 371,
+     "y": 432,
+     "w": 418,
+     "h": 359
+    }
+   ],
+   "flags": []
+  },
+  "eve82.jpeg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve82-1.jpg",
+     "x": 23,
+     "y": 25,
+     "w": 753,
+     "h": 494
+    },
+    {
+     "file": "eve82-2.jpg",
+     "x": 24,
+     "y": 531,
+     "w": 215,
+     "h": 250
+    },
+    {
+     "file": "eve82-3.jpg",
+     "x": 249,
+     "y": 532,
+     "w": 315,
+     "h": 242
+    },
+    {
+     "file": "eve82-4.jpg",
+     "x": 574,
+     "y": 527,
+     "w": 201,
+     "h": 252
+    }
+   ],
+   "flags": []
+  },
+  "eve83.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve83-1.jpg",
+     "x": 0,
+     "y": 0,
+     "w": 1280,
+     "h": 645
+    },
+    {
+     "file": "eve83-2.jpg",
+     "x": 0,
+     "y": 645,
+     "w": 941,
+     "h": 635
+    },
+    {
+     "file": "eve83-3.jpg",
+     "x": 941,
+     "y": 645,
+     "w": 339,
+     "h": 635
+    }
+   ],
+   "flags": []
+  },
+  "eve84.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve84-1.jpg",
+     "x": 40,
+     "y": 40,
+     "w": 884,
+     "h": 516
+    },
+    {
+     "file": "eve84-2.jpg",
+     "x": 936,
+     "y": 40,
+     "w": 304,
+     "h": 516
+    },
+    {
+     "file": "eve84-3.jpg",
+     "x": 40,
+     "y": 583,
+     "w": 283,
+     "h": 657
+    },
+    {
+     "file": "eve84-4.jpg",
+     "x": 350,
+     "y": 583,
+     "w": 890,
+     "h": 657
+    }
+   ],
+   "flags": []
+  },
+  "eve85.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve85-1.jpg",
+     "x": 80,
+     "y": 80,
+     "w": 1055,
+     "h": 540
+    },
+    {
+     "file": "eve85-2.jpg",
+     "x": 80,
+     "y": 659,
+     "w": 541,
+     "h": 541
+    },
+    {
+     "file": "eve85-3.jpg",
+     "x": 659,
+     "y": 659,
+     "w": 541,
+     "h": 541
+    }
+   ],
+   "flags": []
+  },
+  "eve86.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "whole",
+   "by": "review 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve87.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve87-1.jpg",
+     "x": 26,
+     "y": 26,
+     "w": 823,
+     "h": 716
+    },
+    {
+     "file": "eve87-2.jpg",
+     "x": 867,
+     "y": 26,
+     "w": 387,
+     "h": 716
+    },
+    {
+     "file": "eve87-3.jpg",
+     "x": 26,
+     "y": 759,
+     "w": 503,
+     "h": 495
+    },
+    {
+     "file": "eve87-4.jpg",
+     "x": 546,
+     "y": 759,
+     "w": 708,
+     "h": 495
+    }
+   ],
+   "flags": []
+  },
+  "eve88.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve88-1.jpg",
+     "x": 40,
+     "y": 40,
+     "w": 587,
+     "h": 703
+    },
+    {
+     "file": "eve88-2.jpg",
+     "x": 653,
+     "y": 40,
+     "w": 587,
+     "h": 703
+    },
+    {
+     "file": "eve88-3.jpg",
+     "x": 40,
+     "y": 770,
+     "w": 587,
+     "h": 470
+    },
+    {
+     "file": "eve88-4.jpg",
+     "x": 653,
+     "y": 770,
+     "w": 587,
+     "h": 470
+    }
+   ],
+   "flags": []
+  },
+  "eve89.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve9.jpeg": {
+   "W": 768,
+   "H": 1024,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve90.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "review 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve90-1.jpg",
+     "x": 563,
+     "y": 9,
+     "w": 705,
+     "h": 851
+    },
+    {
+     "file": "eve90-2.jpg",
+     "x": 16,
+     "y": 16,
+     "w": 532,
+     "h": 407
+    },
+    {
+     "file": "eve90-3.jpg",
+     "x": 18,
+     "y": 440,
+     "w": 529,
+     "h": 418
+    },
+    {
+     "file": "eve90-4.jpg",
+     "x": 18,
+     "y": 867,
+     "w": 527,
+     "h": 398
+    },
+    {
+     "file": "eve90-5.jpg",
+     "x": 569,
+     "y": 870,
+     "w": 692,
+     "h": 394
+    }
+   ],
+   "flags": []
+  },
+  "eve91.jpg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve91-1.jpg",
+     "x": 10,
+     "y": 10,
+     "w": 540,
+     "h": 557
+    },
+    {
+     "file": "eve91-2.jpg",
+     "x": 11,
+     "y": 590,
+     "w": 321,
+     "h": 200
+    },
+    {
+     "file": "eve91-3.jpg",
+     "x": 335,
+     "y": 577,
+     "w": 215,
+     "h": 213
+    },
+    {
+     "file": "eve91-4.jpg",
+     "x": 560,
+     "y": 10,
+     "w": 229,
+     "h": 780
+    }
+   ],
+   "flags": []
+  },
+  "eve92.jpg": {
+   "W": 624,
+   "H": 244,
+   "method": "whole",
+   "by": "review 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve93.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve93-1.jpg",
+     "x": 25,
+     "y": 25,
+     "w": 1230,
+     "h": 605
+    },
+    {
+     "file": "eve93-2.jpg",
+     "x": 25,
+     "y": 650,
+     "w": 1230,
+     "h": 605
+    }
+   ],
+   "flags": []
+  },
+  "eve94.jpg": {
+   "W": 1280,
+   "H": 720,
+   "method": "whole",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [],
+   "flags": []
+  },
+  "eve95.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve95-1.jpg",
+     "x": 40,
+     "y": 40,
+     "w": 549,
+     "h": 587
+    },
+    {
+     "file": "eve95-2.jpg",
+     "x": 616,
+     "y": 40,
+     "w": 624,
+     "h": 587
+    },
+    {
+     "file": "eve95-3.jpg",
+     "x": 40,
+     "y": 654,
+     "w": 1200,
+     "h": 586
+    }
+   ],
+   "flags": []
+  },
+  "eve96.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve96-1.jpg",
+     "x": 24,
+     "y": 25,
+     "w": 562,
+     "h": 466
+    },
+    {
+     "file": "eve96-2.jpg",
+     "x": 606,
+     "y": 24,
+     "w": 650,
+     "h": 467
+    },
+    {
+     "file": "eve96-3.jpg",
+     "x": 24,
+     "y": 512,
+     "w": 1232,
+     "h": 743
+    }
+   ],
+   "flags": []
+  },
+  "eve97.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve97-1.jpg",
+     "x": 19,
+     "y": 19,
+     "w": 1242,
+     "h": 437
+    },
+    {
+     "file": "eve97-2.jpg",
+     "x": 19,
+     "y": 471,
+     "w": 1242,
+     "h": 790
+    }
+   ],
+   "flags": []
+  },
+  "eve98.jpg": {
+   "W": 1280,
+   "H": 1280,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve98-1.jpg",
+     "x": 18,
+     "y": 18,
+     "w": 465,
+     "h": 346
+    },
+    {
+     "file": "eve98-2.jpg",
+     "x": 18,
+     "y": 379,
+     "w": 465,
+     "h": 395
+    },
+    {
+     "file": "eve98-3.jpg",
+     "x": 18,
+     "y": 789,
+     "w": 465,
+     "h": 473
+    },
+    {
+     "file": "eve98-4.jpg",
+     "x": 499,
+     "y": 18,
+     "w": 763,
+     "h": 1244
+    }
+   ],
+   "flags": []
+  },
+  "eve99.jpg": {
+   "W": 800,
+   "H": 800,
+   "method": "manual",
+   "by": "confirmed 2026-10-23b",
+   "pieces": [
+    {
+     "file": "eve99-1.jpg",
+     "x": 13,
+     "y": 35,
+     "w": 773,
+     "h": 336
+    },
+    {
+     "file": "eve99-2.jpg",
+     "x": 13,
+     "y": 392,
+     "w": 773,
+     "h": 395
+    }
+   ],
+   "flags": []
+  }
+ }
+}
